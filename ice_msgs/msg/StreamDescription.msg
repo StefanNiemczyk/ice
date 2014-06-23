@@ -1,0 +1,2 @@
+Identifier informationIdentifier
+bool shared

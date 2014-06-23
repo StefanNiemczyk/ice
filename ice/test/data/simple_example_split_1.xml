@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<ice>
+	<!-- Description of Information, perheps in an extra file -->
+	<Informations>
+		<!-- Description of the information: Position of a robot on the field -->
+		<!-- Each Information is identified by a UUID -->
+		<Information uuid="39f9b426-741c-4b89-8698-98ec2505db01">
+			<Topic>Position</Topic> <!-- The Topic of the Information used for communication: \Position -->
+			<Type>Position</Type> <!-- Data type of the information -->
+			<_desc>Position of a Robot on the field</_desc> <!-- Description, not required for processing -->
+
+			<!-- Description of nested information: Raw Position -->
+			<Information uuid="39f9b426-741c-4b89-8698-98ec2505db02">
+				<Topic>raw</Topic> <!-- The Topic of the Information used for communication \Position\raw -->
+				<Type>Position</Type> <!-- Data type of the information -->
+				<_desc>Raw position of a Robot on the field</_desc> <!-- Description, not required for processing -->
+			</Information>
+		</Information>
+
+		<Information uuid="39f9b426-741c-4b89-8698-98ec2505db03">
+			<Topic>Obstacle</Topic>
+			<Type>List[Position]</Type>
+			<_desc>Position of obstacles</_desc>
+			
+			<Information uuid="39f9b426-741c-4b89-8698-98ec2505db04">
+				<Topic>fused</Topic> 
+				<Type>List[Position]</Type> 
+				<_desc>Raw position of an obstacle on the field</_desc>
+			</Information>
+		</Information>
+	</Informations>
+</ice>

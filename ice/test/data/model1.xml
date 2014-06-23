@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<ice>
+
+	<Nodes>
+
+		<Node name="PositionRaw2Corrected" type="processing">
+			<ClassName>smothing</ClassName>								
+
+			<Inputs>
+				<Stream name="/Position/raw|own" trigger="true"/> 
+			</Inputs>
+			<Outputs>
+				<Stream name="/Position/corrected|own"/>
+			</Outputs>
+			<_desc>Processing node, creates the corrected position based on the raw position</_desc>
+		</Node>
+
+		<Node name="ObstacleClustering" type="processing">
+			<ClassName>ObstacleFusing</ClassName>
+			<Configurations>
+				<Config name="history">5</Config>
+				<Config name="clustering">true</Config>
+			</Configurations>
+
+			<Inputs>
+				<Stream name="/Obstacle|own" trigger="true"/> 
+				<StreamTemplate name="/Obstacle|?provider"/>	
+			</Inputs>
+			<Outputs> 
+				<Stream name="/Obstacle/fused|own"/>
+			</Outputs>
+		</Node>
+
+		<Node name="ObstacleTracking" type="processing">
+			<ClassName>ObstacleTracking</ClassName>
+			<Configurations>
+				<Config name="history">5</Config>
+				<Config name="clustering">true</Config>
+			</Configurations>
+
+			<Inputs>
+				<Stream name="/Obstacle/fused|own" trigger="true"/> 
+				<Stream name="/Obstacle/tracked|own"/>
+			</Inputs>
+			<Outputs> 
+				<Stream name="/Obstacle/corrected|own"/>
+				<Stream name="/Obstacle/tracked|own"/>
+			</Outputs>
+		</Node>
+		
+	</Nodes>
+
+</ice>

@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<ice>
+
+	<Informations>
+	
+		<Information uuid="39f9b426-741c-4b89-8698-98ec25000011">
+			<Topic>Position</Topic>
+			<Type>Position</Type>
+			<_desc>Position of a Robot on the field</_desc>
+
+			<Information uuid="39f9b426-741c-4b89-8698-98ec25000012">
+				<Topic>raw</Topic>
+				<Type>Position</Type>
+				<_desc>Raw position of a Robot on the field</_desc> 
+			</Information>
+
+			<Information uuid="39f9b426-741c-4b89-8698-98ec25000013">
+				<Topic>corrected</Topic>
+				<Type>Position</Type>
+				<_desc>Raw position of a Robot on the field</_desc> 
+			</Information>
+		</Information>
+
+		<Information uuid="39f9b426-741c-4b89-8698-98ec25000021">
+			<Topic>Obstacle</Topic>
+			<Type>List[Position]</Type>
+			<_desc>Position of obstacles</_desc>
+			
+			<Information uuid="39f9b426-741c-4b89-8698-98ec25000022">
+				<Topic>fused</Topic> 
+				<Type>List[Position]</Type> 
+				<_desc>Raw position of an obstacle on the field</_desc>
+			</Information>
+			
+			<Information uuid="39f9b426-741c-4b89-8698-98ec25000023">
+				<Topic>tracked</Topic> 
+				<Type>List[Position]</Type> 
+				<_desc>traced position of an obstacle on the field</_desc>
+			</Information>
+					
+			<Information uuid="39f9b426-741c-4b89-8698-98ec25000024">
+				<Topic>corrected</Topic> 
+				<Type>List[Position]</Type> 
+				<_desc>Corrected position of an obstacle on the field</_desc>
+			</Information>
+		</Information>
+	</Informations>
+</ice>
