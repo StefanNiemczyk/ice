@@ -12,6 +12,7 @@
 
 #include "ice/Identifier.h"
 
+// Forward declarations
 namespace ice
 {
 class BaseInformationSender;
@@ -19,6 +20,7 @@ class BaseInformationStream;
 class CooperationRequest;
 class CooperationResponse;
 class Coordinator;
+class EventHandler;
 template<typename T>
   class InformationSender;
 template<typename T>
@@ -70,6 +72,7 @@ public:
 
 protected:
   std::weak_ptr<ICEngine> engine; /**< The ice engine */
+  std::shared_ptr<EventHandler> eventHandler; /**< The event handler */
   identifier engineId; /**< identifier of the main engine */
   std::shared_ptr<Coordinator> coordinator; /**< Coordinator which coordinates die communication between engines */
   Logger* _log; /**< Logger for communication */

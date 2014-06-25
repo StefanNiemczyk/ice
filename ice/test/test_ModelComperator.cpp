@@ -17,6 +17,7 @@
 #include "ice/coordination/InformationModel.h"
 #include "ice/coordination/IntersectionInformationModel.h"
 #include "ice/coordination/ModelComperator.h"
+#include "ice/coordination/NodeDescription.h"
 #include "ice/coordination/StreamDescription.h"
 #include "ice/coordination/StreamTemplateDescription.h"
 
@@ -36,11 +37,9 @@ protected:
 
     for (int i = 0; i < 10; ++i)
     {
-      stream[i] = std::make_shared<ice::StreamDescription>();
+      stream[i] = std::make_shared<ice::StreamDescription>(boost::uuids::random_generator()(), true);
       streamTemplate[i] = std::make_shared<ice::StreamTemplateDescription>();
-      stream[i]->setUuid(boost::uuids::random_generator()());
-      stream[i]->setShared(true);
-      streamTemplate[i]->setUuid(stream[i]->getUuid());
+      streamTemplate[i]->setId(stream[i]->getId());
     }
   }
 
@@ -189,9 +188,9 @@ TEST_F(TestModelComperator, find_matchings)
   boost::uuids::uuid* inputTemplateUuids = new boost::uuids::uuid[1];
   boost::uuids::uuid* outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[0]->getUuid();
-  inputTemplateUuids[0] = streamTemplate[0]->getUuid();
-  outputUuids[0] = stream[1]->getUuid();
+  inputUuids[0] = stream[0]->getId();
+  inputTemplateUuids[0] = streamTemplate[0]->getId();
+  outputUuids[0] = stream[1]->getId();
 
   auto node = std::make_shared<ice::NodeDescription>("node1", inputUuids, inputTemplateUuids, outputUuids, 1, 1, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -204,9 +203,9 @@ TEST_F(TestModelComperator, find_matchings)
   boost::uuids::uuid* inputTemplateUuids2 = new boost::uuids::uuid[1];
   boost::uuids::uuid* outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[0]->getUuid();
-  inputTemplateUuids2[0] = streamTemplate[0]->getUuid();
-  outputUuids2[0] = stream[1]->getUuid();
+  inputUuids2[0] = stream[0]->getId();
+  inputTemplateUuids2[0] = streamTemplate[0]->getId();
+  outputUuids2[0] = stream[1]->getId();
 
   auto node2 = std::make_shared<ice::NodeDescription>("node1", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 1, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -219,9 +218,9 @@ TEST_F(TestModelComperator, find_matchings)
   EXPECT_EQ(1, result->size());
   EXPECT_EQ(1, match->getNodeDescriptions()->size());
   EXPECT_EQ(1, match->getInputTemplates()->size());
-  EXPECT_EQ(stream[0]->getUuid(), match->getInputTemplates()->at(0)->getUuid());
+  EXPECT_EQ(stream[0]->getId(), match->getInputTemplates()->at(0)->getId());
   EXPECT_EQ(1, match->getOutputStreams()->size());
-  EXPECT_EQ(stream[1]->getUuid(), match->getOutputStreams()->at(0)->getUuid());
+  EXPECT_EQ(stream[1]->getId(), match->getOutputStreams()->at(0)->getId());
   EXPECT_EQ(3, match->getConnectionMatrix()[0]);
 }
 
@@ -239,9 +238,9 @@ TEST_F(TestModelComperator, find_matchings2)
   boost::uuids::uuid* inputTemplateUuids = new boost::uuids::uuid[1];
   boost::uuids::uuid* outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[0]->getUuid();
-  inputTemplateUuids[0] = streamTemplate[0]->getUuid();
-  outputUuids[0] = stream[1]->getUuid();
+  inputUuids[0] = stream[0]->getId();
+  inputTemplateUuids[0] = streamTemplate[0]->getId();
+  outputUuids[0] = stream[1]->getId();
 
   auto node = std::make_shared<ice::NodeDescription>("node1", inputUuids, inputTemplateUuids, outputUuids, 1, 1, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -250,8 +249,8 @@ TEST_F(TestModelComperator, find_matchings2)
   inputTemplateUuids = new boost::uuids::uuid[0];
   outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[1]->getUuid();
-  outputUuids[0] = stream[2]->getUuid();
+  inputUuids[0] = stream[1]->getId();
+  outputUuids[0] = stream[2]->getId();
 
   node = std::make_shared<ice::NodeDescription>("node2", inputUuids, inputTemplateUuids, outputUuids, 1, 0, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -265,9 +264,9 @@ TEST_F(TestModelComperator, find_matchings2)
   boost::uuids::uuid* inputTemplateUuids2 = new boost::uuids::uuid[1];
   boost::uuids::uuid* outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[0]->getUuid();
-  inputTemplateUuids2[0] = streamTemplate[0]->getUuid();
-  outputUuids2[0] = stream[1]->getUuid();
+  inputUuids2[0] = stream[0]->getId();
+  inputTemplateUuids2[0] = streamTemplate[0]->getId();
+  outputUuids2[0] = stream[1]->getId();
 
   auto node2 = std::make_shared<ice::NodeDescription>("node1", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 1, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -280,9 +279,9 @@ TEST_F(TestModelComperator, find_matchings2)
   EXPECT_EQ(1, result->size());
   EXPECT_EQ(1, match->getNodeDescriptions()->size());
   EXPECT_EQ(1, match->getInputTemplates()->size());
-  EXPECT_EQ(stream[0]->getUuid(), match->getInputTemplates()->at(0)->getUuid());
+  EXPECT_EQ(stream[0]->getId(), match->getInputTemplates()->at(0)->getId());
   EXPECT_EQ(1, match->getOutputStreams()->size());
-  EXPECT_EQ(stream[1]->getUuid(), match->getOutputStreams()->at(0)->getUuid());
+  EXPECT_EQ(stream[1]->getId(), match->getOutputStreams()->at(0)->getId());
   EXPECT_EQ(3, match->getConnectionMatrix()[0]);
 }
 
@@ -300,9 +299,9 @@ TEST_F(TestModelComperator, find_matchings3)
   boost::uuids::uuid* inputTemplateUuids = new boost::uuids::uuid[1];
   boost::uuids::uuid* outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[0]->getUuid();
-  inputTemplateUuids[0] = streamTemplate[0]->getUuid();
-  outputUuids[0] = stream[1]->getUuid();
+  inputUuids[0] = stream[0]->getId();
+  inputTemplateUuids[0] = streamTemplate[0]->getId();
+  outputUuids[0] = stream[1]->getId();
 
   auto node = std::make_shared<ice::NodeDescription>("node1", inputUuids, inputTemplateUuids, outputUuids, 1, 1, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -311,8 +310,8 @@ TEST_F(TestModelComperator, find_matchings3)
   inputTemplateUuids = new boost::uuids::uuid[0];
   outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[1]->getUuid();
-  outputUuids[0] = stream[2]->getUuid();
+  inputUuids[0] = stream[1]->getId();
+  outputUuids[0] = stream[2]->getId();
 
   node = std::make_shared<ice::NodeDescription>("node2", inputUuids, inputTemplateUuids, outputUuids, 1, 0, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -326,9 +325,9 @@ TEST_F(TestModelComperator, find_matchings3)
   boost::uuids::uuid* inputTemplateUuids2 = new boost::uuids::uuid[1];
   boost::uuids::uuid* outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[0]->getUuid();
-  inputTemplateUuids2[0] = streamTemplate[0]->getUuid();
-  outputUuids2[0] = stream[1]->getUuid();
+  inputUuids2[0] = stream[0]->getId();
+  inputTemplateUuids2[0] = streamTemplate[0]->getId();
+  outputUuids2[0] = stream[1]->getId();
 
   auto node2 = std::make_shared<ice::NodeDescription>("node1", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 1, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -337,8 +336,8 @@ TEST_F(TestModelComperator, find_matchings3)
   inputTemplateUuids2 = new boost::uuids::uuid[0];
   outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[1]->getUuid();
-  outputUuids2[0] = stream[2]->getUuid();
+  inputUuids2[0] = stream[1]->getId();
+  outputUuids2[0] = stream[2]->getId();
 
   node2 = std::make_shared<ice::NodeDescription>("node2", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 0, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -351,10 +350,10 @@ TEST_F(TestModelComperator, find_matchings3)
   EXPECT_EQ(1, result->size());
   EXPECT_EQ(2, match->getNodeDescriptions()->size());
   EXPECT_EQ(1, match->getInputTemplates()->size());
-  EXPECT_EQ(stream[0]->getUuid(), match->getInputTemplates()->at(0)->getUuid());
+  EXPECT_EQ(stream[0]->getId(), match->getInputTemplates()->at(0)->getId());
   EXPECT_EQ(2, match->getOutputStreams()->size());
-  EXPECT_EQ(stream[1]->getUuid(), match->getOutputStreams()->at(0)->getUuid());
-  EXPECT_EQ(stream[2]->getUuid(), match->getOutputStreams()->at(1)->getUuid());
+  EXPECT_EQ(stream[1]->getId(), match->getOutputStreams()->at(0)->getId());
+  EXPECT_EQ(stream[2]->getId(), match->getOutputStreams()->at(1)->getId());
   EXPECT_EQ(3, match->getConnectionMatrix()[0]);
   EXPECT_EQ(1, match->getConnectionMatrix()[1]);
   EXPECT_EQ(0, match->getConnectionMatrix()[2]);
@@ -377,9 +376,9 @@ TEST_F(TestModelComperator, find_matchings4)
   boost::uuids::uuid* inputTemplateUuids = new boost::uuids::uuid[1];
   boost::uuids::uuid* outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[0]->getUuid();
-  inputTemplateUuids[0] = streamTemplate[0]->getUuid();
-  outputUuids[0] = stream[1]->getUuid();
+  inputUuids[0] = stream[0]->getId();
+  inputTemplateUuids[0] = streamTemplate[0]->getId();
+  outputUuids[0] = stream[1]->getId();
 
   auto node = std::make_shared<ice::NodeDescription>("node1", inputUuids, inputTemplateUuids, outputUuids, 1, 1, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -388,8 +387,8 @@ TEST_F(TestModelComperator, find_matchings4)
   inputTemplateUuids = new boost::uuids::uuid[0];
   outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[1]->getUuid();
-  outputUuids[0] = stream[2]->getUuid();
+  inputUuids[0] = stream[1]->getId();
+  outputUuids[0] = stream[2]->getId();
 
   node = std::make_shared<ice::NodeDescription>("node2", inputUuids, inputTemplateUuids, outputUuids, 1, 0, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -398,8 +397,8 @@ TEST_F(TestModelComperator, find_matchings4)
   inputTemplateUuids = new boost::uuids::uuid[0];
   outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[3]->getUuid();
-  outputUuids[0] = stream[4]->getUuid();
+  inputUuids[0] = stream[3]->getId();
+  outputUuids[0] = stream[4]->getId();
 
   node = std::make_shared<ice::NodeDescription>("node3", inputUuids, inputTemplateUuids, outputUuids, 1, 0, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -415,9 +414,9 @@ TEST_F(TestModelComperator, find_matchings4)
   boost::uuids::uuid* inputTemplateUuids2 = new boost::uuids::uuid[1];
   boost::uuids::uuid* outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[0]->getUuid();
-  inputTemplateUuids2[0] = streamTemplate[0]->getUuid();
-  outputUuids2[0] = stream[1]->getUuid();
+  inputUuids2[0] = stream[0]->getId();
+  inputTemplateUuids2[0] = streamTemplate[0]->getId();
+  outputUuids2[0] = stream[1]->getId();
 
   auto node2 = std::make_shared<ice::NodeDescription>("node1", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 1, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -426,8 +425,8 @@ TEST_F(TestModelComperator, find_matchings4)
   inputTemplateUuids2 = new boost::uuids::uuid[0];
   outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[1]->getUuid();
-  outputUuids2[0] = stream[2]->getUuid();
+  inputUuids2[0] = stream[1]->getId();
+  outputUuids2[0] = stream[2]->getId();
 
   node2 = std::make_shared<ice::NodeDescription>("node2", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 0, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -436,8 +435,8 @@ TEST_F(TestModelComperator, find_matchings4)
   inputTemplateUuids2 = new boost::uuids::uuid[0];
   outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[3]->getUuid();
-  outputUuids2[0] = stream[4]->getUuid();
+  inputUuids2[0] = stream[3]->getId();
+  outputUuids2[0] = stream[4]->getId();
 
   node2 = std::make_shared<ice::NodeDescription>("node3", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 0, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -450,10 +449,10 @@ TEST_F(TestModelComperator, find_matchings4)
   EXPECT_EQ(1, result->size());
   EXPECT_EQ(2, match->getNodeDescriptions()->size());
   EXPECT_EQ(1, match->getInputTemplates()->size());
-  EXPECT_EQ(stream[0]->getUuid(), match->getInputTemplates()->at(0)->getUuid());
+  EXPECT_EQ(stream[0]->getId(), match->getInputTemplates()->at(0)->getId());
   EXPECT_EQ(2, match->getOutputStreams()->size());
-  EXPECT_EQ(stream[1]->getUuid(), match->getOutputStreams()->at(0)->getUuid());
-  EXPECT_EQ(stream[2]->getUuid(), match->getOutputStreams()->at(1)->getUuid());
+  EXPECT_EQ(stream[1]->getId(), match->getOutputStreams()->at(0)->getId());
+  EXPECT_EQ(stream[2]->getId(), match->getOutputStreams()->at(1)->getId());
   EXPECT_EQ(3, match->getConnectionMatrix()[0]);
   EXPECT_EQ(1, match->getConnectionMatrix()[1]);
   EXPECT_EQ(0, match->getConnectionMatrix()[2]);
@@ -481,9 +480,9 @@ TEST_F(TestModelComperator, find_matchings5)
   boost::uuids::uuid* inputTemplateUuids = new boost::uuids::uuid[1];
   boost::uuids::uuid* outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[0]->getUuid();
-  inputTemplateUuids[0] = streamTemplate[0]->getUuid();
-  outputUuids[0] = stream[1]->getUuid();
+  inputUuids[0] = stream[0]->getId();
+  inputTemplateUuids[0] = streamTemplate[0]->getId();
+  outputUuids[0] = stream[1]->getId();
 
   auto node = std::make_shared<ice::NodeDescription>("node1", inputUuids, inputTemplateUuids, outputUuids, 1, 1, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -492,9 +491,9 @@ TEST_F(TestModelComperator, find_matchings5)
   inputTemplateUuids = new boost::uuids::uuid[0];
   outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[1]->getUuid();
-  inputUuids[1] = stream[5]->getUuid();
-  outputUuids[0] = stream[2]->getUuid();
+  inputUuids[0] = stream[1]->getId();
+  inputUuids[1] = stream[5]->getId();
+  outputUuids[0] = stream[2]->getId();
 
   node = std::make_shared<ice::NodeDescription>("node2", inputUuids, inputTemplateUuids, outputUuids, 1, 0, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -503,8 +502,8 @@ TEST_F(TestModelComperator, find_matchings5)
   inputTemplateUuids = new boost::uuids::uuid[0];
   outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[2]->getUuid();
-  outputUuids[0] = stream[3]->getUuid();
+  inputUuids[0] = stream[2]->getId();
+  outputUuids[0] = stream[3]->getId();
 
   node = std::make_shared<ice::NodeDescription>("node3", inputUuids, inputTemplateUuids, outputUuids, 1, 0, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -513,8 +512,8 @@ TEST_F(TestModelComperator, find_matchings5)
   inputTemplateUuids = new boost::uuids::uuid[0];
   outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[4]->getUuid();
-  outputUuids[0] = stream[5]->getUuid();
+  inputUuids[0] = stream[4]->getId();
+  outputUuids[0] = stream[5]->getId();
 
   node = std::make_shared<ice::NodeDescription>("node4", inputUuids, inputTemplateUuids, outputUuids, 1, 0, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -523,9 +522,9 @@ TEST_F(TestModelComperator, find_matchings5)
   inputTemplateUuids = new boost::uuids::uuid[1];
   outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[6]->getUuid();
-  inputTemplateUuids[0] = streamTemplate[6]->getUuid();
-  outputUuids[0] = stream[7]->getUuid();
+  inputUuids[0] = stream[6]->getId();
+  inputTemplateUuids[0] = streamTemplate[6]->getId();
+  outputUuids[0] = stream[7]->getId();
 
   node = std::make_shared<ice::NodeDescription>("node5", inputUuids, inputTemplateUuids, outputUuids, 1, 1, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -534,8 +533,8 @@ TEST_F(TestModelComperator, find_matchings5)
   inputTemplateUuids = new boost::uuids::uuid[0];
   outputUuids = new boost::uuids::uuid[1];
 
-  inputUuids[0] = stream[7]->getUuid();
-  outputUuids[0] = stream[8]->getUuid();
+  inputUuids[0] = stream[7]->getId();
+  outputUuids[0] = stream[8]->getId();
 
   node = std::make_shared<ice::NodeDescription>("node6", inputUuids, inputTemplateUuids, outputUuids, 1, 0, 1);
   model1->getNodeDescriptions()->push_back(node);
@@ -556,9 +555,9 @@ TEST_F(TestModelComperator, find_matchings5)
   boost::uuids::uuid* inputTemplateUuids2 = new boost::uuids::uuid[1];
   boost::uuids::uuid* outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[0]->getUuid();
-  inputTemplateUuids2[0] = streamTemplate[0]->getUuid();
-  outputUuids2[0] = stream[1]->getUuid();
+  inputUuids2[0] = stream[0]->getId();
+  inputTemplateUuids2[0] = streamTemplate[0]->getId();
+  outputUuids2[0] = stream[1]->getId();
 
   auto node2 = std::make_shared<ice::NodeDescription>("node1", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 1, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -567,9 +566,9 @@ TEST_F(TestModelComperator, find_matchings5)
   inputTemplateUuids2 = new boost::uuids::uuid[0];
   outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[1]->getUuid();
-  inputUuids2[1] = stream[5]->getUuid();
-  outputUuids2[0] = stream[2]->getUuid();
+  inputUuids2[0] = stream[1]->getId();
+  inputUuids2[1] = stream[5]->getId();
+  outputUuids2[0] = stream[2]->getId();
 
   node2 = std::make_shared<ice::NodeDescription>("node2", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 0, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -578,8 +577,8 @@ TEST_F(TestModelComperator, find_matchings5)
   inputTemplateUuids2 = new boost::uuids::uuid[0];
   outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[2]->getUuid();
-  outputUuids2[0] = stream[3]->getUuid();
+  inputUuids2[0] = stream[2]->getId();
+  outputUuids2[0] = stream[3]->getId();
 
   node2 = std::make_shared<ice::NodeDescription>("node3", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 0, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -588,8 +587,8 @@ TEST_F(TestModelComperator, find_matchings5)
   inputTemplateUuids2 = new boost::uuids::uuid[0];
   outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[4]->getUuid();
-  outputUuids2[0] = stream[5]->getUuid();
+  inputUuids2[0] = stream[4]->getId();
+  outputUuids2[0] = stream[5]->getId();
 
   node2 = std::make_shared<ice::NodeDescription>("node4", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 0, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -598,9 +597,9 @@ TEST_F(TestModelComperator, find_matchings5)
   inputTemplateUuids2 = new boost::uuids::uuid[1];
   outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[6]->getUuid();
-  inputTemplateUuids2[0] = streamTemplate[6]->getUuid();
-  outputUuids2[0] = stream[7]->getUuid();
+  inputUuids2[0] = stream[6]->getId();
+  inputTemplateUuids2[0] = streamTemplate[6]->getId();
+  outputUuids2[0] = stream[7]->getId();
 
   node2 = std::make_shared<ice::NodeDescription>("node5", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 1, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -609,8 +608,8 @@ TEST_F(TestModelComperator, find_matchings5)
   inputTemplateUuids2 = new boost::uuids::uuid[0];
   outputUuids2 = new boost::uuids::uuid[1];
 
-  inputUuids2[0] = stream[7]->getUuid();
-  outputUuids2[0] = stream[8]->getUuid();
+  inputUuids2[0] = stream[7]->getId();
+  outputUuids2[0] = stream[8]->getId();
 
   node2 = std::make_shared<ice::NodeDescription>("node6", inputUuids2, inputTemplateUuids2, outputUuids2, 1, 0, 1);
   model2->getNodeDescriptions()->push_back(node2);
@@ -624,11 +623,11 @@ TEST_F(TestModelComperator, find_matchings5)
   auto match = (*result)[0];
   EXPECT_EQ(3, match->getNodeDescriptions()->size());
   EXPECT_EQ(1, match->getInputTemplates()->size());
-  EXPECT_EQ(stream[0]->getUuid(), match->getInputTemplates()->at(0)->getUuid());
+  EXPECT_EQ(stream[0]->getId(), match->getInputTemplates()->at(0)->getId());
   EXPECT_EQ(3, match->getOutputStreams()->size());
-  EXPECT_EQ(stream[1]->getUuid(), match->getOutputStreams()->at(0)->getUuid());
-  EXPECT_EQ(stream[2]->getUuid(), match->getOutputStreams()->at(1)->getUuid());
-  EXPECT_EQ(stream[3]->getUuid(), match->getOutputStreams()->at(2)->getUuid());
+  EXPECT_EQ(stream[1]->getId(), match->getOutputStreams()->at(0)->getId());
+  EXPECT_EQ(stream[2]->getId(), match->getOutputStreams()->at(1)->getId());
+  EXPECT_EQ(stream[3]->getId(), match->getOutputStreams()->at(2)->getId());
   EXPECT_EQ(3, match->getConnectionMatrix()[0]);
   EXPECT_EQ(1, match->getConnectionMatrix()[1]);
   EXPECT_EQ(0, match->getConnectionMatrix()[2]);
@@ -642,10 +641,10 @@ TEST_F(TestModelComperator, find_matchings5)
   match = (*result)[1];
   EXPECT_EQ(2, match->getNodeDescriptions()->size());
   EXPECT_EQ(1, match->getInputTemplates()->size());
-  EXPECT_EQ(stream[6]->getUuid(), match->getInputTemplates()->at(0)->getUuid());
+  EXPECT_EQ(stream[6]->getId(), match->getInputTemplates()->at(0)->getId());
   EXPECT_EQ(2, match->getOutputStreams()->size());
-  EXPECT_EQ(stream[7]->getUuid(), match->getOutputStreams()->at(0)->getUuid());
-  EXPECT_EQ(stream[8]->getUuid(), match->getOutputStreams()->at(1)->getUuid());
+  EXPECT_EQ(stream[7]->getId(), match->getOutputStreams()->at(0)->getId());
+  EXPECT_EQ(stream[8]->getId(), match->getOutputStreams()->at(1)->getId());
   EXPECT_EQ(3, match->getConnectionMatrix()[0]);
   EXPECT_EQ(1, match->getConnectionMatrix()[1]);
   EXPECT_EQ(0, match->getConnectionMatrix()[2]);

@@ -10,19 +10,19 @@
 namespace ice
 {
 
-NodeDescription::NodeDescription(const std::string className, const boost::uuids::uuid* inputUuids,
-                                 const boost::uuids::uuid* inputTemplateUuids, const boost::uuids::uuid* outputUuids,
-                                 const int inputUuidsSize, const int inputTemplateUuidsSize, const int outputUuidsSize) :
-    className(className), inputUuids(inputUuids), inputTemplateUuids(inputTemplateUuids), outputUuids(outputUuids), inputUuidsSize(
-        inputUuidsSize), inputTemplateUuidsSize(inputTemplateUuidsSize), outputUuidsSize(outputUuidsSize)
+NodeDescription::NodeDescription(const std::string className, const identifier* inputIds,
+                                 const identifier* inputTemplateIds, const identifier* outputIds,
+                                 const int inputIdsSize, const int inputTemplateIdsSize, const int outputIdsSize) :
+    className(className), inputIds(inputIds), inputTemplateIds(inputTemplateIds), outputIds(outputIds), inputIdsSize(
+        inputIdsSize), inputTemplateIdsSize(inputTemplateIdsSize), outputIdsSize(outputIdsSize)
 {
 }
 
 NodeDescription::~NodeDescription()
 {
-  delete this->inputUuids;
-  delete this->inputTemplateUuids;
-  delete this->outputUuids;
+  delete this->inputIds;
+  delete this->inputTemplateIds;
+  delete this->outputIds;
 }
 
 const std::string& NodeDescription::getClassName() const
@@ -30,37 +30,37 @@ const std::string& NodeDescription::getClassName() const
   return this->className;
 }
 
-const boost::uuids::uuid* NodeDescription::getInputUuids(int* count) const
+const identifier* NodeDescription::getInputUuids(int* count) const
 {
-  *count = this->inputUuidsSize;
-  return this->inputUuids;
+  *count = this->inputIdsSize;
+  return this->inputIds;
 }
 
-const boost::uuids::uuid* NodeDescription::getInputTemplateUuids(int* count) const
+const identifier* NodeDescription::getInputTemplateIds(int* count) const
 {
-  *count = this->inputTemplateUuidsSize;
-  return this->inputTemplateUuids;
+  *count = this->inputTemplateIdsSize;
+  return this->inputTemplateIds;
 }
 
-const boost::uuids::uuid* NodeDescription::getOutputUuids(int* count) const
+const identifier* NodeDescription::getOutputIds(int* count) const
 {
-  *count = this->outputUuidsSize;
-  return this->outputUuids;
+  *count = this->outputIdsSize;
+  return this->outputIds;
 }
 
-const int NodeDescription::getInputUuidsSize() const
+const int NodeDescription::getInputIdsSize() const
 {
-  return this->inputUuidsSize;
+  return this->inputIdsSize;
 }
 
-const int NodeDescription::getInputTemplateUuidsSize() const
+const int NodeDescription::getInputTemplateIdsSize() const
 {
-  return this->inputTemplateUuidsSize;
+  return this->inputTemplateIdsSize;
 }
 
-const int NodeDescription::getOutputUuidsSize() const
+const int NodeDescription::getOutputIdsSize() const
 {
-  return this->outputUuidsSize;
+  return this->outputIdsSize;
 }
 
 const bool NodeDescription::equals(NodeDescription const* rhs) const
@@ -71,18 +71,18 @@ const bool NodeDescription::equals(NodeDescription const* rhs) const
 
   // Check input streams
   int inputSize = 0;
-  const boost::uuids::uuid* inputs = rhs->getInputUuids(&inputSize);
+  const identifier* inputs = rhs->getInputUuids(&inputSize);
 
-  if (this->inputUuidsSize != inputSize)
+  if (this->inputIdsSize != inputSize)
     return false;
 
   int foundInputs = 0;
 
-  for (int i = 0; i < this->inputUuidsSize; ++i)
+  for (int i = 0; i < this->inputIdsSize; ++i)
   {
     for (int j = 0; j < inputSize; ++j)
     {
-      if (this->inputUuids[i] == inputs[j])
+      if (this->inputIds[i] == inputs[j])
       {
         ++foundInputs;
         break;
@@ -90,23 +90,23 @@ const bool NodeDescription::equals(NodeDescription const* rhs) const
     }
   }
 
-  if (this->inputUuidsSize != foundInputs)
+  if (this->inputIdsSize != foundInputs)
     return false;
 
   // Check input stream templates
   int inputTemplateSize = 0;
-  const boost::uuids::uuid* inputTemplates = rhs->getInputTemplateUuids(&inputTemplateSize);
+  const identifier* inputTemplates = rhs->getInputTemplateIds(&inputTemplateSize);
 
-  if (this->inputTemplateUuidsSize != inputTemplateSize)
+  if (this->inputTemplateIdsSize != inputTemplateSize)
     return false;
 
   int foundTemplateInputs = 0;
 
-  for (int i = 0; i < this->inputTemplateUuidsSize; ++i)
+  for (int i = 0; i < this->inputTemplateIdsSize; ++i)
   {
     for (int j = 0; j < inputTemplateSize; ++j)
     {
-      if (this->inputTemplateUuids[i] == inputTemplates[j])
+      if (this->inputTemplateIds[i] == inputTemplates[j])
       {
         ++foundTemplateInputs;
         break;
@@ -114,23 +114,23 @@ const bool NodeDescription::equals(NodeDescription const* rhs) const
     }
   }
 
-  if (this->inputTemplateUuidsSize != foundTemplateInputs)
+  if (this->inputTemplateIdsSize != foundTemplateInputs)
     return false;
 
   // Check output streams
   int outputSize = 0;
-  const boost::uuids::uuid* outputs = rhs->getOutputUuids(&outputSize);
+  const identifier* outputs = rhs->getOutputIds(&outputSize);
 
-  if (this->outputUuidsSize != outputSize)
+  if (this->outputIdsSize != outputSize)
     return false;
 
   int foundOutputs = 0;
 
-  for (int i = 0; i < this->outputUuidsSize; ++i)
+  for (int i = 0; i < this->outputIdsSize; ++i)
   {
     for (int j = 0; j < outputSize; ++j)
     {
-      if (this->outputUuids[i] == outputs[j])
+      if (this->outputIds[i] == outputs[j])
       {
         ++foundOutputs;
         break;
@@ -138,39 +138,39 @@ const bool NodeDescription::equals(NodeDescription const* rhs) const
     }
   }
 
-  if (this->outputUuidsSize != foundOutputs)
+  if (this->outputIdsSize != foundOutputs)
     return false;
 
   return true;
 }
 
-const bool NodeDescription::existsInInputUuids(const boost::uuids::uuid& toCheck) const
+const bool NodeDescription::existsInInputIds(const identifier& toCheck) const
 {
-  for (int i=0; i < this->inputUuidsSize; ++i)
+  for (int i=0; i < this->inputIdsSize; ++i)
   {
-    if (this->inputUuids[i] == toCheck)
+    if (this->inputIds[i] == toCheck)
       return true;
   }
 
   return false;
 }
 
-const bool NodeDescription::existsInInputTemplateUuids(const boost::uuids::uuid& toCheck) const
+const bool NodeDescription::existsInInputTemplateIds(const identifier& toCheck) const
 {
-  for (int i=0; i < this->inputTemplateUuidsSize; ++i)
+  for (int i=0; i < this->inputTemplateIdsSize; ++i)
   {
-    if (this->inputTemplateUuids[i] == toCheck)
+    if (this->inputTemplateIds[i] == toCheck)
       return true;
   }
 
   return false;
 }
 
-const bool NodeDescription::existsInOutputUuids(const boost::uuids::uuid& toCheck) const
+const bool NodeDescription::existsInOutputIds(const identifier& toCheck) const
 {
-  for (int i=0; i < this->outputUuidsSize; ++i)
+  for (int i=0; i < this->outputIdsSize; ++i)
   {
-    if (this->outputUuids[i] == toCheck)
+    if (this->outputIds[i] == toCheck)
       return true;
   }
 

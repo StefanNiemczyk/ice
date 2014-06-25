@@ -8,13 +8,25 @@
 #ifndef INTERSECTIONINFORMATIONMODEL_H_
 #define INTERSECTIONINFORMATIONMODEL_H_
 
+#include <memory>
+#include <vector>
+
 #include "ice/coordination/InformationModel.h"
-#include "ice/coordination/StreamDescription.h"
-#include "ice/coordination/StreamTemplateDescription.h"
+
+// Forward declaration
+namespace ice
+{
+class StreamDescription;
+class StreamTemplateDescription;
+} /* namespace ice */
 
 namespace ice
 {
 
+//* IntersectionInformationModel
+/**
+ * This class represents a intersection of two information models.
+ */
 class IntersectionInformationModel : public InformationModel
 {
 public:
@@ -63,16 +75,39 @@ public:
   const std::vector<std::shared_ptr<StreamDescription>>* getOutputStreams() const;
 
   /*!
-   * \brief
-   * @param input
-   * @return
+   * \brief Adds an input stream. Returns true if the streams was added, else false.
+   *
+   * Adds an input stream. Returns true if the streams was added, else false.
+   *
+   * @param input The input stream.
    */
   const bool addToInput(std::shared_ptr<StreamTemplateDescription> input);
 
+  /*!
+   * \brief Removes an input stream. Returns true if the streams was removed, else false.
+   *
+   * Removes an input stream. Returns true if the streams was removed, else false.
+   *
+   * @param input The input stream.
+   */
   const bool removeFromInput(std::shared_ptr<StreamTemplateDescription> input);
 
+  /*!
+   * \brief Adds an output stream. Returns true if the streams was added, else false.
+   *
+   * Adds an output stream. Returns true if the streams was added, else false.
+   *
+   * @param output The output stream.
+   */
   const bool addToOutput(std::shared_ptr<StreamDescription> output);
 
+  /*!
+   * \brief Removes an output stream. Returns true if the streams was removed, else false.
+   *
+   * Removes an output stream. Returns true if the streams was removed, else false.
+   *
+   * @param output The output stream.
+   */
   const bool removeFromOutput(std::shared_ptr<StreamDescription> output);
 
 protected:

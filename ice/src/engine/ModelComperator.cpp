@@ -7,7 +7,13 @@
 
 #define DEBUG_NO
 
-#include <ice/coordination/ModelComperator.h>
+#include "ice/coordination/ModelComperator.h"
+
+#include "ice/coordination/InformationModel.h"
+#include "ice/coordination/IntersectionInformationModel.h"
+#include "ice/coordination/NodeDescription.h"
+#include "ice/coordination/StreamDescription.h"
+#include "ice/coordination/StreamTemplateDescription.h"
 
 namespace ice
 {
@@ -81,7 +87,7 @@ std::shared_ptr<std::vector<std::shared_ptr<IntersectionInformationModel>>>Model
       {
         for (auto stream : sharedStreams)
         {
-          if (inputs[i] == stream->getUuid())
+          if (inputs[i] == stream->getId())
           {
             ++foundEquals;
             break;
@@ -97,14 +103,14 @@ std::shared_ptr<std::vector<std::shared_ptr<IntersectionInformationModel>>>Model
       // check input templates
       int inputCount = count;
       count = 0;
-      const boost::uuids::uuid* templates = u2->getInputTemplateUuids(&count);
+      const boost::uuids::uuid* templates = u2->getInputTemplateIds(&count);
       foundEquals = 0;
 
       for (int i = 0; i < count; ++i)
       {
         for (auto streamTemplate : sharedStreamTemplates)
         {
-          if (templates[i] == streamTemplate->getUuid())
+          if (templates[i] == streamTemplate->getId())
           {
             ++foundEquals;
             break;
@@ -119,14 +125,14 @@ std::shared_ptr<std::vector<std::shared_ptr<IntersectionInformationModel>>>Model
 
       // check outputs
       count = 0;
-      const boost::uuids::uuid* outputs = u2->getOutputUuids(&count);
+      const boost::uuids::uuid* outputs = u2->getOutputIds(&count);
       foundEquals = 0;
 
       for (int i = 0; i < count; ++i)
       {
         for (auto stream : sharedStreams)
         {
-          if (outputs[i] == stream->getUuid())
+          if (outputs[i] == stream->getId())
           {
             ++foundEquals;
             break;
@@ -167,8 +173,8 @@ std::shared_ptr<std::vector<std::shared_ptr<IntersectionInformationModel>>>Model
     nodeDesc = sharedNodes[i];
     int inputSize, inputTemplateSize, outputSize;
     const boost::uuids::uuid* inputs = nodeDesc->getInputUuids(&inputSize);
-    const boost::uuids::uuid* inputTemplates = nodeDesc->getInputTemplateUuids(&inputTemplateSize);
-    const boost::uuids::uuid* outputs = nodeDesc->getOutputUuids(&outputSize);
+    const boost::uuids::uuid* inputTemplates = nodeDesc->getInputTemplateIds(&inputTemplateSize);
+    const boost::uuids::uuid* outputs = nodeDesc->getOutputIds(&outputSize);
     bool found = false;
 
     // check if node is an input node
@@ -194,7 +200,7 @@ std::shared_ptr<std::vector<std::shared_ptr<IntersectionInformationModel>>>Model
     {
       for (int k = 0; k < sharedStreams.size(); ++k)
       {
-        if (outputs[j] == sharedStreams[k]->getUuid())
+        if (outputs[j] == sharedStreams[k]->getId())
         {
           if (sharedStreams[k]->isShared())
           {
@@ -238,7 +244,7 @@ std::shared_ptr<std::vector<std::shared_ptr<IntersectionInformationModel>>>Model
           if (k == i)
           continue;
 
-          if (sharedNodes[k]->existsInInputUuids(outputs[j]))
+          if (sharedNodes[k]->existsInInputIds(outputs[j]))
           {
             toVisit.push_back(k);
             cm[i * nodeCount + k] = 1;
@@ -426,7 +432,7 @@ std::shared_ptr<std::vector<std::shared_ptr<IntersectionInformationModel>>>Model
 #endif
         int inputSize, inputTemplateSize;
         const boost::uuids::uuid* inputs = nodeDesc->getInputUuids(&inputSize);
-        const boost::uuids::uuid* inputTemplates = nodeDesc->getInputTemplateUuids(&inputTemplateSize);
+        const boost::uuids::uuid* inputTemplates = nodeDesc->getInputTemplateIds(&inputTemplateSize);
 
         for (int k = 0; k < inputSize; ++k)
         {
@@ -447,13 +453,13 @@ std::shared_ptr<std::vector<std::shared_ptr<IntersectionInformationModel>>>Model
         std::cout << "MC: Match add output from node " << j << std::endl;
 #endif
         int outputSize;
-        const boost::uuids::uuid* outputs = nodeDesc->getOutputUuids(&outputSize);
+        const boost::uuids::uuid* outputs = nodeDesc->getOutputIds(&outputSize);
 
         for (int k = 0; k < outputSize; ++k)
         {
           for (int l = 0; l < sharedStreams.size(); ++l)
           {
-            if (outputs[k] == sharedStreams[l]->getUuid())
+            if (outputs[k] == sharedStreams[l]->getId())
             {
               if (sharedStreams[l]->isShared())
               {

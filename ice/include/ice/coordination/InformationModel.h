@@ -13,9 +13,13 @@
 
 #include "boost/uuid/uuid.hpp"
 
-#include "ice/coordination/NodeDescription.h"
-#include "ice/coordination/StreamDescription.h"
-#include "ice/coordination/StreamTemplateDescription.h"
+// Forward declaration
+namespace ice
+{
+class NodeDescription;
+class StreamDescription;
+class StreamTemplateDescription;
+} /* namespace ice */
 
 namespace ice
 {

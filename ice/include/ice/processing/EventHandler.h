@@ -75,7 +75,7 @@ public:
    * @param task The task which should be executed.
    * @param doIn The time in milliseconds until the task should be executed.
    */
-  const int addTimerTaks(std::shared_ptr<AsynchronousTask> task, long time);
+  const int addTimerTask(std::shared_ptr<AsynchronousTask> task, long time);
 
   /*!
    * \brief Returns the number of threads within the thread pool.

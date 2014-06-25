@@ -14,10 +14,14 @@
 
 #include "boost/uuid/uuid_io.hpp"
 
-#include "ice/coordination/InformationModel.h"
-#include "ice/coordination/IntersectionInformationModel.h"
-#include "ice/coordination/StreamDescription.h"
-#include "ice/coordination/StreamTemplateDescription.h"
+// Forward declaration
+namespace ice
+{
+class InformationModel;
+class IntersectionInformationModel;
+class StreamDescription;
+class StreamTemplateDescription;
+} /* namespace ice */
 
 namespace ice
 {

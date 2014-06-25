@@ -8,9 +8,10 @@
 #ifndef COOPERATIONRESPONSE_H_
 #define COOPERATIONRESPONSE_H_
 
-#include <ice/Identifier.h>
 #include <memory>
 #include <vector>
+
+#include "ice/Identifier.h"
 
 namespace ice
 {
@@ -21,22 +22,55 @@ class StreamTemplateDescription;
 namespace ice
 {
 
+//* CooperationRequest
+/**
+ * This class describes the cooperation response sends to the requesting engine and contains:
+ * - streams requested from an other engine or offered to this engine
+ * - similar elements within the information processing are contained as well.
+ *
+ */
 class CooperationResponse
 {
 public:
-  CooperationResponse(identifier requestingEngine);
+  /*!
+   * \brief The constructor sets the identifier of the receiving engine.
+   *
+   * The constructor sets the identifier of the receiving engine.
+   *
+   * \param receivingEngine The identifier of the receiving engine.
+   */
+  CooperationResponse(identifier receivingEngine);
+
+  /*!
+   * \brief Default destructor
+   *
+   * Default destructor
+   */
   virtual ~CooperationResponse();
 
-  const std::shared_ptr<std::vector<std::shared_ptr<StreamDescription>> > getOffers() const;
+  /*!
+   * \brief Returns true if the response is empty, else false.
+   *
+   * Returns true if the response is empty, else false.
+   */
+  bool isEmpty() const;
 
-  void setOffers(const std::shared_ptr<std::vector<std::shared_ptr<StreamDescription>> > offers);
+  /*!
+   * \brief Returns the vector of accepted offers from the other engine.
+   *
+   * Returns the vector of accepted offers from the other engine.
+   */
+  const std::shared_ptr<std::vector<std::shared_ptr<StreamDescription>> > getOffersAccepted() const;
 
-  const std::shared_ptr<std::vector<std::shared_ptr<StreamTemplateDescription>> > getRequests() const;
-
-  void setRequests(const std::shared_ptr<std::vector<std::shared_ptr<StreamTemplateDescription>>> requests);
+  /*!
+   * \brief Returns the vector of accepted requests from the other engine.
+   *
+   * Returns the vector of accepted requests from the other engine.
+   */
+  const std::shared_ptr<std::vector<std::shared_ptr<StreamTemplateDescription>> > getRequestsAccepted() const;
 
 private:
-  identifier requestingEngine;
+  identifier receivingEngine; /**< Identifier of the receiving engine of this response */
   std::shared_ptr<std::vector<std::shared_ptr<StreamDescription>> > offers; /**< List of offers */
   std::shared_ptr<std::vector<std::shared_ptr<StreamTemplateDescription>>> requests; /**< List of requests */
 };

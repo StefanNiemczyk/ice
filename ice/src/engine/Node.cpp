@@ -76,7 +76,7 @@ int Node::performTask()
   long diff = (stop.tv_usec - start.tv_usec) / 1000;
   long next = this->cyclicTriggerTime - diff;
 
-  this->eventHandler->addTimerTaks(this->shared_from_this(), next);
+  this->eventHandler->addTimerTask(this->shared_from_this(), next);
 
   return 0;
 }

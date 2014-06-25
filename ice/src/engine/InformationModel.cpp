@@ -7,6 +7,10 @@
 
 #include "ice/coordination/InformationModel.h"
 
+#include "ice/coordination/NodeDescription.h"
+#include "ice/coordination/StreamDescription.h"
+#include "ice/coordination/StreamTemplateDescription.h"
+
 namespace ice
 {
 
@@ -40,7 +44,7 @@ std::shared_ptr<StreamDescription> InformationModel::getStreamByUuid(boost::uuid
 {
   for (auto stream : this->streams)
   {
-    if (stream->getUuid() == uuid)
+    if (stream->getId() == uuid)
       return stream;
   }
 
@@ -52,7 +56,7 @@ std::shared_ptr<StreamTemplateDescription> InformationModel::getStreamTemplateBy
 {
   for (auto streamTemplate : this->streamTemplates)
   {
-    if (streamTemplate->getUuid() == uuid)
+    if (streamTemplate->getId() == uuid)
       return streamTemplate;
   }
 

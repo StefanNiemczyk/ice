@@ -6,18 +6,15 @@
  */
 
 #include "ice/coordination/StreamDescription.h"
+
 #include "ice/coordination/StreamTemplateDescription.h"
 
 namespace ice
 {
-StreamDescription::StreamDescription()
-{
-  this->shared = false;
-}
 
-StreamDescription::StreamDescription(const boost::uuids::uuid uuid, bool shared)
+StreamDescription::StreamDescription(const identifier id, bool shared)
 {
-  this->uuid = uuid;
+  this->id = id;
   this->shared = shared;
 }
 
@@ -36,24 +33,24 @@ void StreamDescription::setShared(bool shared)
   this->shared = shared;
 }
 
-const boost::uuids::uuid& StreamDescription::getUuid() const
+const identifier& StreamDescription::getId() const
 {
-  return uuid;
+  return id;
 }
 
-void StreamDescription::setUuid(const boost::uuids::uuid& uuid)
+void StreamDescription::setId(const identifier& id)
 {
-  this->uuid = uuid;
+  this->id = id;
 }
 
 const bool StreamDescription::equals(StreamDescription const* rhs) const
 {
-  return this->uuid == rhs->getUuid() && this->shared == rhs->isShared();
+  return this->id == rhs->getId() && this->shared == rhs->isShared();
 }
 
 const bool StreamDescription::equals(StreamTemplateDescription const* rhs) const
 {
-  return this->uuid == rhs->getUuid();
+  return this->id == rhs->getId();
 }
 
 } /* namespace ice */

@@ -8,13 +8,16 @@
 #ifndef STREAMTEMPLATEDESCRIPTION_H_
 #define STREAMTEMPLATEDESCRIPTION_H_
 
-#include "boost/uuid/uuid.hpp"
+#include "ice/Identifier.h"
+
+// Forward declaration
+namespace ice
+{
+class StreamDescription;
+} /* namespace ice */
 
 namespace ice
 {
-// Forward declaration
-class StreamDescription;
-
 //* StreamTemplateDescription
 /**
  * Data container to describe a stream template.
@@ -30,13 +33,13 @@ public:
   StreamTemplateDescription();
 
   /**
-   * \brief The constructor sets the uuid.
+   * \brief The constructor sets the identifier.
    *
-   * The constructor sets the uuid.
+   * The constructor sets the identifier.
    *
-   * @param uuid The uuid of the information type.
+   * @param id The identifier of the information type.
    */
-  StreamTemplateDescription(const boost::uuids::uuid uuid);
+  StreamTemplateDescription(const identifier id);
 
   /**
    * \brief Default destructor
@@ -46,20 +49,20 @@ public:
   virtual ~StreamTemplateDescription();
 
   /**
-   * \brief Returns the uuid of the information type stored in the stream.
+   * \brief Returns the identifier of the information type stored in the stream.
    *
-   * Returns the uuid of the information type stored in the stream.
+   * Returns the identifier of the information type stored in the stream.
    */
-  const boost::uuids::uuid& getUuid() const;
+  const identifier& getId() const;
 
   /**
-   * \brief Sets the uuid of the information type stored in the stream.
+   * \brief Sets the identifier of the information type stored in the stream.
    *
-   * Sets the uuid of the information type stored in the stream.
+   * Sets the identifier of the information type stored in the stream.
    *
-   * @param uuid The uuid of the information type.
+   * @param id The identifier of the information type.
    */
-  void setUuid(const boost::uuids::uuid& uuid);
+  void setId(const identifier& id);
 
   /**
    * \brief Returns true if the stream is based an the same information type.
@@ -80,7 +83,7 @@ public:
   const bool equals(StreamTemplateDescription const* rhs) const;
 
 private:
-  boost::uuids::uuid uuid; /**< uuid of the information type stored in the stream */
+  identifier id; /**< uuid of the information type stored in the stream */
 };
 
 } /* namespace ice */

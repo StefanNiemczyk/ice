@@ -44,9 +44,27 @@ namespace ice
 class Coordinator
 {
 public:
+  /*!
+   * \brief Creates a new uninitialized object. init() needs to be called before using.
+   *
+   * Creates a new uninitialized object. init() needs to be called before using.
+   *
+   * \param engine Weak pointer to the main engine object.
+   */
   Coordinator(std::weak_ptr<ICEngine> engine);
+
+  /*!
+   * \brief Default destructor
+   *
+   * Default destructor
+   */
   virtual ~Coordinator();
 
+  /*!
+   * \brief Initialize the coordinator.
+   *
+   * Initialize the coordinator.
+   */
   void init();
 
   /*!
@@ -56,35 +74,141 @@ public:
    */
   void cleanUp();
 
+  /*!
+   * \brief Returns the engine state object for a given identifier or NULL.
+   *
+   * Returns the engine state object for a given identifier from the list of known engines.
+   * If no engine for the given identifier exists NULL will be returned
+   *
+   * \param engineId The identifier of the searched engine.
+   */
   std::shared_ptr<EngineState> getEngineState(identifier engineId);
 
+  /*!
+   * \brief This method should be called if a heartbeat from another engine is received.
+   *
+   * This method should be called if a heartbeat from another engine is received.
+   *
+   * \param engineId Identifier of the sending engine.
+   * \param timestamp Time stamp of the receiving of the heartbeat.
+   */
   int onEngineHeartbeat(identifier engineId, time timestamp);
 
+  /*!
+   * \brief This method should be called if an information model request from another engine is received.
+   *
+   * This method should be called if an information model request from another engine is received.
+   *
+   * @param engineId Identifier of the sending engine.
+   */
   int onInformationModelRequest(identifier engineId);
 
+  /*!
+   * \brief This method should be called if an information model from another engine is received.
+   *
+   * This method should be called if an information model from another engine is received.
+   *
+   * @param engineId Identifier of the sending engine.
+   */
   int onInformationModel(identifier engineId, std::shared_ptr<InformationModel> informationModel);
 
+  /*!
+   * \brief This method should be called if a cooperation request from another engine is received.
+   *
+   * This method should be called if a cooperation request from another engine is received.
+   *
+   * @param engineId Identifier of the sending engine.
+   */
   int onCooperationRequest(identifier engineId, std::shared_ptr<CooperationRequest> request);
 
+  /*!
+   * \brief This method should be called if a cooperation response from another engine is received.
+   *
+   * This method should be called if a cooperation response from another engine is received.
+   *
+   * @param engineId Identifier of the sending engine.
+   */
   int onCooperationResponse(identifier engineId, std::shared_ptr<CooperationResponse> response);
 
+  /*!
+   * \brief This method should be called if a cooperation accepted from another engine is received.
+   *
+   * This method should be called if a cooperation accepted from another engine is received.
+   *
+   * @param engineId Identifier of the sending engine.
+   */
   int onCooperationAccept(identifier engineId);
 
+  /*!
+   * \brief This method should be called if a cooperation refuse from another engine is received.
+   *
+   * This method should be called if a cooperation refuse from another engine is received.
+   *
+   * @param engineId Identifier of the sending engine.
+   */
   int onCooperationRefuse(identifier engineId);
 
+  /*!
+   * \brief This method should be called if a negotiation finished from another engine is received.
+   *
+   * This method should be called if a negotiation finished from another engine is received.
+   *
+   * @param engineId Identifier of the sending engine.
+   */
   int onNegotiationFinished(identifier engineId);
 
+  /*!
+   * \brief This method should be called if a stop cooperation from another engine is received.
+   *
+   * This method should be called if a stop cooperation from another engine is received.
+   *
+   * @param engineId Identifier of the sending engine.
+   */
   int onStopCooperation(identifier engineId);
 
+  /*!
+   * \brief This method should be called if a cooperation stopped from another engine is received.
+   *
+   * This method should be called if a cooperation stopped from another engine is received.
+   *
+   * @param engineId Identifier of the sending engine.
+   */
   int onCooperationStopped(identifier engineId);
 
+  /*!
+   * \brief This method should be called if a retry negotiation from another engine is received.
+   *
+   * This method should be called if a retry negotiation from another engine is received.
+   *
+   * @param engineId Identifier of the sending engine.
+   */
   int onRetryNegotiation(identifier engineId);
 
+  /*!
+   * \brief Stops the cooperation with an engine identified by the given identifier.
+   *
+   * Stops the cooperation with an engine identified by the given identifier.
+   *
+   * @param engineId Identifier of engine to stop the cooperation.
+   */
   int stopCooperationWith(identifier engineId);
 
 private:
+  /*!
+   * \brief Stops the cooperation with the given engine.
+   *
+   * Stops the cooperation with the given engine. Sends a stop message if sendStop is true.
+   *
+   * @param engineState The engine to stop the cooperation with.
+   * @param sendStop True if a stop cooperation should be send.
+   */
   void stopCooperationWithEngine(std::shared_ptr<EngineState> engineState, bool sendStop);
 
+  /*!
+   * \brief This message is executed by the worker thread.
+   *
+   * This message is executed by the worker thread.
+   */
   void workerTask();
 
 private:

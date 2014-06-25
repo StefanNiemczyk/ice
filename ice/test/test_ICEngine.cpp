@@ -5,34 +5,38 @@
  *      Author: sni
  */
 
-#include <boost/lexical_cast.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <gtest/gtest.h>
-#include <gtest/gtest-message.h>
-#include <gtest/internal/gtest-internal.h>
-#include <gtest/internal/gtest-string.h>
-#include "ice/container/Position.h"
-#include <ice/coordination/InformationModel.h>
-#include <ice/coordination/ModelComperator.h>
-#include <ice/coordination/StreamDescription.h>
-#include "ice/coordination/EngineState.h"
-#include <ice/information/InformationElement.h>
-#include <ice/information/InformationSpecification.h>
-#include <ice/information/InformationStore.h>
-#include <ice/information/InformationStream.h>
-#include <ice/information/InformationStreamTemplate.h>
-#include <ice/information/InformationType.h>
-#include <ice/ICEngine.h>
-#include <ice/processing/Node.h>
-#include <ice/processing/NodeStore.h>
-#include "ice/Logger.h"
-//#include <sys/time.h>
 #include <chrono>
 #include <ctime>
 #include <memory>
 #include <thread>
 #include <typeinfo>
 #include <vector>
+
+#include <gtest/gtest.h>
+#include <gtest/gtest-message.h>
+#include <gtest/internal/gtest-internal.h>
+#include <gtest/internal/gtest-string.h>
+
+#include "boost/lexical_cast.hpp"
+#include "boost/uuid/uuid.hpp"
+
+#include "ice/Logger.h"
+#include "ice/ICEngine.h"
+#include "ice/container/Position.h"
+#include "ice/coordination/InformationModel.h"
+#include "ice/coordination/IntersectionInformationModel.h"
+#include "ice/coordination/ModelComperator.h"
+#include "ice/coordination/NodeDescription.h"
+#include "ice/coordination/StreamDescription.h"
+#include "ice/coordination/EngineState.h"
+#include "ice/information/InformationElement.h"
+#include "ice/information/InformationSpecification.h"
+#include "ice/information/InformationStore.h"
+#include "ice/information/InformationStream.h"
+#include "ice/information/InformationStreamTemplate.h"
+#include "ice/information/InformationType.h"
+#include "ice/processing/Node.h"
+#include "ice/processing/NodeStore.h"
 
 #include "etc/EngineStuff.cpp"
 #include "etc/TestTime.cpp"
@@ -284,37 +288,37 @@ TEST_F(TestICEngine, check_information_model)
 
   for (auto stream : *model1->getStreams())
   {
-    if (stream->getUuid() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000011"))
+    if (stream->getId() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000011"))
     {
       ++found;
       EXPECT_EQ(false, stream->isShared());
     }
-    else if (stream->getUuid() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000012"))
+    else if (stream->getId() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000012"))
     {
       ++found;
       EXPECT_EQ(false, stream->isShared());
     }
-    else if (stream->getUuid() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000013"))
+    else if (stream->getId() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000013"))
     {
       ++found;
       EXPECT_EQ(true, stream->isShared());
     }
-    else if (stream->getUuid() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000021"))
+    else if (stream->getId() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000021"))
     {
       ++found;
       EXPECT_EQ(true, stream->isShared());
     }
-    else if (stream->getUuid() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000022"))
+    else if (stream->getId() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000022"))
     {
       ++found;
       EXPECT_EQ(true, stream->isShared());
     }
-    else if (stream->getUuid() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000023"))
+    else if (stream->getId() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000023"))
     {
       ++found;
       EXPECT_EQ(false, stream->isShared());
     }
-    else if (stream->getUuid() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000024"))
+    else if (stream->getId() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000024"))
     {
       ++found;
       EXPECT_EQ(true, stream->isShared());
@@ -326,12 +330,11 @@ TEST_F(TestICEngine, check_information_model)
 
   for (auto streamTemplate : *model1->getStreamTemplates())
   {
-    if (streamTemplate->getUuid() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000013"))
+    if (streamTemplate->getId() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000013"))
     {
       ++found;
     }
-    else if (streamTemplate->getUuid()
-        == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000021"))
+    else if (streamTemplate->getId() == boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000021"))
     {
       ++found;
     }
@@ -384,12 +387,12 @@ TEST_F(TestICEngine, compare_models)
   EXPECT_EQ(2, match->getNodeDescriptions()->size());
   EXPECT_EQ(1, match->getInputTemplates()->size());
   EXPECT_EQ(boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000021"),
-            match->getInputTemplates()->at(0)->getUuid());
+            match->getInputTemplates()->at(0)->getId());
   EXPECT_EQ(2, match->getOutputStreams()->size());
   EXPECT_EQ(boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000022"),
-            match->getOutputStreams()->at(0)->getUuid());
+            match->getOutputStreams()->at(0)->getId());
   EXPECT_EQ(boost::lexical_cast<boost::uuids::uuid>("39f9b426-741c-4b89-8698-98ec25000024"),
-            match->getOutputStreams()->at(1)->getUuid());
+            match->getOutputStreams()->at(1)->getId());
   EXPECT_EQ(3, match->getConnectionMatrix()[0]);
   EXPECT_EQ(1, match->getConnectionMatrix()[1]);
   EXPECT_EQ(0, match->getConnectionMatrix()[2]);
@@ -451,6 +454,82 @@ TEST_F(TestICEngine, simple_communication)
   EXPECT_EQ(3, position2->getInformation().x);
   EXPECT_EQ(2, position2->getInformation().y);
   EXPECT_EQ(1, position2->getInformation().z);
+}
+
+TEST_F(TestICEngine, no_cooperation)
+{
+  auto engine1 = getEngine();
+  auto engine2 = getEngine();
+
+  engine2->init();
+
+  bool resultVal1 = engine1->readFromFiles( {"data/information.xml", "data/streams.xml", "data/model1.xml"});
+  // bool resultVal2 = engine2->readFromFiles( {"data/information.xml", "data/streams.xml", "data/model1.xml"});
+
+  ASSERT_TRUE(resultVal1);
+  // ASSERT_TRUE(resultVal2);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds {2000});
+
+  auto engineState1to2 = engine1->getCoordinator()->getEngineState(engine2->getId());
+  auto engineState2to1 = engine2->getCoordinator()->getEngineState(engine1->getId());
+
+  ASSERT_TRUE((engineState1to2 ? true : false));
+  ASSERT_TRUE((engineState2to1 ? true : false));
+
+  EXPECT_EQ(ice::CooperationState::NO_COOPERATION, engineState1to2->getCooperationState());
+  EXPECT_EQ(ice::CooperationState::NO_COOPERATION, engineState2to1->getCooperationState());
+}
+
+TEST_F(TestICEngine, no_cooperation2)
+{
+  auto engine1 = getEngine();
+  auto engine2 = getEngine();
+
+  engine1->init();
+
+  // bool resultVal1 = engine1->readFromFiles( {"data/information.xml", "data/streams.xml", "data/model1.xml"});
+  bool resultVal2 = engine2->readFromFiles( {"data/information.xml", "data/streams.xml", "data/model1.xml"});
+
+  // ASSERT_TRUE(resultVal1);
+  ASSERT_TRUE(resultVal2);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds {2000});
+
+  auto engineState1to2 = engine1->getCoordinator()->getEngineState(engine2->getId());
+  auto engineState2to1 = engine2->getCoordinator()->getEngineState(engine1->getId());
+
+  ASSERT_TRUE((engineState1to2 ? true : false));
+  ASSERT_TRUE((engineState2to1 ? true : false));
+
+  EXPECT_EQ(ice::CooperationState::NO_COOPERATION, engineState1to2->getCooperationState());
+  EXPECT_EQ(ice::CooperationState::NO_COOPERATION, engineState2to1->getCooperationState());
+}
+
+TEST_F(TestICEngine, no_cooperation3)
+{
+  auto engine1 = getEngine();
+  auto engine2 = getEngine();
+
+  engine1->init();
+  engine2->init();
+
+  // bool resultVal1 = engine1->readFromFiles( {"data/information.xml", "data/streams.xml", "data/model1.xml"});
+//  bool resultVal2 = engine2->readFromFiles( {"data/information.xml", "data/streams.xml", "data/model1.xml"});
+
+// ASSERT_TRUE(resultVal1);
+//  ASSERT_TRUE(resultVal2);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds {2000});
+
+  auto engineState1to2 = engine1->getCoordinator()->getEngineState(engine2->getId());
+  auto engineState2to1 = engine2->getCoordinator()->getEngineState(engine1->getId());
+
+  ASSERT_TRUE((engineState1to2 ? true : false));
+  ASSERT_TRUE((engineState2to1 ? true : false));
+
+  EXPECT_EQ(ice::CooperationState::NO_COOPERATION, engineState1to2->getCooperationState());
+  EXPECT_EQ(ice::CooperationState::NO_COOPERATION, engineState2to1->getCooperationState());
 }
 
 }

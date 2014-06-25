@@ -11,7 +11,7 @@
 namespace ice
 {
 
-//* Event
+//* AsynchronousTask
 /**
  * Default task, which is executed asynchronously by the ice event handler
  *

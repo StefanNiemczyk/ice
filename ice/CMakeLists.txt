@@ -129,8 +129,9 @@ add_library(${PROJECT_NAME}
   src/engine/StreamDescription.cpp
   src/engine/StreamTemplateDescription.cpp
   
-  src/engine/EventHandler.cpp
   src/engine/AsynchronousTask.cpp
+  src/engine/EventHandler.cpp
+  src/engine/LambdaTask.cpp
   src/engine/Node.cpp
   src/engine/NodeStore.cpp
   

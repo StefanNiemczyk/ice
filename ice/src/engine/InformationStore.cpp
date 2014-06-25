@@ -145,7 +145,7 @@ std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(const std
 std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(
     const std::shared_ptr<StreamDescription> streamDescription)
 {
-  auto type = this->getInformationType(streamDescription->getUuid());
+  auto type = this->getInformationType(streamDescription->getId());
 
   if (false == type)
   {
@@ -159,7 +159,7 @@ std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(
 std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(
     const std::shared_ptr<StreamTemplateDescription> streamTemplateDescription)
 {
-  auto type = this->getInformationType(streamTemplateDescription->getUuid());
+  auto type = this->getInformationType(streamTemplateDescription->getId());
 
   if (false == type)
   {

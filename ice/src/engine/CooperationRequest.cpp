@@ -10,16 +10,21 @@
 namespace ice
 {
 
-CooperationRequest::CooperationRequest(identifier requestingEngine)
+CooperationRequest::CooperationRequest(identifier receivingEngine)
 {
-  this->requestingEngine = requestingEngine;
+  this->receivingEngine = receivingEngine;
   this->offers = std::make_shared<std::vector<std::shared_ptr<StreamDescription>> >();
   this->requests = std::make_shared<std::vector<std::shared_ptr<StreamTemplateDescription>> >();
 }
 
 CooperationRequest::~CooperationRequest()
 {
-  // TODO Auto-generated destructor stub
+  //
+}
+
+bool CooperationRequest::isEmpty() const
+{
+  return this->offers->size() == 0 && this->requests->size() == 0;
 }
 
 const std::shared_ptr<std::vector<std::shared_ptr<StreamDescription> > > CooperationRequest::getOffers() const
@@ -27,20 +32,9 @@ const std::shared_ptr<std::vector<std::shared_ptr<StreamDescription> > > Coopera
   return offers;
 }
 
-void CooperationRequest::setOffers(const std::shared_ptr<std::vector<std::shared_ptr<StreamDescription> > > offers)
-{
-  this->offers = offers;
-}
-
 const std::shared_ptr<std::vector<std::shared_ptr<StreamTemplateDescription> > > CooperationRequest::getRequests() const
 {
   return requests;
-}
-
-void CooperationRequest::setRequests(
-    const std::shared_ptr<std::vector<std::shared_ptr<StreamTemplateDescription> > > requests)
-{
-  this->requests = requests;
 }
 
 } /* namespace ice */

@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 
-#include "boost/uuid/uuid.hpp"
+#include "ice/Identifier.h"
 
 namespace ice
 {
@@ -28,16 +28,16 @@ public:
    * Initialize all fields of the object.
    *
    * @param className The class name of the node.
-   * @param inputUuids Array of uuids of information of the input streams.
-   * @param inputTemplateUuids Array of uuids of the information of input stream templates.
-   * @param outputUuids Array of uuids of information of the output streams.
-   * @param inputUuidsSize Size of the inputUuids array.
-   * @param inputTemplateUuidsSize Size of the inputTemplateUuids array.
-   * @param outputUuidsSize Size of the outputUuids array.
+   * @param inputIds Array of identifier of information of the input streams.
+   * @param inputTemplateIds Array of identifier of the information of input stream templates.
+   * @param outputIds Array of identifier of information of the output streams.
+   * @param inputIdsSize Size of the inputIds array.
+   * @param inputTemplateIdsSize Size of the inputTemplateIds array.
+   * @param outputIdsSize Size of the outputIds array.
    */
-  NodeDescription(const std::string className, const boost::uuids::uuid* inputUuids,
-                  const boost::uuids::uuid* inputTemplateUuids, const boost::uuids::uuid* outputUuids,
-                  const int inputUuidsSize, const int inputTemplateUuidsSize, const int outputUuidsSize);
+  NodeDescription(const std::string className, const identifier* inputIds,
+                  const identifier* inputTemplateIds, const identifier* outputIds,
+                  const int inputIdsSize, const int inputTemplateIdsSize, const int outputIdsSize);
 
   /**
    * \brief Default destructor
@@ -60,46 +60,46 @@ public:
    *
    * @param count Out parameter, size of the inputUuids array.
    */
-  const boost::uuids::uuid* getInputUuids(int* count) const;
+  const identifier* getInputUuids(int* count) const;
 
   /**
-   * \brief Returns the inputTemplateUuids array and the size as out parameter.
+   * \brief Returns the inputTemplateIds array and the size as out parameter.
    *
-   * Returns the inputTemplateUuids array and the size as out parameter.
+   * Returns the inputTemplateIds array and the size as out parameter.
    *
-   * @param count Out parameter, size of the inputTemplateUuids array.
+   * @param count Out parameter, size of the inputTemplateIds array.
    */
-  const boost::uuids::uuid* getInputTemplateUuids(int* count) const;
+  const identifier* getInputTemplateIds(int* count) const;
 
   /**
-   * \brief Returns the outputUuids array and the size as out parameter.
+   * \brief Returns the outputIds array and the size as out parameter.
    *
-   * Returns the outputUuids array and the size as out parameter.
+   * Returns the outputIds array and the size as out parameter.
    *
-   * @param count Out parameter, size of the outputUuids array.
+   * @param count Out parameter, size of the outputIds array.
    */
-  const boost::uuids::uuid* getOutputUuids(int* count) const;
+  const identifier* getOutputIds(int* count) const;
 
   /**
-   * \brief Returns the size of the inputUuids array.
+   * \brief Returns the size of the inputIds array.
    *
-   * Returns the size of the inputUuids array.
+   * Returns the size of the inputIds array.
    */
-  const int getInputUuidsSize() const;
+  const int getInputIdsSize() const;
 
   /**
-   * \brief Returns the size of the inputTemplateUuids array.
+   * \brief Returns the size of the inputTemplateIds array.
    *
-   * Returns the size of the inputTemplateUuids array.
+   * Returns the size of the inputTemplateIds array.
    */
-  const int getInputTemplateUuidsSize() const;
+  const int getInputTemplateIdsSize() const;
 
   /**
-   * \brief Returns the size of the outputUuids array.
+   * \brief Returns the size of the outputIds array.
    *
-   * Returns the size of the outputUuids array.
+   * Returns the size of the outputIds array.
    */
-  const int getOutputUuidsSize() const;
+  const int getOutputIdsSize() const;
 
   /**
    * \brief Returns true if both node descriptions are equal.
@@ -110,20 +110,44 @@ public:
    */
   const bool equals(NodeDescription const* rhs) const;
 
-  const bool existsInInputUuids(const boost::uuids::uuid& toCheck) const;
+  /*!
+   * \brief Checks if the identifier exists in the list of input ids.
+   *
+   * Checks if the identifier exists in the list of input ids. Returns true if the identifier
+   * was found, else false.
+   *
+   * @param toCheck The identifier to check
+   */
+  const bool existsInInputIds(const identifier& toCheck) const;
 
-  const bool existsInInputTemplateUuids(const boost::uuids::uuid& toCheck) const;
+  /*!
+   * \brief Checks if the identifier exists in the list of input template ids.
+   *
+   * Checks if the identifier exists in the list of input template ids. Returns true if the
+   * identifier was found, else false.
+   *
+   * @param toCheck The identifier to check
+   */
+  const bool existsInInputTemplateIds(const identifier& toCheck) const;
 
-  const bool existsInOutputUuids(const boost::uuids::uuid& toCheck) const;
+  /*!
+   * \brief Checks if the identifier exists in the list of output ids.
+   *
+   * Checks if the identifier exists in the list of output ids. Returns true if the identifier
+   * was found, else false.
+   *
+   * @param toCheck The identifier to check
+   */
+  const bool existsInOutputIds(const identifier& toCheck) const;
 
 private:
   const std::string className; /**< Name of the class of the node */
-  const boost::uuids::uuid* inputUuids; /**< uuids of input information */
-  const boost::uuids::uuid* inputTemplateUuids; /**< uuids of template input information */
-  const boost::uuids::uuid* outputUuids; /**< uuis of output information */
-  const int inputUuidsSize; /**< Size of the inputUuids array */
-  const int inputTemplateUuidsSize; /**< Size of the inputTemplateUuids array */
-  const int outputUuidsSize; /**< Size of the outputUuids array */
+  const identifier* inputIds; /**< identifier of input information */
+  const identifier* inputTemplateIds; /**< identifier of template input information */
+  const identifier* outputIds; /**< identifier of output information */
+  const int inputIdsSize; /**< Size of the inputIds array */
+  const int inputTemplateIdsSize; /**< Size of the inputTemplateIds array */
+  const int outputIdsSize; /**< Size of the outputIds array */
 };
 
 } /* namespace ice */

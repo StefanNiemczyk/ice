@@ -11,6 +11,8 @@
 #include "ice/coordination/Coordinator.h"
 #include "ice/coordination/CooperationRequest.h"
 #include "ice/coordination/CooperationResponse.h"
+#include "ice/coordination/NodeDescription.h"
+#include "ice/processing/LambdaTask.h"
 #include "ice/ros/RosTimeFactory.h"
 
 #include "ice_msgs/Position.h"
@@ -113,7 +115,7 @@ void RosCommunication::sendInformationModel(identifier receiverId, std::shared_p
     ice_msgs::StreamDescription desc;
 
     desc.informationIdentifier.id.resize(16);
-    std::copy(stream->getUuid().begin(), stream->getUuid().end(), desc.informationIdentifier.id.begin());
+    std::copy(stream->getId().begin(), stream->getId().end(), desc.informationIdentifier.id.begin());
     desc.shared = stream->isShared();
 
     model.streamDescriptions.push_back(desc);
@@ -125,8 +127,7 @@ void RosCommunication::sendInformationModel(identifier receiverId, std::shared_p
     ice_msgs::StreamTemplateDescription desc;
 
     desc.informationIdentifier.id.resize(16);
-    std::copy(streamTemplate->getUuid().begin(), streamTemplate->getUuid().end(),
-              desc.informationIdentifier.id.begin());
+    std::copy(streamTemplate->getId().begin(), streamTemplate->getId().end(), desc.informationIdentifier.id.begin());
 
     model.streamTemplateDescriptions.push_back(desc);
   }
@@ -140,8 +141,8 @@ void RosCommunication::sendInformationModel(identifier receiverId, std::shared_p
 
     int inputSize, inputTemplateSize, outputSize;
     const boost::uuids::uuid* inputs = node->getInputUuids(&inputSize);
-    const boost::uuids::uuid* inputTemplates = node->getInputTemplateUuids(&inputTemplateSize);
-    const boost::uuids::uuid* outputs = node->getOutputUuids(&outputSize);
+    const boost::uuids::uuid* inputTemplates = node->getInputTemplateIds(&inputTemplateSize);
+    const boost::uuids::uuid* outputs = node->getOutputIds(&outputSize);
 
     for (int i = 0; i < inputSize; ++i)
     {
@@ -194,7 +195,7 @@ void RosCommunication::sendCooperationRequest(identifier receiverId,
     ice_msgs::StreamDescription desc;
 
     desc.informationIdentifier.id.resize(16);
-    std::copy(offer->getUuid().begin(), offer->getUuid().end(), desc.informationIdentifier.id.begin());
+    std::copy(offer->getId().begin(), offer->getId().end(), desc.informationIdentifier.id.begin());
     desc.shared = offer->isShared();
 
     request.offers.push_back(desc);
@@ -206,7 +207,7 @@ void RosCommunication::sendCooperationRequest(identifier receiverId,
     ice_msgs::StreamTemplateDescription desc;
 
     desc.informationIdentifier.id.resize(16);
-    std::copy(requests->getUuid().begin(), requests->getUuid().end(), desc.informationIdentifier.id.begin());
+    std::copy(requests->getId().begin(), requests->getId().end(), desc.informationIdentifier.id.begin());
 
     request.requests.push_back(desc);
   }
@@ -230,24 +231,24 @@ void RosCommunication::sendCooperationResponse(identifier receiverId,
   response.header.receiverIds.push_back(receiver);
 
   // add offers
-  for (auto offer : *cooperationResponse->getOffers())
+  for (auto offer : *cooperationResponse->getOffersAccepted())
   {
     ice_msgs::StreamDescription desc;
 
     desc.informationIdentifier.id.resize(16);
-    std::copy(offer->getUuid().begin(), offer->getUuid().end(), desc.informationIdentifier.id.begin());
+    std::copy(offer->getId().begin(), offer->getId().end(), desc.informationIdentifier.id.begin());
     desc.shared = offer->isShared();
 
     response.offers.push_back(desc);
   }
 
   // add requests
-  for (auto requests : *cooperationResponse->getRequests())
+  for (auto requests : *cooperationResponse->getRequestsAccepted())
   {
     ice_msgs::StreamTemplateDescription desc;
 
     desc.informationIdentifier.id.resize(16);
-    std::copy(requests->getUuid().begin(), requests->getUuid().end(), desc.informationIdentifier.id.begin());
+    std::copy(requests->getId().begin(), requests->getId().end(), desc.informationIdentifier.id.begin());
 
     response.requests.push_back(desc);
   }
@@ -421,7 +422,9 @@ void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
   if (senderId == this->engineId)
     return;
 
-  this->coordinator->onEngineHeartbeat(senderId, RosTimeFactory::createTime(msg->header.timestamp));
+  this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+  { return this->coordinator->onEngineHeartbeat(senderId, RosTimeFactory::createTime(msg->header.timestamp));}));
+//  this->coordinator->onEngineHeartbeat(senderId, RosTimeFactory::createTime(msg->header.timestamp));
 }
 
 void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr& msg)
@@ -437,25 +440,32 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
   switch (msg->command)
   {
     case RosCoordinationCommand::REQUEST_INFORMATION_MODEL:
-      this->coordinator->onInformationModelRequest(senderId);
+      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+      { return this->coordinator->onInformationModelRequest(senderId);}));
       break;
     case RosCoordinationCommand::COOPERATION_ACCEPT:
-      this->coordinator->onCooperationAccept(senderId);
+      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+      { return this->coordinator->onCooperationAccept(senderId);}));
       break;
     case RosCoordinationCommand::COOPERATION_REFUSE:
-      this->coordinator->onCooperationRefuse(senderId);
+      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+      { return this->coordinator->onCooperationRefuse(senderId);}));
       break;
     case RosCoordinationCommand::NEGOTIATION_FINISHED:
-      this->coordinator->onNegotiationFinished(senderId);
+      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+      { return this->coordinator->onNegotiationFinished(senderId);}));
       break;
     case RosCoordinationCommand::NEGOTIATION_RETRY:
-      this->coordinator->onRetryNegotiation(senderId);
+      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+      { return this->coordinator->onRetryNegotiation(senderId);}));
       break;
     case RosCoordinationCommand::STOP_COOPERATION:
-      this->coordinator->onStopCooperation(senderId);
+      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+      { return this->coordinator->onStopCooperation(senderId);}));
       break;
     case RosCoordinationCommand::COOPERATION_STOPPED:
-      this->coordinator->onCooperationStopped(senderId);
+      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+      { return this->coordinator->onCooperationStopped(senderId);}));
       break;
     default:
       _log->error("onCoordination", "Unknown coordination command from engine %s with command %i",
@@ -528,7 +538,8 @@ void RosCommunication::onInformationModel(const ice_msgs::InformationModel::Cons
     model->getNodeDescriptions()->push_back(desc);
   }
 
-  this->coordinator->onInformationModel(senderId, model);
+  this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+        { return this->coordinator->onInformationModel(senderId, model);}));
 }
 
 void RosCommunication::onCooperationRequest(const ice_msgs::CooperationRequest::ConstPtr& msg)
@@ -559,7 +570,8 @@ void RosCommunication::onCooperationRequest(const ice_msgs::CooperationRequest::
     request->getRequests()->push_back(desc);
   }
 
-  this->coordinator->onCooperationRequest(senderId, request);
+  this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+        { return  this->coordinator->onCooperationRequest(senderId, request);}));
 }
 
 void RosCommunication::onCooperationResponse(const ice_msgs::CooperationResponse::ConstPtr& msg)
@@ -579,7 +591,7 @@ void RosCommunication::onCooperationResponse(const ice_msgs::CooperationResponse
   {
     identifier streamId = IDGenerator::getInstance()->getIdentifier(stream.informationIdentifier.id);
     auto desc = std::make_shared<StreamDescription>(streamId, stream.shared);
-    response->getOffers()->push_back(desc);
+    response->getOffersAccepted()->push_back(desc);
   }
 
 // Stream template requests
@@ -587,10 +599,11 @@ void RosCommunication::onCooperationResponse(const ice_msgs::CooperationResponse
   {
     identifier streamTemplateId = IDGenerator::getInstance()->getIdentifier(streamTemplate.informationIdentifier.id);
     auto desc = std::make_shared<StreamTemplateDescription>(streamTemplateId);
-    response->getRequests()->push_back(desc);
+    response->getRequestsAccepted()->push_back(desc);
   }
 
-  this->coordinator->onCooperationResponse(senderId, response);
+  this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+        { return this->coordinator->onCooperationResponse(senderId, response);}));
 }
 
 bool RosCommunication::checkReceiverIds(ice_msgs::ICEHeader header)

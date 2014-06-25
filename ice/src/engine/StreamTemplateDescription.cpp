@@ -15,9 +15,9 @@ StreamTemplateDescription::StreamTemplateDescription()
   //
 }
 
-StreamTemplateDescription::StreamTemplateDescription(const boost::uuids::uuid uuid)
+StreamTemplateDescription::StreamTemplateDescription(const identifier id)
 {
-  this->uuid = uuid;
+  this->id = id;
 }
 
 StreamTemplateDescription::~StreamTemplateDescription()
@@ -26,24 +26,24 @@ StreamTemplateDescription::~StreamTemplateDescription()
 }
 
 
-const boost::uuids::uuid& StreamTemplateDescription::getUuid() const
+const identifier& StreamTemplateDescription::getId() const
 {
-  return uuid;
+  return id;
 }
 
-void StreamTemplateDescription::setUuid(const boost::uuids::uuid& uuid)
+void StreamTemplateDescription::setId(const identifier& id)
 {
-  this->uuid = uuid;
+  this->id = id;
 }
 
 const bool StreamTemplateDescription::equals(StreamDescription const* rhs) const
 {
-  return this->uuid == rhs->getUuid();
+  return this->id == rhs->getId();
 }
 
 const bool StreamTemplateDescription::equals(StreamTemplateDescription const* rhs) const
 {
-  return this->uuid == rhs->getUuid();
+  return this->id == rhs->getId();
 }
 
 } /* namespace ice */

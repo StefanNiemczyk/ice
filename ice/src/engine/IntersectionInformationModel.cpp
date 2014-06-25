@@ -5,14 +5,17 @@
  *      Author: sni
  */
 
-#include <ice/coordination/IntersectionInformationModel.h>
+#include "ice/coordination/IntersectionInformationModel.h"
+
+#include "ice/coordination/StreamDescription.h"
+#include "ice/coordination/StreamTemplateDescription.h"
 
 namespace ice
 {
 
 IntersectionInformationModel::IntersectionInformationModel()
 {
-  //
+  this->connectionMatrix = nullptr;
 }
 
 IntersectionInformationModel::~IntersectionInformationModel()

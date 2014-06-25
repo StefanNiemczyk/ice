@@ -243,17 +243,27 @@ int Coordinator::onInformationModel(identifier engineId, std::shared_ptr<Informa
   // computing model intersections
   auto engineSptr = this->engine.lock();
   auto ownModel = engineSptr->getInformationModel();
-  auto offers = std::make_shared<std::vector<std::shared_ptr<StreamDescription> > >();
-  auto requests = std::make_shared<std::vector<std::shared_ptr<StreamTemplateDescription> > >();
+  auto request = std::make_shared<CooperationRequest>(engineSptr->getId());
 
-  this->modelComperator.findOfferesAndRequests(ownModel, informationModel, offers, requests);
+  this->modelComperator.findOfferesAndRequests(ownModel, informationModel, request->getOffers(),
+                                               request->getRequests());
   auto compareResult = this->modelComperator.findModelMatches(ownModel, informationModel);
 
-  auto request = std::make_shared<CooperationRequest>(engineSptr->getId());
-  request->setOffers(offers);
-  request->setRequests(requests);
-
   engineState->setCooperationRequest(request);
+
+  if (request->isEmpty())
+  {
+    _log->info("onInformationModel", "Empty Cooperation request, no cooperation with engine %s, refuse send",
+               IDGenerator::toString(engineId).c_str());
+
+    engineState->setCooperationState(CooperationState::COOPERATION_REFUSE_SEND);
+    engineState->updateTimeLastActivity();
+
+    this->communication->sendCooperationRefuse(engineId);
+
+    return 0;
+  }
+
   this->communication->sendCooperationRequest(engineId, request);
 
   engineState->setCooperationState(CooperationState::COOPERATION_REQUEST_SEND);
@@ -334,30 +344,30 @@ int Coordinator::onCooperationRequest(identifier engineId, std::shared_ptr<Coope
     if (false == stream)
     {
       _log->error("onCooperationRequest", "Unknown stream requested %i from engine %i, request partial ignored",
-                  requestedStream->getUuid(), IDGenerator::toString(engineId).c_str());
+                  requestedStream->getId(), IDGenerator::toString(engineId).c_str());
       continue;
     }
 
-    response->getRequests()->push_back(requestedStream);
+    response->getRequestsAccepted()->push_back(requestedStream);
   }
 
   // Check offers
   for (auto offeredStream : *request->getOffers())
   {
-    auto type = this->informationStore->getInformationType(offeredStream->getUuid());
+    auto type = this->informationStore->getInformationType(offeredStream->getId());
 
     if (false == type->existsStreamTemplate(offeredStream))
     {
       _log->error("onCooperationRequest", "Unknown stream offered %i from engine %i, offer partial ignored",
-                  offeredStream->getUuid(), IDGenerator::toString(engineId).c_str());
+                  offeredStream->getId(), IDGenerator::toString(engineId).c_str());
       continue;
     }
 
-    response->getOffers()->push_back(offeredStream);
+    response->getOffersAccepted()->push_back(offeredStream);
   }
 
   // Check if no cooperation will be established
-  if (response->getOffers()->size() == 0 && response->getRequests()->size() == 0)
+  if (response->isEmpty())
   {
     _log->info("onCooperationRequest", "Empty Cooperation response, no cooperation with engine %s, refuse send",
                IDGenerator::toString(engineId).c_str());
@@ -409,7 +419,7 @@ int Coordinator::onCooperationResponse(identifier engineId, std::shared_ptr<Coop
   }
 
   if (engineState->getCooperationState() == CooperationState::COOPERATION_ACCEPT_SEND
-      && (response->getOffers()->size() > 0 || response->getRequests()->size() > 0))
+      && (response->getOffersAccepted()->size() > 0 || response->getRequestsAccepted()->size() > 0))
   {
     _log->info("onCooperationAccept", "Duplicated cooperation response received from engine %s",
                IDGenerator::toString(engineId).c_str());
@@ -418,8 +428,8 @@ int Coordinator::onCooperationResponse(identifier engineId, std::shared_ptr<Coop
     this->communication->sendCooperationAccept(engineId);
     return 0;
   }
-  else if (engineState->getCooperationState() == CooperationState::NO_COOPERATION && response->getOffers()->size() == 0
-      && response->getRequests()->size() == 0)
+  else if (engineState->getCooperationState() == CooperationState::NO_COOPERATION
+      && response->getOffersAccepted()->size() == 0 && response->getRequestsAccepted()->size() == 0)
   {
     _log->info("onCooperationAccept", "Duplicated cooperation response received from engine %s",
                IDGenerator::toString(engineId).c_str());
@@ -447,7 +457,7 @@ int Coordinator::onCooperationResponse(identifier engineId, std::shared_ptr<Coop
   auto engineSptr = this->engine.lock();
 
   // No cooperation
-  if (response->getOffers()->size() == 0 && response->getRequests()->size() == 0)
+  if (response->getOffersAccepted()->size() == 0 && response->getRequestsAccepted()->size() == 0)
   {
     _log->info("onCooperationResponse", "Empty cooperation response received from engine %s results in no cooperation",
                IDGenerator::toString(engineId).c_str());
@@ -460,16 +470,16 @@ int Coordinator::onCooperationResponse(identifier engineId, std::shared_ptr<Coop
   }
 
   // Check accepted requests
-  for (auto requestedStreameAccepted : *response->getRequests())
+  for (auto requestedStreameAccepted : *response->getRequestsAccepted())
   {
-    auto type = this->informationStore->getInformationType(requestedStreameAccepted->getUuid());
+    auto type = this->informationStore->getInformationType(requestedStreameAccepted->getId());
     auto stream = type->createStreamFromTemplate(requestedStreameAccepted, IDGenerator::toString(engineId));
 
     if (false == stream)
     {
       _log->error("onCooperationResponse",
                   "Unknown stream %s from this engine requested from engine %s, request partial ignored",
-                  IDGenerator::toString(requestedStreameAccepted->getUuid()).c_str(),
+                  IDGenerator::toString(requestedStreameAccepted->getId()).c_str(),
                   IDGenerator::toString(engineId).c_str());
       continue;
     }
@@ -479,7 +489,7 @@ int Coordinator::onCooperationResponse(identifier engineId, std::shared_ptr<Coop
   }
 
   // Check accepted offers
-  for (auto offeredStreamsAccepted : *response->getOffers())
+  for (auto offeredStreamsAccepted : *response->getOffersAccepted())
   {
     auto stream = this->informationStore->getBaseStream(offeredStreamsAccepted);
 
@@ -487,7 +497,7 @@ int Coordinator::onCooperationResponse(identifier engineId, std::shared_ptr<Coop
     {
       _log->error("onCooperationResponse",
                   "Unknown stream  %s from this engine offered to engine %s, offer partial ignored",
-                  IDGenerator::toString(offeredStreamsAccepted->getUuid()).c_str(),
+                  IDGenerator::toString(offeredStreamsAccepted->getId()).c_str(),
                   IDGenerator::toString(engineId).c_str());
       continue;
     }
@@ -560,14 +570,14 @@ int Coordinator::onCooperationAccept(identifier engineId)
   auto response = engineState->getCooperationResponse();
 
   // Check requests
-  for (auto requestedStream : *response->getRequests())
+  for (auto requestedStream : *response->getRequestsAccepted())
   {
     auto stream = this->informationStore->getBaseStream(requestedStream);
 
     if (false == stream)
     {
       _log->error("onCooperationRequest", "Unknown stream requested %i from engine %i, request part ignored",
-                  requestedStream->getUuid(), IDGenerator::toString(engineId).c_str());
+                  requestedStream->getId(), IDGenerator::toString(engineId).c_str());
       continue;
     }
 
@@ -580,15 +590,15 @@ int Coordinator::onCooperationAccept(identifier engineId)
   }
 
   // Check offers
-  for (auto offeredStream : *response->getOffers())
+  for (auto offeredStream : *response->getOffersAccepted())
   {
-    auto type = this->informationStore->getInformationType(offeredStream->getUuid());
+    auto type = this->informationStore->getInformationType(offeredStream->getId());
     auto stream = type->createStreamFromTemplate(offeredStream, IDGenerator::toString(engineId));
 
     if (false == stream)
     {
       _log->error("onCooperationRequest", "Unknown stream offer %i from engine %i, request part ignored",
-                  offeredStream->getUuid(), IDGenerator::toString(engineId).c_str());
+                  offeredStream->getId(), IDGenerator::toString(engineId).c_str());
       continue;
     }
 
@@ -640,7 +650,9 @@ int Coordinator::onCooperationRefuse(identifier engineId)
     return 0;
   }
 
-  if (engineState->getCooperationState() != CooperationState::COOPERATION_RESPONSE_SEND)
+  if (engineState->getCooperationState() != CooperationState::COOPERATION_RESPONSE_SEND
+      && engineState->getCooperationState() != CooperationState::COOPERATION_REQUEST_SEND
+      && engineState->getCooperationState() != CooperationState::INFORMATION_MODEL_SEND)
   {
     _log->warning("onCooperationRefuse", "Cooperation refuse received from engine %s in wrong state %i",
                   IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
@@ -653,6 +665,7 @@ int Coordinator::onCooperationRefuse(identifier engineId)
 
   engineState->setCooperationState(CooperationState::NO_COOPERATION);
   engineState->updateTimeLastActivity();
+  this->communication->sendNegotiationFinished(engineId);
 
   _log->info("onCooperationRefuse", "Cooperation refuse received to engine %s",
              IDGenerator::toString(engineId).c_str());
@@ -825,6 +838,12 @@ int Coordinator::onRetryNegotiation(identifier engineId)
     engineState->setCooperationState(CooperationState::UNKNOWN);
   }
 
+  std::shared_ptr<CooperationRequest> requestPtr;
+  engineState->setCooperationRequest(requestPtr);
+
+  std::shared_ptr<CooperationResponse> responsePtr;
+  engineState->setCooperationResponse(responsePtr);
+
   engineState->setCooperationState(CooperationState::INFORMATION_MODEL_REQUESTED);
   engineState->updateTimeLastActivity();
 
@@ -879,6 +898,12 @@ void Coordinator::stopCooperationWithEngine(std::shared_ptr<EngineState> engineS
     stream->dropReceiver();
   }
 
+  std::shared_ptr<CooperationRequest> requestPtr;
+  engineState->setCooperationRequest(requestPtr);
+
+  std::shared_ptr<CooperationResponse> responsePtr;
+  engineState->setCooperationResponse(responsePtr);
+
   if (sendStop)
   {
     engineState->setCooperationState(CooperationState::STOP_COOPERATION_SEND);
@@ -913,7 +938,7 @@ void Coordinator::workerTask()
 
       for (auto engine : this->engineStates)
       {
-        _log->verbose("workerTask", "Checking engine %s in engine state %i since %l",
+        _log->verbose("workerTask", "Checking engine %s in engine state %i since %i",
                       IDGenerator::toString(engine->getEngineId()).c_str(), engine->getCooperationState(),
                       engine->getTimeLastStateUpdate());
 

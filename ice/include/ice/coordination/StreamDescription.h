@@ -8,12 +8,16 @@
 #ifndef STREAMDESCRIPTION_H_
 #define STREAMDESCRIPTION_H_
 
-#include "boost/uuid/uuid.hpp"
+#include "ice/Identifier.h"
+
+//Forward declaration
+namespace ice
+{
+class StreamTemplateDescription;
+} /* namespace ice */
 
 namespace ice
 {
-//Forward declaration
-class StreamTemplateDescription;
 
 //* StreamDescription
 /**
@@ -22,22 +26,16 @@ class StreamTemplateDescription;
 class StreamDescription
 {
 public:
-  /**
-     * \brief Default constructor
-     *
-     * Default constructor
-     */
-    StreamDescription();
 
   /**
-   * \brief The constructor sets the uuid and if the stream is shared.
+   * \brief The constructor sets the identifier and if the stream is shared.
    *
-   * The constructor sets the uuid and if the stream is shared.
+   * The constructor sets the identifier and if the stream is shared.
    *
-   * @param uuid The uuid of the information type.
+   * @param id The identifier of the information type.
    * @param shared True if the stream is shared, else false.
    */
-  StreamDescription(const boost::uuids::uuid uuid, bool shared);
+  StreamDescription(const identifier id, bool shared = false);
 
   /**
    * \brief Default destructor
@@ -63,20 +61,20 @@ public:
   void setShared(bool shared);
 
   /**
-   * \brief Returns the uuid of the information type stored in the stream.
+   * \brief Returns the identifier of the information type stored in the stream.
    *
-   * Returns the uuid of the information type stored in the stream.
+   * Returns the identifier of the information type stored in the stream.
    */
-  const boost::uuids::uuid& getUuid() const;
+  const identifier& getId() const;
 
   /**
-   * \brief Sets the uuid of the information type stored in the stream.
+   * \brief Sets the identifier of the information type stored in the stream.
    *
-   * Sets the uuid of the information type stored in the stream.
+   * Sets the identifier of the information type stored in the stream.
    *
-   * @param uuid The uuid of the information type.
+   * @param id The identifier of the information type.
    */
-  void setUuid(const boost::uuids::uuid& uuid);
+  void setId(const identifier& id);
 
   /**
    * \brief Returns true if both descriptions are equal.
@@ -97,7 +95,7 @@ public:
   const bool equals(StreamTemplateDescription const* rhs) const;
 
 private:
-  boost::uuids::uuid uuid; /**< uuid of the information type stored in the stream */
+  identifier id; /**< Identifier of the information type stored in the stream */
   bool shared; /**< true if the information are shared, else false */
 };
 

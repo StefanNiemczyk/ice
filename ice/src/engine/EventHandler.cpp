@@ -58,7 +58,7 @@ EventHandler::~EventHandler()
 
 const int EventHandler::addTask(std::shared_ptr<AsynchronousTask> event)
 {
-  std::unique_lock<std::mutex> lock(mtx_);
+  std::lock_guard<std::mutex> guard(mtx_);
 
   std::shared_ptr<AsynchronousTask> returnValue = this->taskBuffer->add(event);
 
@@ -74,7 +74,7 @@ const int EventHandler::addTask(std::shared_ptr<AsynchronousTask> event)
   return 0;
 }
 
-const int EventHandler::addTimerTaks(std::shared_ptr<AsynchronousTask> task, long time)
+const int EventHandler::addTimerTask(std::shared_ptr<AsynchronousTask> task, long time)
 {
   // /TODO implement timer task
   return 0;

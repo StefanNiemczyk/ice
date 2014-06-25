@@ -8,16 +8,19 @@
 #ifndef ENGINESTATE_H_
 #define ENGINESTATE_H_
 
-#include <ice/information/InformationStream.h>
-#include <ice/Identifier.h>
-#include <ice/Time.h>
 #include <memory>
 #include <vector>
 
+#include "ice/Identifier.h"
+#include "ice/Time.h"
+
+// Forward declaration
 namespace ice
 {
+class BaseInformationStream;
 class CooperationRequest;
 class CooperationResponse;
+class ICEngine;
 class InformationModel;
 class IntersectionInformationModel;
 class Logger;
@@ -26,28 +29,32 @@ class TimeFactory;
 
 namespace ice
 {
+
+//* CooperationState
+/**
+ * Enum of states of cooperation between two engines.
+ *
+ */
 enum CooperationState
 {
   UNKNOWN, //< 0 Unkown state
   RETRY_NEGOTIATION, //< 1 retry the negotiation process
   INFORMATION_MODEL_REQUESTED, //< 2 information model was requested
   INFORMATION_MODEL_SEND, //< 3 information model was send
-//  INFORMATION_MODEL_RECEIVED, //< 4 information model was received
-  COOPERATION_REQUEST_SEND, //< 5 cooperation request was send
-//  COOPERATION_REQUEST_RECEIVED, //< 6 cooperation request was received
-  COOPERATION_RESPONSE_SEND, //< 7 cooperation response was send
-//  COOPERATION_RESPONSE_RECEIVED, //< 8 cooperation response was received
-  COOPERATION_REFUSE_SEND, //< 9 cooperation refuse was send
-  COOPERATION_ACCEPT_SEND, //< 10 cooperation accept was send
-  NEGOTIATION_FINISHED_SEND, //< 11 negotiation finished was send
-  STOP_COOPERATION_SEND, //< 12 stop cooperation was send
-  COOPERATION, //< 13 active cooperation with this engine
-  NO_COOPERATION //< 14 no cooperation with this engine
+  COOPERATION_REQUEST_SEND, //< 4 cooperation request was send
+  COOPERATION_RESPONSE_SEND, //< 5 cooperation response was send
+  COOPERATION_REFUSE_SEND, //< 6 cooperation refuse was send
+  COOPERATION_ACCEPT_SEND, //< 7 cooperation accept was send
+  NEGOTIATION_FINISHED_SEND, //< 8 negotiation finished was send
+  STOP_COOPERATION_SEND, //< 9 stop cooperation was send
+  COOPERATION, //< 10 active cooperation with this engine
+  NO_COOPERATION //< 11 no cooperation with this engine
 };
 
 //* EngineState
 /**
  * This class stores the meta information from other engines.
+ *
  */
 class EngineState
 {

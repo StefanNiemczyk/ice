@@ -10,6 +10,7 @@
 #include "ice/ICEngine.h"
 #include "ice/Logger.h"
 #include "ice/coordination/Coordinator.h"
+#include "ice/processing/EventHandler.h"
 
 namespace ice
 {
@@ -30,12 +31,14 @@ void Communication::init()
   auto e = engine.lock();
   this->coordinator = e->getCoordinator();
   this->engineId = e->getId();
+  this->eventHandler = e->getEventHandler();
 }
 
 void Communication::cleanUp()
 {
   auto e = engine.lock();
   this->coordinator.reset();
+  this->eventHandler.reset();
 }
 
 } /* namespace ice */
