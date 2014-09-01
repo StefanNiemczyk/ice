@@ -50,11 +50,12 @@ public:
    * \param provider The provider of the information stored in this stream.
    * \param description The description of this stream.
    * \param shared True if the stream is shared, else false.
+   * \param sharingMaxCount Max number of sharing this stream.
    */
   BaseInformationStream(const std::string name, std::weak_ptr<InformationType> informationType,
                         std::shared_ptr<EventHandler> eventHandler,
                         std::shared_ptr<InformationSpecification> specification, std::string provider = "",
-                        std::string description = "", bool shared = false);
+                        std::string description = "", bool shared = false, int sharingMaxCount = 0);
 
   /*!
    * \brief Default destructor
@@ -211,6 +212,36 @@ public:
    */
   virtual void dropReceiver();
 
+  /*!
+   * \brief Returns true if this stream can be shared, else false.
+   *
+   * Returns true if this stream can be shared, else false.
+   */
+  bool canBeShared();
+
+  /*!
+   * \brief Returns the current number of sharing.
+   *
+   * Returns the current number of sharing.
+   */
+  int getSharingCount() const;
+
+  /*!
+   * \brief Returns the max count of sharing.
+   *
+   * Returns the max count of sharing.
+   */
+  int getSharingMaxCount() const;
+
+  /*!
+   * \brief Sets the max count of sharing.
+   *
+   * Sets the max count of sharing.
+   *
+   * \brief sharingMaxCount Max number of sharing this stream;
+   */
+  void setSharingMaxCount(int sharingMaxCount);
+
 protected:
   /*!
    * \brief This method is calls if the last engine state will be unregistered.
@@ -223,6 +254,7 @@ protected:
   const long iid; /**< The internal id */
   const std::string name; /**< The name of the stream */
   bool shared; /**< True if the stream can be shared with others */
+  int sharingMaxCount; /**< Max number of sharing this stream */
   std::string provider; /**< The provider of the information stored in this stream */
   std::string description; /**< The description of this stream */
   std::weak_ptr<InformationStreamTemplate> streamTemplate; /**< The template used to create this stream */

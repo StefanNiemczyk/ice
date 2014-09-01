@@ -90,7 +90,8 @@ void testResult(ice::XMLReader& reader)
         found++;
         EXPECT_EQ("39f9b426-741c-4b89-8698-98ec2505db01", stream->informationUuid);
         EXPECT_EQ("own", stream->provider);
-        EXPECT_EQ("true", stream->shared);
+        EXPECT_EQ("active", stream->sharingState);
+        EXPECT_EQ(10, stream->sharingMaxCount);
         EXPECT_EQ(100, stream->size);
         EXPECT_EQ("Own position on the field", stream->_desc);
       }
@@ -99,7 +100,8 @@ void testResult(ice::XMLReader& reader)
         found++;
         EXPECT_EQ("39f9b426-741c-4b89-8698-98ec2505db02", stream->informationUuid);
         EXPECT_EQ("own", stream->provider);
-        EXPECT_EQ("false", stream->shared);
+        EXPECT_EQ("inactive", stream->sharingState);
+        EXPECT_EQ(0, stream->sharingMaxCount);
         EXPECT_EQ(50, stream->size);
         EXPECT_EQ("Raw position on the field", stream->_desc);
       }
@@ -108,7 +110,8 @@ void testResult(ice::XMLReader& reader)
         found++;
         EXPECT_EQ("39f9b426-741c-4b89-8698-98ec2505db03", stream->informationUuid);
         EXPECT_EQ("own", stream->provider);
-        EXPECT_EQ("true", stream->shared);
+        EXPECT_EQ("active", stream->sharingState);
+        EXPECT_EQ(10, stream->sharingMaxCount);
         EXPECT_EQ(50, stream->size);
         EXPECT_EQ("Obstacle positions on the field", stream->_desc);
       }
@@ -117,7 +120,8 @@ void testResult(ice::XMLReader& reader)
         found++;
         EXPECT_EQ("39f9b426-741c-4b89-8698-98ec2505db04", stream->informationUuid);
         EXPECT_EQ("own", stream->provider);
-        EXPECT_EQ("true", stream->shared);
+        EXPECT_EQ("active", stream->sharingState);
+        EXPECT_EQ(10, stream->sharingMaxCount);
         EXPECT_EQ(20, stream->size);
         EXPECT_EQ("Fused list of obstacles", stream->_desc);
       }

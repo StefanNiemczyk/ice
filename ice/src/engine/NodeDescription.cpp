@@ -20,9 +20,9 @@ NodeDescription::NodeDescription(const std::string className, const identifier* 
 
 NodeDescription::~NodeDescription()
 {
-  delete this->inputIds;
-  delete this->inputTemplateIds;
-  delete this->outputIds;
+  delete[] this->inputIds;
+  delete[] this->inputTemplateIds;
+  delete[] this->outputIds;
 }
 
 const std::string& NodeDescription::getClassName() const

@@ -16,12 +16,15 @@
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationStream.h"
 
+//Forward declaration
 namespace ice
 {
-//Forward declaration
 class StreamFactory;
-
 class Node;
+} /* namespace ice */
+
+namespace ice
+{
 
 struct RegisteredNode
 {
@@ -43,13 +46,14 @@ public:
    * \param informationType The information type which holds this stream.
    * \param eventHandler Handler to execute events asynchronously.
    * \param specification The specification of the stored information.
+   * \param maxStreamCount The count of streams which can be created by this template.
    * \param streamSize The count of information elements within this stream.
    * \param provider The provider of the information stored in this stream.
    * \param description The description of this stream.
    */
   InformationStreamTemplate(std::shared_ptr<StreamFactory> streamFactory, std::string className, const std::string name,
                             std::weak_ptr<InformationType> informationType, std::shared_ptr<EventHandler> eventHandler,
-                            std::shared_ptr<InformationSpecification> specification, int streamSize,
+                            std::shared_ptr<InformationSpecification> specification, int maxStreamCount, int streamSize,
                             std::string provider = "", std::string description = "");
 
   /*!
@@ -105,6 +109,8 @@ public:
    */
   virtual std::shared_ptr<BaseInformationSender> registerSender(std::shared_ptr<Communication> communication)
   {
+    std::shared_ptr<BaseInformationSender> ptr;
+    return ptr;
   }
 
   /*!
@@ -114,6 +120,8 @@ public:
    */
   virtual std::shared_ptr<InformationReceiver> registerReceiver(std::shared_ptr<Communication> communication)
   {
+    std::shared_ptr<InformationReceiver> ptr;
+    return ptr;
   }
 
   /*!
@@ -128,6 +136,13 @@ public:
    */
   std::shared_ptr<StreamTemplateDescription> getStreamTemplateDescription();
 
+  /*!
+   * \brief Returns the max number of streams which can be created by this template.
+   *
+   * Returns the max number of streams which can be created by this template.
+   */
+  int getMaxStreamCount() const;
+
 protected:
   /*!
    * \brief This method is calls if the last engine state will be unregistered.
@@ -137,8 +152,17 @@ protected:
   virtual void allEngineStatesUnregistered();
 
 private:
+  /*!
+   * \brief Checks if a stream can be created.
+   *
+   * Checks if a stream can be created.
+   */
+  bool checkIsStreamCanCreated();
+
+private:
   std::shared_ptr<StreamFactory> streamFactory; /**< Stream factory to create new streams */
   std::string className; /**< Type class name of created streams */
+  int maxStreamCount; /**< count of streams which can be created by this template */
   int streamSize; /**< Size of created streams */
   std::vector<std::weak_ptr<BaseInformationStream>> streamsCreated; /**< Streams created by this template */
   std::vector<RegisteredNode> registeredNodes; /**< Nodes registered for new streams of this template */
@@ -148,10 +172,17 @@ private:
 } /* namespace ice */
 
 template<typename T>
-  inline std::shared_ptr<ice::InformationStream<T> > ice::InformationStreamTemplate::createStream(
+  inline std::shared_ptr<ice::InformationStream<T>> ice::InformationStreamTemplate::createStream(
       const std::string provider)
   {
     auto baseStream = this->createBaseStream(provider);
+
+    if (false == baseStream)
+    {
+      std::shared_ptr<ice::InformationStream<T>> ptr;
+      return ptr;
+    }
+
     auto stream = std::static_pointer_cast<InformationStream<T> >(baseStream);
 
     return stream;

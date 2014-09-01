@@ -16,9 +16,11 @@ InformationStreamTemplate::InformationStreamTemplate(std::shared_ptr<StreamFacto
                                                      std::weak_ptr<InformationType> informationType,
                                                      std::shared_ptr<EventHandler> eventHandler,
                                                      std::shared_ptr<InformationSpecification> specification,
-                                                     int streamSize, std::string provider, std::string description) :
+                                                     int maxStreamCount, int streamSize, std::string provider,
+                                                     std::string description) :
     BaseInformationStream(name, informationType, eventHandler, specification, provider, description)
 {
+  this->maxStreamCount = maxStreamCount;
   this->streamFactory = streamFactory;
   this->className = className;
   this->streamSize = streamSize;
@@ -31,6 +33,13 @@ InformationStreamTemplate::~InformationStreamTemplate()
 
 std::shared_ptr<BaseInformationStream> InformationStreamTemplate::createBaseStream(const std::string provider)
 {
+  std::lock_guard<std::mutex> guard(this->_mtx);
+  if (false == this->checkIsStreamCanCreated())
+  {
+    std::shared_ptr<BaseInformationStream> ptr;
+    return ptr;
+  }
+
   std::string name = this->name;
 
   name.replace(name.find("?provider"), 9, provider);
@@ -45,12 +54,12 @@ std::shared_ptr<BaseInformationStream> InformationStreamTemplate::createBaseStre
   //std::string description
   auto baseStream = this->streamFactory->createStream(this->className, name, this->informationType, this->eventHandler,
                                                       this->specification, this->streamSize, provider,
-                                                      this->description, this->shared);
+                                                      this->description, this->shared, this->sharingMaxCount);
 
   baseStream->setStreamTemplate(this->shared_from_this());
 
   {
-    std::lock_guard<std::mutex> guard(this->_mtx);
+//    std::lock_guard<std::mutex> guard(this->_mtx);
     this->streamsCreated.push_back(baseStream);
 
     for (auto node : this->registeredNodes)
@@ -148,8 +157,35 @@ std::shared_ptr<StreamTemplateDescription> ice::InformationStreamTemplate::getSt
   return this->streamTemplateDescription;
 }
 
+
+int InformationStreamTemplate::getMaxStreamCount() const
+{
+  return maxStreamCount;
+}
+
 void InformationStreamTemplate::allEngineStatesUnregistered()
 {
+}
+
+bool InformationStreamTemplate::checkIsStreamCanCreated()
+{
+  if (this->streamsCreated.size() >= this->maxStreamCount)
+  {
+    // check if weak ptr are expired
+    for (int i = 0; i < this->streamsCreated.size(); ++i)
+    {
+      if (this->streamsCreated.at(i).expired())
+      {
+        this->streamsCreated.erase(this->streamsCreated.begin() + i);
+        --i;
+      }
+    }
+  }
+
+  if (this->streamsCreated.size() >= this->maxStreamCount)
+    return false;
+  else
+    return true;
 }
 
 } /* namespace ice */

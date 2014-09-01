@@ -55,13 +55,14 @@ public:
    * \param provider The provider of the information stored in this stream.
    * \param description The description of this stream.
    * \param shared True if the stream is shared, else false.
+   * \param sharingMaxCount Max number of sharing this stream.
    */
   virtual std::shared_ptr<BaseInformationStream> createStream(const std::string& className, const std::string name,
                                                               std::weak_ptr<InformationType> informationType,
                                                               std::shared_ptr<EventHandler> eventHandler,
                                                               std::shared_ptr<InformationSpecification> specification,
                                                               int streamSize, std::string provider,
-                                                              std::string description, bool shared) const;
+                                                              std::string description, bool shared, int sharingMaxCount) const;
 };
 
 } /* namespace ice */

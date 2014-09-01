@@ -121,6 +121,9 @@ TEST_F(TestICEngine, read_files)
   EXPECT_EQ(100, streamPosition1->getStreamSize());
   EXPECT_EQ("Own position on the field", streamPosition1->getDescription());
   EXPECT_EQ("own", streamPosition1->getProvider());
+  EXPECT_EQ(true, streamPosition1->canBeShared());
+  EXPECT_EQ(0, streamPosition1->getSharingCount());
+  EXPECT_EQ(10, streamPosition1->getSharingMaxCount());
 
   auto streamPositionRaw1 = infoPositionRaw->getStream<ice::Position>("/Position/raw|own");
   auto streamPositionRaw2 = informationStore->getStream<ice::Position>("/Position/raw|own");
@@ -129,6 +132,9 @@ TEST_F(TestICEngine, read_files)
   EXPECT_EQ(50, streamPositionRaw1->getStreamSize());
   EXPECT_EQ("Raw position on the field", streamPositionRaw1->getDescription());
   EXPECT_EQ("own", streamPositionRaw1->getProvider());
+  EXPECT_EQ(false, streamPositionRaw1->canBeShared());
+  EXPECT_EQ(0, streamPositionRaw1->getSharingCount());
+  EXPECT_EQ(0, streamPositionRaw1->getSharingMaxCount());
 
   auto streamObstacle1 = infoObstacle->getStream<std::vector<ice::Position>>("/Obstacle|own");
   auto streamObstacle2 = informationStore->getStream<std::vector<ice::Position>>("/Obstacle|own");
@@ -137,6 +143,9 @@ TEST_F(TestICEngine, read_files)
   EXPECT_EQ(50, streamObstacle1->getStreamSize());
   EXPECT_EQ("Obstacle positions on the field", streamObstacle1->getDescription());
   EXPECT_EQ("own", streamObstacle1->getProvider());
+  EXPECT_EQ(true, streamObstacle1->canBeShared());
+  EXPECT_EQ(0, streamObstacle1->getSharingCount());
+  EXPECT_EQ(10, streamObstacle1->getSharingMaxCount());
 
   auto streamObstacleFused1 = infoObstacleFused->getStream<std::vector<ice::Position>>("/Obstacle/fused|own");
   auto streamObstacleFused2 = informationStore->getStream<std::vector<ice::Position>>("/Obstacle/fused|own");
@@ -145,6 +154,9 @@ TEST_F(TestICEngine, read_files)
   EXPECT_EQ(20, streamObstacleFused1->getStreamSize());
   EXPECT_EQ("Fused list of obstacles", streamObstacleFused1->getDescription());
   EXPECT_EQ("own", streamObstacleFused1->getProvider());
+  EXPECT_EQ(true, streamObstacleFused1->canBeShared());
+  EXPECT_EQ(0, streamObstacleFused1->getSharingCount());
+  EXPECT_EQ(10, streamObstacleFused1->getSharingMaxCount());
 
   try
   {
@@ -173,6 +185,7 @@ TEST_F(TestICEngine, read_files)
   EXPECT_EQ(streamTemplatePosition1, streamTemplatePosition2);
   EXPECT_EQ("$other", streamTemplatePosition1->getProvider());
   EXPECT_EQ("Position of other robots on the field", streamTemplatePosition1->getDescription());
+  EXPECT_EQ(10, streamTemplatePosition1->getMaxStreamCount());
 
   auto streamTemplateObstalce1 = infoObstacle->getStreamTemplate("/Obstacle|?provider");
   auto streamTemplateObstacle2 = informationStore->getStreamTemplate("/Obstacle|?provider");
@@ -180,6 +193,7 @@ TEST_F(TestICEngine, read_files)
   EXPECT_EQ(streamTemplateObstalce1, streamTemplateObstacle2);
   EXPECT_EQ("$other", streamTemplateObstalce1->getProvider());
   EXPECT_EQ("List of streams of the given providers", streamTemplateObstalce1->getDescription());
+  EXPECT_EQ(10, streamTemplateObstalce1->getMaxStreamCount());
 
   // Checking nodes
   auto nodeSource = nodeStore->getNode("SimpleSourceNode");
@@ -515,10 +529,10 @@ TEST_F(TestICEngine, no_cooperation3)
   engine2->init();
 
   // bool resultVal1 = engine1->readFromFiles( {"data/information.xml", "data/streams.xml", "data/model1.xml"});
-//  bool resultVal2 = engine2->readFromFiles( {"data/information.xml", "data/streams.xml", "data/model1.xml"});
+  // bool resultVal2 = engine2->readFromFiles( {"data/information.xml", "data/streams.xml", "data/model1.xml"});
 
-// ASSERT_TRUE(resultVal1);
-//  ASSERT_TRUE(resultVal2);
+  // ASSERT_TRUE(resultVal1);
+  // ASSERT_TRUE(resultVal2);
 
   std::this_thread::sleep_for(std::chrono::milliseconds {2000});
 

@@ -158,10 +158,11 @@ bool ICEngine::readFromFiles(std::initializer_list<std::string> fileNameList)
     //std::string provider,
     //std::string description
     //bool shared
+    //int sharingMaxCount
     baseStream = this->streamFactory->createStream(type->getSpecification()->getTypeString(), stream->name, type,
                                                    this->eventHandler, type->getSpecification(), stream->size,
                                                    stream->provider, stream->_desc,
-                                                   (stream->shared == "true" ? true : false));
+                                                   (stream->sharingState == "active" ? true : false), stream->sharingMaxCount);
 
     if (false == baseStream)
     {
@@ -220,8 +221,9 @@ bool ICEngine::readFromFiles(std::initializer_list<std::string> fileNameList)
     auto st = std::make_shared<InformationStreamTemplate>(this->streamFactory,
                                                           type->getSpecification()->getTypeString(),
                                                           streamTemplate->name, type, this->eventHandler,
-                                                          type->getSpecification(), streamTemplate->size,
-                                                          streamTemplate->provider, streamTemplate->_desc);
+                                                          type->getSpecification(), streamTemplate->maxStreamCount,
+                                                          streamTemplate->size, streamTemplate->provider,
+                                                          streamTemplate->_desc);
 
     type->registerStreamTemplate(st);
   }

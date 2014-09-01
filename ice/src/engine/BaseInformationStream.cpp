@@ -19,7 +19,7 @@ int BaseInformationStream::IDENTIFIER_COUNTER = 0;
 BaseInformationStream::BaseInformationStream(const std::string name, std::weak_ptr<InformationType> informationType,
                                              std::shared_ptr<EventHandler> eventHandler,
                                              std::shared_ptr<InformationSpecification> specification,
-                                             std::string provider, std::string description, bool shared) :
+                                             std::string provider, std::string description, bool shared, int sharingMaxCount) :
     name(name), specification(specification), iid(IDENTIFIER_COUNTER++)
 {
   this->eventHandler = eventHandler;
@@ -27,6 +27,7 @@ BaseInformationStream::BaseInformationStream(const std::string name, std::weak_p
   this->provider = provider;
   this->description = description;
   this->shared = shared;
+  this->sharingMaxCount = sharingMaxCount;
   this->_log = Logger::get("InformationStream");
 }
 
@@ -199,6 +200,26 @@ int BaseInformationStream::unregisterEngineState(std::shared_ptr<EngineState> en
 
 void BaseInformationStream::dropReceiver()
 {
+}
+
+bool BaseInformationStream::canBeShared()
+{
+  return this->remoteListeners.size() < this->sharingMaxCount -1 && this->shared;
+}
+
+int BaseInformationStream::getSharingCount() const
+{
+  return this->remoteListeners.size();
+}
+
+int BaseInformationStream::getSharingMaxCount() const
+{
+  return sharingMaxCount;
+}
+
+void BaseInformationStream::setSharingMaxCount(int sharingMaxCount)
+{
+  this->sharingMaxCount = sharingMaxCount;
 }
 
 } /* namespace ice */

@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
   ice_msgs
+  cling_wrap
   cmake_modules
 )
 
@@ -17,6 +18,8 @@ find_package(TinyXML REQUIRED)
 
 ## Use c++ 11x std
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+
+  add_definitions(-DWITH_THREADS=0)
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
@@ -91,7 +94,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 catkin_package(
    INCLUDE_DIRS include
    LIBRARIES ice
-#  CATKIN_DEPENDS roscpp std_msgs
+   CATKIN_DEPENDS roscpp std_msgs ice_msgs cling_wrap
    DEPENDS TinyXML
 )
 
@@ -213,6 +216,7 @@ target_link_libraries(ice_node
 catkin_add_gtest(${PROJECT_NAME}-test 
   test/etc/TestTime.cpp
   test/etc/EngineStuff.cpp
+  test/test_ASPComposition.cpp
   test/test_Logger.cpp
   test/test_RingBuffer.cpp
   test/test_Buffer.cpp

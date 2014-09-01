@@ -9,7 +9,6 @@
 #include "ice/information/StreamFactory.h"
 #include "ice/processing/Node.h"
 
-
 class TestFactory : public ice::StreamFactory
 {
   std::shared_ptr<ice::BaseInformationStream> createStream(const std::string& className, const std::string name,
@@ -17,10 +16,11 @@ class TestFactory : public ice::StreamFactory
                                                            std::shared_ptr<ice::EventHandler> eventHandler,
                                                            std::shared_ptr<ice::InformationSpecification> specification,
                                                            int streamSize, std::string provider,
-                                                           std::string description, bool shared) const
+                                                           std::string description, bool shared,
+                                                           int sharingMaxCount) const
   {
     auto stream = ice::StreamFactory::createStream(className, name, informationType, eventHandler, specification,
-                                                   streamSize, provider, description, shared);
+                                                   streamSize, provider, description, shared, sharingMaxCount);
     if (stream)
       return stream;
 
@@ -29,13 +29,14 @@ class TestFactory : public ice::StreamFactory
 
     if ("Position" == className)
     {
-      stream = std::make_shared<ice::InformationStream<ice::Position>>(name, informationType, eventHandler, specification,
-                                                                  streamSize, provider, description, shared);
+      stream = std::make_shared<ice::InformationStream<ice::Position>>(name, informationType, eventHandler,
+                                                                       specification, streamSize, provider, description,
+                                                                       shared, sharingMaxCount);
     }
     else if ("List[Position]" == className)
     {
       stream = std::make_shared<ice::InformationStream<std::vector<ice::Position>>>(name, informationType, eventHandler, specification, streamSize, provider,
-      description, shared);
+      description, shared, sharingMaxCount);
     }
 
     return stream;
@@ -101,8 +102,8 @@ public:
   virtual int performNode()
   {
     auto infoEle = this->inputStream->getLast();
-    std::unique_ptr<ice::Position> posNew (new ice::Position());
-    auto pos= infoEle->getInformation();
+    std::unique_ptr<ice::Position> posNew(new ice::Position());
+    auto pos = infoEle->getInformation();
 
     posNew->x = pos.x - 1;
     posNew->y = pos.y - 1;

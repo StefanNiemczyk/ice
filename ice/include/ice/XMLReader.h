@@ -15,6 +15,7 @@
 
 #include "tinyxml.h"
 
+#include "ice/Logger.h"
 #include "ice/processing/Node.h"
 
 namespace ice
@@ -33,7 +34,8 @@ struct XMLStream {
   std::string name;
   std::string informationUuid;
   std::string provider;
-  std::string shared;
+  std::string sharingState = "inactive";
+  int sharingMaxCount = 0;
   int size = -1;
   std::string _desc;
   bool trigger = false;
@@ -43,6 +45,7 @@ struct XMLStreamTeamplate {
   std::string name;
   std::string informationUuid;
   std::string provider;
+  int maxStreamCount = 0;
   int size = -1;
   std::string _desc;
   bool trigger = false;
@@ -78,6 +81,7 @@ public:
 private:
   XMLInformation* readInformation(TiXmlElement* element);
   XMLStream* readStream(TiXmlElement* element, bool checkName);
+  bool readStreamSharing(TiXmlElement* element, XMLStream* stream);
   XMLStreamTeamplate* readStreamTemplate(TiXmlElement* element, bool checkName);
   XMLNode* readNode(TiXmlElement* element);
   void clearInformation(XMLInformation* information);
@@ -87,6 +91,7 @@ private:
   std::vector<XMLStream*> streams;
   std::vector<XMLStreamTeamplate*> streamTemplates;
   std::vector<XMLNode*> nodes;
+  Logger* _log;
 };
 
 } /* namespace ice */

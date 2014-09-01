@@ -77,11 +77,12 @@ template<typename T>
      * \param provider The provider of the information stored in this stream.
      * \param description The description of this stream.
      * \param shared True if the stream is shared, else false.
+   * \param sharingMaxCount Max number of sharing this stream.
      */
     InformationStream(const std::string name, std::weak_ptr<InformationType> informationType,
                       std::shared_ptr<EventHandler> eventHandler,
                       std::shared_ptr<InformationSpecification> specification, int streamSize,
-                      std::string provider = "", std::string description = "", bool shared = false);
+                      std::string provider = "", std::string description = "", bool shared = false, int sharingMaxCount = 0);
 
     /*!
      * \brief Default destructor
@@ -246,8 +247,8 @@ template<typename T>
   ice::InformationStream<T>::InformationStream(const std::string name, std::weak_ptr<InformationType> informationType,
                                                std::shared_ptr<EventHandler> eventHandler,
                                                std::shared_ptr<InformationSpecification> specification, int streamSize,
-                                               std::string provider, std::string description, bool shared) :
-      BaseInformationStream(name, informationType, eventHandler, specification, provider, description, shared)
+                                               std::string provider, std::string description, bool shared, int sharingMaxCount) :
+      BaseInformationStream(name, informationType, eventHandler, specification, provider, description, shared, sharingMaxCount)
   {
     this->ringBuffer = std::unique_ptr<RingBuffer<InformationElement<T>>>(
     new RingBuffer<InformationElement<T>>(streamSize));

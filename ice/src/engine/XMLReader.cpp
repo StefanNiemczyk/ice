@@ -12,8 +12,7 @@ namespace ice
 
 XMLReader::XMLReader()
 {
-  // TODO Auto-generated constructor stub
-
+  this->_log = Logger::get("XMLReader");
 }
 
 XMLReader::~XMLReader()
@@ -278,9 +277,10 @@ XMLStream* XMLReader::readStream(TiXmlElement* element, bool checkName)
     {
       stream->provider = streamElement->GetText();
     }
-    else if (strcmp("Share", child) == 0)
+    else if (strcmp("Sharing", child) == 0)
     {
-      stream->shared = streamElement->GetText();
+      this->readStreamSharing(streamElement, stream);
+      //stream->shared = streamElement->GetText();
     }
     else if (strcmp("Size", child) == 0)
     {
@@ -295,6 +295,47 @@ XMLStream* XMLReader::readStream(TiXmlElement* element, bool checkName)
       std::cerr << "Unknown child of stream " << name << " : " << child << std::endl;
       delete stream;
       return NULL;
+    }
+  }
+
+  return stream;
+}
+
+bool XMLReader::readStreamSharing(TiXmlElement* element, XMLStream* stream)
+{
+  const char *name = element->Value();
+  const char *state = element->Attribute("state");
+
+  if (!name || strcmp("Sharing", name) != 0 || !state)
+  {
+    _log->error("readStreamSharing", "Invalid sharing element %s, with state %s", (name ? name : "null"),
+                (state ? state : "null"));
+    return false;
+  }
+
+  if (state)
+  {
+    stream->sharingState = state;
+  }
+
+  for (TiXmlElement* streamElement = element->FirstChildElement(); streamElement;
+      streamElement = streamElement->NextSiblingElement())
+  {
+    const char *child = streamElement->Value();
+    if (!child)
+    {
+      _log->error("readStreamSharing", "Invalid child of sharing element %s: %s", (name ? name : "null"), "null");
+      return false;
+    }
+    else if (strcmp("MaxSharingCount", child) == 0)
+    {
+      stream->sharingMaxCount = std::stoi(streamElement->GetText());
+    }
+    else
+    {
+      _log->error("readStreamSharing", "Invalid child of sharing element %s: %s", (name ? name : "null"),
+                  (child ? child : "null"));
+      return false;
     }
   }
 
@@ -344,6 +385,14 @@ XMLStreamTeamplate* XMLReader::readStreamTemplate(TiXmlElement* element, bool ch
     else if (strcmp("Provider", child) == 0)
     {
       streamTemplate->provider = streamTemplateElement->GetText();
+    }
+    else if (strcmp("MaxStreamCount", child) == 0)
+    {
+      streamTemplate->maxStreamCount = std::stoi(streamTemplateElement->GetText());
+    }
+    else if (strcmp("MaxStreamCount", child) == 0)
+    {
+      streamTemplate->maxStreamCount = std::stoi(streamTemplateElement->GetText());
     }
     else if (strcmp("Size", child) == 0)
     {
@@ -466,7 +515,8 @@ XMLNode* XMLReader::readNode(TiXmlElement* element)
     }
     else if (strcmp("Outputs", child) == 0)
     {
-      for ( TiXmlElement* output = nodeElement->FirstChildElement("Stream"); output; output = output->NextSiblingElement())
+      for (TiXmlElement* output = nodeElement->FirstChildElement("Stream"); output; output =
+          output->NextSiblingElement())
       {
         XMLStream* stream = this->readStream(output, false);
 
@@ -483,7 +533,8 @@ XMLNode* XMLReader::readNode(TiXmlElement* element)
     }
     else if (strcmp("Configurations", child) == 0)
     {
-      for (TiXmlElement* configElement = nodeElement->FirstChildElement(); configElement; configElement = configElement->NextSiblingElement())
+      for (TiXmlElement* configElement = nodeElement->FirstChildElement(); configElement;
+          configElement = configElement->NextSiblingElement())
       {
         const char *elementName = configElement->Value();
         const char *configName = configElement->Attribute("name");

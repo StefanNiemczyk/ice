@@ -727,7 +727,7 @@ int Coordinator::onNegotiationFinished(identifier engineId)
     engineState->setCooperationState(CooperationState::COOPERATION);
   engineState->updateTimeLastActivity();
 
-  _log->info("onNegotiationFinished", "Negotiation finished received to engine %s",
+  _log->info("onNegotiationFinished", "Negotiation finished received from engine %s",
              IDGenerator::toString(engineId).c_str());
 
   return 0;

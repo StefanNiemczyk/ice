@@ -5,7 +5,9 @@
 		<Stream name="/Position|own">
 			<Information>39f9b426-741c-4b89-8698-98ec25000011</Information>
 			<Provider>own</Provider>
-			<Share>false</Share>
+			<Sharing state="inactive"> 
+				<MaxSharingCount>0</MaxSharingCount>
+			</Sharing>
 			<Size>100</Size>
 			<_desc>Own position on the field</_desc>
 		</Stream>
@@ -13,7 +15,9 @@
 		<Stream name="/Position/raw|own">
 			<Information>39f9b426-741c-4b89-8698-98ec25000012</Information>
 			<Provider>own</Provider>
-			<Share>false</Share>
+			<Sharing state="inactive"> 
+				<MaxSharingCount>0</MaxSharingCount>
+			</Sharing>
 			<Size>50</Size>
 			<_desc>Raw position on the field</_desc>
 		</Stream>
@@ -21,7 +25,9 @@
 		<Stream name="/Position/corrected|own">
 			<Information>39f9b426-741c-4b89-8698-98ec25000013</Information>
 			<Provider>own</Provider>
-			<Share>true</Share>
+			<Sharing state="active"> 
+				<MaxSharingCount>10</MaxSharingCount>
+			</Sharing>
 			<Size>50</Size>
 			<_desc>Corrected position on the field</_desc>
 		</Stream>
@@ -29,7 +35,9 @@
 		<Stream name="/Obstacle|own">
 			<Information>39f9b426-741c-4b89-8698-98ec25000021</Information>
 			<Provider>own</Provider>
-			<Share>true</Share>
+			<Sharing state="active"> 
+				<MaxSharingCount>10</MaxSharingCount>
+			</Sharing>
 			<Size>50</Size>
 			<_desc>Obstacle positions on the field</_desc>
 		</Stream>
@@ -37,7 +45,9 @@
 		<Stream name="/Obstacle/fused|own"> 
 			<Information>39f9b426-741c-4b89-8698-98ec25000022</Information>
 			<Provider>own</Provider>
-			<Share>true</Share>
+			<Sharing state="active"> 
+				<MaxSharingCount>10</MaxSharingCount>
+			</Sharing>
 			<Size>20</Size>
 			<_desc>Fused list of obstacles</_desc>
 		</Stream>
@@ -45,7 +55,9 @@
 		<Stream name="/Obstacle/tracked|own"> 
 			<Information>39f9b426-741c-4b89-8698-98ec25000023</Information>
 			<Provider>own</Provider>
-			<Share>false</Share>
+			<Sharing state="inactive"> 
+				<MaxSharingCount>0</MaxSharingCount>
+			</Sharing>
 			<Size>10</Size>
 			<_desc>Tracked list of obstacles</_desc>
 		</Stream>
@@ -53,7 +65,9 @@
 		<Stream name="/Obstacle/corrected|own"> 
 			<Information>39f9b426-741c-4b89-8698-98ec25000024</Information>
 			<Provider>own</Provider>
-			<Share>true</Share>
+			<Sharing state="active"> 
+				<MaxSharingCount>10</MaxSharingCount>
+			</Sharing>
 			<Size>20</Size>
 			<_desc>Corrected list of obstacles</_desc>
 		</Stream>
@@ -63,6 +77,7 @@
 		<StreamTemplate name="/Position/corrected|?provider">
 			<Information>39f9b426-741c-4b89-8698-98ec25000013</Information> 
 			<Provider>$other</Provider>
+			<MaxStreamCount>10</MaxStreamCount>
 			<Size>20</Size>
 			<_desc>Corrected position of other robots on the field</_desc>
 		</StreamTemplate>
@@ -70,6 +85,7 @@
 		<StreamTemplate name="/Obstacle|?provider"> 
 			<Information>39f9b426-741c-4b89-8698-98ec25000021</Information>
 			<Provider>$other</Provider>
+			<MaxStreamCount>10</MaxStreamCount>
 			<Size>20</Size>
 			<_desc>List of obstacles of the given providers</_desc>
 		</StreamTemplate>	

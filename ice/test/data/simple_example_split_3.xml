@@ -8,7 +8,9 @@
 		<Stream name="/Position/raw|own">
 			<Information>39f9b426-741c-4b89-8698-98ec2505db02</Information> <!-- The Information type of elements within the stream -->
 			<Provider>own</Provider>
-			<Share>false</Share> <!-- specify is this information will be shared -->
+			<Sharing state="inactive"> <!-- specify is this information will be shared -->
+				<MaxSharingCount>0</MaxSharingCount>
+			</Sharing>
 			<Size>50</Size> <!-- Count of information elements stored in the information stream -->
 			<_desc>Raw position on the field</_desc> <!-- Description, not required for processing -->
 		</Stream>
@@ -18,17 +20,21 @@
 		<Stream name="/Obstacle|own">
 			<Information>39f9b426-741c-4b89-8698-98ec2505db03</Information> <!-- The Information type of elements within the stream -->
 			<Provider>own</Provider>
-			<Share>true</Share> <!-- specify is this information will be shared -->
+			<Sharing state="active"> <!-- specify is this information will be shared -->
+				<MaxSharingCount>10</MaxSharingCount>
+			</Sharing>
 			<Size>50</Size> <!-- Count of information elements stored in the information stream -->
 			<_desc>Obstacle positions on the field</_desc> <!-- Description, not required for processing -->
 		</Stream>
-                <Stream name="/Obstacle/fused|own"> 
-                        <Information>39f9b426-741c-4b89-8698-98ec2505db04</Information> <!-- The Information type of elements within the stream -->
-                        <Provider>own</Provider>
-                        <Share>true</Share> <!-- specify is this information will be shared -->
-                        <Size>20</Size> <!-- Count of information elements stored in the information stream -->
-                        <_desc>Fused list of obstacles</_desc> <!-- Description, not required for processing -->
-                </Stream>
+        <Stream name="/Obstacle/fused|own"> 
+            <Information>39f9b426-741c-4b89-8698-98ec2505db04</Information> <!-- The Information type of elements within the stream -->
+            <Provider>own</Provider>
+			<Sharing state="active"> <!-- specify is this information will be shared -->
+				<MaxSharingCount>10</MaxSharingCount>
+			</Sharing>
+            <Size>20</Size> <!-- Count of information elements stored in the information stream -->
+            <_desc>Fused list of obstacles</_desc> <!-- Description, not required for processing -->
+        </Stream>
 	</NamedStreams>
 			
 	<!-- Nodes which process information -->
