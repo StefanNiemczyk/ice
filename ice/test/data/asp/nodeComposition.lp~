@@ -1,6 +1,6 @@
-% information/2		:		(entity,scope)
-% stream/2		: 		(system,source,information)
-% node/4		:		(system,nodeName,entity)
+% information/3		:		(entity,scope,representation)
+% stream/3		: 		(system,source,information)
+% node/3		:		(system,nodeName,entity)
 % output/2 		:		(nodeName,scope)
 %--------------------------------------------------------------------------------------
 % paramters
@@ -8,6 +8,8 @@
  #const priorityAccuracy=3.
  #const priorityTransferCost=2.
  #const priorityCost=1.
+ #const maxTransferDelayValue=100.
+ #const maxTranslateDelayValue=100.
  
 
 %--------------------------------------------------------------------------------------
@@ -33,30 +35,69 @@ streamCost(SYSTEM,SOURCE,INFO,k,COST) :- inputStream(SYSTEM,SOURCE,INFO,_,_,COST
 
 
 % guessing
+
+%% creating a node
 0 { node(SYSTEM,NODE,ENTITY,k) } 1 :- nodeTemplate(SYSTEM,NODE), entity(ENTITY), query(k).
-MIN { connect(SYSTEM,NODE,SOURCE,information(ENTITY,SCOPE),k) : stream(SYSTEM,SOURCE,information(ENTITY,SCOPE),k) } MAX :- 
-		input(SYSTEM,NODE,SCOPE,MIN,MAX), node(SYSTEM,NODE,ENTITY,k), query(k).
-		
-0 { streamTransfer(SYSTEM_SOURCE,SYSTEM_TARGET,SOURCE,INFO,k,TRANSFER_DELAY,TRANSFER_COST) : stream(SYSTEM_SOURCE,SOURCE,INFO,k), SYSTEM_TARGET!=SOURCE } 1
-		:- transfer(SYSTEM_SOURCE,SYSTEM_TARGET,TRANSFER_DELAY,TRANSFER_COST).
+MIN { connect(SYSTEM,NODE,SOURCE,information(ENTITY,SCOPE,REP),k) : stream(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP),k) } MAX :- 
+		input(SYSTEM,NODE,SCOPE,REP,MIN,MAX), node(SYSTEM,NODE,ENTITY,k), query(k).
+
+stream(SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP),k) :- node(SYSTEM,NODE,ENTITY,k), output(SYSTEM,NODE,SCOPE,REP).
+
+% computing QoS paramters	
+streamDelay(SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP),k,ND) :- node(SYSTEM,NODE,ENTITY,k), output(SYSTEM,NODE,SCOPE,REP), nodeDelay(SYSTEM,NODE,ND),
+		SD = #max{D : connect(SYSTEM,NODE,SOURCE,INFO,k), streamDelay(SYSTEM,SOURCE,INFO,k,D)}, SD==#infimum.
+streamDelay(SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP),k,ND+SD) :- node(SYSTEM,NODE,ENTITY,k), output(SYSTEM,NODE,SCOPE,REP), nodeDelay(SYSTEM,NODE,ND),
+		SD = #max{D : connect(SYSTEM,NODE,SOURCE,INFO,k), streamDelay(SYSTEM,SOURCE,INFO,k,D)}, SD!=#infimum.
+streamCost(SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP),k,0) :- node(SYSTEM,NODE,ENTITY,k), output(SYSTEM,NODE,SCOPE,REP).
+	
+	
+%% transfer a stream between systems
+0 { streamTransfer(SYSTEM_SOURCE,SYSTEM_TARGET,SOURCE,INFO,k,TRANSFER_DELAY,TRANSFER_COST) } 1
+		:- transfer(SYSTEM_SOURCE,SYSTEM_TARGET,TRANSFER_DELAY,TRANSFER_COST), stream(SYSTEM_SOURCE,SOURCE,INFO,k).
 
 % computing QoS paramters		
 stream(SYSTEM_TARGET,SOURCE,INFO,k) :- streamTransfer(SYSTEM_SOURCE,SYSTEM_TARGET,SOURCE,INFO,k,TRANSFER_DELAY,TRANSFER_COST).
 streamDelay(SYSTEM_TARGET,SOURCE,INFO,k,TRANSFER_DELAY+ DELAY) :- streamTransfer(SYSTEM_SOURCE,SYSTEM_TARGET,SOURCE,INFO,k,TRANSFER_DELAY,TRANSFER_COST), 
-		streamDelay(SYSTEM_SOURCE,SOURCE,INFO,k,DELAY).
-streamCost(SYSTEM_NAME_TARGET,SOURCE,INFO,k,TRANSFER_COST+COST) :- streamTransfer(SYSTEM_NAME_SOURCE,SYSTEM_NAME_TARGET,SOURCE,INFO,k,TRANSFER_DELAY,TRANSFER_COST),
-		streamCost(SYSTEM_NAME_SOURCE,SOURCE,INFO,k,COST).
+		streamDelay(SYSTEM_SOURCE,SOURCE,INFO,k,DELAY), TRANSFER_DELAY+DELAY < maxTransferDelayValue.
+streamCost(SYSTEM_TARGET,SOURCE,INFO,k,0) :- streamTransfer(SYSTEM_SOURCE,SYSTEM_TARGET,SOURCE,INFO,k,TRANSFER_DELAY,TRANSFER_COST).
+%streamCost(SYSTEM_NAME_TARGET,SOURCE,INFO,k,TRANSFER_COST+COST) :- streamTransfer(SYSTEM_NAME_SOURCE,SYSTEM_NAME_TARGET,SOURCE,INFO,k,TRANSFER_DELAY,TRANSFER_COST),
+%		streamCost(SYSTEM_NAME_SOURCE,SOURCE,INFO,k,COST).
 
-stream(SYSTEM,SYSTEM,information(ENTITY,SCOPE),k) :- node(SYSTEM,NODE,ENTITY,k), output(SYSTEM,NODE,SCOPE).
+%% translate representation
+0 { informationTranslation(SYSTEM,SOURCE,REP1,information(ENTITY,SCOPE,REP2),k,TRANSLATION_DELAY,TRANSLATION_COST) } 1 :-  stream(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP1),k), interRepresentationOperation(SYSTEM,REP1,REP2,TRANSLATION_DELAY,TRANSLATION_COST).
 
-streamDelay(SYSTEM,SYSTEM,information(ENTITY,SCOPE),k,ND) :- node(SYSTEM,NODE,ENTITY,k), output(SYSTEM,NODE,SCOPE), nodeDelay(SYSTEM,NODE,ND),
-		SD = #max{D : connect(SYSTEM,NODE,SOURCE,INFO,k), streamDelay(SYSTEM,SOURCE,INFO,k,D)}, SD==#infimum.
-streamDelay(SYSTEM,SYSTEM,information(ENTITY,SCOPE),k,ND+SD) :- node(SYSTEM,NODE,ENTITY,k), output(SYSTEM,NODE,SCOPE), nodeDelay(SYSTEM,NODE,ND),
-		SD = #max{D : connect(SYSTEM,NODE,SOURCE,INFO,k), streamDelay(SYSTEM,SOURCE,INFO,k,D)}, SD!=#infimum.
-streamCost(SYSTEM,SYSTEM,information(ENTITY,SCOPE),k,0) :- node(SYSTEM,NODE,ENTITY,k), output(SYSTEM,NODE,SCOPE).
+stream(SYSTEM,SOURCE,INFO,k) :- informationTranslation(SYSTEM,SOURCE,REP1,INFO,k,TRANSLATION_DELAY,TRANSLATION_COST).
+streamDelay(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP2),k,TRANSLATION_DELAY+DELAY) :- informationTranslation(SYSTEM,SOURCE,REP1,information(ENTITY,SCOPE,REP2),k,TRANSLATION_DELAY,TRANSLATION_COST),
+		streamDelay(SYSTEM_SOURCE,SOURCE,information(ENTITY,SCOPE,REP1),k,DELAY), TRANSLATION_DELAY+DELAY < maxTranslateDelayValue.
+streamCost(SYSTEM,SOURCE,INFO,k,0) :- informationTranslation(SYSTEM,SOURCE,REP1,INFO,k,TRANSLATION_DELAY,TRANSLATION_COST).
+
+%% extract from representation
+0 { informationExtrection(SYSTEM,SOURCE,SCOPE,REP1,information(ENTITY,SUB_SCOPE,REP2),k) } 1 :- stream(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP1),k), hasValueScope(REP1,SUB_SCOPE,_,_), hasRepresentation(SUB_SCOPE,REP2).
+stream(SYSTEM,SOURCE,INFO,k) :- informationExtrection(SYSTEM,SOURCE,SCOPE,REP1,INFO,k).
+streamDelay(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP2),k,DELAY) :- informationExtrection(SYSTEM,SOURCE,SCOPE,REP1,information(ENTITY,SUB_SCOPE,REP2),k),
+		streamDelay(SYSTEM_SOURCE,SOURCE,information(ENTITY,SCOPE,REP1),k,DELAY).
+streamCost(SYSTEM,SOURCE,INFO,k,0) :- informationExtrection(SYSTEM,SOURCE,SCOPE,REP1,INFO,k).
+
+
+% checking consistency of ontology
+%:- hasRepresentation(X,_), not scope(X), not valueScope(X).
+%:- hasRepresentation(_,Y), not representation(Y).
+%:- hasValueScope(X,_,_,_), not representation(X).
+%:- hasValueScope(_,Y,_,_), not valueScope(Y).
+%:- hasScope(X,_), not entityType(X).
+%:- hasScope(_,Y), not scope(Y).
+%:- hasUnit(X,_), not valueScope(X).
+%:- hasUnit(_,Y), not unit(Y).
+%:- interRepresentationOperation(X,_), not representation(X).
+%:- interRepresentationOperation(_,Y), not representation(Y).
+
+%:- entity(_,Y), not entityType(Y).
+%:- information(X,_,_), not entity(X,_).
+%:- information(X,Y,_), not scope(X,Y), not valueScope(Y).
+%:- information(_,Y,Z), not hasRepresentation(Y,Z).
 
 % checking
-% soft optimization contraint instead of a hard constraint in order so enable partial solitions
+% soft optimization contraint instead of a hard constraint in order to enable partial solitions
 :~ requiredStream(SYSTEM,INFO,DELAY,ACCURACY), not stream(SYSTEM,_,INFO,k), query(k). [1@5,requiredStream]
 
 % checking QoS parameters of the required streams
@@ -69,7 +110,7 @@ matchingRequirements(SYSTEM,INFO,REQUIRED_DELAY,REQUIRED_ACCURACY) :- requiredSt
 :~ requiredStream(SYSTEM,INFO,REQUIRED_DELAY,REQUIRED_ACCURACY), REQUIRED_DELAY < 0, REQUIRED_ACCURACY > -1, stream(SYSTEM,SOURCE,INFO,k), 
 		streamAccuracy(SYSTEM,SOURCE,INFO,k,ACCURACY), REQUIRED_ACCURACY < ACCURACY, query(k). [1@4,requiredStream]
 
-% checking cost points of the systems
+% checking point budget of the systems
 :- system(SYSTEM,POINTS), SUM_STREAMS = #sum{COST,SYSTEM_SOURCE,SYSTEM_TARGET,SOURCE,INFO : streamTransfer(SYSTEM_SOURCE,SYSTEM_TARGET,SOURCE,INFO,k,_,COST)}, 
 		SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY : node(SYSTEM,NODE,ENTITY,k), nodeCost(SYSTEM,NODE,COST)}, (SUM_NODES + SUM_STREAMS) > POINTS.
 
@@ -110,5 +151,18 @@ entity(entity).
 
 #external transfer(system1,system2,delay,cost).
 transfer(system2,system1,delay,cost) :- transfer(system1,system2,delay,cost).
+
+
+%--------------------------------------------------------------------------------------
+#program interRepresentationOperation(system,rep1,rep2,delay,cost).
+
+#external interRepresentationOperation(system,rep1,rep2,delay,cost).
+
+
+
+
+
+
+
 
 
