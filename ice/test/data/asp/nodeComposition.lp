@@ -124,7 +124,7 @@ streamCost(SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP),k,0) :- informationTrans
 
 %% extract from representation
 0 { informationExtrection(SYSTEM,SOURCE,SCOPE,REP1,information(ENTITY,SUB_SCOPE,REP2),k) } 1 :- 
-		stream(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP1),k), hasValueScope(REP1,SUB_SCOPE,_,_), hasRepresentation(SUB_SCOPE,REP2).
+		stream(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP1),k), hasValueScope(REP1,SUB_SCOPE,_,_), hasRepresentation(SUB_SCOPE,REP2), query(k).
 stream(SYSTEM,SOURCE,INFO,k) :- informationExtrection(SYSTEM,SOURCE,SCOPE,REP1,INFO,k).
 
 % computing QoS paramters	
@@ -155,20 +155,25 @@ streamAccuracy(SYSTEM,SOURCE,information(ENTITY,SUB_SCOPE,REP2),k,ACCURACY) :- i
 % checking
 % soft optimization contraint instead of a hard constraint in order to enable partial solitions
 :~ requiredStream(SYSTEM,INFO,DELAY,ACCURACY), not stream(SYSTEM,_,INFO,k), query(k). [1@5,requiredStream]
-
 % checking QoS parameters of the required streams
-matchingRequirements(SYSTEM,INFO,REQUIRED_DELAY,REQUIRED_ACCURACY) :- requiredStream(SYSTEM,INFO,REQUIRED_DELAY,REQUIRED_ACCURACY), REQUIRED_DELAY > -1, REQUIRED_ACCURACY > -1, 
-		stream(SYSTEM,SOURCE,INFO,k), streamDelay(SYSTEM,SOURCE,INFO,k,DELAY), streamAccuracy(SYSTEM,SOURCE,INFO,k,ACCURACY), REQUIRED_ACCURACY < ACCURACY, 
-		REQUIRED_DELAY > DELAY,	query(k).
-:~ requiredStream(SYSTEM,INFO,REQUIRED_DELAY,REQUIRED_ACCURACY), not matchingRequirements(SYSTEM,INFO,REQUIRED_DELAY,REQUIRED_ACCURACY). [1@4,requiredStream]
-:~ requiredStream(SYSTEM,INFO,REQUIRED_DELAY,REQUIRED_ACCURACY), REQUIRED_DELAY > -1, REQUIRED_ACCURACY < 0, stream(SYSTEM,SOURCE,INFO,k), 
-		streamDelay(SYSTEM,SOURCE,INFO,k,DELAY), REQUIRED_DELAY > DELAY,query(k). [1@4,requiredStream]
-:~ requiredStream(SYSTEM,INFO,REQUIRED_DELAY,REQUIRED_ACCURACY), REQUIRED_DELAY < 0, REQUIRED_ACCURACY > -1, stream(SYSTEM,SOURCE,INFO,k), 
-		streamAccuracy(SYSTEM,SOURCE,INFO,k,ACCURACY), REQUIRED_ACCURACY < ACCURACY, query(k). [1@4,requiredStream]
+:~ requiredStream(SYSTEM,INFO,REQUIRED_DELAY,REQUIRED_ACCURACY), stream(SYSTEM,SOURCE,INFO,k), streamDelay(SYSTEM,SOURCE,INFO,k,DELAY), streamAccuracy(SYSTEM,SOURCE,INFO,k,ACCURACY), 
+		REQUIRED_ACCURACY < ACCURACY, REQUIRED_DELAY > DELAY, query(k). [1@4,requiredStream]
+
+
+% checking required streams
+:~ requiredStreams(SYSTEM,ENTITY_TYPE,SCOPE,REP,REQ_DELAY,REQ_ACCURACY,MIN,MAX), 
+		COUNT = #count{ENTITY,SCOPE,REP : stream(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP),k), entity(ENTITY,ENTITY_TYPE), streamDelay(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP),k,DELAY),
+		streamAccuracy(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP),k,ACCURACY), DELAY < REQ_DELAY, ACCURACY > REQ_ACCURACY }, 
+		COUNT < MIN, query(k).[1@5,requiredStream]
+:~ requiredStreams(SYSTEM,ENTITY_TYPE,SCOPE,REP,REQ_DELAY,REQ_ACCURACY,MIN,MAX), 
+		COUNT = #count{ENTITY,SCOPE,REP : stream(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP),k), entity(ENTITY,ENTITY_TYPE), streamDelay(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP),k,DELAY),
+		streamAccuracy(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP),k,ACCURACY), DELAY < REQ_DELAY, ACCURACY > REQ_ACCURACY }, 
+		COUNT > MAX, query(k).[1@5,requiredStream]
+
 
 % checking point budget of the systems
 :- system(SYSTEM,POINTS), SUM_STREAMS = #sum{COST,SYSTEM_SOURCE,SYSTEM_TARGET,SOURCE,INFO : streamTransfer(SYSTEM_SOURCE,SYSTEM_TARGET,SOURCE,INFO,k,_,COST)}, 
-		SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY : node(SYSTEM,NODE,ENTITY,k), nodeCost(SYSTEM,NODE,COST)}, (SUM_NODES + SUM_STREAMS) > POINTS.
+		SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY : node(SYSTEM,NODE,ENTITY,k), nodeCost(SYSTEM,NODE,COST)}, (SUM_NODES + SUM_STREAMS) > POINTS, query(k).
 
 % optimize
 #minimize{ TRANSFER_COST@priorityTransferCost,SYSTEM_SOURCE,SYSTEM_TARGET,SOURCE,INFO : streamTransfer(SYSTEM_SOURCE,SYSTEM_TARGET,SOURCE,INFO,k,_,TRANSFER_COST), query(k) }.
@@ -179,7 +184,7 @@ sumCost(SUM_NODES + SUM_STREAMS + SUM_TRANSLATIONS + SUM_EXTRACTIONS, k) :-
 		SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY : node(SYSTEM,NODE,ENTITY,k), nodeCost(SYSTEM,NODE,COST), query(k)}, 
 		SUM_TRANSLATIONS = #sum{COST,SYSTEM,IRO,ENTITY,SCOPE : informationTranslation(SYSTEM,IRO,ENTITY,SCOPE,k), iroCost(SYSTEM,IRO,COST), query(k)},
 		SUM_EXTRACTIONS = #count{SYSTEM,SOURCE,SCOPE,REP1,INFO :  informationExtrection(SYSTEM,SOURCE,SCOPE,REP1,INFO,k), query(k)}.
-#minimize { COST@priorityCost : sumCost(COST, k) }.
+#minimize { COST@priorityCost : sumCost(COST, k), query(k) }.
 
 
 %--------------------------------------------------------------------------------------
@@ -201,6 +206,12 @@ entity(entity,entityType).
 
 
 %--------------------------------------------------------------------------------------
+#program requiredStreams(system,entity_type,scope,representation,delay,accuracy,min,max).
+
+#external requiredStreams(system,entity_type,scope,representation,delay,accuracy,min,max).
+
+
+%--------------------------------------------------------------------------------------
 #program system(name,points).
 
 #external system(name,points).
@@ -211,12 +222,6 @@ entity(entity,entityType).
 
 #external transfer(system1,system2,delay,cost).
 transfer(system2,system1,delay,cost) :- transfer(system1,system2,delay,cost).
-
-
-%--------------------------------------------------------------------------------------
-#program interRepresentationOperation(system,rep1,rep2,accuracy,delay,cost).
-
-#external interRepresentationOperation(system,rep1,rep2,accuracy,delay,cost).
 
 
 
