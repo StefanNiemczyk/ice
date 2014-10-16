@@ -36,7 +36,11 @@ include(UseJava)
 # Old script set JAVA_HOME in .bashrc
 include(FindJNI)
 
-set(CMAKE_JAVA_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/java/lib)
+set(CMAKE_JAVA_INCLUDE_PATH 
+  ${CMAKE_CURRENT_SOURCE_DIR}/java/lib/owlapi-distribution-4.0.0.jar
+  ${CMAKE_CURRENT_SOURCE_DIR}/java/lib/HermiT.jar
+  ${CMAKE_CURRENT_SOURCE_DIR}/java/lib/slf4j-simple-1.7.7.jar
+  )
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -112,7 +116,13 @@ catkin_package(
 
 ## Java Build
 add_jar(
-	java_ontology_interface java/src/de/unikassel/vs/ice/ICEOntologyInterface.java
+  java_ontology_interface 
+  SOURCES java/src/de/unikassel/vs/ice/IceOntologyInterface.java
+  java/src/de/unikassel/vs/ice/IceVisitor.java
+  java/src/de/unikassel/vs/ice/InfoStructureVisitor.java
+  java/src/de/unikassel/vs/ice/NodeIROVisitor.java
+  java/src/de/unikassel/vs/ice/SystemContainer.java
+  OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/java/lib
 )
 
 
@@ -144,6 +154,7 @@ add_library(${PROJECT_NAME}
   src/engine/IntersectionInformationModel.cpp
   src/engine/ModelComperator.cpp
   src/engine/NodeDescription.cpp
+  src/engine/OntologyInterface.cpp
   src/engine/StreamDescription.cpp
   src/engine/StreamTemplateDescription.cpp
   
@@ -231,22 +242,26 @@ target_link_libraries(ice_node
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test 
-  test/etc/TestTime.cpp
-  test/etc/EngineStuff.cpp
-  test/test_ASPComposition.cpp
+ # test/etc/TestTime.cpp
+ # test/etc/EngineStuff.cpp
+ # test/test_ASPComposition.cpp
   test/test_JNI.cpp
-  test/test_Logger.cpp
-  test/test_RingBuffer.cpp
-  test/test_Buffer.cpp
-  test/test_InformationStore.cpp
-  test/test_EventHandler.cpp
-  test/test_Time.cpp
-  test/test_XMLReader
-  test/test_Node.cpp
-  test/test_ModelComperator.cpp
-  test/test_ICEngine.cpp
+ # test/test_Logger.cpp
+ # test/test_RingBuffer.cpp
+ # test/test_Buffer.cpp
+ # test/test_InformationStore.cpp
+ # test/test_EventHandler.cpp
+ # test/test_Time.cpp
+ # test/test_XMLReader
+ # test/test_Node.cpp
+ # test/test_ModelComperator.cpp
+ # test/test_ICEngine.cpp
+  test/test_main.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
 )
+
+
+add_dependencies(${PROJECT_NAME}-test java_ontology_interface)
 
 if(TARGET ${PROJECT_NAME}-test)
   target_link_libraries(${PROJECT_NAME}-test
