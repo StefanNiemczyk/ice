@@ -2,6 +2,7 @@ entityType(robot).
 
 scope(position).
 
+representation(relCoords).
 representation(coords).
 representation(wgs84).
 
@@ -21,16 +22,23 @@ unit(meter).
 
 hasScope(robot,position).
 
+hasRepresentation(position,relCoords).
 hasRepresentation(position,coords).
 hasRepresentation(position,wgs84).
 
-hasValueScope(coords,x,1,1).
-hasValueScope(coords,y,1,1).
-hasValueScope(coords,z,1,1).
+hasDimension(relCoords,position,coords,1,1).
 
-hasValueScope(wgs84,lat,1,1).
-hasValueScope(wgs84,lon,1,1).
-hasValueScope(wgs84,alt,1,1).
+hasDimension(relCoords,x,1,1).
+hasDimension(relCoords,y,1,1).
+hasDimension(relCoords,z,1,1).
+
+hasDimension(coords,x,1,1).
+hasDimension(coords,y,1,1).
+hasDimension(coords,z,1,1).
+
+hasDimension(wgs84,lat,1,1).
+hasDimension(wgs84,lon,1,1).
+hasDimension(wgs84,alt,1,1).
 
 hasRepresentation(x,floatRep).
 hasRepresentation(y,floatRep).

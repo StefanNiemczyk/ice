@@ -30,6 +30,14 @@ find_package(Boost REQUIRED COMPONENTS system)
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
 
+## Java Flags
+find_package(Java REQUIRED)
+include(UseJava)
+# Old script set JAVA_HOME in .bashrc
+include(FindJNI)
+
+set(CMAKE_JAVA_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/java/lib)
+
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
@@ -102,6 +110,12 @@ catkin_package(
 ## Build ##
 ###########
 
+## Java Build
+add_jar(
+	java_ontology_interface java/src/de/unikassel/vs/ice/ICEOntologyInterface.java
+)
+
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
@@ -109,6 +123,7 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${TinyXML_INCLUDE_DIRS}
+  ${JNI_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
@@ -165,12 +180,14 @@ add_executable(ice_node src/node/ice_node.cpp)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(ice_node ice_generate_messages_cpp)
+add_dependencies(ice_node java_ontology_interface)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ice_node
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}
   ${TinyXML_LIBRARIES}
+  ${JNI_LIBRARIES}
 )
 
 #############
@@ -217,6 +234,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/etc/TestTime.cpp
   test/etc/EngineStuff.cpp
   test/test_ASPComposition.cpp
+  test/test_JNI.cpp
   test/test_Logger.cpp
   test/test_RingBuffer.cpp
   test/test_Buffer.cpp
@@ -235,6 +253,7 @@ if(TARGET ${PROJECT_NAME}-test)
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${TinyXML_LIBRARIES}
+  	${JNI_LIBRARIES}
   )
 endif()
 
