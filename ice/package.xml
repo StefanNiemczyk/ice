@@ -53,6 +53,7 @@
   <run_depend>cling_wrap</run_depend>
   <run_depend>message_runtime</run_depend>
   <run_depend>tinyxml</run_depend>
+  <run_depend>roslib</run_depend>
 
   <test_depend>gtest</test_depend>
 

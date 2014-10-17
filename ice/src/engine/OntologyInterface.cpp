@@ -44,14 +44,27 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
     return;
 
   jmethodID cnstrctr = this->env->GetMethodID(this->javaOntologyInterface, "<init>", "()V");
-// TODO
-  if (this->checkError("Constructor", "Failed to find class"))
+
+  if (this->checkError("Constructor", "Failed to find constructor for class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
 
   this->javaInterface = this->env->NewObject(this->javaOntologyInterface, cnstrctr,
                                              this->env->NewStringUTF("testPath"));
 
-  if (this->checkError("Constructor", "Failed to find class"))
+  if (this->checkError("Constructor", "Failed to instantiate class de/unikassel/vs/ice/IceOntologyInterface"))
+    return;
+
+  _log->verbose("Constructor", "Ontology interface created successfully");
+
+  this->addIRIMapperMethod = this->env->GetMethodID(this->javaOntologyInterface, "addIRIMapper", "(Ljava/lang/String;)V");
+  this->loadOntologiesMethod = this->env->GetMethodID(this->javaOntologyInterface, "loadOntologies", "()Z");
+  this->isConsistentMethod = this->env->GetMethodID(this->javaOntologyInterface, "isConsistent", "()Z");
+  this->addSystemMethod = this->env->GetMethodID(this->javaOntologyInterface, "addSystem", "(Ljava/lang/String;)Z");
+  this->addOntologyIRIMethod = this->env->GetMethodID(this->javaOntologyInterface, "addOntologyIRI", "(Ljava/lang/String;)Z");
+  this->removeOntologyIRIMethod = this->env->GetMethodID(this->javaOntologyInterface, "removeOntologyIRI", "(Ljava/lang/String;)Z");
+  this->readInformationStructureAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface, "readInformationStructureAsASP", "()Ljava/lang/String;");
+
+  if (this->checkError("Constructor", "Failed to lookup method ids for class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
 
   _log->verbose("Constructor", "Ontology interface created successfully");
@@ -85,5 +98,87 @@ bool OntologyInterface::checkError(std::string p_method, std::string p_error)
 
   return this->error;
 }
+
+void OntologyInterface::addIRIMapper(std::string const p_mapper)
+{
+  this->checkError("addIRIMapper", "Error exists, method addIRIMapper will not be executed");
+
+  env->CallVoidMethod(this->javaInterface, this->addIRIMapperMethod, env->NewStringUTF(p_mapper.c_str()));
+
+  this->checkError("addIRIMapper", "Error occurred during add iri mapper: " + p_mapper);
+}
+
+bool OntologyInterface::loadOntologies()
+{
+  this->checkError("loadOntologies", "Error exists, method loadOntologies will not be executed");
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->loadOntologiesMethod);
+
+  if(this->checkError("loadOntologies", "Error occurred at loading the ontologies"))
+    return false;
+
+  return result;
+}
+
+bool OntologyInterface::isConsistent()
+{
+  this->checkError("isConsistent", "Error exists, method isConsistent will not be executed");
+
+  bool result =  env->CallBooleanMethod(this->javaInterface, this->isConsistentMethod);
+
+  if(this->checkError("isConsistent", "Error occurred at checking consistency"))
+    return false;
+
+  return result;
+}
+
+bool OntologyInterface::addSystem(std::string const p_system)
+{
+  this->checkError("addSystem", "Error exists, method addSystem will not be executed");
+
+  bool result =  env->CallBooleanMethod(this->javaInterface, this->addSystemMethod, env->NewStringUTF(p_system.c_str()));
+
+  if(this->checkError("addSystem", "Error occurred adding a system " + p_system))
+    return false;
+
+  return result;
+}
+
+bool OntologyInterface::addOntologyIRI(std::string const p_iri)
+{
+  this->checkError("addOntologyIRI", "Error exists, method addOntologyIRI will not be executed");
+
+  bool result =  env->CallBooleanMethod(this->javaInterface, this->addOntologyIRIMethod, env->NewStringUTF(p_iri.c_str()));
+
+  if(this->checkError("addOntologyIRI", "Error occurred at adding ontologie " + p_iri))
+    return false;
+
+  return result;
+}
+
+bool OntologyInterface::removeOntologyIRI(std::string const p_iri)
+{
+  this->checkError("removeOntologyIRI", "Error exists, removeOntologyIRI will not be executed");
+
+  bool result =  env->CallBooleanMethod(this->javaInterface, this->removeOntologyIRIMethod, env->NewStringUTF(p_iri.c_str()));
+
+  if(this->checkError("removeOntologyIRI", "Error occurred at removing ontology " + p_iri))
+    return false;
+
+  return result;
+}
+
+std::string OntologyInterface::readInformationStructureAsASP()
+{
+  this->checkError("readInformationStructureAsASP", "Error exists, readInformationStructureAsASP will not be executed");
+
+  jstring result = (jstring) env->CallObjectMethod(this->javaInterface, this->readInformationStructureAsASPMethod);
+
+  if(this->checkError("readInformationStructureAsASP", "Error occurred at reading information structure"))
+    return false;
+
+  return env->GetStringUTFChars(result,0);
+}
+
 
 } /* namespace ice */

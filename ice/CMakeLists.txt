@@ -6,6 +6,7 @@ project(ice)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  roslib
   message_generation
   std_msgs
   ice_msgs

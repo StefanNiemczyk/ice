@@ -1,4 +1,5 @@
 package de.unikassel.vs.ice;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -103,9 +104,9 @@ public class InfoStructureVisitor extends IceVisitor {
 	private OWLClass lastValueScope;
 	private OWLClass lastRepresentation;
 
-	public InfoStructureVisitor(final OWLOntology p_ontology, final OWLReasoner p_reasoner,
+	public InfoStructureVisitor(final Set<OWLOntology> p_ontologies, final OWLReasoner p_reasoner,
 			final OWLDataFactory p_dataFactory) {
-		super(p_ontology, p_reasoner, p_dataFactory);
+		super(p_ontologies, p_reasoner, p_dataFactory);
 
 		this.anonymiousThings = new HashSet<String>();
 	}
@@ -124,32 +125,34 @@ public class InfoStructureVisitor extends IceVisitor {
 		OWLClass lastRepresentation = this.lastRepresentation;
 		List<OWLSubClassOfAxiom> others = new ArrayList<OWLSubClassOfAxiom>();
 
-		for (OWLSubClassOfAxiom ax : this.ontology.getSubClassAxiomsForSubClass(ce)) {
+		for (OWLOntology ont : this.ontologies) {
 
-			if (this.isSubClassOf(ax.getSuperClass(), entityType)) {
-				sb.append("entityType(");
-				sb.append(this.iRIShortName(ce.getIRI()));
-				this.lastEntity = ce;
-				sb.append(").\n");
-			} else if (this.isSubClassOf(ax.getSuperClass(), entityScope)) {
-				sb.append("scope(");
-				sb.append(this.iRIShortName(ce.getIRI()));
-				this.lastEntityScope = ce;
-				this.lastScope = ce;
-				sb.append(").\n");
-			} else if (this.isSubClassOf(ax.getSuperClass(), valueScope)) {
-				sb.append("valueScope(");
-				sb.append(this.iRIShortName(ce.getIRI()));
-				this.lastValueScope = ce;
-				this.lastScope = ce;
-				sb.append(").\n");
-			} else if (this.isSubClassOf(ax.getSuperClass(), representation)) {
-				sb.append("representation(");
-				sb.append(this.iRIShortName(ce.getIRI()));
-				this.lastRepresentation = ce;
-				sb.append(").\n");
-			} else {
-				others.add(ax);
+			for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(ce)) {
+				if (this.isSubClassOf(ax.getSuperClass(), entityType)) {
+					sb.append("entityType(");
+					sb.append(this.iRIShortName(ce.getIRI()));
+					this.lastEntity = ce;
+					sb.append(").\n");
+				} else if (this.isSubClassOf(ax.getSuperClass(), entityScope)) {
+					sb.append("scope(");
+					sb.append(this.iRIShortName(ce.getIRI()));
+					this.lastEntityScope = ce;
+					this.lastScope = ce;
+					sb.append(").\n");
+				} else if (this.isSubClassOf(ax.getSuperClass(), valueScope)) {
+					sb.append("valueScope(");
+					sb.append(this.iRIShortName(ce.getIRI()));
+					this.lastValueScope = ce;
+					this.lastScope = ce;
+					sb.append(").\n");
+				} else if (this.isSubClassOf(ax.getSuperClass(), representation)) {
+					sb.append("representation(");
+					sb.append(this.iRIShortName(ce.getIRI()));
+					this.lastRepresentation = ce;
+					sb.append(").\n");
+				} else {
+					others.add(ax);
+				}
 			}
 		}
 

@@ -115,8 +115,9 @@ public class NodeIROVisitor extends IceVisitor {
 
 	private OWLNamedIndividual grounding;
 
-	public NodeIROVisitor(final OWLOntology p_ontology, final OWLReasoner p_reasoner, final OWLDataFactory p_dataFactory) {
-		super(p_ontology, p_reasoner, p_dataFactory);
+	public NodeIROVisitor(final Set<OWLOntology> p_ontologies, final OWLReasoner p_reasoner,
+			final OWLDataFactory p_dataFactory) {
+		super(p_ontologies, p_reasoner, p_dataFactory);
 	}
 
 	public void start() {
@@ -135,7 +136,10 @@ public class NodeIROVisitor extends IceVisitor {
 				this.grounding = grounding;
 
 				// check types
-				Collection<OWLClassExpression> types = EntitySearcher.getTypes(grounding, this.ontology);
+				Collection<OWLClassExpression> types = new ArrayList<OWLClassExpression>();
+
+				for (OWLOntology ont : this.ontologies)
+					types.addAll(EntitySearcher.getTypes(grounding, ont));
 
 				for (OWLClassExpression type : types) {
 					type.accept(this);
@@ -175,7 +179,11 @@ public class NodeIROVisitor extends IceVisitor {
 		} else {
 			OWLNamedIndividual ind = groundings.iterator().next();
 
-			Collection<OWLClassExpression> types = EntitySearcher.getTypes(ind, this.ontology);
+			Collection<OWLClassExpression> types = new ArrayList<OWLClassExpression>();
+
+			for (OWLOntology ont : this.ontologies)
+				types.addAll(EntitySearcher.getTypes(ind, ont));
+
 			int count = 0;
 
 			for (OWLClassExpression type : types) {
@@ -211,42 +219,43 @@ public class NodeIROVisitor extends IceVisitor {
 		OWLClass lastOnlyEntity = this.lastOnlyEntity;
 		List<OWLSubClassOfAxiom> others = new ArrayList<OWLSubClassOfAxiom>();
 		boolean iro = false;
+		for (OWLOntology ont : this.ontologies) {
+			for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(ce)) {
+				if (this.isSubClassOf(ax.getSuperClass(), this.node)) {
+					this.currentType = Type.NODE;
+					this.lastIRO = ce;
 
-		for (OWLSubClassOfAxiom ax : this.ontology.getSubClassAxiomsForSubClass(ce)) {
-			if (this.isSubClassOf(ax.getSuperClass(), this.node)) {
-				this.currentType = Type.NODE;
-				this.lastIRO = ce;
+					this.sb.append("#program ");
+					this.sb.append(this.iRIShortName(this.grounding.getIRI()));
+					this.sb.append(".\n");
 
-				this.sb.append("#program ");
-				this.sb.append(this.iRIShortName(this.grounding.getIRI()));
-				this.sb.append(".\n");
+					// #external nodeTemplate(system1,node1,any).
+					StringBuffer sb = new StringBuffer();
+					sb.append("nodeTemplate(");
+					sb.append(this.iRIShortName(this.system.getIRI()));
+					sb.append(",");
+					sb.append(this.iRIShortName(this.grounding.getIRI()));
+					sb.append(",");
+					sb.append((this.lastOnlyEntity != null) ? this.iRIShortName(this.lastOnlyEntity.getIRI()) : "any");
+					sb.append(").\n");
 
-				// #external nodeTemplate(system1,node1,any).
-				StringBuffer sb = new StringBuffer();
-				sb.append("nodeTemplate(");
-				sb.append(this.iRIShortName(this.system.getIRI()));
-				sb.append(",");
-				sb.append(this.iRIShortName(this.grounding.getIRI()));
-				sb.append(",");
-				sb.append((this.lastOnlyEntity != null) ? this.iRIShortName(this.lastOnlyEntity.getIRI()) : "any");
-				sb.append(").\n");
+					this.elementString = sb.toString();
+					this.sb.append("#external ");
+					this.sb.append(this.elementString);
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.iro)) {
+					this.currentType = Type.IRO;
+					this.lastIRO = ce;
+					iro = true;
 
-				this.elementString = sb.toString();
-				this.sb.append("#external ");
-				this.sb.append(this.elementString);
-			} else if (this.isSubClassOf(ax.getSuperClass(), this.iro)) {
-				this.currentType = Type.IRO;
-				this.lastIRO = ce;
-				iro = true;
-
-				this.sb.append("#program ");
-				this.sb.append(this.iRIShortName(this.grounding.getIRI()));
-				this.sb.append(".\n");
-			} else if (this.isSubClassOf(ax.getSuperClass(), this.entityScope)) {
-				this.currentScope = ce;
-			} else {
-				// System.out.println(ax);
-				others.add(ax);
+					this.sb.append("#program ");
+					this.sb.append(this.iRIShortName(this.grounding.getIRI()));
+					this.sb.append(".\n");
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.entityScope)) {
+					this.currentScope = ce;
+				} else {
+					// System.out.println(ax);
+					others.add(ax);
+				}
 			}
 		}
 
@@ -405,8 +414,10 @@ public class NodeIROVisitor extends IceVisitor {
 			OWLClass c = p_ce.asOWLClass();
 
 			if (this.isSubClassOf(c, this.namedStream)) {
-				for (OWLSubClassOfAxiom ax : this.ontology.getSubClassAxiomsForSubClass(c)) {
-					ax.getSuperClass().accept(this);
+				for (OWLOntology ont : this.ontologies) {
+					for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(c)) {
+						ax.getSuperClass().accept(this);
+					}
 				}
 			}
 		}

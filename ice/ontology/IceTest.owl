@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY Ice "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#" >
+]>
+
+
+<rdf:RDF xmlns="http://vs.uni-kassel.de/IceTest#"
+     xml:base="http://vs.uni-kassel.de/IceTest"
+     xmlns:Ice="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about="http://vs.uni-kassel.de/IceTest">
+        <owl:imports rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/Ice"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionToRelativeCoordinatePosition -->
+
+    <owl:Class rdf:about="&Ice;CoordinatePositionToRelativeCoordinatePosition">
+        <rdfs:subClassOf rdf:resource="&Ice;InterRepresentationOperation"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRelatedInput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#KalmanFilter -->
+
+    <owl:Class rdf:about="&Ice;KalmanFilter">
+        <rdfs:subClassOf rdf:resource="&Ice;Node"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;impairInformationMetadata"/>
+                <owl:someValuesFrom rdf:resource="&Ice;Delay"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;improveInformationMetadata"/>
+                <owl:someValuesFrom rdf:resource="&Ice;Accuracy"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#StreamPositionCoordinateRep -->
+
+    <owl:Class rdf:about="&Ice;StreamPositionCoordinateRep">
+        <rdfs:subClassOf rdf:resource="&Ice;NamedStream"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;isStreamOf"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;Position"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                <owl:someValuesFrom rdf:resource="&Ice;CoordinatePositionRep"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordPositionToRelCoordCostInd -->
+
+    <owl:NamedIndividual rdf:about="&Ice;CoordPositionToRelCoordCostInd">
+        <rdf:type rdf:resource="&Ice;Cost"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">3</Ice:hasMetadataValue>
+        <Ice:isMetadataOf rdf:resource="&Ice;CoordinatePositionToRelativeCoordinatePositionInd"/>
+        <Ice:hasGrounding rdf:resource="&Ice;IROCostASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordPositionToRelCoorsIRODelayInd -->
+
+    <owl:NamedIndividual rdf:about="&Ice;CoordPositionToRelCoorsIRODelayInd">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">2</Ice:hasMetadataValue>
+        <Ice:isMetadataOf rdf:resource="&Ice;CoordinatePositionToRelativeCoordinatePositionInd"/>
+        <Ice:hasGrounding rdf:resource="&Ice;IRODelayASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionToRelativeCoordinatePositionInd -->
+
+    <owl:NamedIndividual rdf:about="&Ice;CoordinatePositionToRelativeCoordinatePositionInd">
+        <rdf:type rdf:resource="&Ice;CoordinatePositionToRelativeCoordinatePosition"/>
+        <Ice:hasMetadata rdf:resource="&Ice;CoordPositionToRelCoordCostInd"/>
+        <Ice:hasMetadata rdf:resource="&Ice;CoordPositionToRelCoorsIRODelayInd"/>
+        <Ice:hasGrounding rdf:resource="&Ice;CoordinatePositionToRelativeCoordinatePositionGroundingInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#KalmanFilterCostInd -->
+
+    <owl:NamedIndividual rdf:about="&Ice;KalmanFilterCostInd">
+        <rdf:type rdf:resource="&Ice;Cost"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">10</Ice:hasMetadataValue>
+        <Ice:isMetadataOf rdf:resource="&Ice;KalmanFilterInd"/>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeCostASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#KalmanFilterDelayInd -->
+
+    <owl:NamedIndividual rdf:about="&Ice;KalmanFilterDelayInd">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">1</Ice:hasMetadataValue>
+        <Ice:isMetadataOf rdf:resource="&Ice;KalmanFilterInd"/>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeDelayASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#KalmanFilterGroundingInd -->
+
+    <owl:NamedIndividual rdf:about="&Ice;KalmanFilterGroundingInd">
+        <rdf:type rdf:resource="&Ice;Grounding"/>
+        <Ice:operationClass rdf:datatype="&xsd;string">foundation.operation.KalmanFilter</Ice:operationClass>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#KalmanFilterInd -->
+
+    <owl:NamedIndividual rdf:about="&Ice;KalmanFilterInd">
+        <rdf:type rdf:resource="&Ice;KalmanFilter"/>
+        <Ice:hasMetadata rdf:resource="&Ice;KalmanFilterCostInd"/>
+        <Ice:hasMetadata rdf:resource="&Ice;KalmanFilterDelayInd"/>
+        <Ice:hasGrounding rdf:resource="&Ice;KalmanFilterGroundingInd"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.5.0) http://owlapi.sourceforge.net -->
+

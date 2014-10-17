@@ -1,6 +1,8 @@
 #include <iostream>
 #include <jni.h>
 
+#include <ros/package.h>
+
 #include "ice/coordination/OntologyInterface.h"
 
 #include "gtest/gtest.h"
@@ -11,65 +13,42 @@ namespace
 
 TEST(JNITest, create)
 {
-  ice::OntologyInterface oi("/home/sni/pjx/catkin_ws/src/ice/ice/java/lib/");
+  std::string path = ros::package::getPath("ice");
+  bool result;
 
-//  std::cout << "muh" << std::endl;
-//  JavaVM *jvm;       /* denotes a Java VM */
-//      JNIEnv *env;       /* pointer to native method interface */
-//      JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
-//      JavaVMOption* options = new JavaVMOption[1];
-//      std::string classPath("-Djava.class.path=/home/sni/pjx/catkin_ws/build/ice/ice/java_ontology_interface.jar");
-//      options[0].optionString = (char *) classPath.c_str();
-//      vm_args.version = JNI_VERSION_1_6;
-//      vm_args.nOptions = 1;
-//      vm_args.options = options;
-//      vm_args.ignoreUnrecognized = false;
-//      /* load and initialize a Java VM, return a JNI interface
-//       * pointer in env */
-//      JNI_CreateJavaVM(&jvm, (void**) &env, &vm_args);
-//      delete options;
-//      /* invoke method using the JNI */
-//      jclass cls = env->FindClass("de/unikassel/vs/ice/IceOntologyInterface");
-//
-//      if (env->ExceptionOccurred()) {
-//        env->ExceptionDescribe();
-//      }
-//
-//      jmethodID cnstrctr = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;)V");
-//
-//      if (env->ExceptionOccurred()) {
-//        env->ExceptionDescribe();
-//      }
-//
-//      jobject obj = env->NewObject(cls, cnstrctr, env->NewStringUTF("testPath"));
+  ice::OntologyInterface oi(path + "/java/lib/");
 
+  ASSERT_FALSE(oi.errorOccurred());
 
+  oi.addIRIMapper(path + "/ontology/");
 
+  ASSERT_FALSE(oi.errorOccurred());
 
+//  result =  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  result =  oi.addOntologyIRI("http://vs.uni-kassel.de/IceTest");
 
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
 
-//      if (env->ExceptionOccurred()) {
-//        env->ExceptionDescribe();
-//      }
-//
-//      jmethodID getOntologyPath = env->GetMethodID(cls, "getOntologyPath", "()Ljava/lang/String;");
-//
-//      if (env->ExceptionOccurred()) {
-//        env->ExceptionDescribe();
-//      }
-//
-//      jstring path = (jstring) env->CallObjectMethod(obj, getOntologyPath);
-//
-//      if (env->ExceptionOccurred()) {
-//        env->ExceptionDescribe();
-//      }
-//
-//      const char *str= env->GetStringUTFChars(path,0);
-//      std::cout << str << std::endl;
+  result = oi.loadOntologies();
 
-      /* We are done. */
-//      jvm->DestroyJavaVM();
-  std::cout << "muh2" << std::endl;
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.isConsistent();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.addSystem("TestSystem");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  std::string infoStructure = oi.readInformationStructureAsASP();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  std::cout << infoStructure << std::endl;
 }
 
 }
