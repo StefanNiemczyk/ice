@@ -63,6 +63,8 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->addOntologyIRIMethod = this->env->GetMethodID(this->javaOntologyInterface, "addOntologyIRI", "(Ljava/lang/String;)Z");
   this->removeOntologyIRIMethod = this->env->GetMethodID(this->javaOntologyInterface, "removeOntologyIRI", "(Ljava/lang/String;)Z");
   this->readInformationStructureAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface, "readInformationStructureAsASP", "()Ljava/lang/String;");
+  this->readNodesAndIROsAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface, "readNodesAndIROsAsASP", "()Ljava/lang/String;");
+  this->addNodeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addNode", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;[I[Ljava/lang/String;)Z");
 
   if (this->checkError("Constructor", "Failed to lookup method ids for class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
@@ -175,9 +177,52 @@ std::string OntologyInterface::readInformationStructureAsASP()
   jstring result = (jstring) env->CallObjectMethod(this->javaInterface, this->readInformationStructureAsASPMethod);
 
   if(this->checkError("readInformationStructureAsASP", "Error occurred at reading information structure"))
-    return false;
+    return "";
 
   return env->GetStringUTFChars(result,0);
+}
+
+std::string OntologyInterface::readNodesAndIROsAsASP()
+{
+  this->checkError("readNodesAndIROsAsASP", "Error exists, readNodesAndIROsAsASP will not be executed");
+
+  jstring result = (jstring) env->CallObjectMethod(this->javaInterface, this->readNodesAndIROsAsASPMethod);
+
+  if(this->checkError("readNodesAndIROsAsASP", "Error occurred at reading nodes and iros"))
+    return "";
+
+  return env->GetStringUTFChars(result,0);
+}
+
+bool OntologyInterface::addNode(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::vector<std::string> p_metadatas,
+                                std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings)
+{
+  this->checkError("removeOntologyIRI", "Error exists, addNode will not be executed");
+
+  int size = p_metadatas.size();
+
+  jstring node = env->NewStringUTF(p_node.c_str());
+  jstring nodeClass = env->NewStringUTF(p_nodeClass.c_str());
+  jstring system = env->NewStringUTF(p_system.c_str());
+  jobjectArray metadatas = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
+                                                             env->NewStringUTF(""));
+  jintArray metadataValues = env->NewIntArray(size);
+  jobjectArray metadataGroundings = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
+                                                             env->NewStringUTF(""));
+
+  for (int i = 0; i < size; ++i)
+  {
+    env->SetObjectArrayElement(metadatas, i, env->NewStringUTF(p_metadatas[i].c_str()));
+    env->SetObjectArrayElement(metadataGroundings, i, env->NewStringUTF(p_metadataGroundings[i].c_str()));
+  }
+  env->SetIntArrayRegion(metadataValues, 0, size, p_metadataValues.data());
+
+  bool result =  env->CallBooleanMethod(this->javaInterface, this->addNodeMethod, node, nodeClass, system, metadatas, metadataValues, metadataGroundings);
+
+  if(this->checkError("removeOntologyIRI", "Error occurred at adding a node " + p_node))
+    return false;
+
+  return result;
 }
 
 

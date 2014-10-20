@@ -2,6 +2,7 @@ package de.unikassel.vs.ice;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,10 +12,14 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -36,9 +41,17 @@ public class IceOntologyInterface {
 	private OWLDataFactory dataFactory;
 
 	private OWLClass systemOWLClass;
+	private OWLClass nodeOWLClass;
+	private OWLClass metadataOWLClass;
 	private OWLClass entityTypeOWLClass;
+	private OWLClass aspMetadataGroundingOWLClass;
 	private OWLObjectProperty hasSystemOWLProperty;
 	private OWLObjectProperty isSystemOfOWLProperty;
+	private OWLObjectProperty hasMetadataOWLProperty;
+	private OWLObjectProperty isMetadataOfOWLProperty;
+	private OWLObjectProperty hasGroundingOWLProperty;
+	private OWLObjectProperty isGroundingOfOWLProperty;
+	private OWLDataProperty hasMetadataValueOWLDataProperty;
 
 	private List<String> ontologyIries;
 	private List<SystemContainer> systems;
@@ -73,9 +86,22 @@ public class IceOntologyInterface {
 
 		// Fetching ontology things: class, properties, usw.
 		this.systemOWLClass = this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "System"));
+		this.nodeOWLClass = this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Node"));
+		this.metadataOWLClass = this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Metadata"));
 		this.entityTypeOWLClass = this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "EntityType"));
+		this.aspMetadataGroundingOWLClass = this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX
+				+ "ASPMetadataGrounding"));
 		this.hasSystemOWLProperty = this.dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasSystem"));
 		this.isSystemOfOWLProperty = this.dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "isSystemOf"));
+		this.hasMetadataOWLProperty = this.dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasMetadata"));
+		this.isMetadataOfOWLProperty = this.dataFactory.getOWLObjectProperty(IRI
+				.create(ICE_IRI_PREFIX + "isMetadataOf"));
+		this.hasGroundingOWLProperty = this.dataFactory.getOWLObjectProperty(IRI
+				.create(ICE_IRI_PREFIX + "hasGrounding"));
+		this.isGroundingOfOWLProperty = this.dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX
+				+ "isGroundingOf"));
+		this.hasMetadataValueOWLDataProperty = this.dataFactory.getOWLDataProperty(IRI.create(ICE_IRI_PREFIX
+				+ "hasMetadataValue"));
 
 		this.reasoner = this.reasonerFactory.createReasoner(this.mainOntology);
 		this.reasoner.precomputeInferences();
@@ -111,7 +137,8 @@ public class IceOntologyInterface {
 		return true;
 	}
 
-	public boolean addNode(final String p_node, final String p_system, String[] p_metadatas, int[] p_metadataValues) {
+	public boolean addNode(final String p_node, final String p_nodeClass, final String p_system, String[] p_metadatas,
+			int[] p_metadataValues, String[] p_metadataGroundings) {
 		// check if node exists
 		IRI nodeIRI = IRI.create(this.mainIRIPrefix + p_node);
 		if (this.mainOntology.containsIndividualInSignature(nodeIRI))
@@ -141,30 +168,103 @@ public class IceOntologyInterface {
 		}
 
 		// create node
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 		OWLIndividual nodeInd = this.dataFactory.getOWLNamedIndividual(nodeIRI);
+
+		OWLClass nodeCls = this.findOWLClass(this.nodeOWLClass, p_nodeClass);
+
+		if (nodeCls == null) {
+			System.out.println(String.format("Unknown node class %s for node %s in system %s, node not created.",
+					nodeCls, p_node, p_system));
+			return false;
+		}
+
+		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(nodeCls, nodeInd);
+		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, ax);
+		changes.add(addAxiomChange);
 
 		OWLObjectPropertyAssertionAxiom assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(
 				hasSystemOWLProperty, nodeInd, system.getIndividual());
-		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-		this.manager.applyChange(addAxiomChange);
+		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+		changes.add(addAxiomChange);
 
 		// ---
 		// TODO remove when new hermit version available
 		assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isSystemOfOWLProperty,
 				system.getIndividual(), nodeInd);
 		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-		this.manager.applyChange(addAxiomChange);
+		changes.add(addAxiomChange);
 		// ---
 
 		// add metadata
 		for (int i = 0; i < p_metadatas.length; ++i) {
 			String metadata = p_metadatas[i];
+			String grounding = p_metadataGroundings[i];
 			int value = p_metadataValues[i];
 
-			// TODO
+			OWLClass metadataCls = this.findOWLClass(this.metadataOWLClass, metadata);
+
+			if (metadataCls == null) {
+				System.out.println(String.format("Unknown Metadata %s for node %s in system %s, node not created.",
+						metadata, p_node, p_system));
+				return false;
+			}
+
+			OWLIndividual metadataInd = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_node
+					+ metadata));
+
+			ax = this.dataFactory.getOWLClassAssertionAxiom(metadataCls, metadataInd);
+			addAxiomChange = new AddAxiom(this.mainOntology, ax);
+			changes.add(addAxiomChange);
+
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.hasMetadataOWLProperty, nodeInd,
+					metadataInd);
+			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			changes.add(addAxiomChange);
+
+			// ---
+			// TODO remove when new hermit version available
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isMetadataOfOWLProperty, metadataInd,
+					nodeInd);
+			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			changes.add(addAxiomChange);
+			// ---
+
+			OWLDataPropertyAssertionAxiom dataAssertion = this.dataFactory.getOWLDataPropertyAssertionAxiom(
+					this.hasMetadataValueOWLDataProperty, metadataInd, value);
+			addAxiomChange = new AddAxiom(this.mainOntology, dataAssertion);
+			changes.add(addAxiomChange);
+
+			// set grounding
+			OWLIndividual metadataGrounding = this.findOWLIndividual(this.aspMetadataGroundingOWLClass, grounding);
+
+			if (metadataGrounding == null) {
+				System.out.println(String.format(
+						"Unknown Metadata grounding %s of grounding %s for node %s in system %s, node not created.",
+						grounding, metadata, p_node, p_system));
+				return false;
+			}
+
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.hasGroundingOWLProperty, metadataInd,
+					metadataGrounding);
+			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			changes.add(addAxiomChange);
+
+			// ---
+			// TODO remove when new hermit version available
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isGroundingOfOWLProperty,
+					metadataGrounding, metadataInd);
+			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			changes.add(addAxiomChange);
+			// ---
 		}
 
-		return false;
+		// apply changes
+		for (OWLOntologyChange change : changes) {
+			this.manager.applyChange(change);
+		}
+
+		return true;
 	}
 
 	public boolean addOntologyIRI(final String p_iri) {
@@ -176,7 +276,11 @@ public class IceOntologyInterface {
 	}
 
 	public String readInformationStructureAsASP() {
-		InfoStructureVisitor isv = new InfoStructureVisitor(this.imports, this.reasoner, this.dataFactory);
+		Set<OWLOntology> onts = new HashSet<OWLOntology>();
+		onts.add(this.mainOntology);
+		onts.addAll(this.imports);
+
+		InfoStructureVisitor isv = new InfoStructureVisitor(onts, this.reasoner, this.dataFactory);
 
 		Set<OWLClass> classes = this.reasoner.getSubClasses(this.entityTypeOWLClass, true).getFlattened();
 
@@ -185,5 +289,58 @@ public class IceOntologyInterface {
 		}
 
 		return isv.toString();
+	}
+
+	public String readNodesAndIROsAsASP() {
+		Set<OWLOntology> onts = new HashSet<OWLOntology>();
+		onts.add(this.mainOntology);
+		onts.addAll(this.imports);
+
+		NodeIROVisitor niv = new NodeIROVisitor(onts, this.reasoner, this.dataFactory);
+
+		niv.start();
+
+		return niv.toString();
+	}
+
+	private OWLIndividual findOWLIndividual(final OWLClass p_class, final String p_name) {
+		Set<OWLClass> subs = this.getAllLeafs(p_class);
+
+		for (OWLClass metadata : subs) {
+			Set<OWLNamedIndividual> inds = this.reasoner.getInstances(metadata, true).getFlattened();
+
+			for (OWLNamedIndividual ind : inds) {
+				if (ind.getIRI().getShortForm().equals(p_name))
+					return ind;
+			}
+		}
+
+		return null;
+	}
+
+	private OWLClass findOWLClass(final OWLClass p_class, final String p_name) {
+		Set<OWLClass> subs = this.getAllLeafs(p_class);
+
+		for (OWLClass metadata : subs) {
+			if (metadata.getIRI().getShortForm().equals(p_name))
+				return metadata;
+		}
+
+		return null;
+	}
+
+	private Set<OWLClass> getAllLeafs(final OWLClass p_start) {
+		Set<OWLClass> subClasses = this.reasoner.getSubClasses(p_start, true).getFlattened();
+		Set<OWLClass> results = new HashSet<OWLClass>();
+
+		for (OWLClass c : subClasses) {
+			if (c.isOWLNothing()) {
+				results.add(p_start);
+			}
+
+			results.addAll(this.getAllLeafs(c));
+		}
+
+		return results;
 	}
 }

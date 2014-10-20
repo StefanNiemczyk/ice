@@ -1,5 +1,6 @@
 #include <iostream>
 #include <jni.h>
+#include <vector>
 
 #include <ros/package.h>
 
@@ -46,6 +47,28 @@ TEST(JNITest, create)
   ASSERT_TRUE(result);
 
   std::string infoStructure = oi.readInformationStructureAsASP();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  //std::cout << infoStructure << std::endl;
+
+  std::vector<std::string> metadatas;
+  std::vector<int> metadataValues;
+  std::vector<std::string> metadataGroundings;
+
+  metadatas.push_back("Delay");
+  metadataValues.push_back(5);
+  metadataGroundings.push_back("NodeDelayASPGrounding");
+  metadatas.push_back("Cost");
+  metadataValues.push_back(5);
+  metadataGroundings.push_back("NodeCostASPGrounding");
+
+  result = oi.addNode("TestNode", "KalmanFilter", "TestSystem", metadatas, metadataValues, metadataGroundings);
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+
+  infoStructure = oi.readNodesAndIROsAsASP();
 
   ASSERT_FALSE(oi.errorOccurred());
   std::cout << infoStructure << std::endl;

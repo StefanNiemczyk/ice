@@ -10,11 +10,12 @@
 
 #include <jni.h>
 #include <string>
+#include <vector>
 
 // Forward declaration
 namespace ice
 {
-  class Logger;
+class Logger;
 }
 
 namespace ice
@@ -33,6 +34,9 @@ public:
   bool addOntologyIRI(std::string const p_iri);
   bool removeOntologyIRI(std::string const p_iri);
   std::string readInformationStructureAsASP();
+  std::string readNodesAndIROsAsASP();
+  bool addNode(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::vector<std::string> p_metadatas,
+               std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings);
 
 private:
   bool checkError(std::string p_method, std::string p_error);
@@ -51,6 +55,8 @@ private:
   jmethodID addOntologyIRIMethod; /*< Method id */
   jmethodID removeOntologyIRIMethod; /*< Method id */
   jmethodID readInformationStructureAsASPMethod; /* Method id */
+  jmethodID readNodesAndIROsAsASPMethod; /*< Method id */
+  jmethodID addNodeMethod; /* Method id */
 };
 
 } /* namespace ice */

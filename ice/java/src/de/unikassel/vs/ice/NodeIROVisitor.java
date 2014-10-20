@@ -112,6 +112,7 @@ public class NodeIROVisitor extends IceVisitor {
 	private OWLClass currentRepresentation;
 	private OWLNamedIndividual currentSystem;
 	private String elementString;
+	private boolean found;
 
 	private OWLNamedIndividual grounding;
 
@@ -135,6 +136,7 @@ public class NodeIROVisitor extends IceVisitor {
 				System.out.println(String.format("Checking grounding %s in system %s", grounding, system));
 				this.grounding = grounding;
 
+				this.found = false;
 				// check types
 				Collection<OWLClassExpression> types = new ArrayList<OWLClassExpression>();
 
@@ -142,6 +144,7 @@ public class NodeIROVisitor extends IceVisitor {
 					types.addAll(EntitySearcher.getTypes(grounding, ont));
 
 				for (OWLClassExpression type : types) {
+					sb.append(type + "\n");
 					type.accept(this);
 				}
 
@@ -222,6 +225,10 @@ public class NodeIROVisitor extends IceVisitor {
 		for (OWLOntology ont : this.ontologies) {
 			for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(ce)) {
 				if (this.isSubClassOf(ax.getSuperClass(), this.node)) {
+					if (found)
+						continue;
+
+					this.found = true;
 					this.currentType = Type.NODE;
 					this.lastIRO = ce;
 
@@ -232,7 +239,7 @@ public class NodeIROVisitor extends IceVisitor {
 					// #external nodeTemplate(system1,node1,any).
 					StringBuffer sb = new StringBuffer();
 					sb.append("nodeTemplate(");
-					sb.append(this.iRIShortName(this.system.getIRI()));
+					sb.append(this.iRIShortName(this.currentSystem.getIRI()));
 					sb.append(",");
 					sb.append(this.iRIShortName(this.grounding.getIRI()));
 					sb.append(",");
@@ -243,6 +250,10 @@ public class NodeIROVisitor extends IceVisitor {
 					this.sb.append("#external ");
 					this.sb.append(this.elementString);
 				} else if (this.isSubClassOf(ax.getSuperClass(), this.iro)) {
+					if (found)
+						continue;
+
+					this.found = true;
 					this.currentType = Type.IRO;
 					this.lastIRO = ce;
 					iro = true;
@@ -424,7 +435,7 @@ public class NodeIROVisitor extends IceVisitor {
 
 		if (this.currentScope != null) {
 			if (this.currentRepresentation != null) {
-				sb.append(String.format(p_pattern, this.iRIShortName(this.system.getIRI()),
+				sb.append(String.format(p_pattern, this.iRIShortName(this.currentSystem.getIRI()),
 						this.iRIShortName(this.lastIRO.getIRI()), this.iRIShortName(this.currentScope.getIRI()),
 						this.iRIShortName(this.currentRepresentation.getIRI())));
 			} else {
@@ -435,10 +446,8 @@ public class NodeIROVisitor extends IceVisitor {
 	}
 
 	private String replace(String p_string) {
-		p_string.replace("system", this.iRIShortName(this.currentSystem.getIRI()));
-		p_string.replace("node", this.iRIShortName(this.grounding.getIRI()));
-
-		return p_string;
+		p_string = p_string.replace("system", this.iRIShortName(this.currentSystem.getIRI()));
+		return p_string.replace("node", this.iRIShortName(this.grounding.getIRI()));
 	}
 
 	// Generic Stuff, which I ignore
