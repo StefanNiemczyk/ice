@@ -38,7 +38,7 @@ include(UseJava)
 include(FindJNI)
 
 set(CMAKE_JAVA_INCLUDE_PATH 
-  ${CMAKE_CURRENT_SOURCE_DIR}/java/lib/owlapi-distribution-4.0.0.jar
+  ${CMAKE_CURRENT_SOURCE_DIR}/java/lib/owlapi-distribution-3.5.1.jar
   ${CMAKE_CURRENT_SOURCE_DIR}/java/lib/HermiT.jar
   ${CMAKE_CURRENT_SOURCE_DIR}/java/lib/slf4j-simple-1.7.7.jar
   )

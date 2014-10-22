@@ -64,7 +64,12 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->removeOntologyIRIMethod = this->env->GetMethodID(this->javaOntologyInterface, "removeOntologyIRI", "(Ljava/lang/String;)Z");
   this->readInformationStructureAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface, "readInformationStructureAsASP", "()Ljava/lang/String;");
   this->readNodesAndIROsAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface, "readNodesAndIROsAsASP", "()Ljava/lang/String;");
-  this->addNodeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addNode", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;[I[Ljava/lang/String;)Z");
+  this->addNodeIndividualMethod = this->env->GetMethodID(this->javaOntologyInterface, "addNodeIndividual", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;[I[Ljava/lang/String;)Z");
+  this->getSomeMinCardinalityMethod = this->env->GetMethodID(this->javaOntologyInterface, "getSomeMinCardinality", "()I");
+  this->setSomeMinCardinalityMethod = this->env->GetMethodID(this->javaOntologyInterface, "setSomeMinCardinality", "(I)V");
+  this->getSomeMaxCardinalityMethod = this->env->GetMethodID(this->javaOntologyInterface, "getSomeMaxCardinality", "()I");
+  this->setSomeMaxCardinalityMethod = this->env->GetMethodID(this->javaOntologyInterface, "setSomeMaxCardinality", "(I)V");
+
 
   if (this->checkError("Constructor", "Failed to lookup method ids for class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
@@ -194,7 +199,7 @@ std::string OntologyInterface::readNodesAndIROsAsASP()
   return env->GetStringUTFChars(result,0);
 }
 
-bool OntologyInterface::addNode(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::vector<std::string> p_metadatas,
+bool OntologyInterface::addNodeIndividual(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::vector<std::string> p_metadatas,
                                 std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings)
 {
   this->checkError("removeOntologyIRI", "Error exists, addNode will not be executed");
@@ -217,7 +222,7 @@ bool OntologyInterface::addNode(std::string const p_node, std::string const p_no
   }
   env->SetIntArrayRegion(metadataValues, 0, size, p_metadataValues.data());
 
-  bool result =  env->CallBooleanMethod(this->javaInterface, this->addNodeMethod, node, nodeClass, system, metadatas, metadataValues, metadataGroundings);
+  bool result =  env->CallBooleanMethod(this->javaInterface, this->addNodeIndividualMethod, node, nodeClass, system, metadatas, metadataValues, metadataGroundings);
 
   if(this->checkError("removeOntologyIRI", "Error occurred at adding a node " + p_node))
     return false;
@@ -225,5 +230,52 @@ bool OntologyInterface::addNode(std::string const p_node, std::string const p_no
   return result;
 }
 
+int OntologyInterface::getSomeMinCardinality()
+{
+  this->checkError("getSomeMinCardinality", "Error exists, getSomeMinCardinality will not be executed");
+
+  jint result = env->CallIntMethod(this->javaInterface, this->getSomeMinCardinalityMethod);
+
+  if(this->checkError("getSomeMinCardinality", "Error occurred at reading min cardinality for some constraints"))
+    return -1;
+
+  return result;
+}
+
+bool OntologyInterface::setSomeMinCardinality(int p_value)
+{
+  this->checkError("setSomeMinCardinality", "Error exists, setSomeMinCardinality will not be executed");
+
+  env->CallIntMethod(this->javaInterface, this->setSomeMinCardinalityMethod);
+
+  if(this->checkError("setSomeMinCardinality", "Error occurred at setting min cardinality for some constraints"))
+    return false;
+
+  return true;
+}
+
+int OntologyInterface::getSomeMaxCardinality()
+{
+  this->checkError("getSomeMaxCardinality", "Error exists, getSomeMaxCardinality will not be executed");
+
+  jint result = env->CallIntMethod(this->javaInterface, this->getSomeMaxCardinalityMethod);
+
+  if(this->checkError("getSomeMaxCardinality", "Error occurred at reading max cardinality for some constraints"))
+    return -1;
+
+  return result;
+}
+
+bool OntologyInterface::setSomeMaxCardinality(int p_value)
+{
+  this->checkError("setSomeMaxCardinality", "Error exists, setSomeMaxCardinality will not be executed");
+
+  env->CallIntMethod(this->javaInterface, this->setSomeMaxCardinalityMethod);
+
+  if(this->checkError("setSomeMaxCardinality", "Error occurred at setting max cardinality for some constraints"))
+    return false;
+
+  return true;
+}
 
 } /* namespace ice */

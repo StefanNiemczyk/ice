@@ -6,11 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
@@ -25,7 +27,6 @@ import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 
 public class IceOntologyInterface {
@@ -37,7 +38,7 @@ public class IceOntologyInterface {
 	private OWLOntology mainOntology;
 	private Set<OWLOntology> imports;
 	private OWLReasonerFactory reasonerFactory;
-	private OWLReasoner reasoner;
+	private OWLReasoner internalReasoner;
 	private OWLDataFactory dataFactory;
 
 	private OWLClass systemOWLClass;
@@ -55,6 +56,10 @@ public class IceOntologyInterface {
 
 	private List<String> ontologyIries;
 	private List<SystemContainer> systems;
+	private boolean dirty;
+
+	private int someMinCardinality;
+	private int someMaxCardinality;
 
 	private String mainIRI;
 	private String mainIRIPrefix;
@@ -62,15 +67,18 @@ public class IceOntologyInterface {
 	public IceOntologyInterface() {
 		this.manager = OWLManager.createOWLOntologyManager();
 		this.dataFactory = manager.getOWLDataFactory();
-		// OWLReasonerFactory reasonerFactory = new Reasoner.ReasonerFactory();
-		this.reasonerFactory = new StructuralReasonerFactory();
+		this.reasonerFactory = new Reasoner.ReasonerFactory();
+		// this.reasonerFactory = new StructuralReasonerFactory();
 		this.ontologyIries = new ArrayList<String>();
 		this.systems = new ArrayList<SystemContainer>();
+		this.someMinCardinality = 1;
+		this.someMaxCardinality = 1;
+		this.dirty = true;
 	}
 
 	public void addIRIMapper(final String p_path) {
 		OWLOntologyIRIMapper aim = new AutoIRIMapper(new File(p_path), true);
-		this.manager.getIRIMappers().add(aim);
+		this.manager.addIRIMapper(aim);
 	}
 
 	public boolean loadOntologies() throws OWLOntologyCreationException {
@@ -103,14 +111,13 @@ public class IceOntologyInterface {
 		this.hasMetadataValueOWLDataProperty = this.dataFactory.getOWLDataProperty(IRI.create(ICE_IRI_PREFIX
 				+ "hasMetadataValue"));
 
-		this.reasoner = this.reasonerFactory.createReasoner(this.mainOntology);
-		this.reasoner.precomputeInferences();
+		this.dirty = true;
 
 		return true;
 	}
 
 	public boolean isConsistent() {
-		return this.reasoner.isConsistent();
+		return this.getReasoner().isConsistent();
 	}
 
 	public boolean addSystem(final String p_systemName) {
@@ -134,11 +141,13 @@ public class IceOntologyInterface {
 
 		this.systems.add(system);
 
+		this.dirty = true;
+
 		return true;
 	}
 
-	public boolean addNode(final String p_node, final String p_nodeClass, final String p_system, String[] p_metadatas,
-			int[] p_metadataValues, String[] p_metadataGroundings) {
+	public boolean addNodeIndividual(final String p_node, final String p_nodeClass, final String p_system,
+			String[] p_metadatas, int[] p_metadataValues, String[] p_metadataGroundings) {
 		// check if node exists
 		IRI nodeIRI = IRI.create(this.mainIRIPrefix + p_node);
 		if (this.mainOntology.containsIndividualInSignature(nodeIRI))
@@ -174,7 +183,7 @@ public class IceOntologyInterface {
 		OWLClass nodeCls = this.findOWLClass(this.nodeOWLClass, p_nodeClass);
 
 		if (nodeCls == null) {
-			System.out.println(String.format("Unknown node class %s for node %s in system %s, node not created.",
+			System.out.println(String.format("Unknown node class '%s' for node '%s' in system '%s', node not created.",
 					nodeCls, p_node, p_system));
 			return false;
 		}
@@ -190,10 +199,11 @@ public class IceOntologyInterface {
 
 		// ---
 		// TODO remove when new hermit version available
-		assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isSystemOfOWLProperty,
-				system.getIndividual(), nodeInd);
-		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-		changes.add(addAxiomChange);
+		// assertion =
+		// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isSystemOfOWLProperty,
+		// system.getIndividual(), nodeInd);
+		// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+		// changes.add(addAxiomChange);
 		// ---
 
 		// add metadata
@@ -224,10 +234,12 @@ public class IceOntologyInterface {
 
 			// ---
 			// TODO remove when new hermit version available
-			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isMetadataOfOWLProperty, metadataInd,
-					nodeInd);
-			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-			changes.add(addAxiomChange);
+			// assertion =
+			// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isMetadataOfOWLProperty,
+			// metadataInd,
+			// nodeInd);
+			// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			// changes.add(addAxiomChange);
 			// ---
 
 			OWLDataPropertyAssertionAxiom dataAssertion = this.dataFactory.getOWLDataPropertyAssertionAxiom(
@@ -252,10 +264,11 @@ public class IceOntologyInterface {
 
 			// ---
 			// TODO remove when new hermit version available
-			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isGroundingOfOWLProperty,
-					metadataGrounding, metadataInd);
-			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-			changes.add(addAxiomChange);
+			// assertion =
+			// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isGroundingOfOWLProperty,
+			// metadataGrounding, metadataInd);
+			// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			// changes.add(addAxiomChange);
 			// ---
 		}
 
@@ -263,6 +276,8 @@ public class IceOntologyInterface {
 		for (OWLOntologyChange change : changes) {
 			this.manager.applyChange(change);
 		}
+
+		this.dirty = true;
 
 		return true;
 	}
@@ -280,11 +295,14 @@ public class IceOntologyInterface {
 		onts.add(this.mainOntology);
 		onts.addAll(this.imports);
 
-		InfoStructureVisitor isv = new InfoStructureVisitor(onts, this.reasoner, this.dataFactory);
+		InfoStructureVisitor isv = new InfoStructureVisitor(onts, this.getReasoner(), this.dataFactory);
 
-		Set<OWLClass> classes = this.reasoner.getSubClasses(this.entityTypeOWLClass, true).getFlattened();
+		Set<OWLClassExpression> classes = this.entityTypeOWLClass.getSubClasses(onts);
+		// Set<OWLClass> classes =
+		// this.getReasoner().getSubClasses(this.entityTypeOWLClass,
+		// true).getFlattened();
 
-		for (OWLClass cls : classes) {
+		for (OWLClassExpression cls : classes) {
 			cls.accept(isv);
 		}
 
@@ -296,21 +314,30 @@ public class IceOntologyInterface {
 		onts.add(this.mainOntology);
 		onts.addAll(this.imports);
 
-		NodeIROVisitor niv = new NodeIROVisitor(onts, this.reasoner, this.dataFactory);
+		NodeIROVisitor niv = new NodeIROVisitor(onts, this.getReasoner(), this.dataFactory);
 
 		niv.start();
 
 		return niv.toString();
 	}
 
+	private OWLReasoner getReasoner() {
+		if (this.dirty || this.internalReasoner == null) {
+			this.internalReasoner = this.reasonerFactory.createReasoner(this.mainOntology);
+			this.dirty = false;
+		}
+
+		return this.internalReasoner;
+	}
+
 	private OWLIndividual findOWLIndividual(final OWLClass p_class, final String p_name) {
 		Set<OWLClass> subs = this.getAllLeafs(p_class);
 
 		for (OWLClass metadata : subs) {
-			Set<OWLNamedIndividual> inds = this.reasoner.getInstances(metadata, true).getFlattened();
+			Set<OWLNamedIndividual> inds = this.getReasoner().getInstances(metadata, true).getFlattened();
 
 			for (OWLNamedIndividual ind : inds) {
-				if (ind.getIRI().getShortForm().equals(p_name))
+				if (ind.getIRI().toString().endsWith("#" + p_name))
 					return ind;
 			}
 		}
@@ -322,7 +349,7 @@ public class IceOntologyInterface {
 		Set<OWLClass> subs = this.getAllLeafs(p_class);
 
 		for (OWLClass metadata : subs) {
-			if (metadata.getIRI().getShortForm().equals(p_name))
+			if (metadata.getIRI().toString().endsWith("#" + p_name))
 				return metadata;
 		}
 
@@ -330,7 +357,7 @@ public class IceOntologyInterface {
 	}
 
 	private Set<OWLClass> getAllLeafs(final OWLClass p_start) {
-		Set<OWLClass> subClasses = this.reasoner.getSubClasses(p_start, true).getFlattened();
+		Set<OWLClass> subClasses = this.getReasoner().getSubClasses(p_start, true).getFlattened();
 		Set<OWLClass> results = new HashSet<OWLClass>();
 
 		for (OWLClass c : subClasses) {
@@ -342,5 +369,21 @@ public class IceOntologyInterface {
 		}
 
 		return results;
+	}
+
+	public int getSomeMinCardinality() {
+		return someMinCardinality;
+	}
+
+	public void setSomeMinCardinality(int someMinCardinality) {
+		this.someMinCardinality = someMinCardinality;
+	}
+
+	public int getSomeMaxCardinality() {
+		return someMaxCardinality;
+	}
+
+	public void setSomeMaxCardinality(int someMaxCardinality) {
+		this.someMaxCardinality = someMaxCardinality;
 	}
 }

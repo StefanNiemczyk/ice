@@ -93,7 +93,6 @@ import org.semanticweb.owlapi.model.SWRLRule;
 import org.semanticweb.owlapi.model.SWRLSameIndividualAtom;
 import org.semanticweb.owlapi.model.SWRLVariable;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.search.EntitySearcher;
 
 public class NodeIROVisitor extends IceVisitor {
 
@@ -141,10 +140,11 @@ public class NodeIROVisitor extends IceVisitor {
 				Collection<OWLClassExpression> types = new ArrayList<OWLClassExpression>();
 
 				for (OWLOntology ont : this.ontologies)
-					types.addAll(EntitySearcher.getTypes(grounding, ont));
+					types.addAll(grounding.getTypes(ont));
+				// OWL API 4.0
+				// types.addAll(EntitySearcher.getTypes(grounding, ont));
 
 				for (OWLClassExpression type : types) {
-					sb.append(type + "\n");
 					type.accept(this);
 				}
 
@@ -185,7 +185,9 @@ public class NodeIROVisitor extends IceVisitor {
 			Collection<OWLClassExpression> types = new ArrayList<OWLClassExpression>();
 
 			for (OWLOntology ont : this.ontologies)
-				types.addAll(EntitySearcher.getTypes(ind, ont));
+				types.addAll(ind.getTypes(ont));
+			// OWL API 4.0
+			// types.addAll(EntitySearcher.getTypes(ind, ont));
 
 			int count = 0;
 

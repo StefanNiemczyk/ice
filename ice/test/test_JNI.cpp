@@ -49,7 +49,7 @@ TEST(JNITest, create)
   std::string infoStructure = oi.readInformationStructureAsASP();
 
   ASSERT_FALSE(oi.errorOccurred());
-  //std::cout << infoStructure << std::endl;
+//  std::cout << infoStructure << std::endl;
 
   std::vector<std::string> metadatas;
   std::vector<int> metadataValues;
@@ -62,11 +62,10 @@ TEST(JNITest, create)
   metadataValues.push_back(5);
   metadataGroundings.push_back("NodeCostASPGrounding");
 
-  result = oi.addNode("TestNode", "KalmanFilter", "TestSystem", metadatas, metadataValues, metadataGroundings);
+  result = oi.addNodeIndividual("TestNode", "KalmanFilter", "TestSystem", metadatas, metadataValues, metadataGroundings);
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
-
 
   infoStructure = oi.readNodesAndIROsAsASP();
 

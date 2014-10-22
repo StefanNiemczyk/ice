@@ -292,7 +292,7 @@ public class InfoStructureVisitor extends IceVisitor {
 					class1 = (OWLClass) exp;
 				} else if (exp instanceof OWLObjectHasValue) {
 					OWLObjectHasValue ohv = (OWLObjectHasValue) exp;
-					if (ohv.getProperty().equals(p_property) && ohv.getFiller().isAnonymous() == false) {
+					if (ohv.getProperty().equals(p_property) && ohv.getValue().isAnonymous() == false) {
 						unit = this.iRIShortName(ohv.getFiller().asOWLNamedIndividual().getIRI());
 					}
 				} else if (exp instanceof OWLObjectExactCardinality) {
@@ -332,8 +332,8 @@ public class InfoStructureVisitor extends IceVisitor {
 					class1 = (OWLClass) exp;
 				} else if (exp instanceof OWLObjectHasValue) {
 					OWLObjectHasValue ohv = (OWLObjectHasValue) exp;
-					if (ohv.getProperty().equals(p_property) && ohv.getFiller().isAnonymous() == false) {
-						unit = this.iRIShortName(ohv.getFiller().asOWLNamedIndividual().getIRI());
+					if (ohv.getProperty().equals(p_property) && ohv.getValue().isAnonymous() == false) {
+						unit = this.iRIShortName(ohv.getValue().asOWLNamedIndividual().getIRI());
 					}
 				} else if (exp instanceof OWLObjectExactCardinality) {
 					OWLObjectExactCardinality ohv = (OWLObjectExactCardinality) exp;
