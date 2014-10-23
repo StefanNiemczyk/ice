@@ -37,6 +37,8 @@ public:
   std::string readNodesAndIROsAsASP();
   bool addNodeIndividual(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::vector<std::string> p_metadatas,
                std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings);
+  bool addIROIndividual(std::string const p_iro, std::string const p_iroClass, std::string const p_system, std::vector<std::string> p_metadatas,
+               std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings);
   int getSomeMinCardinality();
   bool setSomeMinCardinality(int p_value);
   int getSomeMaxCardinality();
@@ -61,6 +63,7 @@ private:
   jmethodID readInformationStructureAsASPMethod; /* Method id */
   jmethodID readNodesAndIROsAsASPMethod; /*< Method id */
   jmethodID addNodeIndividualMethod; /* Method id */
+  jmethodID addIROIndividualMethod; /* Method id */
   jmethodID getSomeMinCardinalityMethod; /*< Method id */
   jmethodID setSomeMinCardinalityMethod; /*< Method id */
   jmethodID getSomeMaxCardinalityMethod; /*< Method id */

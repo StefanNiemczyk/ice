@@ -65,6 +65,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->readInformationStructureAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface, "readInformationStructureAsASP", "()Ljava/lang/String;");
   this->readNodesAndIROsAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface, "readNodesAndIROsAsASP", "()Ljava/lang/String;");
   this->addNodeIndividualMethod = this->env->GetMethodID(this->javaOntologyInterface, "addNodeIndividual", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;[I[Ljava/lang/String;)Z");
+  this->addIROIndividualMethod = this->env->GetMethodID(this->javaOntologyInterface, "addIROIndividual", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;[I[Ljava/lang/String;)Z");
   this->getSomeMinCardinalityMethod = this->env->GetMethodID(this->javaOntologyInterface, "getSomeMinCardinality", "()I");
   this->setSomeMinCardinalityMethod = this->env->GetMethodID(this->javaOntologyInterface, "setSomeMinCardinality", "(I)V");
   this->getSomeMaxCardinalityMethod = this->env->GetMethodID(this->javaOntologyInterface, "getSomeMaxCardinality", "()I");
@@ -202,7 +203,7 @@ std::string OntologyInterface::readNodesAndIROsAsASP()
 bool OntologyInterface::addNodeIndividual(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::vector<std::string> p_metadatas,
                                 std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings)
 {
-  this->checkError("removeOntologyIRI", "Error exists, addNode will not be executed");
+  this->checkError("addNodeIndividual", "Error exists, addNodeIndividual will not be executed");
 
   int size = p_metadatas.size();
 
@@ -224,7 +225,38 @@ bool OntologyInterface::addNodeIndividual(std::string const p_node, std::string 
 
   bool result =  env->CallBooleanMethod(this->javaInterface, this->addNodeIndividualMethod, node, nodeClass, system, metadatas, metadataValues, metadataGroundings);
 
-  if(this->checkError("removeOntologyIRI", "Error occurred at adding a node " + p_node))
+  if(this->checkError("addNodeIndividual", "Error occurred at adding a node " + p_node))
+    return false;
+
+  return result;
+}
+
+bool OntologyInterface::addIROIndividual(std::string const p_iro, std::string const p_iroClass, std::string const p_system, std::vector<std::string> p_metadatas,
+                                std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings)
+{
+  this->checkError("addIROIndividual", "Error exists, addIROIndividual will not be executed");
+
+  int size = p_metadatas.size();
+
+  jstring iro = env->NewStringUTF(p_iro.c_str());
+  jstring iroClass = env->NewStringUTF(p_iroClass.c_str());
+  jstring system = env->NewStringUTF(p_system.c_str());
+  jobjectArray metadatas = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
+                                                             env->NewStringUTF(""));
+  jintArray metadataValues = env->NewIntArray(size);
+  jobjectArray metadataGroundings = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
+                                                             env->NewStringUTF(""));
+
+  for (int i = 0; i < size; ++i)
+  {
+    env->SetObjectArrayElement(metadatas, i, env->NewStringUTF(p_metadatas[i].c_str()));
+    env->SetObjectArrayElement(metadataGroundings, i, env->NewStringUTF(p_metadataGroundings[i].c_str()));
+  }
+  env->SetIntArrayRegion(metadataValues, 0, size, p_metadataValues.data());
+
+  bool result =  env->CallBooleanMethod(this->javaInterface, this->addIROIndividualMethod, iro, iroClass, system, metadatas, metadataValues, metadataGroundings);
+
+  if(this->checkError("addIROIndividual", "Error occurred at adding an IRO " + p_iro))
     return false;
 
   return result;

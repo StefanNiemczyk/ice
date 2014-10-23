@@ -122,7 +122,6 @@ add_jar(
   java/src/de/unikassel/vs/ice/IceVisitor.java
   java/src/de/unikassel/vs/ice/InfoStructureVisitor.java
   java/src/de/unikassel/vs/ice/NodeIROVisitor.java
-  java/src/de/unikassel/vs/ice/SystemContainer.java
   OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/java/lib
 )
 
@@ -245,7 +244,7 @@ target_link_libraries(ice_node
 catkin_add_gtest(${PROJECT_NAME}-test 
  # test/etc/TestTime.cpp
  # test/etc/EngineStuff.cpp
- # test/test_ASPComposition.cpp
+  test/test_ASPComposition.cpp
   test/test_JNI.cpp
  # test/test_Logger.cpp
  # test/test_RingBuffer.cpp

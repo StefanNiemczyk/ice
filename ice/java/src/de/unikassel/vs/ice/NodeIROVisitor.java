@@ -206,7 +206,7 @@ public class NodeIROVisitor extends IceVisitor {
 			for (OWLLiteral lit : literals) {
 				String pattern = this.replace(lit.getLiteral());
 
-				pattern = pattern.replace("value1", value);
+				pattern = pattern.replace("$value1", value);
 
 				sb.append(pattern + "\n");
 			}
@@ -291,6 +291,7 @@ public class NodeIROVisitor extends IceVisitor {
 			sb.append(this.iRIShortName(this.iroScope.getIRI()));
 
 			if (this.iroRelatedScope != null) {
+				sb.append(",");
 				sb.append((this.lastOnlyEntity != null) ? this.iRIShortName(this.lastOnlyEntity.getIRI()) : "any");
 				sb.append(",");
 				sb.append(this.iRIShortName(this.iroRelatedScope.getIRI()));
@@ -345,10 +346,10 @@ public class NodeIROVisitor extends IceVisitor {
 
 			switch (this.currentType) {
 			case NODE:
-				pattern = "output(%s,%s,%s,%s,max,0).\n";
+				pattern = "output(%s,%s,%s,%s).\n";
 				break;
 			case IRO:
-				pattern = "outputIRO(%s,%s,%s,%s,max,0).\n";
+				pattern = "outputIRO(%s,%s,%s,%s).\n";
 				break;
 			default:
 				// TODO
@@ -448,8 +449,8 @@ public class NodeIROVisitor extends IceVisitor {
 	}
 
 	private String replace(String p_string) {
-		p_string = p_string.replace("system", this.iRIShortName(this.currentSystem.getIRI()));
-		return p_string.replace("node", this.iRIShortName(this.grounding.getIRI()));
+		p_string = p_string.replace("$system", this.iRIShortName(this.currentSystem.getIRI()));
+		return p_string.replace("$node", this.iRIShortName(this.grounding.getIRI()));
 	}
 
 	// Generic Stuff, which I ignore

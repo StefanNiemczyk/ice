@@ -44,31 +44,49 @@ streamCost(k,SYSTEM,SOURCE,INFO,COST) :- inputStream(SYSTEM,SOURCE,INFO,_,_,COST
 MIN { connect(k,SYSTEM,NODE,SOURCE,information(ENTITY,SCOPE,REP,none)) : stream(k,SYSTEM,SOURCE,information(ENTITY,SCOPE,REP,none)) } MAX :- 
 		input(SYSTEM,NODE,SCOPE,REP,MIN,MAX), node(k,SYSTEM,NODE,ENTITY).
 
-stream(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none)) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,_,_).
+stream(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none)) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP).
 
 % computing QoS paramters
-streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ND) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,_,_), nodeDelay(SYSTEM,NODE,ND),
+streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ND) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP), nodeDelay(SYSTEM,NODE,ND),
 		SD = #max{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamDelay(k,SYSTEM,SOURCE,INFO,D)}, SD==#infimum.
-streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ND+SD) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,_,_), nodeDelay(SYSTEM,NODE,ND),
+streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ND+SD) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP), nodeDelay(SYSTEM,NODE,ND),
 		SD = #max{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamDelay(k,SYSTEM,SOURCE,INFO,D)}, SD!=#infimum.
-streamCost(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),0) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,_,_).
+streamCost(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),0) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP).
 
-streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ACC_COUNT*ACC_MODIFIER+ACC) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,min,ACC_MODIFIER), 
+streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ACC_COUNT*ACC_MODIFIER+ACC) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP), nodeAccuracyMin(SYSTEM,NODE,ACC_MODIFIER), 
 		ACC = #min{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, 
 		ACC_COUNT = #count{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)},
 		ACC_MODIFIER+ACC < maxAccuracyValue, ACC_MODIFIER+ACC > minAccuracyValue.
-streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ACC_COUNT*ACC_MODIFIER+ACC) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,avg,ACC_MODIFIER), 
+streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ACC_COUNT*ACC_MODIFIER+ACC) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP), nodeAccuracyAvg(SYSTEM,NODE,ACC_MODIFIER), 
 		ACC_SUM = #sum{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, 
 		ACC_COUNT = #count{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC_COUNT != 0,
 		ACC = ACC_SUM / ACC_COUNT, ACC_MODIFIER+ACC < maxAccuracyValue, ACC_MODIFIER+ACC > minAccuracyValue.
-streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),0) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,avg,ACC_MODIFIER), 
+streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),0) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP), nodeAccuracyAvg(SYSTEM,NODE,ACC_MODIFIER), 
 		ACC_COUNT = #count{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC_COUNT == 0.
-streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ACC_COUNT*ACC_MODIFIER+ACC) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,max,ACC_MODIFIER), 
+streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ACC_COUNT*ACC_MODIFIER+ACC) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP), nodeAccuracyMax(SYSTEM,NODE,ACC_MODIFIER), 
 		ACC = #max{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC!=#infimum, 
 		ACC_COUNT = #count{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC_COUNT != 0,
 		ACC_MODIFIER+ACC < maxAccuracyValue, ACC_MODIFIER+ACC > minAccuracyValue.
-streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),0) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,max,ACC_MODIFIER), 
+streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),0) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP), nodeAccuracyMax(SYSTEM,NODE,ACC_MODIFIER), 
 		ACC = #max{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC==#infimum.
+
+%% OLD
+%streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ACC_COUNT*ACC_MODIFIER+ACC) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,min,ACC_MODIFIER), 
+%		ACC = #min{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, 
+%		ACC_COUNT = #count{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)},
+%		ACC_MODIFIER+ACC < maxAccuracyValue, ACC_MODIFIER+ACC > minAccuracyValue.
+%streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ACC_COUNT*ACC_MODIFIER+ACC) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,avg,ACC_MODIFIER), 
+%		ACC_SUM = #sum{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, 
+%		ACC_COUNT = #count{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC_COUNT != 0,
+%		ACC = ACC_SUM / ACC_COUNT, ACC_MODIFIER+ACC < maxAccuracyValue, ACC_MODIFIER+ACC > minAccuracyValue.
+%streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),0) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,avg,ACC_MODIFIER), 
+%		ACC_COUNT = #count{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC_COUNT == 0.
+%streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),ACC_COUNT*ACC_MODIFIER+ACC) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,max,ACC_MODIFIER), 
+%		ACC = #max{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC!=#infimum, 
+%		ACC_COUNT = #count{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC_COUNT != 0,
+%		ACC_MODIFIER+ACC < maxAccuracyValue, ACC_MODIFIER+ACC > minAccuracyValue.
+%streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none),0) :- node(k,SYSTEM,NODE,ENTITY), output(SYSTEM,NODE,SCOPE,REP,max,ACC_MODIFIER), 
+%		ACC = #max{D,SOURCE,INFO : connect(k,SYSTEM,NODE,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC==#infimum.
 
 
 %% transfer a stream between systems
@@ -95,37 +113,48 @@ streamAccuracy(k,SYSTEM_TARGET,SOURCE,INFO,ACCURACY) :- streamTransfer(k,SYSTEM_
 
 %MIN { connectToIro(k,SYSTEM,IRO,SOURCE,information(ENTITY,SCOPE,REP,none)) : stream(k,SYSTEM,SOURCE,information(ENTITY,SCOPE,REP,none)) } MAX :- 
 %		inputIro(SYSTEM,IRO,SCOPE,REP,MIN,MAX), informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,_,_).
-MIN { connectToIro(k,SYSTEM,IRO,SOURCE,information(ENTITY,SCOPE2,REP,none)) : stream(k,SYSTEM,SOURCE,information(ENTITY,SCOPE2,REP,none)) } MAX :- 
-		inputIro(SYSTEM,IRO,SCOPE2,REP,MIN,MAX), informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,_,_).
-MIN { connectToIro(k,SYSTEM,IRO,SOURCE,information(ENTITY,SCOPE2,REP,none)) : stream(k,SYSTEM,SOURCE,information(ENTITY,SCOPE2,REP,none)) } MAX :- 
-		inputIro2(SYSTEM,IRO,SCOPE2,REP,MIN,MAX), informationTranslation(k,SYSTEM,IRO,_,_,ENTITY,SCOPE).
+MIN { connectToIro(k,SYSTEM,IRO,SOURCE,information(ENTITY,SCOPE,REP,none)) : stream(k,SYSTEM,SOURCE,information(ENTITY,SCOPE,REP,none)) } MAX :- 
+		inputIro(SYSTEM,IRO,SCOPE,REP,MIN,MAX), informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,_,_).
+MIN { connectToIro(k,SYSTEM,IRO,SOURCE,information(ENTITY,SCOPE,REP,none)) : stream(k,SYSTEM,SOURCE,information(ENTITY,SCOPE,REP,none)) } MAX :- 
+		inputIro2(SYSTEM,IRO,SCOPE,REP,MIN,MAX), informationTranslation(k,SYSTEM,IRO,_,_,ENTITY,SCOPE).
 
-%stream(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,none)) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,SCOPE2), outputIro(SYSTEM,IRO,REP,_,_).
-stream(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2)) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP,_,_).
+outputIro(SYSTEM,IRO,SCOPE,REP) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,_,_), outputIro(SYSTEM,IRO,REP).
 
-%0 { informationTranslation(SYSTEM,SOURCE,REP1,information(ENTITY,SCOPE,REP2),k,ACCURACY_MODIFIER,TRANSLATION_DELAY,TRANSLATION_COST) } 1 :-  stream(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP1),k), interRepresentationOperation(SYSTEM,REP1,REP2,ACCURACY_MODIFIER,TRANSLATION_DELAY,TRANSLATION_COST).
-%stream(SYSTEM,SOURCE,INFO,k) :- informationTranslation(SYSTEM,SOURCE,REP1,INFO,k,ACCURACY_MODIFIER,TRANSLATION_DELAY,TRANSLATION_COST).
+%stream(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,REP).
+stream(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2)) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP).
 
 % computing QoS paramters
 
-streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),ND) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,REP,_,_), 
+%streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),ND) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,REP), 
+%		iroDelay(SYSTEM,IRO,ND), SD = #max{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamDelay(k,SYSTEM,SOURCE,INFO,D)}, SD==#infimum.
+%streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),ND+SD) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,REP), 
+%		iroDelay(SYSTEM,IRO,ND), SD = #max{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamDelay(k,SYSTEM,SOURCE,INFO,D)}, SD!=#infimum.
+streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),ND) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP), 
 		iroDelay(SYSTEM,IRO,ND), SD = #max{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamDelay(k,SYSTEM,SOURCE,INFO,D)}, SD==#infimum.
-streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),ND+SD) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,REP,_,_), 
-		iroDelay(SYSTEM,IRO,ND), SD = #max{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamDelay(k,SYSTEM,SOURCE,INFO,D)}, SD!=#infimum.
-streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),ND) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP,_,_), 
-		iroDelay(SYSTEM,IRO,ND), SD = #max{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamDelay(k,SYSTEM,SOURCE,INFO,D)}, SD==#infimum.
-streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),ND+SD) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP,_,_), 
+streamDelay(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),ND+SD) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP), 
 		iroDelay(SYSTEM,IRO,ND), SD = #max{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamDelay(k,SYSTEM,SOURCE,INFO,D)}, SD!=#infimum.
 
-%streamDelay(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP2),k,TRANSLATION_DELAY+DELAY) :- 
-%		informationTranslation(SYSTEM,SOURCE,REP1,information(ENTITY,SCOPE,REP2),k,ACCURACY_MODIFIER,TRANSLATION_DELAY,TRANSLATION_COST),
-%		streamDelay(SYSTEM_SOURCE,SOURCE,information(ENTITY,SCOPE,REP1),k,DELAY), TRANSLATION_DELAY+DELAY < maxTranslateDelayValue.
+streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),ACC_COUNT*ACC_MODIFIER+ACC) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP), 
+		iroAccuracyMin(SYSTEM,IRO,ACC_MODIFIER), ACC = #min{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, 
+		ACC_COUNT = #count{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)},
+		ACC_MODIFIER+ACC < maxAccuracyValue, ACC_MODIFIER+ACC > minAccuracyValue.
+streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),ACC_COUNT*ACC_MODIFIER+ACC) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP), 
+		iroAccuracyAvg(SYSTEM,IRO,ACC_MODIFIER), ACC_SUM = #sum{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, 
+		ACC_COUNT = #count{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC_COUNT != 0,
+		ACC = ACC_SUM / ACC_COUNT, ACC_MODIFIER+ACC < maxAccuracyValue, ACC_MODIFIER+ACC > minAccuracyValue.
+streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),0) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP), 
+		iroAccuracyAvg(SYSTEM,IRO,ACC_MODIFIER), ACC_COUNT = #count{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, 
+		ACC_COUNT == 0.
+streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),ACC_COUNT*ACC_MODIFIER+ACC) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP), 
+		iroAccuracyMax(SYSTEM,IRO,ACC_MODIFIER), ACC = #max{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC!=#infimum, 
+		ACC_COUNT = #count{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC_COUNT != 0,
+		ACC_MODIFIER+ACC < maxAccuracyValue, ACC_MODIFIER+ACC > minAccuracyValue.
+streamAccuracy(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),0) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP), 
+		iroAccuracyMax(SYSTEM,IRO,ACC_MODIFIER), ACC = #max{D,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,SOURCE,INFO), streamAccuracy(k,SYSTEM,SOURCE,INFO,D)}, ACC==#infimum.
 
-streamCost(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),0) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,REP,_,_).
-streamCost(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),0) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP,_,_).
-%streamAccuracy(SYSTEM,SOURCE,information(ENTITY,SCOPE,REP2),k,ACCURACY_MODIFIER+ACCURACY) :- 
-%		informationTranslation(SYSTEM,SOURCE,REP1,information(ENTITY,SCOPE,REP2),k,ACCURACY_MODIFIER,TRANSLATION_DELAY,TRANSLATION_COST),
-%		streamAccuracy(SYSTEM_SOURCE,SOURCE,information(ENTITY,SCOPE,REP1),k,ACCURACY), ACCURACY_MODIFIER+ACCURACY < maxAccuracyValue, ACCURACY_MODIFIER+ACCURACY > minAccuracyValue.
+%streamCost(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),0) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,REP).
+streamCost(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),0) :- informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), outputIro(SYSTEM,IRO,SCOPE2,REP).
+
 
 
 %% extract from representation
@@ -134,7 +163,7 @@ streamCost(k,SYSTEM,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2),0) :- informat
 stream(k,SYSTEM,SOURCE,INFO) :- informationExtrection(k,SYSTEM,SOURCE,SCOPE,REP1,INFO).
 
 % computing QoS paramters	
-streamDelay(k,SYSTEM,SOURCE,information(ENTITY,SUB_SCOPE,REP2,none),DELAY) :- informationExtrection(k,SYSTEM,SOURCE,SCOPE,REP1,information(ENTITY,SUB_SCOPE,REP2,none)),
+streamDelay(k,SYSTEM,SOURCE,information(ENTITY,SUB_SCOPE,REP2,ENTITY2),DELAY) :- informationExtrection(k,SYSTEM,SOURCE,SCOPE,REP1,information(ENTITY,SUB_SCOPE,REP2,none)),
 		streamDelay(k,SYSTEM_SOURCE,SOURCE,information(ENTITY,SCOPE,REP1,none),DELAY).
 streamCost(k,SYSTEM,SOURCE,INFO,0) :- informationExtrection(k,SYSTEM,SOURCE,SCOPE,REP1,INFO).
 streamAccuracy(k,SYSTEM,SOURCE,information(ENTITY,SUB_SCOPE,REP2,none),ACCURACY) :- informationExtrection(k,SYSTEM,SOURCE,SCOPE,REP1,information(ENTITY,SUB_SCOPE,REP2,none)),
@@ -173,7 +202,7 @@ streamAccuracy(k,SYSTEM,SOURCE,information(ENTITY,SUB_SCOPE,REP2,none),ACCURACY)
 		DELAY < REQ_DELAY, ACCURACY > REQ_ACCURACY }, COUNT < MIN, query(k).[1@5,requiredStream]
 :~ requiredStreams(SYSTEM,ENTITY_TYPE,SCOPE,REP,REQ_DELAY,REQ_ACCURACY,MIN,MAX), 
 		COUNT = #count{ENTITY,SCOPE,REP : stream(k,SYSTEM,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2)), entity(ENTITY,ENTITY_TYPE), 
-		streamDelay(k,SYSTEM,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2),DELAY),	streamAccuracy(k,SYSTEM,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2),ACCURACY), 
+		streamDelay(k,SYSTEM,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2),DELAY), streamAccuracy(k,SYSTEM,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2),ACCURACY), 
 		DELAY < REQ_DELAY, ACCURACY > REQ_ACCURACY }, COUNT > MAX, query(k).[1@5,requiredStream]
 
 

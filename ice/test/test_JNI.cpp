@@ -61,8 +61,30 @@ TEST(JNITest, create)
   metadatas.push_back("Cost");
   metadataValues.push_back(5);
   metadataGroundings.push_back("NodeCostASPGrounding");
+  metadatas.push_back("Accuracy");
+  metadataValues.push_back(-1);
+  metadataGroundings.push_back("NodeAccuracyMaxASPGrounding");
 
   result = oi.addNodeIndividual("TestNode", "KalmanFilter", "TestSystem", metadatas, metadataValues, metadataGroundings);
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  metadatas.clear();
+  metadataValues.clear();
+  metadataGroundings.clear();
+
+  metadatas.push_back("Delay");
+  metadataValues.push_back(3);
+  metadataGroundings.push_back("IRODelayASPGrounding");
+  metadatas.push_back("Cost");
+  metadataValues.push_back(4);
+  metadataGroundings.push_back("IROCostASPGrounding");
+  metadatas.push_back("Accuracy");
+  metadataValues.push_back(-5);
+  metadataGroundings.push_back("IROAccuracyMaxASPGrounding");
+
+  result = oi.addIROIndividual("TestIRO", "Ego2AlloIRO", "TestSystem", metadatas, metadataValues, metadataGroundings);
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);

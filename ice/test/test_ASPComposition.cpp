@@ -56,9 +56,10 @@ TEST(ClingWrap, simpleTest)
   auto node1 = cw->getExternal("nodeTemplate", {"system1", "node1", "any"}, "node1", {}, true);
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "input(system1,node1,scope2,rep1,1,1) :- nodeTemplate(system1,node1,any).");
-  cw->add("node1", {}, "output(system1,node1,scope3,rep1,max,0).");
+  cw->add("node1", {}, "output(system1,node1,scope3,rep1).");
   cw->add("node1", {}, "nodeDelay(system1,node1,1).");
   cw->add("node1", {}, "nodeCost(system1,node1,10).");
+  cw->add("node1", {}, "nodeAccuracyMax(system1,node1,0).");
   cw->ground("node1", {});
 
   // add node2
@@ -66,9 +67,10 @@ TEST(ClingWrap, simpleTest)
   auto node2 = cw->getExternal("nodeTemplate", {"system1", "node2", "any"}, "node2", {}, true);
   cw->add("node2", {}, "input(system1,node2,scope1,rep1,1,1) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "input(system1,node2,scope2,rep1,2,2) :- nodeTemplate(system1,node2,any).");
-  cw->add("node2", {}, "output(system1,node2,scope3,rep1,avg,1).");
+  cw->add("node2", {}, "output(system1,node2,scope3,rep1).");
   cw->add("node2", {}, "nodeDelay(system1,node2,1).");
   cw->add("node2", {}, "nodeCost(system1,node2,5).");
+  cw->add("node1", {}, "nodeAccuracyAvg(system1,node2,1).");
   cw->ground("node2", {});
 
   auto query1 = cw->getExternal("query", {1}, true);
@@ -174,20 +176,21 @@ TEST(ClingWrap, informationTranslation)
   cw->add("coords2Wgs84", {}, "#external iro(system1,coords2Wgs84,any,position).");
   auto coords2Wgs84 = cw->getExternal("iro", {"system1", "coords2Wgs84", "any", "position"}, "coords2Wgs84", {}, true);
   cw->add("coords2Wgs84", {}, "inputIro(system1,coords2Wgs84,position,coords,1,1) :- iro(system1,coords2Wgs84,any,position).");
-  cw->add("coords2Wgs84", {}, "outputIro(system1,coords2Wgs84,position,wgs84,max,1).");
+  cw->add("coords2Wgs84", {}, "outputIro(system1,coords2Wgs84,wgs84).");
   cw->add("coords2Wgs84", {}, "iroDelay(system1,coords2Wgs84,1).");
-  cw->add("coords2Wgs84", {}, "iroAccuracy(system1,coords2Wgs84,0).");
+  cw->add("coords2Wgs84", {}, "iroAccuracyMax(system1,coords2Wgs84,1).");
   cw->add("coords2Wgs84", {}, "iroCost(system1,coords2Wgs84,1).");
   cw->ground("coords2Wgs84", {});
 
   auto query1 = cw->getExternal("query", {1}, true);
 
   cw->solve();
-  //cw->printLastModel();
+  // cw->printLastModel();
 
   EXPECT_EQ(true, cw->query("stream", {1, "system2","system1",Gringo::Value("information", {"nase", "position", "wgs84", "none"})}));
   EXPECT_EQ(true, cw->query("streamDelay", {1, "system2","system1",Gringo::Value("information", {"nase", "position", "wgs84", "none"}),2}));
   EXPECT_EQ(true, cw->query("streamCost", {1, "system2","system1",Gringo::Value("information", {"nase", "position", "wgs84", "none"}),0}));
+  EXPECT_EQ(true, cw->query("streamAccuracy", {1, "system2","system1",Gringo::Value("information", {"nase", "position", "wgs84", "none"}),91}));
 }
 
 
@@ -219,9 +222,9 @@ TEST(ClingWrap, informationExtraction)
   cw->add("coords2Wgs84", {}, "#external iro(system1,coords2Wgs84,any,position).");
   auto coords2Wgs84 = cw->getExternal("iro", {"system1", "coords2Wgs84", "any", "position"}, "coords2Wgs84", {}, true);
   cw->add("coords2Wgs84", {}, "inputIro(system1,coords2Wgs84,position,coords,1,1) :- iro(system1,coords2Wgs84,any,position).");
-  cw->add("coords2Wgs84", {}, "outputIro(system1,coords2Wgs84,position,wgs84,avg,1).");
+  cw->add("coords2Wgs84", {}, "outputIro(system1,coords2Wgs84,wgs84).");
   cw->add("coords2Wgs84", {}, "iroDelay(system1,coords2Wgs84,1).");
-  cw->add("coords2Wgs84", {}, "iroAccuracy(system1,coords2Wgs84,0).");
+  cw->add("coords2Wgs84", {}, "iroAccuracyAvg(system1,coords2Wgs84,1).");
   cw->add("coords2Wgs84", {}, "iroCost(system1,coords2Wgs84,1).");
   cw->ground("coords2Wgs84", {});
 
@@ -235,6 +238,7 @@ TEST(ClingWrap, informationExtraction)
   EXPECT_EQ(false, cw->query("streamDelay", {1, "system2","system1",Gringo::Value("information", {"nase", "alt", "floatRep", "none"}),4}));
   EXPECT_EQ(true, cw->query("streamCost", {1, "system2","system1",Gringo::Value("information", {"nase", "alt", "floatRep", "none"}),0}));
   EXPECT_EQ(false, cw->query("streamCost", {1, "system2","system1",Gringo::Value("information", {"nase", "alt", "floatRep", "none"}),1}));
+  EXPECT_EQ(true, cw->query("streamAccuracy", {1, "system2","system1",Gringo::Value("information", {"nase", "alt", "floatRep", "none"}),91}));
 }
 
 TEST(ClingWrap, ego2allo)
@@ -269,22 +273,23 @@ TEST(ClingWrap, ego2allo)
   auto allo2ego = cw->getExternal("iro", {"system1", "allo2ego", "any", "position", "any", "position"}, "allo2ego", {}, true);
   cw->add("allo2ego", {}, "inputIro2(system1,allo2ego,position,coords,1,1) :- iro(system1,allo2ego,any,position,any,position).");
   cw->add("allo2ego", {}, "inputIro(system1,allo2ego,position,coords,1,1) :- iro(system1,allo2ego,any,position,any,position).");
-  cw->add("allo2ego", {}, "outputIro(system1,allo2ego,position,egoCoords,avg,1).");
+  cw->add("allo2ego", {}, "outputIro(system1,allo2ego,egoCoords).");
   cw->add("allo2ego", {}, "iroDelay(system1,allo2ego,0).");
-  cw->add("allo2ego", {}, "iroAccuracy(system1,allo2ego,0).");
+  cw->add("allo2ego", {}, "iroAccuracyAvg(system1,allo2ego,1).");
   cw->add("allo2ego", {}, "iroCost(system1,allo2ego,1).");
   cw->ground("allo2ego", {});
 
   auto query1 = cw->getExternal("query", {1}, true);
 
   cw->solve();
- // cw->printLastModel();
+  // cw->printLastModel();
 
   EXPECT_EQ(true, cw->query("stream", {1, "system1","system1",Gringo::Value("information", {"bart", "position", "egoCoords", "nase"})}));
   EXPECT_EQ(true, cw->query("streamDelay", {1, "system1","system1",Gringo::Value("information", {"bart", "position", "egoCoords", "nase"}),2}));
-  EXPECT_EQ(false, cw->query("streamDelay", {1, "system1","system1",Gringo::Value("information", {"bart", "position", "egoCoords", "none"}),4}));
+  EXPECT_EQ(false, cw->query("streamDelay", {1, "system1","system1",Gringo::Value("information", {"bart", "position", "egoCoords", "nase"}),4}));
   EXPECT_EQ(true, cw->query("streamCost", {1, "system1","system1",Gringo::Value("information", {"bart", "position", "egoCoords", "nase"}),0}));
-  EXPECT_EQ(false, cw->query("streamCost", {1, "system1","system1",Gringo::Value("information", {"bart", "position", "egoCoords", "none"}),1}));
+  EXPECT_EQ(false, cw->query("streamCost", {1, "system1","system1",Gringo::Value("information", {"bart", "position", "egoCoords", "nase"}),1}));
+  EXPECT_EQ(true, cw->query("streamAccuracy", {1, "system1","system1",Gringo::Value("information", {"bart", "position", "egoCoords", "nase"}),92}));
 }
 
 

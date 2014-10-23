@@ -43,6 +43,7 @@ public class IceOntologyInterface {
 
 	private OWLClass systemOWLClass;
 	private OWLClass nodeOWLClass;
+	private OWLClass iroOWLClass;
 	private OWLClass metadataOWLClass;
 	private OWLClass entityTypeOWLClass;
 	private OWLClass aspMetadataGroundingOWLClass;
@@ -55,7 +56,6 @@ public class IceOntologyInterface {
 	private OWLDataProperty hasMetadataValueOWLDataProperty;
 
 	private List<String> ontologyIries;
-	private List<SystemContainer> systems;
 	private boolean dirty;
 
 	private int someMinCardinality;
@@ -70,7 +70,6 @@ public class IceOntologyInterface {
 		this.reasonerFactory = new Reasoner.ReasonerFactory();
 		// this.reasonerFactory = new StructuralReasonerFactory();
 		this.ontologyIries = new ArrayList<String>();
-		this.systems = new ArrayList<SystemContainer>();
 		this.someMinCardinality = 1;
 		this.someMaxCardinality = 1;
 		this.dirty = true;
@@ -95,6 +94,7 @@ public class IceOntologyInterface {
 		// Fetching ontology things: class, properties, usw.
 		this.systemOWLClass = this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "System"));
 		this.nodeOWLClass = this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Node"));
+		this.iroOWLClass = this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "InterRepresentationOperation"));
 		this.metadataOWLClass = this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Metadata"));
 		this.entityTypeOWLClass = this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "EntityType"));
 		this.aspMetadataGroundingOWLClass = this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX
@@ -122,24 +122,14 @@ public class IceOntologyInterface {
 
 	public boolean addSystem(final String p_systemName) {
 		// check existing systems
-		if (this.mainOntology.containsIndividualInSignature(IRI.create(this.mainIRIPrefix + p_systemName)))
+		OWLIndividual systemInd = this.findOWLIndividual(this.systemOWLClass, p_systemName);
+		if (systemInd != null)
 			return false;
 
-		// for (SystemContainer sys : this.systems) {
-		// if (sys.getName().equals(p_systemName))
-		// return false;
-		// }
-
-		SystemContainer system = new SystemContainer(p_systemName);
-
-		OWLIndividual systemInd = dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_systemName));
+		systemInd = dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_systemName));
 		OWLClassAssertionAxiom ax = dataFactory.getOWLClassAssertionAxiom(this.systemOWLClass, systemInd);
 		// Add this axiom to our ontology - with a convenience method
 		this.manager.addAxiom(this.mainOntology, ax);
-
-		system.setIndividual(systemInd);
-
-		this.systems.add(system);
 
 		this.dirty = true;
 
@@ -153,27 +143,13 @@ public class IceOntologyInterface {
 		if (this.mainOntology.containsIndividualInSignature(nodeIRI))
 			return false;
 
-		SystemContainer system = null;
-
-		// Get System
-		for (SystemContainer sys : this.systems) {
-			if (sys.getName().equals(p_system)) {
-				system = sys;
-			}
-		}
+		OWLIndividual system = this.findOWLIndividual(this.systemOWLClass, p_system);
 
 		if (system == null) {
-			SystemContainer sys = new SystemContainer(p_system);
-
-			OWLIndividual systemInd = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_system));
-			OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(this.systemOWLClass, systemInd);
+			system = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_system));
+			OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(this.systemOWLClass, system);
 			// Add this axiom to our ontology - with a convenience method
 			this.manager.addAxiom(this.mainOntology, ax);
-
-			sys.setIndividual(systemInd);
-
-			this.systems.add(sys);
-			system = sys;
 		}
 
 		// create node
@@ -184,7 +160,7 @@ public class IceOntologyInterface {
 
 		if (nodeCls == null) {
 			System.out.println(String.format("Unknown node class '%s' for node '%s' in system '%s', node not created.",
-					nodeCls, p_node, p_system));
+					p_nodeClass, p_node, p_system));
 			return false;
 		}
 
@@ -193,12 +169,12 @@ public class IceOntologyInterface {
 		changes.add(addAxiomChange);
 
 		OWLObjectPropertyAssertionAxiom assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(
-				hasSystemOWLProperty, nodeInd, system.getIndividual());
+				hasSystemOWLProperty, nodeInd, system);
 		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
 		changes.add(addAxiomChange);
 
 		// ---
-		// TODO remove when new hermit version available
+		// Required for structure reasoner
 		// assertion =
 		// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isSystemOfOWLProperty,
 		// system.getIndividual(), nodeInd);
@@ -215,8 +191,9 @@ public class IceOntologyInterface {
 			OWLClass metadataCls = this.findOWLClass(this.metadataOWLClass, metadata);
 
 			if (metadataCls == null) {
-				System.out.println(String.format("Unknown Metadata %s for node %s in system %s, node not created.",
-						metadata, p_node, p_system));
+				System.out.println(String.format(
+						"Unknown Metadata '%s' for node '%s' in system '%s', node not created.", metadata, p_node,
+						p_system));
 				return false;
 			}
 
@@ -233,7 +210,7 @@ public class IceOntologyInterface {
 			changes.add(addAxiomChange);
 
 			// ---
-			// TODO remove when new hermit version available
+			// Required for structure reasoner
 			// assertion =
 			// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isMetadataOfOWLProperty,
 			// metadataInd,
@@ -251,9 +228,10 @@ public class IceOntologyInterface {
 			OWLIndividual metadataGrounding = this.findOWLIndividual(this.aspMetadataGroundingOWLClass, grounding);
 
 			if (metadataGrounding == null) {
-				System.out.println(String.format(
-						"Unknown Metadata grounding %s of grounding %s for node %s in system %s, node not created.",
-						grounding, metadata, p_node, p_system));
+				System.out
+						.println(String
+								.format("Unknown Metadata grounding '%s' of grounding '%s' for node '%s' in system '%s', node not created.",
+										grounding, metadata, p_node, p_system));
 				return false;
 			}
 
@@ -263,7 +241,130 @@ public class IceOntologyInterface {
 			changes.add(addAxiomChange);
 
 			// ---
-			// TODO remove when new hermit version available
+			// Required for structure reasoner
+			// assertion =
+			// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isGroundingOfOWLProperty,
+			// metadataGrounding, metadataInd);
+			// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			// changes.add(addAxiomChange);
+			// ---
+		}
+
+		// apply changes
+		for (OWLOntologyChange change : changes) {
+			this.manager.applyChange(change);
+		}
+
+		this.dirty = true;
+
+		return true;
+	}
+
+	public boolean addIROIndividual(final String p_iro, final String p_iroClass, final String p_system,
+			String[] p_metadatas, int[] p_metadataValues, String[] p_metadataGroundings) {
+		// check if iro exists
+		IRI iroIRI = IRI.create(this.mainIRIPrefix + p_iro);
+		if (this.mainOntology.containsIndividualInSignature(iroIRI))
+			return false;
+
+		OWLIndividual system = this.findOWLIndividual(this.systemOWLClass, p_system);
+
+		if (system == null) {
+			system = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_system));
+			OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(this.systemOWLClass, system);
+			// Add this axiom to our ontology - with a convenience method
+			this.manager.addAxiom(this.mainOntology, ax);
+		}
+
+		// create iro
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+		OWLIndividual iroInd = this.dataFactory.getOWLNamedIndividual(iroIRI);
+
+		OWLClass iroCls = this.findOWLClass(this.iroOWLClass, p_iroClass);
+
+		if (iroCls == null) {
+			System.out.println(String.format("Unknown IRO class '%s' for IRO '%s' in system '%s', IRO not created.",
+					p_iroClass, p_iro, p_system));
+			return false;
+		}
+
+		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(iroCls, iroInd);
+		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, ax);
+		changes.add(addAxiomChange);
+
+		OWLObjectPropertyAssertionAxiom assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(
+				hasSystemOWLProperty, iroInd, system);
+		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+		changes.add(addAxiomChange);
+
+		// ---
+		// Required for structure reasoner
+		// assertion =
+		// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isSystemOfOWLProperty,
+		// system.getIndividual(), nodeInd);
+		// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+		// changes.add(addAxiomChange);
+		// ---
+
+		// add metadata
+		for (int i = 0; i < p_metadatas.length; ++i) {
+			String metadata = p_metadatas[i];
+			String grounding = p_metadataGroundings[i];
+			int value = p_metadataValues[i];
+
+			OWLClass metadataCls = this.findOWLClass(this.metadataOWLClass, metadata);
+
+			if (metadataCls == null) {
+				System.out.println(String.format("Unknown Metadata '%s' for IRO '%s' in system '%s', IRO not created.",
+						metadata, p_iro, p_system));
+				return false;
+			}
+
+			OWLIndividual metadataInd = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_iro
+					+ metadata));
+
+			ax = this.dataFactory.getOWLClassAssertionAxiom(metadataCls, metadataInd);
+			addAxiomChange = new AddAxiom(this.mainOntology, ax);
+			changes.add(addAxiomChange);
+
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.hasMetadataOWLProperty, iroInd,
+					metadataInd);
+			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			changes.add(addAxiomChange);
+
+			// ---
+			// Required for structure reasoner
+			// assertion =
+			// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isMetadataOfOWLProperty,
+			// metadataInd,
+			// nodeInd);
+			// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			// changes.add(addAxiomChange);
+			// ---
+
+			OWLDataPropertyAssertionAxiom dataAssertion = this.dataFactory.getOWLDataPropertyAssertionAxiom(
+					this.hasMetadataValueOWLDataProperty, metadataInd, value);
+			addAxiomChange = new AddAxiom(this.mainOntology, dataAssertion);
+			changes.add(addAxiomChange);
+
+			// set grounding
+			OWLIndividual metadataGrounding = this.findOWLIndividual(this.aspMetadataGroundingOWLClass, grounding);
+
+			if (metadataGrounding == null) {
+				System.out
+						.println(String
+								.format("Unknown Metadata grounding '%s' of grounding '%s' for IRO '%s' in system '%s', IRO not created.",
+										grounding, metadata, p_iro, p_system));
+				return false;
+			}
+
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.hasGroundingOWLProperty, metadataInd,
+					metadataGrounding);
+			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			changes.add(addAxiomChange);
+
+			// ---
+			// Required for structure reasoner
 			// assertion =
 			// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isGroundingOfOWLProperty,
 			// metadataGrounding, metadataInd);
@@ -348,9 +449,9 @@ public class IceOntologyInterface {
 	private OWLClass findOWLClass(final OWLClass p_class, final String p_name) {
 		Set<OWLClass> subs = this.getAllLeafs(p_class);
 
-		for (OWLClass metadata : subs) {
-			if (metadata.getIRI().toString().endsWith("#" + p_name))
-				return metadata;
+		for (OWLClass cls : subs) {
+			if (cls.getIRI().toString().endsWith("#" + p_name))
+				return cls;
 		}
 
 		return null;
