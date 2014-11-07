@@ -6,7 +6,8 @@
  */
 
 #include "ice/coordination/StreamTemplateDescription.h"
-#include "ice/coordination/StreamDescription.h"
+
+#include "ice/information/StreamDescription.h"
 
 namespace ice
 {

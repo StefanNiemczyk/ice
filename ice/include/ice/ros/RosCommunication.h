@@ -133,7 +133,7 @@ template<typename ICEType, typename ROSType>
     // int bufferSize
     // transform<ICEType, ROSType> &messageTransform
     return std::make_shared<RosInformationSender<ICEType, ROSType>>(this->engineId, &this->nodeHandel,
-                                                                    "/ice" + stream->getSpecification()->getName(),
+                                                                    "/ice" + stream->getName(),
                                                                     100, messageTransform);
   }
 
@@ -148,7 +148,7 @@ template<typename ICEType, typename ROSType>
     // int bufferSize,
     // transformM2C<ICEType, ROSType> &messageTransform
     return std::make_shared<RosInformationReceiver<ICEType, ROSType>>(this->engineId, stream, &this->nodeHandel,
-                                                                      "/ice" + stream->getSpecification()->getName(),
+                                                                      "/ice" + stream->getName(),
                                                                       100, messageTransform);
   }
 

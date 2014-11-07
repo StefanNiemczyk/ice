@@ -12,7 +12,7 @@
 #include <mutex>
 
 #include "ice/Logger.h"
-#include "ice/coordination/StreamDescription.h"
+#include "ice/information/StreamDescription.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/processing/AsynchronousTask.h"
 
@@ -43,19 +43,13 @@ public:
    *
    * Default constructor
    *
-   * \param name The name of the stream
-   * \param informationType The information type which holds this stream.
+   * \param streamDescription The description of this stream.
    * \param eventHandler Handler to execute events asynchronously.
-   * \param specification The specification of the stored information.
-   * \param provider The provider of the information stored in this stream.
-   * \param description The description of this stream.
-   * \param shared True if the stream is shared, else false.
    * \param sharingMaxCount Max number of sharing this stream.
    */
-  BaseInformationStream(const std::string name, std::weak_ptr<InformationType> informationType,
+  BaseInformationStream(std::shared_ptr<StreamDescription> streamDescription,
                         std::shared_ptr<EventHandler> eventHandler,
-                        std::shared_ptr<InformationSpecification> specification, std::string provider = "",
-                        std::string description = "", bool shared = false, int sharingMaxCount = 0);
+                        int sharingMaxCount = 0);
 
   /*!
    * \brief Default destructor
@@ -114,20 +108,11 @@ public:
   const std::string getProvider() const;
 
   /*!
-   * \brief Sets the provider of the information stored in this stream.
-   *
-   * Sets the provider of the information stored in this stream.
-   *
-   * \param provider The new provider.
-   */
-  void setProvider(std::string provider);
-
-  /*!
    * \brief Returns the description of the information stored in this stream.
    *
    * Returns the description of the information stored in this stream.
    */
-  const std::string getDescription() const;
+//  const std::string getDescription() const;
 
   /*!
    * \brief Sets the description of the information stored in this stream.
@@ -136,7 +121,14 @@ public:
    *
    * \param description The new description.
    */
-  void setDescription(std::string description);
+//  void setDescription(std::string description);
+
+  /*!
+   * \brief Returns the description of this stream.
+   *
+   * Returns the description of this stream.
+   */
+  virtual std::shared_ptr<StreamDescription> getStreamDescription();
 
   /*!
    * \brief Register a task which is executed asynchronous if a new information element is added.
@@ -185,25 +177,18 @@ public:
   int unregisterEngineState(std::shared_ptr<EngineState> engineState);
 
   /*!
-   * \brief Returns the description of this stream.
-   *
-   * Returns the description of this stream.
-   */
-  virtual std::shared_ptr<StreamDescription> getStreamDescription();
-
-  /*!
    *\brief Returns the stream template used to create this stream, else NULL.
    *
    * Returns the stream template used to create this stream, else NULL.
    */
-  const std::weak_ptr<InformationStreamTemplate> getStreamTemplate() const;
+//  const std::weak_ptr<InformationStreamTemplate> getStreamTemplate() const;
 
   /*!
    * \brief Sets the stream template used to create this stream.
    *
    * Sets the stream template used to create this stream.
    */
-  void setStreamTemplate(const std::weak_ptr<InformationStreamTemplate> streamTemplate);
+//  void setStreamTemplate(const std::weak_ptr<InformationStreamTemplate> streamTemplate);
 
   /*!
    * \brief Removes the receiver of this stream.
@@ -242,6 +227,13 @@ public:
    */
   void setSharingMaxCount(int sharingMaxCount);
 
+  /*!
+   * \brief Returns the stream as string.
+   *
+   * Returns the stream as string.
+   */
+  std::string toString();
+
 protected:
   /*!
    * \brief This method is calls if the last engine state will be unregistered.
@@ -252,19 +244,16 @@ protected:
 
 protected:
   const long iid; /**< The internal id */
-  const std::string name; /**< The name of the stream */
-  bool shared; /**< True if the stream can be shared with others */
   int sharingMaxCount; /**< Max number of sharing this stream */
-  std::string provider; /**< The provider of the information stored in this stream */
-  std::string description; /**< The description of this stream */
-  std::weak_ptr<InformationStreamTemplate> streamTemplate; /**< The template used to create this stream */
-  std::weak_ptr<InformationType> informationType; /**< The information type */
-  std::shared_ptr<InformationSpecification> specification; /**< Specification of the information stored in this container */
+//  std::string description; /**< The description of this stream */
+//  std::weak_ptr<InformationStreamTemplate> streamTemplate; /**< The template used to create this stream */
+//  std::weak_ptr<InformationType> informationType; /**< The information type */
+//  std::shared_ptr<InformationSpecification> specification; /**< Specification of the information stored in this container */
   std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute events asynchronously */
   std::vector<std::shared_ptr<AsynchronousTask>> taskAsynchronous; /**< List of events which are fired asynchronous if a new element is addes */
   std::vector<std::shared_ptr<AsynchronousTask>> taskSynchronous; /**< List of events which are executed synchronous if a new element is addes */
   std::vector<std::shared_ptr<EngineState>> remoteListeners; /**< List of engine states of remote engines registered */
-  std::shared_ptr<StreamDescription> streamDescription; /**< Description of this stream used for information coordination */
+  const std::shared_ptr<StreamDescription> streamDescription; /**< Description of this stream used for information coordination */
   Logger* _log; /**< Logger */
   std::mutex _mtx; /**< Mutex */
 

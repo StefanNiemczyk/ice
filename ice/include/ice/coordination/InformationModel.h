@@ -37,28 +37,28 @@ public:
    *
    * Default constructor.
    */
-  InformationModel();
+//  InformationModel();
 
   /*!
    * \brief Default destructor
    *
    * Default destructor
    */
-  virtual ~InformationModel();
+//  virtual ~InformationModel();
 
   /*!
     * \brief Returns a reference to the node description vector.
     *
     * Returns a reference to the node description vector.
     */
-  std::vector<std::shared_ptr<NodeDescription>>* getNodeDescriptions();
+//  std::vector<std::shared_ptr<NodeDescription>>* getNodeDescriptions();
 
   /*!
     * \brief Returns a reference to the stream vector.
     *
     * Returns a reference to the stream vector.
     */
-  std::vector<std::shared_ptr<StreamDescription>>* getStreams();
+//  std::vector<std::shared_ptr<StreamDescription>>* getStreams();
 
   /*!
    * \brief Returns a stream description for a given uuid.
@@ -67,14 +67,14 @@ public:
    *
    * \param uuid The uuid of the stream.
    */
-  std::shared_ptr<StreamDescription> getStreamByUuid(boost::uuids::uuid uuid) const;
+//  std::shared_ptr<StreamDescription> getStreamByUuid(boost::uuids::uuid uuid) const;
 
   /*!
    * \brief Returns a reference to the streamTemplate vector.
    *
    * Returns a reference to the streamTemplate vector.
    */
-  std::vector<std::shared_ptr<StreamTemplateDescription>>* getStreamTemplates();
+//  std::vector<std::shared_ptr<StreamTemplateDescription>>* getStreamTemplates();
 
   /*!
    * \brief Returns a stream template description for a given uuid.
@@ -83,7 +83,7 @@ public:
    *
    * \param uuid The uuid of the stream template.
    */
-  std::shared_ptr<StreamTemplateDescription> getStreamTemplateByUuid(boost::uuids::uuid uuid) const;
+//  std::shared_ptr<StreamTemplateDescription> getStreamTemplateByUuid(boost::uuids::uuid uuid) const;
 
 protected:
   std::vector<std::shared_ptr<NodeDescription>> nodeDescriptions; /**< Vector of node descriptions */

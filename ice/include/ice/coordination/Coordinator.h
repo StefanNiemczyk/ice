@@ -17,7 +17,7 @@
 #include "ice/Identifier.h"
 #include "ice/Logger.h"
 #include "ice/Time.h"
-#include "ice/coordination/ModelComperator.h"
+
 
 //Forward declaration
 namespace ice
@@ -220,7 +220,7 @@ private:
   std::shared_ptr<Communication> communication; /**< Communication interface to send messages */
   std::shared_ptr<InformationStore> informationStore; /**< The information store */
   std::vector<std::shared_ptr<EngineState>> engineStates; /**< List of known engines */
-  ModelComperator modelComperator; /**< Comparator to find intersections in information models */
+//  ModelComperator modelComperator; /**< Comparator to find intersections in information models */
   Logger* _log; /**< Logger */
   std::mutex mtx_; /**< Mutex */
   std::condition_variable cv; /**< Condition variable for synchronizing threads */

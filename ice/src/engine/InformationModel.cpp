@@ -7,9 +7,9 @@
 
 #include "ice/coordination/InformationModel.h"
 
-#include "ice/coordination/NodeDescription.h"
-#include "ice/coordination/StreamDescription.h"
+#include "ice/processing/NodeDescription.h"
 #include "ice/coordination/StreamTemplateDescription.h"
+#include "ice/information/StreamDescription.h"
 
 namespace ice
 {

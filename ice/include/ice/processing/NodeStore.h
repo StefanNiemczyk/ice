@@ -12,13 +12,14 @@
 #include <mutex>
 #include <vector>
 
-#include "ice/coordination/InformationModel.h"
+#include "ice/TypeDefs.h"
 #include "ice/processing/Node.h"
 
 namespace ice
 {
 //Forward declarations
 class ICEngine;
+class Logger;
 
 //* NodeStore
 /**
@@ -57,7 +58,7 @@ public:
    *
    * \param nodeName The name of the searched node.
    */
-  std::shared_ptr<Node> getNode(const std::string nodeName);
+  std::shared_ptr<Node> getNode(const std::string nodeName, const ont::entity entity);
 
   /*!
    * \brief Adds the node description to the information model.
@@ -67,12 +68,23 @@ public:
    *
    * @param informationModel The information model.
    */
-  bool addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel);
+//  bool addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel);
+
+  std::shared_ptr<Node> registerNode(const NodeType type, const std::string className, const std::string name,
+                                       const ont::entity entity, std::map<std::string, std::string> config,
+                                       const std::string source = "");
+
+  bool existNodeCreator(const std::string className);
+
+  void cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes);
+
+  void cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp);
 
 private:
   std::weak_ptr<ICEngine> engine; /**< Weak ptr to the engine */
   std::vector<std::shared_ptr<Node>> nodes; /**< Nodes registered in this store */
   std::mutex mtx_; /** Mutex */
+  Logger* _log; /**< Logger */
 };
 
 } /* namespace ice */

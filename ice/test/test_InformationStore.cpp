@@ -4,9 +4,6 @@
 #include <time.h>
 #include <vector>
 
-#include "boost/uuid/uuid.hpp"
-#include "boost/uuid/uuid_generators.hpp"
-
 #include "ros/ros.h"
 
 #include "ice/information/AbstractInformationListener.h"
@@ -15,7 +12,9 @@
 #include "ice/information/InformationStream.h"
 #include "ice/information/InformationStore.h"
 #include "ice/information/InformationType.h"
+#include "ice/information/StreamDescription.h"
 #include "ice/processing/EventHandler.h"
+#include "ice/TypeDefs.h"
 
 #include "gtest/gtest.h"
 
@@ -93,10 +92,11 @@ class InformationStoreTests : public ::testing::Test
 
 protected:
   std::shared_ptr<ice::InformationStore> store;
-  std::shared_ptr<ice::InformationType> type;
+//  std::shared_ptr<ice::InformationType> type;
   std::shared_ptr<ice::InformationStream<double> > stream1;
   std::shared_ptr<ice::InformationStream<int> > stream2;
-  std::shared_ptr<ice::InformationSpecification> spec;
+  std::shared_ptr<ice::InformationSpecification> spec1;
+  std::shared_ptr<ice::InformationSpecification> spec2;
   time_t start_time_;
   static std::string TOPIC_1;
   static std::string TOPIC_2;
@@ -108,13 +108,15 @@ protected:
     auto eh = std::make_shared<ice::EventHandler>(1, 10);
     store = std::make_shared<ice::InformationStore>(eh);
 
-    auto uuid = boost::uuids::random_generator()();
-    spec = std::make_shared<ice::InformationSpecification>(uuid, "/Test");
+   // auto uuid = boost::uuids::random_generator()();
+    //ont::entity entity, ont::entityType, ont::scope scope, ont::representation representation
+    spec1 = std::make_shared<ice::InformationSpecification>("entity1", "entityType1", "scope1", "representation1");
+    spec2 = std::make_shared<ice::InformationSpecification>("entity2", "entityType2", "scope2", "representation2");
 
-    type = store->registerInformationType(spec);
+    std::map<std::string, int> metadatas;
 
-    stream1 = store->registerStream<double>(uuid, TOPIC_1, 1000);
-    stream2 = store->registerStream<int>(uuid, TOPIC_2, 1000);
+    stream1 = store->registerStream<double>(spec1, TOPIC_1, 1000, metadatas, "provider", "source");
+    stream2 = store->registerStream<int>(spec2, TOPIC_2, 1000, metadatas, "provider", "source");
   }
 
   virtual void TearDown()
@@ -144,17 +146,11 @@ TEST_F(InformationStoreTests, get_buffer)
   std::shared_ptr<ice::InformationStream<double> > stream1;
   std::shared_ptr<ice::InformationStream<int> > stream2;
 
-  stream1 = type->getStream<double>(TOPIC_1);
-  stream2 = type->getStream<int>(TOPIC_2);
+  stream1 = store->getStream<double>(spec1.get(), "provider", "source");
+  stream2 = store->getStream<int>(spec2.get(), "provider", "source");
 
   EXPECT_EQ(true, (stream1 ? true : false));
   EXPECT_EQ(true, (stream2 ? true : false));
-
-  // stream1 = type->getStream<double>(InformationStoreTests::stream1->getSpecification()->getUUID());
-  // stream2 = type->getStream<int>(InformationStoreTests::stream2->getSpecification()->getUUID());
-
-  // EXPECT_EQ(true, (stream1 ? true : false));
-  // EXPECT_EQ(true, (stream2 ? true : false));
 }
 
 TEST_F(InformationStoreTests, add_information)
@@ -194,7 +190,7 @@ TEST_F(InformationStoreTests, async_event)
 {
   std::shared_ptr<ice::InformationStream<int> > stream;
 
-  stream = type->getStream<int>(TOPIC_2);
+  stream = stream2;
 
   std::shared_ptr<SimpleListener> listener = std::make_shared<SimpleListener>();
   std::shared_ptr<SimpleListener2> listener2 = std::make_shared<SimpleListener2>();
@@ -219,7 +215,7 @@ TEST_F(InformationStoreTests, sync_event)
 {
   std::shared_ptr<ice::InformationStream<int> > stream;
 
-  stream = type->getStream<int>(TOPIC_2);
+  stream = stream2;
 
   std::shared_ptr<SimpleListener> listener = std::make_shared<SimpleListener>();
   std::shared_ptr<SimpleListener2> listener2 = std::make_shared<SimpleListener2>();
@@ -242,7 +238,7 @@ TEST_F(InformationStoreTests, sync_async_event)
 {
   std::shared_ptr<ice::InformationStream<int> > stream;
 
-  stream = type->getStream<int>(TOPIC_2);
+  stream = stream2;
 
   std::shared_ptr<SimpleListener> listener = std::make_shared<SimpleListener>();
   std::shared_ptr<SimpleListener2> listener2 = std::make_shared<SimpleListener2>();
@@ -267,7 +263,7 @@ TEST_F(InformationStoreTests, sync_async_task)
 {
   std::shared_ptr<ice::InformationStream<int> > stream;
 
-  stream = type->getStream<int>(TOPIC_2);
+  stream = stream2;
 
   auto task1 = std::make_shared<SimpleTask>();
   auto task2 = std::make_shared<SimpleTask>();
@@ -307,7 +303,7 @@ TEST_F(InformationStoreTests, sync_async_task)
 
 TEST_F(InformationStoreTests, filtered_list)
 {
-  auto stream = type->getStream<int>(TOPIC_2);
+  auto stream = stream2;
   auto vec = std::make_shared<std::vector<std::shared_ptr<ice::InformationElement<int>>> >();
 
   for (int i = 0; i < 1000; ++i)

@@ -42,14 +42,14 @@ public:
    *
    * Default constructor
    */
-  ModelComperator();
+//  ModelComperator();
 
   /**
    * \brief Default destructor
    *
    * Default destructor
    */
-  virtual ~ModelComperator();
+//  virtual ~ModelComperator();
 
   /**
    * \brief Identifies similar information processing in the models and returns these.
@@ -60,8 +60,8 @@ public:
    * \param model1 The first information model.
    * \param model2 The second information model.
    */
-  std::shared_ptr<std::vector<std::shared_ptr<IntersectionInformationModel>>>findModelMatches(std::shared_ptr<InformationModel> model1,
-      std::shared_ptr<InformationModel> model2);
+//  std::shared_ptr<std::vector<std::shared_ptr<IntersectionInformationModel>>>findModelMatches(std::shared_ptr<InformationModel> model1,
+//      std::shared_ptr<InformationModel> model2);
 
   /**
    * \brief Finds matching stream offers and requests.
@@ -75,9 +75,9 @@ public:
    * @param offers Out parameter, contains streams offered from the fist model to the second.
    * @param requests Out parameter, contains streams requests from the fist model to the second.
    */
-  bool findOfferesAndRequests(std::shared_ptr<InformationModel> model1, std::shared_ptr<InformationModel> model2,
-      std::shared_ptr<std::vector<std::shared_ptr<StreamDescription>>>offers,
-      std::shared_ptr<std::vector<std::shared_ptr<StreamTemplateDescription>>> requests);
+//  bool findOfferesAndRequests(std::shared_ptr<InformationModel> model1, std::shared_ptr<InformationModel> model2,
+//      std::shared_ptr<std::vector<std::shared_ptr<StreamDescription>>>offers,
+//      std::shared_ptr<std::vector<std::shared_ptr<StreamTemplateDescription>>> requests);
 
 private:
   /*  bool findMatchings(const std::vector<StreamDescription>* uuids1,

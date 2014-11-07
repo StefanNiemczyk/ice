@@ -201,75 +201,75 @@ int Coordinator::onInformationModel(identifier engineId, std::shared_ptr<Informa
 
   _log->debug("onInformationModel", "Information model received from %s", IDGenerator::toString(engineId).c_str());
 
-  std::lock_guard<std::mutex> guard(mtx_);
-
-  auto engineState = this->getEngineState(engineId);
-
-  if (false == engineState)
-  {
-    _log->info("onInformationModel", "Information model received from unknown engine %s",
-               IDGenerator::toString(engineId).c_str());
-
-    engineState = std::make_shared<EngineState>(engineId, this->engine);
-    this->engineStates.push_back(engineState);
-
-    this->communication->sendRetryNegotiation(engineId);
-    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
-
-    return 1;
-  }
-
-  if (engineState->getCooperationState() == CooperationState::COOPERATION_REQUEST_SEND)
-  {
-    _log->info("onInformationModel", "Duplicated information model received from engine %s",
-               IDGenerator::toString(engineId).c_str());
-
-    this->communication->sendCooperationRequest(engineId, engineState->getCooperationRequest());
-    engineState->updateTimeLastActivity();
-    return 0;
-  }
-
-  if (engineState->getCooperationState() != CooperationState::INFORMATION_MODEL_REQUESTED)
-  {
-    _log->warning("onInformationModel", "Information model received from engine %s in wrong state %i",
-                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
-
-    this->communication->sendRetryNegotiation(engineId);
-    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
-
-    return 1;
-  }
-
-  // computing model intersections
-  auto engineSptr = this->engine.lock();
-  auto ownModel = engineSptr->getInformationModel();
-  auto request = std::make_shared<CooperationRequest>(engineSptr->getId());
-
-  this->modelComperator.findOfferesAndRequests(ownModel, informationModel, request->getOffers(),
-                                               request->getRequests());
-  auto compareResult = this->modelComperator.findModelMatches(ownModel, informationModel);
-
-  engineState->setCooperationRequest(request);
-
-  if (request->isEmpty())
-  {
-    _log->info("onInformationModel", "Empty Cooperation request, no cooperation with engine %s, refuse send",
-               IDGenerator::toString(engineId).c_str());
-
-    engineState->setCooperationState(CooperationState::COOPERATION_REFUSE_SEND);
-    engineState->updateTimeLastActivity();
-
-    this->communication->sendCooperationRefuse(engineId);
-
-    return 0;
-  }
-
-  this->communication->sendCooperationRequest(engineId, request);
-
-  engineState->setCooperationState(CooperationState::COOPERATION_REQUEST_SEND);
-  engineState->updateTimeLastActivity();
-
-  _log->info("onInformationModel", "Cooperation request sends to engine %s", IDGenerator::toString(engineId).c_str());
+//  std::lock_guard<std::mutex> guard(mtx_);
+//
+//  auto engineState = this->getEngineState(engineId);
+//
+//  if (false == engineState)
+//  {
+//    _log->info("onInformationModel", "Information model received from unknown engine %s",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    engineState = std::make_shared<EngineState>(engineId, this->engine);
+//    this->engineStates.push_back(engineState);
+//
+//    this->communication->sendRetryNegotiation(engineId);
+//    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
+//
+//    return 1;
+//  }
+//
+//  if (engineState->getCooperationState() == CooperationState::COOPERATION_REQUEST_SEND)
+//  {
+//    _log->info("onInformationModel", "Duplicated information model received from engine %s",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    this->communication->sendCooperationRequest(engineId, engineState->getCooperationRequest());
+//    engineState->updateTimeLastActivity();
+//    return 0;
+//  }
+//
+//  if (engineState->getCooperationState() != CooperationState::INFORMATION_MODEL_REQUESTED)
+//  {
+//    _log->warning("onInformationModel", "Information model received from engine %s in wrong state %i",
+//                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
+//
+//    this->communication->sendRetryNegotiation(engineId);
+//    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
+//
+//    return 1;
+//  }
+//
+//  // computing model intersections
+//  auto engineSptr = this->engine.lock();
+//  auto ownModel = engineSptr->getInformationModel();
+//  auto request = std::make_shared<CooperationRequest>(engineSptr->getId());
+//
+//  this->modelComperator.findOfferesAndRequests(ownModel, informationModel, request->getOffers(),
+//                                               request->getRequests());
+//  auto compareResult = this->modelComperator.findModelMatches(ownModel, informationModel);
+//
+//  engineState->setCooperationRequest(request);
+//
+//  if (request->isEmpty())
+//  {
+//    _log->info("onInformationModel", "Empty Cooperation request, no cooperation with engine %s, refuse send",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    engineState->setCooperationState(CooperationState::COOPERATION_REFUSE_SEND);
+//    engineState->updateTimeLastActivity();
+//
+//    this->communication->sendCooperationRefuse(engineId);
+//
+//    return 0;
+//  }
+//
+//  this->communication->sendCooperationRequest(engineId, request);
+//
+//  engineState->setCooperationState(CooperationState::COOPERATION_REQUEST_SEND);
+//  engineState->updateTimeLastActivity();
+//
+//  _log->info("onInformationModel", "Cooperation request sends to engine %s", IDGenerator::toString(engineId).c_str());
 
   return 0;
 }
@@ -281,113 +281,113 @@ int Coordinator::onCooperationRequest(identifier engineId, std::shared_ptr<Coope
 
   _log->debug("onCooperationRequest", "Cooperation request received from %s", IDGenerator::toString(engineId).c_str());
 
-  std::lock_guard<std::mutex> guard(mtx_);
-
-  auto engineState = this->getEngineState(engineId);
-
-  if (false == engineState)
-  {
-    _log->info("onCooperationRequest", "Cooperation request received from unknown engine %s",
-               IDGenerator::toString(engineId).c_str());
-
-    engineState = std::make_shared<EngineState>(engineId, this->engine);
-    this->engineStates.push_back(engineState);
-
-    this->communication->sendRetryNegotiation(engineId);
-    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
-
-    return 1;
-  }
-
-  if (engineState->getCooperationState() == CooperationState::COOPERATION_RESPONSE_SEND)
-  {
-    _log->info("onCooperationRequest", "Duplicated cooperation request received from engine %s",
-               IDGenerator::toString(engineId).c_str());
-
-    engineState->updateTimeLastActivity();
-    this->communication->sendCooperationResponse(engineId, engineState->getCooperationResponse());
-    return 0;
-  }
-  else if (engineState->getCooperationState() == CooperationState::COOPERATION_REFUSE_SEND)
-  {
-    _log->info("onCooperationRequest", "Duplicated cooperation request received from engine %s",
-               IDGenerator::toString(engineId).c_str());
-
-    engineState->updateTimeLastActivity();
-    this->communication->sendCooperationRefuse(engineId);
-    return 0;
-  }
-
-  if (engineState->getCooperationState() != CooperationState::INFORMATION_MODEL_SEND)
-  {
-    _log->warning("onCooperationRequest", "Cooperation request received from engine %s in wrong state %i",
-                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
-
-    this->communication->sendRetryNegotiation(engineId);
-    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
-
-    return 1;
-  }
-
-  // save the request
-  engineState->setCooperationRequest(request);
-
-  // Accepting cooperation request
-  auto engineSptr = this->engine.lock();
-  auto response = std::make_shared<CooperationResponse>(engineSptr->getId());
-
-  // Check requests
-  for (auto requestedStream : *request->getRequests())
-  {
-    auto stream = this->informationStore->getBaseStream(requestedStream);
-
-    if (false == stream)
-    {
-      _log->error("onCooperationRequest", "Unknown stream requested %i from engine %i, request partial ignored",
-                  requestedStream->getId(), IDGenerator::toString(engineId).c_str());
-      continue;
-    }
-
-    response->getRequestsAccepted()->push_back(requestedStream);
-  }
-
-  // Check offers
-  for (auto offeredStream : *request->getOffers())
-  {
-    auto type = this->informationStore->getInformationType(offeredStream->getId());
-
-    if (false == type->existsStreamTemplate(offeredStream))
-    {
-      _log->error("onCooperationRequest", "Unknown stream offered %i from engine %i, offer partial ignored",
-                  offeredStream->getId(), IDGenerator::toString(engineId).c_str());
-      continue;
-    }
-
-    response->getOffersAccepted()->push_back(offeredStream);
-  }
-
-  // Check if no cooperation will be established
-  if (response->isEmpty())
-  {
-    _log->info("onCooperationRequest", "Empty Cooperation response, no cooperation with engine %s, refuse send",
-               IDGenerator::toString(engineId).c_str());
-
-    engineState->setCooperationState(CooperationState::COOPERATION_REFUSE_SEND);
-    engineState->updateTimeLastActivity();
-
-    this->communication->sendCooperationRefuse(engineId);
-
-    return 0;
-  }
-
-  this->communication->sendCooperationResponse(engineId, response);
-
-  engineState->setCooperationResponse(response);
-  engineState->setCooperationState(CooperationState::COOPERATION_RESPONSE_SEND);
-  engineState->updateTimeLastActivity();
-
-  _log->info("onCooperationRequest", "Cooperation response sends to engine %s",
-             IDGenerator::toString(engineId).c_str());
+//  std::lock_guard<std::mutex> guard(mtx_);
+//
+//  auto engineState = this->getEngineState(engineId);
+//
+//  if (false == engineState)
+//  {
+//    _log->info("onCooperationRequest", "Cooperation request received from unknown engine %s",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    engineState = std::make_shared<EngineState>(engineId, this->engine);
+//    this->engineStates.push_back(engineState);
+//
+//    this->communication->sendRetryNegotiation(engineId);
+//    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
+//
+//    return 1;
+//  }
+//
+//  if (engineState->getCooperationState() == CooperationState::COOPERATION_RESPONSE_SEND)
+//  {
+//    _log->info("onCooperationRequest", "Duplicated cooperation request received from engine %s",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    engineState->updateTimeLastActivity();
+//    this->communication->sendCooperationResponse(engineId, engineState->getCooperationResponse());
+//    return 0;
+//  }
+//  else if (engineState->getCooperationState() == CooperationState::COOPERATION_REFUSE_SEND)
+//  {
+//    _log->info("onCooperationRequest", "Duplicated cooperation request received from engine %s",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    engineState->updateTimeLastActivity();
+//    this->communication->sendCooperationRefuse(engineId);
+//    return 0;
+//  }
+//
+//  if (engineState->getCooperationState() != CooperationState::INFORMATION_MODEL_SEND)
+//  {
+//    _log->warning("onCooperationRequest", "Cooperation request received from engine %s in wrong state %i",
+//                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
+//
+//    this->communication->sendRetryNegotiation(engineId);
+//    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
+//
+//    return 1;
+//  }
+//
+//  // save the request
+//  engineState->setCooperationRequest(request);
+//
+//  // Accepting cooperation request
+//  auto engineSptr = this->engine.lock();
+//  auto response = std::make_shared<CooperationResponse>(engineSptr->getId());
+//
+//  // Check requests
+//  for (auto requestedStream : *request->getRequests())
+//  {
+//    auto stream = this->informationStore->getBaseStream(requestedStream);
+//
+//    if (false == stream)
+//    {
+//      _log->error("onCooperationRequest", "Unknown stream requested %i from engine %i, request partial ignored",
+//                  requestedStream->getId(), IDGenerator::toString(engineId).c_str());
+//      continue;
+//    }
+//
+//    response->getRequestsAccepted()->push_back(requestedStream);
+//  }
+//
+//  // Check offers
+//  for (auto offeredStream : *request->getOffers())
+//  {
+//    auto type = this->informationStore->getInformationType(offeredStream->getId());
+//
+//    if (false == type->existsStreamTemplate(offeredStream))
+//    {
+//      _log->error("onCooperationRequest", "Unknown stream offered %i from engine %i, offer partial ignored",
+//                  offeredStream->getId(), IDGenerator::toString(engineId).c_str());
+//      continue;
+//    }
+//
+//    response->getOffersAccepted()->push_back(offeredStream);
+//  }
+//
+//  // Check if no cooperation will be established
+//  if (response->isEmpty())
+//  {
+//    _log->info("onCooperationRequest", "Empty Cooperation response, no cooperation with engine %s, refuse send",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    engineState->setCooperationState(CooperationState::COOPERATION_REFUSE_SEND);
+//    engineState->updateTimeLastActivity();
+//
+//    this->communication->sendCooperationRefuse(engineId);
+//
+//    return 0;
+//  }
+//
+//  this->communication->sendCooperationResponse(engineId, response);
+//
+//  engineState->setCooperationResponse(response);
+//  engineState->setCooperationState(CooperationState::COOPERATION_RESPONSE_SEND);
+//  engineState->updateTimeLastActivity();
+//
+//  _log->info("onCooperationRequest", "Cooperation response sends to engine %s",
+//             IDGenerator::toString(engineId).c_str());
 
   return 0;
 }
@@ -400,122 +400,122 @@ int Coordinator::onCooperationResponse(identifier engineId, std::shared_ptr<Coop
   _log->debug("onCooperationResponse", "Cooperation response received from %s",
               IDGenerator::toString(engineId).c_str());
 
-  std::lock_guard<std::mutex> guard(mtx_);
-
-  auto engineState = this->getEngineState(engineId);
-
-  if (false == engineState)
-  {
-    _log->info("onCooperationResponse", "Cooperation response received from unknown engine %s",
-               IDGenerator::toString(engineId).c_str());
-
-    engineState = std::make_shared<EngineState>(engineId, this->engine);
-    this->engineStates.push_back(engineState);
-
-    this->communication->sendRetryNegotiation(engineId);
-    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
-
-    return 1;
-  }
-
-  if (engineState->getCooperationState() == CooperationState::COOPERATION_ACCEPT_SEND
-      && (response->getOffersAccepted()->size() > 0 || response->getRequestsAccepted()->size() > 0))
-  {
-    _log->info("onCooperationAccept", "Duplicated cooperation response received from engine %s",
-               IDGenerator::toString(engineId).c_str());
-
-    engineState->updateTimeLastActivity();
-    this->communication->sendCooperationAccept(engineId);
-    return 0;
-  }
-  else if (engineState->getCooperationState() == CooperationState::NO_COOPERATION
-      && response->getOffersAccepted()->size() == 0 && response->getRequestsAccepted()->size() == 0)
-  {
-    _log->info("onCooperationAccept", "Duplicated cooperation response received from engine %s",
-               IDGenerator::toString(engineId).c_str());
-
-    engineState->updateTimeLastActivity();
-    this->communication->sendNegotiationFinished(engineId);
-    return 0;
-  }
-
-  if (engineState->getCooperationState() != CooperationState::COOPERATION_REQUEST_SEND)
-  {
-    _log->warning("onCooperationResponse", "Cooperation response received from engine %s in wrong state %i",
-                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
-
-    this->communication->sendRetryNegotiation(engineId);
-    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
-
-    return 1;
-  }
-
-  // save the response
-  engineState->setCooperationResponse(response);
-
-  // Accepting cooperation request
-  auto engineSptr = this->engine.lock();
-
-  // No cooperation
-  if (response->getOffersAccepted()->size() == 0 && response->getRequestsAccepted()->size() == 0)
-  {
-    _log->info("onCooperationResponse", "Empty cooperation response received from engine %s results in no cooperation",
-               IDGenerator::toString(engineId).c_str());
-
-    this->communication->sendNegotiationFinished(engineId);
-    engineState->setCooperationState(CooperationState::NO_COOPERATION);
-    engineState->updateTimeLastActivity();
-
-    return 1;
-  }
-
-  // Check accepted requests
-  for (auto requestedStreameAccepted : *response->getRequestsAccepted())
-  {
-    auto type = this->informationStore->getInformationType(requestedStreameAccepted->getId());
-    auto stream = type->createStreamFromTemplate(requestedStreameAccepted, IDGenerator::toString(engineId));
-
-    if (false == stream)
-    {
-      _log->error("onCooperationResponse",
-                  "Unknown stream %s from this engine requested from engine %s, request partial ignored",
-                  IDGenerator::toString(requestedStreameAccepted->getId()).c_str(),
-                  IDGenerator::toString(engineId).c_str());
-      continue;
-    }
-
-    engineState->getStreamsRequested()->push_back(stream);
-    stream->registerReceiver(this->communication);
-  }
-
-  // Check accepted offers
-  for (auto offeredStreamsAccepted : *response->getOffersAccepted())
-  {
-    auto stream = this->informationStore->getBaseStream(offeredStreamsAccepted);
-
-    if (false == stream)
-    {
-      _log->error("onCooperationResponse",
-                  "Unknown stream  %s from this engine offered to engine %s, offer partial ignored",
-                  IDGenerator::toString(offeredStreamsAccepted->getId()).c_str(),
-                  IDGenerator::toString(engineId).c_str());
-      continue;
-    }
-
-    if (stream->registerEngineState(engineState) == 0)
-    {
-      engineState->getStreamsOffered()->push_back(stream);
-    }
-
-    stream->registerSender(this->communication);
-  }
-
-  this->communication->sendCooperationAccept(engineId);
-
-  engineState->setCooperationState(CooperationState::COOPERATION_ACCEPT_SEND);
-  engineState->updateTimeLastActivity();
-
-  _log->info("onCooperationResponse", "Cooperation accept sends to engine %s", IDGenerator::toString(engineId).c_str());
+//  std::lock_guard<std::mutex> guard(mtx_);
+//
+//  auto engineState = this->getEngineState(engineId);
+//
+//  if (false == engineState)
+//  {
+//    _log->info("onCooperationResponse", "Cooperation response received from unknown engine %s",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    engineState = std::make_shared<EngineState>(engineId, this->engine);
+//    this->engineStates.push_back(engineState);
+//
+//    this->communication->sendRetryNegotiation(engineId);
+//    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
+//
+//    return 1;
+//  }
+//
+//  if (engineState->getCooperationState() == CooperationState::COOPERATION_ACCEPT_SEND
+//      && (response->getOffersAccepted()->size() > 0 || response->getRequestsAccepted()->size() > 0))
+//  {
+//    _log->info("onCooperationAccept", "Duplicated cooperation response received from engine %s",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    engineState->updateTimeLastActivity();
+//    this->communication->sendCooperationAccept(engineId);
+//    return 0;
+//  }
+//  else if (engineState->getCooperationState() == CooperationState::NO_COOPERATION
+//      && response->getOffersAccepted()->size() == 0 && response->getRequestsAccepted()->size() == 0)
+//  {
+//    _log->info("onCooperationAccept", "Duplicated cooperation response received from engine %s",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    engineState->updateTimeLastActivity();
+//    this->communication->sendNegotiationFinished(engineId);
+//    return 0;
+//  }
+//
+//  if (engineState->getCooperationState() != CooperationState::COOPERATION_REQUEST_SEND)
+//  {
+//    _log->warning("onCooperationResponse", "Cooperation response received from engine %s in wrong state %i",
+//                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
+//
+//    this->communication->sendRetryNegotiation(engineId);
+//    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
+//
+//    return 1;
+//  }
+//
+//  // save the response
+//  engineState->setCooperationResponse(response);
+//
+//  // Accepting cooperation request
+//  auto engineSptr = this->engine.lock();
+//
+//  // No cooperation
+//  if (response->getOffersAccepted()->size() == 0 && response->getRequestsAccepted()->size() == 0)
+//  {
+//    _log->info("onCooperationResponse", "Empty cooperation response received from engine %s results in no cooperation",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    this->communication->sendNegotiationFinished(engineId);
+//    engineState->setCooperationState(CooperationState::NO_COOPERATION);
+//    engineState->updateTimeLastActivity();
+//
+//    return 1;
+//  }
+//
+//  // Check accepted requests
+//  for (auto requestedStreameAccepted : *response->getRequestsAccepted())
+//  {
+//    auto type = this->informationStore->getInformationType(requestedStreameAccepted->getId());
+//    auto stream = type->createStreamFromTemplate(requestedStreameAccepted, IDGenerator::toString(engineId));
+//
+//    if (false == stream)
+//    {
+//      _log->error("onCooperationResponse",
+//                  "Unknown stream %s from this engine requested from engine %s, request partial ignored",
+//                  IDGenerator::toString(requestedStreameAccepted->getId()).c_str(),
+//                  IDGenerator::toString(engineId).c_str());
+//      continue;
+//    }
+//
+//    engineState->getStreamsRequested()->push_back(stream);
+//    stream->registerReceiver(this->communication);
+//  }
+//
+//  // Check accepted offers
+//  for (auto offeredStreamsAccepted : *response->getOffersAccepted())
+//  {
+//    auto stream = this->informationStore->getBaseStream(offeredStreamsAccepted);
+//
+//    if (false == stream)
+//    {
+//      _log->error("onCooperationResponse",
+//                  "Unknown stream  %s from this engine offered to engine %s, offer partial ignored",
+//                  IDGenerator::toString(offeredStreamsAccepted->getId()).c_str(),
+//                  IDGenerator::toString(engineId).c_str());
+//      continue;
+//    }
+//
+//    if (stream->registerEngineState(engineState) == 0)
+//    {
+//      engineState->getStreamsOffered()->push_back(stream);
+//    }
+//
+//    stream->registerSender(this->communication);
+//  }
+//
+//  this->communication->sendCooperationAccept(engineId);
+//
+//  engineState->setCooperationState(CooperationState::COOPERATION_ACCEPT_SEND);
+//  engineState->updateTimeLastActivity();
+//
+//  _log->info("onCooperationResponse", "Cooperation accept sends to engine %s", IDGenerator::toString(engineId).c_str());
 
   return 0;
 }
@@ -527,91 +527,91 @@ int Coordinator::onCooperationAccept(identifier engineId)
 
   _log->debug("onCooperationAccept", "Cooperation accept received from %s", IDGenerator::toString(engineId).c_str());
 
-  std::lock_guard<std::mutex> guard(mtx_);
-
-  auto engineState = this->getEngineState(engineId);
-
-  if (false == engineState)
-  {
-    _log->info("onCooperationAccept", "Cooperation accept received from unknown engine %s",
-               IDGenerator::toString(engineId).c_str());
-
-    engineState = std::make_shared<EngineState>(engineId, this->engine);
-    this->engineStates.push_back(engineState);
-
-    this->communication->sendRetryNegotiation(engineId);
-    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
-
-    return 1;
-  }
-
-  if (engineState->getCooperationState() == CooperationState::COOPERATION)
-  {
-    _log->info("onCooperationAccept", "Duplicated cooperation accept received from engine %s",
-               IDGenerator::toString(engineId).c_str());
-
-    engineState->updateTimeLastActivity();
-    this->communication->sendNegotiationFinished(engineId);
-    return 0;
-  }
-
-  if (engineState->getCooperationState() != CooperationState::COOPERATION_RESPONSE_SEND)
-  {
-    _log->warning("onCooperationAccept", "Cooperation accept received from engine %s in wrong state %i",
-                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
-
-    this->communication->sendRetryNegotiation(engineId);
-    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
-
-    return 1;
-  }
-
-  // adding stream sending and listening
-  auto response = engineState->getCooperationResponse();
-
-  // Check requests
-  for (auto requestedStream : *response->getRequestsAccepted())
-  {
-    auto stream = this->informationStore->getBaseStream(requestedStream);
-
-    if (false == stream)
-    {
-      _log->error("onCooperationRequest", "Unknown stream requested %i from engine %i, request part ignored",
-                  requestedStream->getId(), IDGenerator::toString(engineId).c_str());
-      continue;
-    }
-
-    if (stream->registerEngineState(engineState) == 0)
-    {
-      engineState->getStreamsOffered()->push_back(stream);
-    }
-
-    stream->registerSender(this->communication);
-  }
-
-  // Check offers
-  for (auto offeredStream : *response->getOffersAccepted())
-  {
-    auto type = this->informationStore->getInformationType(offeredStream->getId());
-    auto stream = type->createStreamFromTemplate(offeredStream, IDGenerator::toString(engineId));
-
-    if (false == stream)
-    {
-      _log->error("onCooperationRequest", "Unknown stream offer %i from engine %i, request part ignored",
-                  offeredStream->getId(), IDGenerator::toString(engineId).c_str());
-      continue;
-    }
-
-    engineState->getStreamsRequested()->push_back(stream);
-    stream->registerReceiver(this->communication);
-  }
-
-  engineState->setCooperationState(CooperationState::COOPERATION);
-  engineState->updateTimeLastActivity();
-  this->communication->sendNegotiationFinished(engineId);
-
-  _log->info("onCooperationAccept", "Cooperation accept received to engine %s",
-             IDGenerator::toString(engineId).c_str());
+//  std::lock_guard<std::mutex> guard(mtx_);
+//
+//  auto engineState = this->getEngineState(engineId);
+//
+//  if (false == engineState)
+//  {
+//    _log->info("onCooperationAccept", "Cooperation accept received from unknown engine %s",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    engineState = std::make_shared<EngineState>(engineId, this->engine);
+//    this->engineStates.push_back(engineState);
+//
+//    this->communication->sendRetryNegotiation(engineId);
+//    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
+//
+//    return 1;
+//  }
+//
+//  if (engineState->getCooperationState() == CooperationState::COOPERATION)
+//  {
+//    _log->info("onCooperationAccept", "Duplicated cooperation accept received from engine %s",
+//               IDGenerator::toString(engineId).c_str());
+//
+//    engineState->updateTimeLastActivity();
+//    this->communication->sendNegotiationFinished(engineId);
+//    return 0;
+//  }
+//
+//  if (engineState->getCooperationState() != CooperationState::COOPERATION_RESPONSE_SEND)
+//  {
+//    _log->warning("onCooperationAccept", "Cooperation accept received from engine %s in wrong state %i",
+//                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
+//
+//    this->communication->sendRetryNegotiation(engineId);
+//    engineState->setCooperationState(CooperationState::RETRY_NEGOTIATION);
+//
+//    return 1;
+//  }
+//
+//  // adding stream sending and listening
+//  auto response = engineState->getCooperationResponse();
+//
+//  // Check requests
+//  for (auto requestedStream : *response->getRequestsAccepted())
+//  {
+//    auto stream = this->informationStore->getBaseStream(requestedStream);
+//
+//    if (false == stream)
+//    {
+//      _log->error("onCooperationRequest", "Unknown stream requested %i from engine %i, request part ignored",
+//                  requestedStream->getId(), IDGenerator::toString(engineId).c_str());
+//      continue;
+//    }
+//
+//    if (stream->registerEngineState(engineState) == 0)
+//    {
+//      engineState->getStreamsOffered()->push_back(stream);
+//    }
+//
+//    stream->registerSender(this->communication);
+//  }
+//
+//  // Check offers
+//  for (auto offeredStream : *response->getOffersAccepted())
+//  {
+//    auto type = this->informationStore->getInformationType(offeredStream->getId());
+//    auto stream = type->createStreamFromTemplate(offeredStream, IDGenerator::toString(engineId));
+//
+//    if (false == stream)
+//    {
+//      _log->error("onCooperationRequest", "Unknown stream offer %i from engine %i, request part ignored",
+//                  offeredStream->getId(), IDGenerator::toString(engineId).c_str());
+//      continue;
+//    }
+//
+//    engineState->getStreamsRequested()->push_back(stream);
+//    stream->registerReceiver(this->communication);
+//  }
+//
+//  engineState->setCooperationState(CooperationState::COOPERATION);
+//  engineState->updateTimeLastActivity();
+//  this->communication->sendNegotiationFinished(engineId);
+//
+//  _log->info("onCooperationAccept", "Cooperation accept received to engine %s",
+//             IDGenerator::toString(engineId).c_str());
 
   return 0;
 }

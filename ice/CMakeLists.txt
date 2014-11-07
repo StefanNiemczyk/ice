@@ -149,14 +149,15 @@ add_library(${PROJECT_NAME}
   src/engine/CooperationRequest.cpp
   src/engine/CooperationResponse.cpp
   src/engine/Coordinator.cpp
+  src/engine/ASPCoordinator.cpp
   src/engine/EngineState.cpp
-  src/engine/InformationModel.cpp
-  src/engine/IntersectionInformationModel.cpp
-  src/engine/ModelComperator.cpp
+#  src/engine/InformationModel.cpp
+#  src/engine/IntersectionInformationModel.cpp
+#  src/engine/ModelComperator.cpp
   src/engine/NodeDescription.cpp
   src/engine/OntologyInterface.cpp
   src/engine/StreamDescription.cpp
-  src/engine/StreamTemplateDescription.cpp
+#  src/engine/StreamTemplateDescription.cpp
   
   src/engine/AsynchronousTask.cpp
   src/engine/EventHandler.cpp
@@ -166,9 +167,9 @@ add_library(${PROJECT_NAME}
   
   src/engine/BaseInformationStream.cpp
   src/engine/InformationSpecification.cpp
-  src/engine/InformationStreamTemplate.cpp
+#  src/engine/InformationStreamTemplate.cpp
   src/engine/InformationStore.cpp
-  src/engine/InformationType.cpp
+#  src/engine/InformationType.cpp
   src/engine/StreamFactory.cpp
   
   src/engine/Configuration.cpp
@@ -245,11 +246,13 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/etc/TestTime.cpp
  # test/etc/EngineStuff.cpp
   test/test_ASPComposition.cpp
-  test/test_JNI.cpp
+ # test/test_JNI.cpp
+ # test/test_ASPCoordinator.cpp
  # test/test_Logger.cpp
  # test/test_RingBuffer.cpp
  # test/test_Buffer.cpp
  # test/test_InformationStore.cpp
+ # test/test_NodeStore.cpp
  # test/test_EventHandler.cpp
  # test/test_Time.cpp
  # test/test_XMLReader

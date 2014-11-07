@@ -122,7 +122,7 @@ public class IceOntologyInterface {
 
 	public boolean addSystem(final String p_systemName) {
 		// check existing systems
-		OWLIndividual systemInd = this.findOWLIndividual(this.systemOWLClass, p_systemName);
+		OWLIndividual systemInd = this.findOWLIndividual(this.systemOWLClass, p_systemName, false);
 		if (systemInd != null)
 			return false;
 
@@ -143,7 +143,7 @@ public class IceOntologyInterface {
 		if (this.mainOntology.containsIndividualInSignature(nodeIRI))
 			return false;
 
-		OWLIndividual system = this.findOWLIndividual(this.systemOWLClass, p_system);
+		OWLIndividual system = this.findOWLIndividual(this.systemOWLClass, p_system, false);
 
 		if (system == null) {
 			system = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_system));
@@ -159,8 +159,8 @@ public class IceOntologyInterface {
 		OWLClass nodeCls = this.findOWLClass(this.nodeOWLClass, p_nodeClass);
 
 		if (nodeCls == null) {
-			System.out.println(String.format("Unknown node class '%s' for node '%s' in system '%s', node not created.",
-					p_nodeClass, p_node, p_system));
+			log(String.format("Unknown node class '%s' for node '%s' in system '%s', node not created.", p_nodeClass,
+					p_node, p_system));
 			return false;
 		}
 
@@ -191,9 +191,8 @@ public class IceOntologyInterface {
 			OWLClass metadataCls = this.findOWLClass(this.metadataOWLClass, metadata);
 
 			if (metadataCls == null) {
-				System.out.println(String.format(
-						"Unknown Metadata '%s' for node '%s' in system '%s', node not created.", metadata, p_node,
-						p_system));
+				log(String.format("Unknown Metadata '%s' for node '%s' in system '%s', node not created.", metadata,
+						p_node, p_system));
 				return false;
 			}
 
@@ -225,7 +224,8 @@ public class IceOntologyInterface {
 			changes.add(addAxiomChange);
 
 			// set grounding
-			OWLIndividual metadataGrounding = this.findOWLIndividual(this.aspMetadataGroundingOWLClass, grounding);
+			OWLIndividual metadataGrounding = this.findOWLIndividual(this.aspMetadataGroundingOWLClass, grounding,
+					false);
 
 			if (metadataGrounding == null) {
 				System.out
@@ -267,7 +267,7 @@ public class IceOntologyInterface {
 		if (this.mainOntology.containsIndividualInSignature(iroIRI))
 			return false;
 
-		OWLIndividual system = this.findOWLIndividual(this.systemOWLClass, p_system);
+		OWLIndividual system = this.findOWLIndividual(this.systemOWLClass, p_system, false);
 
 		if (system == null) {
 			system = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_system));
@@ -283,8 +283,8 @@ public class IceOntologyInterface {
 		OWLClass iroCls = this.findOWLClass(this.iroOWLClass, p_iroClass);
 
 		if (iroCls == null) {
-			System.out.println(String.format("Unknown IRO class '%s' for IRO '%s' in system '%s', IRO not created.",
-					p_iroClass, p_iro, p_system));
+			log(String.format("Unknown IRO class '%s' for IRO '%s' in system '%s', IRO not created.", p_iroClass,
+					p_iro, p_system));
 			return false;
 		}
 
@@ -315,8 +315,8 @@ public class IceOntologyInterface {
 			OWLClass metadataCls = this.findOWLClass(this.metadataOWLClass, metadata);
 
 			if (metadataCls == null) {
-				System.out.println(String.format("Unknown Metadata '%s' for IRO '%s' in system '%s', IRO not created.",
-						metadata, p_iro, p_system));
+				log(String.format("Unknown Metadata '%s' for IRO '%s' in system '%s', IRO not created.", metadata,
+						p_iro, p_system));
 				return false;
 			}
 
@@ -348,7 +348,8 @@ public class IceOntologyInterface {
 			changes.add(addAxiomChange);
 
 			// set grounding
-			OWLIndividual metadataGrounding = this.findOWLIndividual(this.aspMetadataGroundingOWLClass, grounding);
+			OWLIndividual metadataGrounding = this.findOWLIndividual(this.aspMetadataGroundingOWLClass, grounding,
+					false);
 
 			if (metadataGrounding == null) {
 				System.out
@@ -394,6 +395,7 @@ public class IceOntologyInterface {
 	public String readInformationStructureAsASP() {
 		Set<OWLOntology> onts = new HashSet<OWLOntology>();
 		onts.add(this.mainOntology);
+
 		onts.addAll(this.imports);
 
 		InfoStructureVisitor isv = new InfoStructureVisitor(onts, this.getReasoner(), this.dataFactory);
@@ -410,16 +412,50 @@ public class IceOntologyInterface {
 		return isv.toString();
 	}
 
-	public String readNodesAndIROsAsASP() {
+	public String[][] readNodesAndIROsAsASP(String p_system) {
 		Set<OWLOntology> onts = new HashSet<OWLOntology>();
 		onts.add(this.mainOntology);
 		onts.addAll(this.imports);
 
+		OWLNamedIndividual system = this.findOWLIndividual(this.systemOWLClass, p_system, true);
+
+		if (system == null) {
+			system = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_system));
+			OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(this.systemOWLClass, system);
+			// Add this axiom to our ontology - with a convenience method
+			this.manager.addAxiom(this.mainOntology, ax);
+		}
+
 		NodeIROVisitor niv = new NodeIROVisitor(onts, this.getReasoner(), this.dataFactory);
 
-		niv.start();
+		List<List<String>> result = niv.readInformation(system);
 
-		return niv.toString();
+		String[][] resultArray = new String[result.size()][0];
+
+		for (int i = 0; i < result.size(); ++i) {
+			List<String> lst = result.get(i);
+			String[] arr = new String[lst.size()];
+			for (int j = 0; j < lst.size(); ++j) {
+				arr[j] = lst.get(j);
+			}
+			resultArray[i] = arr;
+		}
+
+		return resultArray;
+	}
+
+	public String[] getSystems() {
+		Set<OWLNamedIndividual> systems = this.getReasoner().getInstances(this.systemOWLClass, true).getFlattened();
+
+		String[] result = new String[systems.size()];
+		int i = 0;
+
+		for (OWLNamedIndividual ind : systems) {
+			result[i] = ind.getIRI().toString();
+			++i;
+		}
+
+		return result;
 	}
 
 	private OWLReasoner getReasoner() {
@@ -431,15 +467,20 @@ public class IceOntologyInterface {
 		return this.internalReasoner;
 	}
 
-	private OWLIndividual findOWLIndividual(final OWLClass p_class, final String p_name) {
+	private OWLNamedIndividual findOWLIndividual(final OWLClass p_class, final String p_name, boolean p_fullName) {
 		Set<OWLClass> subs = this.getAllLeafs(p_class);
 
-		for (OWLClass metadata : subs) {
-			Set<OWLNamedIndividual> inds = this.getReasoner().getInstances(metadata, true).getFlattened();
+		for (OWLClass sub : subs) {
+			Set<OWLNamedIndividual> inds = this.getReasoner().getInstances(sub, true).getFlattened();
 
 			for (OWLNamedIndividual ind : inds) {
-				if (ind.getIRI().toString().endsWith("#" + p_name))
-					return ind;
+				if (p_fullName) {
+					if (ind.getIRI().toString().equals(p_name))
+						return ind;
+				} else {
+					if (ind.getIRI().toString().endsWith("#" + p_name))
+						return ind;
+				}
 			}
 		}
 
@@ -486,5 +527,9 @@ public class IceOntologyInterface {
 
 	public void setSomeMaxCardinality(int someMaxCardinality) {
 		this.someMaxCardinality = someMaxCardinality;
+	}
+
+	private void log(String p_msg) {
+		System.out.println("java     " + p_msg);
 	}
 }

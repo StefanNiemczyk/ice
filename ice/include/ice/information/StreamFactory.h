@@ -47,22 +47,17 @@ public:
    * shared pointer. Returns a null pointer if the className is unknown.
    *
    * \param className The class name of the template type used for the information stream.
-   * \param name The name of the stream.
-   * \param informationType The information type which holds this stream.
-   * \param eventHandler Handler to execute events asynchronously.
-   * \param specification The specification of the stored information.
-   * \param streamSize The count of information elements within this stream.
-   * \param provider The provider of the information stored in this stream.
-   * \param description The description of this stream.
+   * \param informationSpecification The specification of the information.
+   * \param name The name of this stream
+   * \param provider The provider of this stream.
+   * \param metadatas The metadata of this stream.
    * \param shared True if the stream is shared, else false.
-   * \param sharingMaxCount Max number of sharing this stream.
    */
-  virtual std::shared_ptr<BaseInformationStream> createStream(const std::string& className, const std::string name,
-                                                              std::weak_ptr<InformationType> informationType,
+  virtual std::shared_ptr<BaseInformationStream> createStream(const std::string& className,
+                                                              std::shared_ptr<StreamDescription> streamDescription,
                                                               std::shared_ptr<EventHandler> eventHandler,
-                                                              std::shared_ptr<InformationSpecification> specification,
-                                                              int streamSize, std::string provider,
-                                                              std::string description, bool shared, int sharingMaxCount) const;
+                                                              int streamSize,
+                                                              int sharingMaxCount = 0) const;
 };
 
 } /* namespace ice */

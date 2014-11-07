@@ -21,7 +21,9 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 	// "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#";
 
 	protected final OWLClass node;
+	protected final OWLClass sourceNode;
 	protected final OWLClass iro;
+	protected final OWLClass requiredStream;
 	protected final OWLClass system;
 	protected final OWLClass entityType;
 	protected final OWLClass entityScope;
@@ -29,7 +31,7 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 	protected final OWLClass valueScope;
 	protected final OWLClass stream;
 	protected final OWLClass namedStream;
-	protected final OWLClass aSPGrounding;
+	protected final OWLClass groundingOWLClass;
 
 	protected final OWLObjectProperty hasInput;
 	protected final OWLObjectProperty hasRelatedInput;
@@ -48,9 +50,12 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 	protected final OWLObjectProperty improveInformationMetadata;
 	protected final OWLObjectProperty impairInformationMetadata;
 	protected final OWLObjectProperty hasGrounding;
+	protected final OWLObjectProperty aboutEntity;
+	protected final OWLObjectProperty aboutRelatedEntity;
 
-	protected final OWLDataProperty hasASPGrounding;
+	protected final OWLDataProperty hasGroundingValue;
 	protected final OWLDataProperty hasMetadataValue;
+	protected final OWLDataProperty hasConfiguration;
 
 	protected final Set<OWLOntology> ontologies;
 	protected final OWLReasoner reasoner;
@@ -67,11 +72,13 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 		this.representation = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Representation"));
 		this.valueScope = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "ValueScope"));
 		this.node = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Node"));
+		this.sourceNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "SourceNode"));
 		this.iro = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "InterRepresentationOperation"));
+		this.requiredStream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "RequiredStream"));
 		this.system = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "System"));
 		this.stream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Stream"));
 		this.namedStream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "NamedStream"));
-		this.aSPGrounding = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "ASPGrounding"));
+		this.groundingOWLClass = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Grounding"));
 
 		this.hasInput = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasInput"));
 		this.hasRelatedInput = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasRelatedInput"));
@@ -93,9 +100,12 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 		this.impairInformationMetadata = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX
 				+ "impairInformationMetadata"));
 		this.hasGrounding = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasGrounding"));
+		this.aboutEntity = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "aboutEntity"));
+		this.aboutRelatedEntity = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "aboutRelatedEntity"));
 
-		this.hasASPGrounding = p_dataFactory.getOWLDataProperty(IRI.create(ICE_IRI_PREFIX + "hasASPGrounding"));
+		this.hasGroundingValue = p_dataFactory.getOWLDataProperty(IRI.create(ICE_IRI_PREFIX + "hasGroundingValue"));
 		this.hasMetadataValue = p_dataFactory.getOWLDataProperty(IRI.create(ICE_IRI_PREFIX + "hasMetadataValue"));
+		this.hasConfiguration = p_dataFactory.getOWLDataProperty(IRI.create(ICE_IRI_PREFIX + "hasConfiguration"));
 
 		this.sb = new StringBuffer();
 		this.foundClasses = new ArrayList<OWLClass>();
@@ -103,8 +113,9 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 
 	protected boolean isSubClassOf(final OWLClassExpression p_child, final OWLClass p_parent) {
 		// owlapi 4.0 remove this
-		if (p_child.isAnonymous())
+		if (p_child.isAnonymous()) {
 			return false;
+		}
 
 		if (p_child.equals(p_parent))
 			return true;
@@ -151,4 +162,7 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 		return this.sb.toString();
 	}
 
+	protected void log(String p_msg) {
+		System.out.println("java     " + p_msg);
+	}
 }

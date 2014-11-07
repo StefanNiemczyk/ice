@@ -7,6 +7,8 @@
 
 #include "ice/processing/Node.h"
 
+#include <sstream>
+
 namespace ice
 {
 // static part
@@ -34,11 +36,15 @@ std::shared_ptr<Node> Node::createNode(const std::string& className)
   return (*Node::creators[className])();
 }
 
+bool Node::existNodeCreator(const std::string &className)
+{
+  return Node::creators.find(className) != Node::creators.end();
+}
+
 // object part
 Node::Node()
 {
   this->eventHandler = eventHandler;
-  this->type = type;
   this->active = false;
   this->cyclicTriggerTime = cyclicTriggerTime;
 }
@@ -81,7 +87,7 @@ int Node::performTask()
   return 0;
 }
 
-int Node::addInput(std::shared_ptr<BaseInformationStream> stream, bool trigger, bool base)
+int Node::addInput(std::shared_ptr<BaseInformationStream> stream, bool trigger)
 {
   std::lock_guard<std::mutex> guard(this->mtx_);
 
@@ -99,10 +105,10 @@ int Node::addInput(std::shared_ptr<BaseInformationStream> stream, bool trigger, 
     stream->registerTaskAsync(this->shared_from_this());
   }
 
-  if (base)
-  {
-    this->baseInputs.push_back(stream);
-  }
+//  if (base)
+//  {
+//    this->baseInputs.push_back(stream);
+//  }
 
   return 0;
 }
@@ -125,14 +131,14 @@ int Node::removeInput(std::shared_ptr<BaseInformationStream> stream)
   if (returnVel != 0)
     return returnVel;
 
-  for (int i = 0; i < this->baseInputs.size(); ++i)
-  {
-    auto streamItr = this->baseInputs[i];
-    if (streamItr == stream)
-    {
-      this->baseInputs.erase(this->baseInputs.begin() + i);
-    }
-  }
+//  for (int i = 0; i < this->baseInputs.size(); ++i)
+//  {
+//    auto streamItr = this->baseInputs[i];
+//    if (streamItr == stream)
+//    {
+//      this->baseInputs.erase(this->baseInputs.begin() + i);
+//    }
+//  }
 
   for (int i = 0; i < this->triggeredByInputs.size(); ++i)
   {
@@ -178,59 +184,59 @@ int Node::removeOutput(std::shared_ptr<BaseInformationStream> stream)
   return 1;
 }
 
-int Node::addInputTemplate(std::shared_ptr<InformationStreamTemplate> streamTemplate, bool trigger)
-{
-  std::lock_guard<std::mutex> guard(this->mtx_);
-
-  for (auto streamItr : this->inputTemplates)
-  {
-    if (streamItr.expired())
-      continue;
-
-    std::shared_ptr<InformationStreamTemplate> st = streamItr.lock();
-
-    if (st == streamTemplate)
-      return 1;
-  }
-
-  streamTemplate->registerNode(this->shared_from_this(), trigger);
-
-  this->inputTemplates.push_back(streamTemplate);
-
-  return 0;
-}
-
-int Node::removeInputTemplate(std::shared_ptr<InformationStreamTemplate> streamTemplate)
-{
-  std::shared_ptr<InformationStreamTemplate> st;
-
-  {
-    std::lock_guard<std::mutex> guard(this->mtx_);
-
-    for (int i = 0; i < this->inputTemplates.size(); ++i)
-    {
-      auto streamItr = this->inputTemplates[i];
-
-      if (streamItr.expired())
-        continue;
-
-      st = streamItr.lock();
-      if (st == streamTemplate)
-      {
-        this->inputTemplates.erase(this->inputTemplates.begin() + i);
-
-      }
-    }
-  }
-
-  if (st)
-  {
-    st->unregisterNode(this->shared_from_this());
-    return 0;
-  }
-
-  return 1;
-}
+//int Node::addInputTemplate(std::shared_ptr<InformationStreamTemplate> streamTemplate, bool trigger)
+//{
+//  std::lock_guard<std::mutex> guard(this->mtx_);
+//
+//  for (auto streamItr : this->inputTemplates)
+//  {
+//    if (streamItr.expired())
+//      continue;
+//
+//    std::shared_ptr<InformationStreamTemplate> st = streamItr.lock();
+//
+//    if (st == streamTemplate)
+//      return 1;
+//  }
+//
+//  streamTemplate->registerNode(this->shared_from_this(), trigger);
+//
+//  this->inputTemplates.push_back(streamTemplate);
+//
+//  return 0;
+//}
+//
+//int Node::removeInputTemplate(std::shared_ptr<InformationStreamTemplate> streamTemplate)
+//{
+//  std::shared_ptr<InformationStreamTemplate> st;
+//
+//  {
+//    std::lock_guard<std::mutex> guard(this->mtx_);
+//
+//    for (int i = 0; i < this->inputTemplates.size(); ++i)
+//    {
+//      auto streamItr = this->inputTemplates[i];
+//
+//      if (streamItr.expired())
+//        continue;
+//
+//      st = streamItr.lock();
+//      if (st == streamTemplate)
+//      {
+//        this->inputTemplates.erase(this->inputTemplates.begin() + i);
+//
+//      }
+//    }
+//  }
+//
+//  if (st)
+//  {
+//    st->unregisterNode(this->shared_from_this());
+//    return 0;
+//  }
+//
+//  return 1;
+//}
 
 int Node::init()
 {
@@ -241,6 +247,21 @@ int Node::init()
 int Node::cleanUp()
 {
   //
+  return 0;
+}
+
+int Node::destroy()
+{
+  this->inputs.clear();
+  this->outputs.clear();
+
+  for (auto stream : this->triggeredByInputs)
+  {
+    stream->registerTaskAsync(this->shared_from_this());
+  }
+
+  this->triggeredByInputs.clear();
+
   return 0;
 }
 
@@ -274,65 +295,51 @@ bool Node::isValid()
 
 std::shared_ptr<NodeDescription> Node::getNodeDescription()
 {
-  if (this->nodeDescription)
-    return this->nodeDescription;
-
-  std::lock_guard<std::mutex> guard(this->mtx_);
-
-  if (this->nodeDescription)
-    return this->nodeDescription;
-
-  int inputSize = this->inputs.size();
-  int inputTemplateSize = this->inputTemplates.size();
-  int outputSize = this->outputs.size();
-
-  boost::uuids::uuid * inputUuids = new boost::uuids::uuid[inputSize];
-
-  for (int i = 0; i < inputSize; ++i)
-  {
-    inputUuids[i] = this->inputs[i]->getSpecification()->getUUID();
-  }
-
-  boost::uuids::uuid * inputTeamplateUuids = new boost::uuids::uuid[inputTemplateSize];
-
-  for (int i = 0; i < inputTemplateSize; ++i)
-  {
-    inputTeamplateUuids[i] = this->inputTemplates[i].lock()->getSpecification()->getUUID();
-  }
-
-  boost::uuids::uuid * outputUuids = new boost::uuids::uuid[outputSize];
-
-  for (int i = 0; i < outputSize; ++i)
-  {
-    outputUuids[i] = this->outputs[i]->getSpecification()->getUUID();
-  }
-
-  auto desc = std::make_shared<NodeDescription>(this->getClassName(), inputUuids, inputTeamplateUuids, outputUuids, inputSize,
-                                                inputTemplateSize, outputSize);
-
-  this->nodeDescription = desc;
-
-  return desc;
+  return this->nodeDescription;
+//  if (this->nodeDescription)
+//    return this->nodeDescription;
+//
+//  std::lock_guard<std::mutex> guard(this->mtx_);
+//
+//  if (this->nodeDescription)
+//    return this->nodeDescription;
+//
+//  int inputSize = this->inputs.size();
+//  int inputTemplateSize = this->inputTemplates.size();
+//  int outputSize = this->outputs.size();
+//
+//  boost::uuids::uuid * inputUuids = new boost::uuids::uuid[inputSize];
+//
+//  for (int i = 0; i < inputSize; ++i)
+//  {
+//    inputUuids[i] = this->inputs[i]->getSpecification()->getUUID();
+//  }
+//
+//  boost::uuids::uuid * inputTeamplateUuids = new boost::uuids::uuid[inputTemplateSize];
+//
+//  for (int i = 0; i < inputTemplateSize; ++i)
+//  {
+//    inputTeamplateUuids[i] = this->inputTemplates[i].lock()->getSpecification()->getUUID();
+//  }
+//
+//  boost::uuids::uuid * outputUuids = new boost::uuids::uuid[outputSize];
+//
+//  for (int i = 0; i < outputSize; ++i)
+//  {
+//    outputUuids[i] = this->outputs[i]->getSpecification()->getUUID();
+//  }
+//
+//  auto desc = std::make_shared<NodeDescription>(this->getClassName(), inputUuids, inputTeamplateUuids, outputUuids, inputSize,
+//                                                inputTemplateSize, outputSize);
+//
+//  this->nodeDescription = desc;
+//
+//  return desc;
 }
 
-NodeType Node::getType() const
+void Node::setNodeDescription(std::shared_ptr<NodeDescription> description)
 {
-  return this->type;
-}
-
-void Node::setType(NodeType type)
-{
-  this->type = type;
-}
-
-std::string Node::getName() const
-{
-  return this->name;
-}
-
-void Node::setName(std::string name)
-{
-  this->name = name;
+  this->nodeDescription = description;
 }
 
 long Node::getCyclicTriggerTime() const
@@ -355,25 +362,15 @@ void Node::setEventHandler(std::shared_ptr<EventHandler> eventHandler)
   this->eventHandler = eventHandler;
 }
 
-std::string Node::getStringDescription() const
-{
-  return this->stringDescription;
-}
-
-void Node::setStringDescription(std::string stringDescription)
-{
-  this->stringDescription = stringDescription;
-}
-
-std::string Node::getSource() const
-{
-  return this->source;
-}
-
-void Node::setSource(std::string source)
-{
-  this->source = source;
-}
+//std::string Node::getStringDescription() const
+//{
+//  return this->stringDescription;
+//}
+//
+//void Node::setStringDescription(std::string stringDescription)
+//{
+//  this->stringDescription = stringDescription;
+//}
 
 std::map<std::string, std::string> Node::getConfiguration() const
 {
@@ -390,24 +387,33 @@ const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getInputs() con
   return &this->inputs;
 }
 
-const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getBaseInputs() const
-{
-  return &this->baseInputs;
-}
+//const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getBaseInputs() const
+//{
+//  return &this->baseInputs;
+//}
 
 const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getTriggeredByInputs() const
 {
   return &this->triggeredByInputs;
 }
 
-const std::vector<std::weak_ptr<InformationStreamTemplate>>* Node::getInputTemplates() const
-{
-  return &this->inputTemplates;
-}
+//const std::vector<std::weak_ptr<InformationStreamTemplate>>* Node::getInputTemplates() const
+//{
+//  return &this->inputTemplates;
+//}
 
 const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getOutputs() const
 {
   return &this->outputs;
+}
+
+std::string Node::toString()
+{
+  std::stringstream ss;
+
+  ss << "node(" << this->nodeDescription->toString() << "," << this->active << ")";
+
+  return ss.str();
 }
 
 } /* namespace ice */

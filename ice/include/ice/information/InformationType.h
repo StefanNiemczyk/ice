@@ -12,8 +12,8 @@
 #include <vector>
 
 #include "ice/Time.h"
-#include "ice/coordination/StreamDescription.h"
 #include "ice/coordination/StreamTemplateDescription.h"
+#include "ice/information/StreamDescription.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/processing/EventHandler.h"
 
@@ -22,12 +22,9 @@ namespace ice
 
 //Forward declaration
 class InformationStore;
-
 class BaseInformationStream;
-
 template<typename T>
   class InformationStream;
-
 class InformationStreamTemplate;
 
 //* InformationType

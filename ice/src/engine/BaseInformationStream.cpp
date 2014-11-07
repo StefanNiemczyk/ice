@@ -7,6 +7,8 @@
 
 #include "ice/information/BaseInformationStream.h"
 
+#include <sstream>
+
 #include "ice/coordination/EngineState.h"
 #include "ice/information/InformationType.h"
 #include "ice/processing/EventHandler.h"
@@ -16,17 +18,13 @@ namespace ice
 
 int BaseInformationStream::IDENTIFIER_COUNTER = 0;
 
-BaseInformationStream::BaseInformationStream(const std::string name, std::weak_ptr<InformationType> informationType,
+BaseInformationStream::BaseInformationStream(std::shared_ptr<StreamDescription> streamDescription,
                                              std::shared_ptr<EventHandler> eventHandler,
-                                             std::shared_ptr<InformationSpecification> specification,
-                                             std::string provider, std::string description, bool shared, int sharingMaxCount) :
-    name(name), specification(specification), iid(IDENTIFIER_COUNTER++)
+                                             int sharingMaxCount) :
+    streamDescription(streamDescription), iid(IDENTIFIER_COUNTER++)
 {
   this->eventHandler = eventHandler;
-  this->informationType = informationType;
-  this->provider = provider;
-  this->description = description;
-  this->shared = shared;
+//  this->description = description;
   this->sharingMaxCount = sharingMaxCount;
   this->_log = Logger::get("InformationStream");
 }
@@ -38,7 +36,7 @@ BaseInformationStream::~BaseInformationStream()
 
 std::shared_ptr<InformationSpecification> BaseInformationStream::getSpecification() const
 {
-  return this->specification;
+  return this->streamDescription->getInformationSpecification();
 }
 
 const int BaseInformationStream::getIID() const
@@ -48,28 +46,28 @@ const int BaseInformationStream::getIID() const
 
 const std::string BaseInformationStream::getName() const
 {
-  return this->name;
+  return this->streamDescription->getName();
 }
 
 const std::string BaseInformationStream::getProvider() const
 {
-  return this->provider;
+  return this->streamDescription->getProvider();
 }
 
-void BaseInformationStream::setProvider(std::string provider)
-{
-  this->provider = provider;
-}
+//void BaseInformationStream::setProvider(std::string provider)
+//{
+//  this->provider = provider;
+//}
 
-const std::string BaseInformationStream::getDescription() const
-{
-  return this->description;
-}
-
-void BaseInformationStream::setDescription(std::string description)
-{
-  this->description = description;
-}
+//const std::string BaseInformationStream::getDescription() const
+//{
+//  return this->description;
+//}
+//
+//void BaseInformationStream::setDescription(std::string description)
+//{
+//  this->description = description;
+//}
 
 int ice::BaseInformationStream::registerTaskAsync(std::shared_ptr<AsynchronousTask> task)
 {
@@ -139,15 +137,15 @@ int ice::BaseInformationStream::unregisterTaskSync(std::shared_ptr<AsynchronousT
 
 std::shared_ptr<StreamDescription> BaseInformationStream::getStreamDescription()
 {
-  if (this->streamDescription)
-    return this->streamDescription;
-
-  std::lock_guard<std::mutex> guard(this->_mtx);
-
-  if (this->streamDescription)
-    return this->streamDescription;
-
-  this->streamDescription = std::make_shared<StreamDescription>(this->getSpecification()->getUUID(), this->shared);
+//  if (this->streamDescription)
+//    return this->streamDescription;
+//
+//  std::lock_guard<std::mutex> guard(this->_mtx);
+//
+//  if (this->streamDescription)
+//    return this->streamDescription;
+//
+//  this->streamDescription = std::make_shared<StreamDescription>(this->getSpecification(), this->shared);
 
   return this->streamDescription;
 }
@@ -167,15 +165,15 @@ int BaseInformationStream::registerEngineState(std::shared_ptr<EngineState> engi
   return 0;
 }
 
-const std::weak_ptr<InformationStreamTemplate> BaseInformationStream::getStreamTemplate() const
-{
-  return streamTemplate;
-}
-
-void BaseInformationStream::setStreamTemplate(const std::weak_ptr<InformationStreamTemplate> streamTemplate)
-{
-  this->streamTemplate = streamTemplate;
-}
+//const std::weak_ptr<InformationStreamTemplate> BaseInformationStream::getStreamTemplate() const
+//{
+//  return streamTemplate;
+//}
+//
+//void BaseInformationStream::setStreamTemplate(const std::weak_ptr<InformationStreamTemplate> streamTemplate)
+//{
+//  this->streamTemplate = streamTemplate;
+//}
 
 int BaseInformationStream::unregisterEngineState(std::shared_ptr<EngineState> engineState)
 {
@@ -204,7 +202,7 @@ void BaseInformationStream::dropReceiver()
 
 bool BaseInformationStream::canBeShared()
 {
-  return this->remoteListeners.size() < this->sharingMaxCount -1 && this->shared;
+  return this->remoteListeners.size() < this->sharingMaxCount -1 && this->streamDescription->isShared();
 }
 
 int BaseInformationStream::getSharingCount() const
@@ -220,6 +218,17 @@ int BaseInformationStream::getSharingMaxCount() const
 void BaseInformationStream::setSharingMaxCount(int sharingMaxCount)
 {
   this->sharingMaxCount = sharingMaxCount;
+}
+
+std::string BaseInformationStream::toString()
+{
+  std::stringstream ss;
+
+  ss << "stream(" << this->streamDescription->toString() << ",";
+  ss << this->iid;
+  ss << ")";
+
+  return ss.str();
 }
 
 } /* namespace ice */

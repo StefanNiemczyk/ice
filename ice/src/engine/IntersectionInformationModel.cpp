@@ -7,8 +7,8 @@
 
 #include "ice/coordination/IntersectionInformationModel.h"
 
-#include "ice/coordination/StreamDescription.h"
 #include "ice/coordination/StreamTemplateDescription.h"
+#include "ice/information/StreamDescription.h"
 
 namespace ice
 {

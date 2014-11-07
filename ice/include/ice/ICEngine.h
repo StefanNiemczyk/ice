@@ -125,6 +125,13 @@ public:
   std::shared_ptr<Coordinator> getCoordinator();
 
   /*!
+   * \brief Returns the stream factory.
+   *
+   * Returns the stream factory.
+   */
+  std::shared_ptr<StreamFactory> getStreamFactory();
+
+  /*!
    * \brief Reads a xml file and adds specified elements to the engine. Returns
    * true if successful, false otherwise.
    *

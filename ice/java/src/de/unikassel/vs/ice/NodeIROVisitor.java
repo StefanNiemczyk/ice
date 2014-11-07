@@ -99,17 +99,18 @@ public class NodeIROVisitor extends IceVisitor {
 	private static final String IRO_PLACEHOLDER = "$IRO";
 
 	enum Type {
-		NODE, IRO
+		SOURCE_NODE, NODE, IRO, REQUIRED_STREAM
 	};
 
 	private Type currentType;
 	private OWLClass lastIRO;
 	private OWLClass iroScope;
 	private OWLClass iroRelatedScope;
-	private OWLClass lastOnlyEntity;
 	private OWLClass currentScope;
 	private OWLClass currentRepresentation;
 	private OWLNamedIndividual currentSystem;
+	private OWLNamedIndividual currentEntity;
+	private OWLNamedIndividual currentRelatedEntity;
 	private String elementString;
 	private boolean found;
 
@@ -124,61 +125,182 @@ public class NodeIROVisitor extends IceVisitor {
 		Set<OWLNamedIndividual> systems = this.reasoner.getInstances(this.system, true).getFlattened();
 
 		for (OWLNamedIndividual system : systems) {
-			System.out.println("Creating IROs for system " + system);
+			this.readInformation(system);
+		}
+	}
 
-			this.currentSystem = system;
+	public List<List<String>> readInformation(OWLNamedIndividual system) {
+		log("Creating IROs for system " + system);
 
-			Set<OWLNamedIndividual> groundings = this.reasoner.getObjectPropertyValues(system, isSystemOf)
+		List<List<String>> result = new ArrayList<List<String>>();
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+
+		this.currentSystem = system;
+
+		Set<OWLNamedIndividual> groundings = this.reasoner.getObjectPropertyValues(system, isSystemOf).getFlattened();
+
+		for (OWLNamedIndividual grounding : groundings) {
+			log(String.format("Checking grounding %s in system %s", grounding, system));
+			this.grounding = grounding;
+
+			this.currentEntity = null;
+			this.currentRelatedEntity = null;
+			this.currentScope = null;
+			this.currentRepresentation = null;
+
+			// check about entity
+			Set<OWLNamedIndividual> entities = this.reasoner.getObjectPropertyValues(grounding, this.aboutEntity)
 					.getFlattened();
 
-			for (OWLNamedIndividual grounding : groundings) {
-				System.out.println(String.format("Checking grounding %s in system %s", grounding, system));
-				this.grounding = grounding;
-
-				this.found = false;
-				// check types
-				Collection<OWLClassExpression> types = new ArrayList<OWLClassExpression>();
-
-				for (OWLOntology ont : this.ontologies)
-					types.addAll(grounding.getTypes(ont));
-				// OWL API 4.0
-				// types.addAll(EntitySearcher.getTypes(grounding, ont));
-
-				for (OWLClassExpression type : types) {
-					type.accept(this);
-				}
-
-				// check metadata
-				Set<OWLNamedIndividual> metadatas = this.reasoner.getObjectPropertyValues(grounding, this.hasMetadata)
-						.getFlattened();
-
-				for (OWLNamedIndividual metadata : metadatas) {
-					metadata.accept(this);
-				}
-
-				sb.append("\n");
+			if (entities.size() == 1) {
+				this.currentEntity = entities.iterator().next();
+			} else if (entities.size() > 1) {
+				// TODO
 			}
+
+			// check about related entity
+			entities = this.reasoner.getObjectPropertyValues(grounding, this.aboutRelatedEntity).getFlattened();
+
+			if (entities.size() == 1) {
+				this.currentRelatedEntity = entities.iterator().next();
+			} else if (entities.size() > 1) {
+				// TODO
+			}
+
+			this.found = false;
+			// check types
+			Collection<OWLClassExpression> types = new ArrayList<OWLClassExpression>();
+
+			for (OWLOntology ont : this.ontologies)
+				types.addAll(grounding.getTypes(ont));
+			// OWL API 4.0
+			// types.addAll(EntitySearcher.getTypes(grounding, ont));
+
+			for (OWLClassExpression type : types) {
+				if (this.isSubClassOf(type, this.requiredStream)) {
+					if (found)
+						continue;
+
+					this.found = true;
+					this.currentType = Type.REQUIRED_STREAM;
+
+					// this.sb.append("#program ");
+					// this.sb.append(this.iRIShortName(this.grounding.getIRI()));
+					// this.sb.append(".\n");
+				}
+
+				type.accept(this);
+			}
+
+			if (this.currentType == Type.REQUIRED_STREAM) {
+				// #external requiredStream(system,information).
+				if (this.currentEntity == null || this.currentScope == null || this.currentRepresentation == null) {
+					this.log(String
+							.format("Missing information description elements '%s' (entity), '%s' (scope) '%s' (representation)",
+									this.currentEntity, this.currentScope, this.currentRepresentation));
+				} else {
+					String info = "information("
+							+ this.iRIShortName(this.currentEntity.getIRI())
+							+ ","
+							+ this.iRIShortName(this.currentScope.getIRI())
+							+ ","
+							+ this.iRIShortName(this.currentRepresentation.getIRI())
+							+ ","
+							+ (this.currentRelatedEntity != null ? this
+									.iRIShortName(this.currentRelatedEntity.getIRI()) : "none") + ")";
+
+					StringBuffer sb = new StringBuffer();
+					sb.append("requiredStream(");
+					sb.append(this.iRIShortName(this.currentSystem.getIRI()));
+					sb.append(",");
+					sb.append(info);
+					sb.append(").\n");
+
+					this.elementString = sb.toString();
+					this.sb.append("#external ");
+					this.sb.append(this.elementString);
+				}
+			}
+
+			// check metadata
+			Set<OWLNamedIndividual> metadatas = this.reasoner.getObjectPropertyValues(grounding, this.hasMetadata)
+					.getFlattened();
+
+			for (OWLNamedIndividual metadata : metadatas) {
+				metadata.accept(this);
+			}
+
+			if (this.currentType == Type.NODE) {
+				result.get(0).add(this.iRIShortName(this.grounding.getIRI()));
+				result.get(1).add(this.elementString);
+				result.get(2).add(this.sb.toString());
+
+				this.sb = new StringBuffer();
+				this.grounding.accept(this);
+
+				result.get(3).add(this.sb.toString());
+
+			} else if (this.currentType == Type.SOURCE_NODE) {
+				result.get(4).add(this.iRIShortName(this.grounding.getIRI()));
+				result.get(5).add(this.elementString);
+				result.get(6).add(this.sb.toString());
+
+				this.sb = new StringBuffer();
+				this.grounding.accept(this);
+
+				result.get(7).add(this.sb.toString());
+			} else if (this.currentType == Type.IRO) {
+				result.get(8).add(this.iRIShortName(this.grounding.getIRI()));
+				result.get(9).add(this.elementString);
+				result.get(10).add(this.sb.toString());
+
+				this.sb = new StringBuffer();
+				this.grounding.accept(this);
+
+				result.get(11).add(this.sb.toString());
+			} else if (this.currentType == Type.REQUIRED_STREAM) {
+				result.get(12).add(this.iRIShortName(this.grounding.getIRI()));
+				result.get(13).add(this.elementString);
+				result.get(14).add(this.sb.toString());
+
+				this.sb = new StringBuffer();
+				this.grounding.accept(this);
+
+				result.get(15).add(this.sb.toString());
+			}
+
+			this.sb = new StringBuffer();
 		}
+
+		return result;
 	}
 
 	@Override
 	public void visit(OWLNamedIndividual individual) {
-		Set<OWLLiteral> literals = this.reasoner.getDataPropertyValues(individual, this.hasMetadataValue);
-
-		if (literals.size() != 1) {
-			System.out.println("Wrong size of hasMetadataValue properties " + literals.size() + " " + individual
-					+ " will be skipped.");
-			return;
-		}
-
-		String value = literals.iterator().next().getLiteral();
 
 		Set<OWLNamedIndividual> groundings = this.reasoner.getObjectPropertyValues(individual, this.hasGrounding)
 				.getFlattened();
 
 		if (groundings.size() != 1) {
-			System.out.println("Wrong size of hasGrounding properties " + groundings.size() + " " + individual
-					+ " will be skipped.");
+			log("Wrong size of hasGrounding properties " + groundings.size() + " " + individual + " will be skipped.");
 		} else {
 			OWLNamedIndividual ind = groundings.iterator().next();
 
@@ -192,23 +314,41 @@ public class NodeIROVisitor extends IceVisitor {
 			int count = 0;
 
 			for (OWLClassExpression type : types) {
-				if (this.isSubClassOf(type, this.aSPGrounding))
+				if (this.isSubClassOf(type, this.groundingOWLClass))
 					++count;
 			}
 
 			if (count != 1) {
-				System.out.println("Individual " + individual + " is not a ASP Grounding and will be skipped.");
+				log("Individual " + individual + " is not grounding and will be skipped.");
 				return;
 			}
 
-			literals = this.reasoner.getDataPropertyValues(ind, this.hasASPGrounding);
+			Set<OWLLiteral> literals = this.reasoner.getDataPropertyValues(individual, this.hasMetadataValue);
+			String value;
+
+			if (literals.size() != 1) {
+				log("Wrong size of hasMetadataValue properties " + literals.size() + " " + individual
+						+ " will be skipped.");
+				value = null;
+			} else {
+				value = literals.iterator().next().getLiteral();
+			}
+
+			literals = this.reasoner.getDataPropertyValues(ind, this.hasGroundingValue);
 
 			for (OWLLiteral lit : literals) {
 				String pattern = this.replace(lit.getLiteral());
 
-				pattern = pattern.replace("$value1", value);
+				if (value != null)
+					pattern = pattern.replace("$value1", value);
 
 				sb.append(pattern + "\n");
+			}
+
+			literals = this.reasoner.getDataPropertyValues(ind, this.hasConfiguration);
+
+			for (OWLLiteral lit : literals) {
+				sb.append(lit.getLiteral() + "\n");
 			}
 		}
 	}
@@ -221,12 +361,41 @@ public class NodeIROVisitor extends IceVisitor {
 		// foundClasses.add(ce);
 
 		OWLClass lastNode = this.lastIRO;
-		OWLClass lastOnlyEntity = this.lastOnlyEntity;
 		List<OWLSubClassOfAxiom> others = new ArrayList<OWLSubClassOfAxiom>();
 		boolean iro = false;
 		for (OWLOntology ont : this.ontologies) {
 			for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(ce)) {
-				if (this.isSubClassOf(ax.getSuperClass(), this.node)) {
+				if (this.isSubClassOf(ax.getSuperClass(), this.sourceNode)) {
+					if (found)
+						continue;
+
+					if (this.currentEntity == null) {
+						this.log(String.format("No entity specified for source node %s, skipping node", this.grounding));
+						continue;
+					}
+
+					this.found = true;
+					this.currentType = Type.SOURCE_NODE;
+					this.lastIRO = ce;
+
+					// this.sb.append("#program ");
+					// this.sb.append(this.iRIShortName(this.grounding.getIRI()));
+					// this.sb.append(".\n");
+
+					// #external nodeTemplate(system1,node1,any).
+					StringBuffer sb = new StringBuffer();
+					sb.append("sourceNode(");
+					sb.append(this.iRIShortName(this.currentSystem.getIRI()));
+					sb.append(",");
+					sb.append(this.iRIShortName(this.grounding.getIRI()));
+					sb.append(",");
+					sb.append(this.iRIShortName(this.currentEntity.getIRI()));
+					sb.append(").\n");
+
+					this.elementString = sb.toString();
+					this.sb.append("#external ");
+					this.sb.append(this.elementString);
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.node)) {
 					if (found)
 						continue;
 
@@ -234,9 +403,9 @@ public class NodeIROVisitor extends IceVisitor {
 					this.currentType = Type.NODE;
 					this.lastIRO = ce;
 
-					this.sb.append("#program ");
-					this.sb.append(this.iRIShortName(this.grounding.getIRI()));
-					this.sb.append(".\n");
+					// this.sb.append("#program ");
+					// this.sb.append(this.iRIShortName(this.grounding.getIRI()));
+					// this.sb.append(".\n");
 
 					// #external nodeTemplate(system1,node1,any).
 					StringBuffer sb = new StringBuffer();
@@ -245,7 +414,7 @@ public class NodeIROVisitor extends IceVisitor {
 					sb.append(",");
 					sb.append(this.iRIShortName(this.grounding.getIRI()));
 					sb.append(",");
-					sb.append((this.lastOnlyEntity != null) ? this.iRIShortName(this.lastOnlyEntity.getIRI()) : "any");
+					sb.append((this.currentEntity != null) ? this.iRIShortName(this.currentEntity.getIRI()) : "any");
 					sb.append(").\n");
 
 					this.elementString = sb.toString();
@@ -260,13 +429,13 @@ public class NodeIROVisitor extends IceVisitor {
 					this.lastIRO = ce;
 					iro = true;
 
-					this.sb.append("#program ");
-					this.sb.append(this.iRIShortName(this.grounding.getIRI()));
-					this.sb.append(".\n");
+					// this.sb.append("#program ");
+					// this.sb.append(this.iRIShortName(this.grounding.getIRI()));
+					// this.sb.append(".\n");
 				} else if (this.isSubClassOf(ax.getSuperClass(), this.entityScope)) {
 					this.currentScope = ce;
 				} else {
-					// System.out.println(ax);
+					// log(ax);
 					others.add(ax);
 				}
 			}
@@ -275,7 +444,7 @@ public class NodeIROVisitor extends IceVisitor {
 		for (OWLSubClassOfAxiom ax : others) {
 			// others
 			ax.getSuperClass().accept(this);
-			// System.out.println(ax.getSuperClass());
+			// log(ax.getSuperClass());
 		}
 
 		if (iro) {
@@ -286,13 +455,13 @@ public class NodeIROVisitor extends IceVisitor {
 			sb.append(",");
 			sb.append(this.iRIShortName(this.grounding.getIRI()));
 			sb.append(",");
-			sb.append((this.lastOnlyEntity != null) ? this.iRIShortName(this.lastOnlyEntity.getIRI()) : "any");
+			sb.append((this.currentEntity != null) ? this.iRIShortName(this.currentEntity.getIRI()) : "any");
 			sb.append(",");
 			sb.append(this.iRIShortName(this.iroScope.getIRI()));
 
 			if (this.iroRelatedScope != null) {
 				sb.append(",");
-				sb.append((this.lastOnlyEntity != null) ? this.iRIShortName(this.lastOnlyEntity.getIRI()) : "any");
+				sb.append((this.currentEntity != null) ? this.iRIShortName(this.currentEntity.getIRI()) : "any");
 				sb.append(",");
 				sb.append(this.iRIShortName(this.iroRelatedScope.getIRI()));
 			}
@@ -313,7 +482,6 @@ public class NodeIROVisitor extends IceVisitor {
 		}
 
 		this.lastIRO = lastNode;
-		this.lastOnlyEntity = lastOnlyEntity;
 	}
 
 	@Override
@@ -327,6 +495,7 @@ public class NodeIROVisitor extends IceVisitor {
 
 			switch (this.currentType) {
 			case NODE:
+			case SOURCE_NODE:
 				pattern = "input(%s,%s,%s,%s," + cardinality + "," + cardinality + ") :- " + this.elementString;
 				this.printNodeStreamRelation(ce.getFiller(), pattern);
 				break;
@@ -334,7 +503,7 @@ public class NodeIROVisitor extends IceVisitor {
 				pattern = "inputIRO(%s,%s,%s,%s," + cardinality + "," + cardinality + ") :- " + IRO_PLACEHOLDER;
 				this.printNodeStreamRelation(ce.getFiller(), pattern);
 				this.iroScope = this.currentScope;
-				System.out.println(currentScope);
+				log(currentScope.toString());
 				break;
 			default:
 				// TODO
@@ -346,6 +515,7 @@ public class NodeIROVisitor extends IceVisitor {
 
 			switch (this.currentType) {
 			case NODE:
+			case SOURCE_NODE:
 				pattern = "output(%s,%s,%s,%s).\n";
 				break;
 			case IRO:
@@ -362,6 +532,7 @@ public class NodeIROVisitor extends IceVisitor {
 
 			switch (this.currentType) {
 			case NODE:
+			case SOURCE_NODE:
 				pattern = "input2(%s,%s,%s,%s," + cardinality + "," + cardinality + ") :- " + this.elementString;
 				this.printNodeStreamRelation(ce.getFiller(), pattern);
 				break;
@@ -374,7 +545,7 @@ public class NodeIROVisitor extends IceVisitor {
 				// TODO
 			}
 		} else {
-			System.out.println("Unknown OWLObjectExactCardinality " + ce);
+			log("Unknown OWLObjectExactCardinality " + ce);
 		}
 	}
 
@@ -387,7 +558,7 @@ public class NodeIROVisitor extends IceVisitor {
 			}
 		} else if (ce.getProperty().equals(hasRepresentation)) {
 			if (ce.getFiller().isAnonymous()) {
-				System.out.println("Anonymous Representation? " + ce.getFiller());
+				log("Anonymous Representation? " + ce.getFiller());
 			} else {
 				this.currentRepresentation = ce.getFiller().asOWLClass();
 			}
@@ -406,7 +577,7 @@ public class NodeIROVisitor extends IceVisitor {
 		} else if (ce.getProperty().equals(impairInformationMetadata)) {
 			// currently ignored
 		} else {
-			System.out.println("Unknown OWLObjectSomeValuesFrom " + ce);
+			log("Unknown OWLObjectSomeValuesFrom " + ce);
 		}
 	}
 
@@ -439,18 +610,40 @@ public class NodeIROVisitor extends IceVisitor {
 		if (this.currentScope != null) {
 			if (this.currentRepresentation != null) {
 				sb.append(String.format(p_pattern, this.iRIShortName(this.currentSystem.getIRI()),
-						this.iRIShortName(this.lastIRO.getIRI()), this.iRIShortName(this.currentScope.getIRI()),
+						this.iRIShortName(this.grounding.getIRI()), this.iRIShortName(this.currentScope.getIRI()),
 						this.iRIShortName(this.currentRepresentation.getIRI())));
 			} else {
 				// TODO
-				System.out.println("No representation for scope " + this.currentScope + " skipping " + p_pattern);
+				log("No representation for scope " + this.currentScope + " skipping " + p_pattern);
 			}
 		}
 	}
 
 	private String replace(String p_string) {
 		p_string = p_string.replace("$system", this.iRIShortName(this.currentSystem.getIRI()));
-		return p_string.replace("$node", this.iRIShortName(this.grounding.getIRI()));
+		p_string = p_string.replace("$node", this.iRIShortName(this.grounding.getIRI()));
+
+		if (p_string.contains("$information")) {
+			if (this.currentEntity == null || this.currentScope == null || this.currentRepresentation == null) {
+				this.log(String.format(
+						"Missing information description elements '%s' (entity), '%s' (scope) '%s' (representation)",
+						this.currentEntity, this.currentScope, this.currentRepresentation));
+			} else {
+				String info = "information("
+						+ this.iRIShortName(this.currentEntity.getIRI())
+						+ ","
+						+ this.iRIShortName(this.currentScope.getIRI())
+						+ ","
+						+ this.iRIShortName(this.currentRepresentation.getIRI())
+						+ ","
+						+ (this.currentRelatedEntity != null ? this.iRIShortName(this.currentRelatedEntity.getIRI())
+								: "none") + ")";
+
+				p_string = p_string.replace("$information", info);
+			}
+		}
+
+		return p_string;
 	}
 
 	// Generic Stuff, which I ignore

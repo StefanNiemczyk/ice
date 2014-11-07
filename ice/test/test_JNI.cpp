@@ -44,7 +44,14 @@ TEST(JNITest, create)
   result = oi.addSystem("TestSystem");
 
   ASSERT_FALSE(oi.errorOccurred());
-  ASSERT_TRUE(result);
+  ASSERT_FALSE(result);
+
+  std::unique_ptr<std::vector<std::string>> systems = oi.getSystems();
+
+  ASSERT_FALSE(oi.errorOccurred());
+
+//  for (std::string sys : *systems)
+//    std::cout << sys << std::endl;
 
   std::string infoStructure = oi.readInformationStructureAsASP();
 
@@ -88,11 +95,20 @@ TEST(JNITest, create)
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
+  for (std::string sys : *systems)
+  {
+    std::unique_ptr<std::vector<std::vector<std::string>>>vec= oi.readNodesAndIROsAsASP(sys);
 
-  infoStructure = oi.readNodesAndIROsAsASP();
+    ASSERT_FALSE(oi.errorOccurred());
 
-  ASSERT_FALSE(oi.errorOccurred());
-  std::cout << infoStructure << std::endl;
+    for (std::vector<std::string> v : *vec)
+    {
+      for (std::string s : v)
+      {
+        std::cout << "#" << s << std::endl;
+      }
+    }
+  }
 }
 
 }

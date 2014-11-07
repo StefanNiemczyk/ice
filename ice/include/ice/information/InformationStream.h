@@ -21,6 +21,7 @@
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationElement.h"
 #include "ice/information/InformationSpecification.h"
+#include "ice/information/StreamDescription.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/processing/InformationEvent.h"
 
@@ -41,7 +42,7 @@ namespace ice
 {
 //* InformationStream
 /**
- * The class stored information for a given type. The stream is initialized with a
+ * The class stores information for a given type. The stream is initialized with a
  * fixed size, which enables to access old information. Access the stored information is thread save.
  *
  */
@@ -50,39 +51,21 @@ template<typename T>
   {
 
   public:
+
     /*!
      * \brief The constructor initialize the stream with a given stream size.
      *
      * The constructor initialize the stream with a given stream size.
      *
-     * \param name The name of the stream.
-     * \param informationType The information type which holds this stream.
+     * \param streamDescription The description of this stream.
      * \param eventHandler Handler to execute events asynchronously.
-     * \param specification The specification of the stored information.
      * \param streamSize The count of information elements within this stream.
-     */
-    // InformationStream(const std::string name, std::weak_ptr<InformationType> informationType,
-    //                     std::shared_ptr<EventHandler> eventHandler,
-    //                  std::shared_ptr<InformationSpecification> specification, int streamSize);
-    /*!
-     * \brief The constructor initialize the stream with a given stream size.
-     *
-     * The constructor initialize the stream with a given stream size.
-     *
-     * \param name The name of the stream.
-     * \param informationType The information type which holds this stream.
-     * \param eventHandler Handler to execute events asynchronously.
-     * \param specification The specification of the stored information.
-     * \param streamSize The count of information elements within this stream.
-     * \param provider The provider of the information stored in this stream.
      * \param description The description of this stream.
-     * \param shared True if the stream is shared, else false.
-   * \param sharingMaxCount Max number of sharing this stream.
+     * \param sharingMaxCount Max number of sharing this stream.
      */
-    InformationStream(const std::string name, std::weak_ptr<InformationType> informationType,
-                      std::shared_ptr<EventHandler> eventHandler,
-                      std::shared_ptr<InformationSpecification> specification, int streamSize,
-                      std::string provider = "", std::string description = "", bool shared = false, int sharingMaxCount = 0);
+  InformationStream(std::shared_ptr<StreamDescription> streamDescription,
+                        std::shared_ptr<EventHandler> eventHandler, int streamSize,
+                        int sharingMaxCount = 0);
 
     /*!
      * \brief Default destructor
@@ -227,28 +210,14 @@ template<typename T>
 #include "ice/communication/InformationSender.h"
 #include "ice/coordination/EngineState.h"
 #include "ice/information/AbstractInformationListener.h"
-#include "ice/information/InformationType.h"
 
 //Implementing methods here
-/*
- template<typename T>
- ice::InformationStream<T>::InformationStream(const std::string name,
- std::weak_ptr<InformationType> informationType,
- std::shared_ptr<EventHandler> eventHandler,
- std::shared_ptr<InformationSpecification> specification,
- int streamSize) :
- BaseInformationStream(name, informationType, eventHandler, specification)
- {
- this->ringBuffer = std::unique_ptr<RingBuffer<InformationElement<T> > >(
- new RingBuffer<InformationElement<T> >(streamSize));
- }*/
 
 template<typename T>
-  ice::InformationStream<T>::InformationStream(const std::string name, std::weak_ptr<InformationType> informationType,
-                                               std::shared_ptr<EventHandler> eventHandler,
-                                               std::shared_ptr<InformationSpecification> specification, int streamSize,
-                                               std::string provider, std::string description, bool shared, int sharingMaxCount) :
-      BaseInformationStream(name, informationType, eventHandler, specification, provider, description, shared, sharingMaxCount)
+  ice::InformationStream<T>::InformationStream(std::shared_ptr<StreamDescription> streamDescription,
+                                               std::shared_ptr<EventHandler> eventHandler, int streamSize,
+                                               int sharingMaxCount) :
+      BaseInformationStream(streamDescription, eventHandler, sharingMaxCount)
   {
     this->ringBuffer = std::unique_ptr<RingBuffer<InformationElement<T>>>(
     new RingBuffer<InformationElement<T>>(streamSize));
@@ -278,8 +247,9 @@ template<typename T>
                                      time timeProcessed)
   {
     std::lock_guard<std::mutex> guard(_mtx);
-    auto informationElement = std::make_shared<InformationElement<T>>(this->specification, std::move(information),
-                                                                      timeValidity, timeObservation, timeProcessed);
+    auto informationElement = std::make_shared<InformationElement<T>>(
+        this->streamDescription->getInformationSpecification(), std::move(information), timeValidity, timeObservation,
+        timeProcessed);
 
     int returnValue = this->ringBuffer->add(informationElement);
 
@@ -324,7 +294,7 @@ template<typename T>
       }
       else
       {
-        _log->error("add", "No sender for stream %s", &this->name);
+        _log->error("add", "No sender for stream %s", std::string(this->streamDescription->getName()).c_str());
       }
     }
 
@@ -363,7 +333,7 @@ template<typename T>
 
     if (false == comResult)
     {
-      _log->error("registerSender", "No sender returned for stream %s", std::string(this->name).c_str());
+      _log->error("registerSender", "No sender returned for stream %s", std::string(this->streamDescription->getName()).c_str());
       std::shared_ptr<ice::BaseInformationSender> ptr;
       return ptr;
     }
@@ -376,7 +346,7 @@ template<typename T>
     else
     {
       _log->error("registerSender", "Incorrect type of sender %s for stream %s", comResult->getTypeInfo(),
-                  std::string(this->name).c_str());
+                  std::string(this->streamDescription->getName()).c_str());
       std::shared_ptr<ice::BaseInformationSender> ptr;
       return ptr;
     }
@@ -391,7 +361,7 @@ template<typename T>
 
     if (false == comResult)
     {
-      _log->error("registerReceiver", "No receiver returned for stream %s", std::string(this->name).c_str());
+      _log->error("registerReceiver", "No receiver returned for stream %s", std::string(this->streamDescription->getName()).c_str());
       std::shared_ptr<ice::InformationReceiver> ptr;
       return ptr;
     }

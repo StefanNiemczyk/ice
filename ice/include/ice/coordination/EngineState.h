@@ -11,6 +11,8 @@
 #include <memory>
 #include <vector>
 
+#include "ClingWrapper.h"
+
 #include "ice/Identifier.h"
 #include "ice/Time.h"
 
@@ -29,6 +31,46 @@ class TimeFactory;
 
 namespace ice
 {
+
+//* ASPNodeState
+/**
+ * Enum of states an ASP node.
+ *
+ */
+enum ASPElementState
+{
+  NEW_ELEMENT,
+  ADDED_TO_ASP
+};
+
+//* ASPNodeType
+/**
+ * Enum of ASP node types
+ *
+ */
+enum ASPElementType
+{
+  ASP_COMPUTATION_NODE,
+  ASP_SOURCE_NODE,
+  ASP_IRO,
+  ASP_REQUIRED_STREAM
+};
+
+//* ASPNode
+/**
+ * This struct contains the asp informations of a node.
+ *
+ */
+struct ASPElement
+{
+  std::shared_ptr<supplementary::External> external;
+  std::string aspString;
+  std::string name;
+  std::string className;
+  std::map<std::string,std::string> config;
+  ASPElementState state;
+  ASPElementType type;
+};
 
 //* CooperationState
 /**
@@ -65,9 +107,20 @@ public:
    * This contructor initialize the object and sets the unique identifier.
    *
    * /param engineId The identifier of the engine.
+   * /param systemIri The ontology iri of this system.
    * /param engine The main engine.
    */
   EngineState(const identifier engineId, std::weak_ptr<ICEngine> engine);
+
+  /*!
+   * \brief This contructor initialize the object and sets the unique identifier.
+   *
+   * This contructor initialize the object and sets the unique identifier.
+   *
+   * /param systemIri The ontology iri of this system.
+   * /param engine The main engine.
+   */
+  EngineState(std::string const systemIri, std::weak_ptr<ICEngine> engine);
 
   /*!
    * \brief Default destructor
@@ -82,6 +135,29 @@ public:
    * Returns the id of the engine.
    */
   const identifier getEngineId() const;
+
+  /*!
+   * \brief Sets the id of the engine.
+   *
+   * Sets the id of the engine.
+   *
+   * \param id The new identifier.
+   */
+  void setEngineId(const identifier id);
+
+  /*!
+   * \brief Returns the iri of this engine.
+   *
+   * Returns the iri of this engine.
+   */
+  const std::string getSystemIri() const;
+
+  /*!
+   * \brief Returns the short version of the iri of this engine.
+   *
+   * Returns the iri short version of the iri of this engine.
+   */
+  const std::string getSystemIriShort() const;
 
   /*!
    * \brief Returns the information model of the engine.
@@ -228,10 +304,20 @@ public:
    */
   void resetRetryCounter();
 
+  std::shared_ptr<ASPElement> getASPElementByName(ASPElementType type, std::string const name);
+  std::shared_ptr<ASPElement> getASPElementByName(std::string const name);
+
+  void addASPElement(std::shared_ptr<ASPElement> node);
+
 private:
-  const identifier engineId; /**< Unique identifier of the engine */
+  identifier engineId; /**< Unique identifier of the engine */
+  const std::string systemIri; /**< The iri of this system */
   CooperationState cooperationState; /**< State of the cooperation between this engine and the main engine */
   std::weak_ptr<ICEngine> engine; /**< The main engine */
+  std::vector<std::shared_ptr<ASPElement>> aspNodes; /**< Vector of asp nodes */
+  std::vector<std::shared_ptr<ASPElement>> aspSourceNodes; /**< Vector of asp source nodes */
+  std::vector<std::shared_ptr<ASPElement>> aspIro; /**< Vector of asp nodes */
+  std::vector<std::shared_ptr<ASPElement>> aspRequiredStreams; /**< Vector of asp nodes */
   std::shared_ptr<InformationModel> informationModel; /**< The information model of this engine */
   time timeLastActivity; /**< Time stamp of the last activity of this engine */
   time timeLastStateUpdate; /**< Time stamp of the last cooperation state update */

@@ -7,12 +7,14 @@
 
 #include "ice/processing/NodeStore.h"
 #include "ice/ICEngine.h"
+#include "ice/Logger.h"
 
 namespace ice
 {
 
 NodeStore::NodeStore(std::weak_ptr<ICEngine> engine)
 {
+  _log = Logger::get("NodeStore");
   this->engine = engine;
 }
 
@@ -27,7 +29,7 @@ int NodeStore::addNode(std::shared_ptr<Node> node)
 
   for (auto nodeItr : this->nodes)
   {
-    if (nodeItr->getName() == node->getName())
+    if (nodeItr->getNodeDescription()->getName() == node->getNodeDescription()->getName())
       return 1;
   }
 
@@ -36,9 +38,9 @@ int NodeStore::addNode(std::shared_ptr<Node> node)
   return 0;
 }
 
-std::shared_ptr<Node> NodeStore::getNode(const std::string nodeName)
+std::shared_ptr<Node> NodeStore::getNode(const std::string nodeName, const ont::entity entity)
 {
-  if ("" == nodeName)
+  if ("" == nodeName || entity == "")
   {
     std::shared_ptr<Node> ptr;
     return ptr;
@@ -48,7 +50,8 @@ std::shared_ptr<Node> NodeStore::getNode(const std::string nodeName)
 
   for (auto node : this->nodes)
   {
-    if (node->getName() == nodeName)
+    auto desc = node->getNodeDescription();
+    if (desc->getName() == nodeName && desc->getEntity() == entity)
       return node;
   }
 
@@ -56,18 +59,108 @@ std::shared_ptr<Node> NodeStore::getNode(const std::string nodeName)
   return ptr;
 }
 
-bool NodeStore::addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel)
+std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::string className, const std::string name,
+                                              const ont::entity entity, std::map<std::string, std::string> config,
+                                              const std::string source)
 {
-  std::lock_guard<std::mutex> guard(this->mtx_);
-  bool returnValue = false;
+  auto node = this->getNode(name, entity);
 
-  for (auto node : this->nodes)
+  if (node)
   {
-    informationModel->getNodeDescriptions()->push_back(node->getNodeDescription());
-    returnValue = true;
+    _log->info("registerNode", "Node '%s' already registered for entity '%s'", name.c_str(), entity.c_str());
+    return node;
   }
 
-  return returnValue;
+  auto desc = std::make_shared<NodeDescription>(type, className, name, entity);
+
+  if (type == NodeType::SOURCE)
+  {
+    desc->setSource(source);
+  }
+
+  node = Node::createNode(className);
+
+  if (false == node)
+  {
+    _log->error("registerNode", "Node '%s' could not be created for entity '%s'. Register missing?", name.c_str(),
+                entity.c_str());
+    return node;
+  }
+
+  node->setNodeDescription(desc);
+  node->setConfiguration(config);
+
+  return node;
 }
+
+bool NodeStore::existNodeCreator(const std::string className)
+{
+  return Node::existNodeCreator(className);
+}
+
+void NodeStore::cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes)
+{
+  _log->verbose("cleanUpUnusedNodes", "Start removing unused nodes");
+  int counter = 0;
+
+  for (int i = 0; i < this->nodes.size(); ++i)
+  {
+    auto node = this->nodes.at(i);
+    bool found = false;
+
+    for (auto usedNode : usedNodes)
+    {
+      if (usedNode == node)
+      {
+        found = true;
+        break;
+      }
+    }
+
+    if (found)
+      continue;
+
+    _log->info("cleanUpUnusedNodes", "Remove unused node %s", node->toString().c_str());
+    counter++;
+
+    node->deactivate();
+    node->destroy();
+
+    --i;
+  }
+
+  _log->info("cleanUpUnusedNodes", "Clean up node store: '%d' nodes are removed", counter);
+}
+
+void NodeStore::cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp)
+{
+  _log->verbose("cleanUpUnusedNodes", "Start removing nodes");
+  int counter = 0;
+
+  for (auto node : nodesToCleanUp)
+  {
+    _log->info("cleanUpUnusedNodes", "Remove node %s", node->toString().c_str());
+    counter++;
+
+    node->deactivate();
+    node->destroy();
+  }
+
+  _log->info("cleanUpUnusedNodes", "Clean up node store: '%d' nodes are removed", counter);
+}
+
+//bool NodeStore::addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel)
+//{
+//  std::lock_guard<std::mutex> guard(this->mtx_);
+//  bool returnValue = false;
+//
+//  for (auto node : this->nodes)
+//  {
+//    informationModel->getNodeDescriptions()->push_back(node->getNodeDescription());
+//    returnValue = true;
+//  }
+//
+//  return returnValue;
+//}
 
 } /* namespace ice */

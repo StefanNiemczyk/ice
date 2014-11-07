@@ -16,8 +16,7 @@
 
 #include "ice/Configuration.h"
 #include "ice/Logger.h"
-#include "ice/coordination/InformationModel.h"
-#include "ice/coordination/StreamDescription.h"
+#include "ice/information/StreamDescription.h"
 #include "ice/coordination/StreamTemplateDescription.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/information/InformationSpecification.h"
@@ -27,10 +26,10 @@ namespace ice
 //Forward declarations
 class ICEngine;
 
-class InformationType;
-
 template<typename T>
   class InformationStream;
+
+class StreamFactory;
 
 //* InformationStore
 /**
@@ -76,8 +75,7 @@ public:
    *
    * \param name The name of the information stream
    */
-  boost::uuids::uuid getUUIDByName(std::string name);
-
+//  boost::uuids::uuid getUUIDByName(std::string name);
   /*!
    * \brief Registers an information type and returns a shared ptr.
    *
@@ -87,8 +85,7 @@ public:
    * \param uuid The universal unique identifier.
    * \param specification The specification of the information type.
    */
-  std::shared_ptr<InformationType> registerInformationType(std::shared_ptr<InformationSpecification> specification);
-
+//  std::shared_ptr<InformationType> registerInformationType(std::shared_ptr<InformationSpecification> specification);
   /*!
    * \brief Returns the information type for the given uuid or null.
    *
@@ -96,8 +93,7 @@ public:
    *
    * @param uuid The universal unique identifier of the requested information type.
    */
-  std::shared_ptr<InformationType> getInformationType(const boost::uuids::uuid& uuid) const;
-
+//  std::shared_ptr<InformationType> getInformationType(const boost::uuids::uuid& uuid) const;
   /*!
    * \brief Returns the information type for the given name or null.
    *
@@ -105,8 +101,7 @@ public:
    *
    * @param name The name of the requested information type.
    */
-  std::shared_ptr<InformationType> getInformationType(const std::string& name) const;
-
+//  std::shared_ptr<InformationType> getInformationType(const std::string& name) const;
   /*!
    * \brief Registers an stream and returns a shared_ptr. Returns null if no matching information type exists.
    *
@@ -114,16 +109,37 @@ public:
    * with the given uuid. If a stream with this name is already registered the existing stream will be
    * returned. If no information type with a matching uuid exists null is returned.
    *
-   * \param uuid The universal unique identifier of the information type.
+   * \param specification The specification of the information.
    * \param name The name of the information stream.
    * \param streamSize The count of elements stored within the stream.
+   * \param metadata The metadata of this stream.
    * \param provider The provider of the information elements.
-   * \param description The description of the stream.
+   * \param sourceSystem The source system of the stream.
    */
   template<typename T>
-    std::shared_ptr<InformationStream<T>> registerStream(boost::uuids::uuid& uuid, const std::string name,
-                                                         const int streamSize, std::string provider = "",
-                                                         std::string description = "");
+    std::shared_ptr<InformationStream<T>> registerStream(std::shared_ptr<InformationSpecification> specification,
+                                                         const std::string name, const int streamSize,
+                                                         std::map<std::string, int> metadata, std::string provider,
+                                                         std::string sourceSystem);
+
+  /*!
+   * \brief Registers an stream and returns a shared_ptr. Returns null if no matching information type exists.
+   *
+   *
+   *
+   * \param dataType The data type of the stream.
+   * \param specification The specification of the information.
+   * \param name The name of the information stream.
+   * \param streamSize The count of elements stored within the stream.
+   * \param metadata The metadata of this stream.
+   * \param provider The provider of the information elements.
+   * \param sourceSystem The source system of the stream.
+   */
+  std::shared_ptr<BaseInformationStream> registerBaseStream(std::string dataType,
+                                                            std::shared_ptr<InformationSpecification> specification,
+                                                            const std::string name, const int streamSize,
+                                                            std::map<std::string, int> metadata, std::string provider,
+                                                            std::string sourceSystem);
 
   /*!
    * \brief Returns the configuration object.
@@ -146,8 +162,7 @@ public:
    *
    * \param stream The stream to add.
    */
-  int addStream(std::shared_ptr<BaseInformationStream> stream);
-
+//  int addStream(std::shared_ptr<BaseInformationStream> stream);
   /*!
    * \brief Returns a BaseInformationStream for the given stream name.
    *
@@ -156,7 +171,8 @@ public:
    * \param streamName The name of the searched stream.
    */
   template<typename T>
-    std::shared_ptr<InformationStream<T>> getStream(const std::string streamName);
+    std::shared_ptr<InformationStream<T>> getStream(InformationSpecification *specification, std::string provider,
+                                                    std::string sourceSystem);
 
   /*!
    * \brief Returns a BaseInformationStream for the given stream name.
@@ -165,7 +181,10 @@ public:
    *
    * \param streamName The name of the searched stream.
    */
-  std::shared_ptr<BaseInformationStream> getBaseStream(const std::string streamName);
+  std::shared_ptr<BaseInformationStream> getBaseStream(InformationSpecification *specification);
+
+  std::shared_ptr<BaseInformationStream> getBaseStream(InformationSpecification *specification, std::string provider,
+                                                       std::string sourceSystem);
 
   /*!
    * \brief Returns a BaseInformationStream for the given stream description.
@@ -183,9 +202,8 @@ public:
    *
    * \param streamTemplateDescription The description of the searched stream.
    */
-  std::shared_ptr<BaseInformationStream> getBaseStream(
-      const std::shared_ptr<StreamTemplateDescription> streamDescription);
-
+//  std::shared_ptr<BaseInformationStream> getBaseStream(
+//      const std::shared_ptr<StreamTemplateDescription> streamDescription);
   /*!
    * \brief Adds a stream template to the stream template map.
    *
@@ -194,8 +212,7 @@ public:
    *
    * \param streamTemplate The stream template to add.
    */
-  int addStreamTemplate(std::shared_ptr<InformationStreamTemplate> streamTemplate);
-
+//  int addStreamTemplate(std::shared_ptr<InformationStreamTemplate> streamTemplate);
   /*!
    * \brief Returns a InformationStreamTemplate for the given stream name.
    *
@@ -204,8 +221,7 @@ public:
    *
    * \param streamTemplateName The name of the searched stream template.
    */
-  std::shared_ptr<InformationStreamTemplate> getStreamTemplate(const std::string streamTemplateName);
-
+//  std::shared_ptr<InformationStreamTemplate> getStreamTemplate(const std::string streamTemplateName);
   /*!
    * \brief Adds the stream description and stream template description to the information model.
    *
@@ -216,13 +232,19 @@ public:
    */
   bool addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel);
 
+  void cleanUpStreams();
+
+private:
+  std::shared_ptr<BaseInformationStream> selectBestStream(std::vector<std::shared_ptr<BaseInformationStream>> *streams);
+
 private:
   std::weak_ptr<ICEngine> engine; /**< Weak pointer to the engine */
   std::shared_ptr<Configuration> config; /**< The configuration object */
-  std::vector<std::shared_ptr<InformationType>> informationTypes; /**< The information types */
+  std::vector<std::shared_ptr<BaseInformationStream>> streams; /**< The information steams */
   std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute events asynchronously */
-  std::map<std::string, std::shared_ptr<BaseInformationStream>> streams; /**< Map of stream name -> information stream */
-  std::map<std::string, std::shared_ptr<InformationStreamTemplate>> streamTemplates; /**< Map of stream name -> information stream */
+  std::shared_ptr<StreamFactory> streamFactory; /**< Stream factory to create streams */
+//  std::map<std::string, std::shared_ptr<BaseInformationStream>> streamMap; /**< Map of stream name -> information stream */
+//  std::map<std::string, std::shared_ptr<InformationStreamTemplate>> streamTemplates; /**< Map of stream name -> information stream */
   std::mutex _mtx; /**< Mutex */
   Logger* _log; /**< Logger */
 };
@@ -232,46 +254,45 @@ private:
 //Include after forward declaration
 
 #include "ice/information/InformationStream.h"
-#include "ice/information/InformationType.h"
 
 //Implementing methods here
 
 template<typename T>
-  inline std::shared_ptr<ice::InformationStream<T>> ice::InformationStore::registerStream(boost::uuids::uuid& uuid,
-                                                                                          const std::string name,
-                                                                                          const int streamSize,
-                                                                                          std::string provider,
-                                                                                          std::string description)
+  inline std::shared_ptr<ice::InformationStream<T>> ice::InformationStore::registerStream(
+      std::shared_ptr<InformationSpecification> specification, const std::string name, const int streamSize,
+      std::map<std::string, int> metadata, std::string provider, std::string sourceSystem)
   {
-    std::shared_ptr<InformationStream<T>> ptr;
+    auto ptr = this->getStream<T>(specification.get(), provider, sourceSystem);
 
-    for (auto type : this->informationTypes)
+    //stream already registered
+    if (ptr)
     {
-      if (type->getSpecification()->getUUID() == uuid)
-      {
-        ptr = type->registerStream<T>(name, streamSize, provider, description);
-        break;
-      }
-    }
-
-    return ptr;
-  }
-
-template<typename T>
-  inline std::shared_ptr<ice::InformationStream<T>> ice::InformationStore::getStream(const std::string streamName)
-  {
-
-    _log->debug("getStream", "Get stream %s from map", streamName.c_str());
-
-    std::shared_ptr<BaseInformationStream> stream;
-    std::shared_ptr<ice::InformationStream<T>> ptr;
-
-    if (this->streams.find(streamName) == this->streams.end())
-    {
+      _log->warning("registerStream", "InformationStore: Duplicated Stream with '%s', '%s', '%s'",
+                    specification->toString().c_str(), provider.c_str(), sourceSystem.c_str());
       return ptr;
     }
 
-    stream = this->streams[streamName];
+    auto desc = std::make_shared<StreamDescription>(specification, name, provider, sourceSystem, metadata);
+    auto stream = std::make_shared<InformationStream<T>>(desc, this->eventHandler, streamSize);
+
+    _log->debug("registerStream", "Created stream with '%s', '%s', '%s'", specification->toString().c_str(),
+                provider.c_str(), sourceSystem.c_str());
+    this->streams.push_back(stream);
+
+    return stream;
+  }
+
+template<typename T>
+  inline std::shared_ptr<ice::InformationStream<T>> ice::InformationStore::getStream(
+      InformationSpecification *specification, std::string provider, std::string sourceSystem)
+  {
+    std::shared_ptr<BaseInformationStream> stream;
+    std::shared_ptr<ice::InformationStream<T>> ptr;
+
+    stream = this->getBaseStream(specification, provider, sourceSystem);
+
+    if (false == stream)
+      return ptr;
 
     if (typeid(T) == *stream->getTypeInfo())
       return std::static_pointer_cast<InformationStream<T>>(stream);

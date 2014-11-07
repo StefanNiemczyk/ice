@@ -11,14 +11,14 @@
 #include <memory>
 #include <string>
 
-#include "boost/uuid/uuid.hpp"
+#include "ice/TypeDefs.h"
 
 namespace ice
 {
 
 //* InformationSpecification
 /**
- * This class stored metadata of an information.
+ * This class stores metadata of an information.
  */
 class InformationSpecification
 {
@@ -29,10 +29,14 @@ public:
    *
    * Default constructor
    *
-   * \param uuid The universal unique id of the information
-   * \param name The name of the information
+   * \param entity The entity.
+   * \param entityType The type of the entity.
+   * \param scope The scope.
+   * \param representation The representation.
+   * \param relatedEntity The related entity of this information.
    */
-  InformationSpecification(boost::uuids::uuid uuid, const std::string name);
+  InformationSpecification(ont::entity entity, ont::entityType, ont::scope scope, ont::representation representation,
+                           ont::entity relatedEntity = "");
 
   /*!
    * \brief Default destructor
@@ -42,34 +46,39 @@ public:
   virtual ~InformationSpecification();
 
   /*!
-   * \brief Returns the universal unique id of the information type.
+   * \brief Returns the entity described by this information.
    *
-   * Returns the universal unique id of the information type.
+   * Returns the entity described by this information.
    */
-  const boost::uuids::uuid& getUUID() const;
+  const ont::entity getEntity() const;
 
   /*!
-   * \brief Returns the name of the information.
+   * \brief Returns the entity type of the entity from this information.
    *
-   * Returns the name of the information.
+   * Returns the entity type of the entity from this information.
    */
-  const std::string& getName() const;
+  const ont::entityType getEntityType() const;
 
   /*!
-   * \brief Returns the description of the information.
+   * \brief Returns the scope of this information.
    *
-   * Returns the description of the information.
+   * Returns the scope of this information.
    */
-  const std::string getDescription() const;
+  const ont::scope getScope() const;
 
   /*!
-   * \brief Sets the description of the information.
+   * \brief Returns the representation of this information.
    *
-   * Sets the description of the information.
-   *
-   * \param description The new description.
+   * Returns the representation of this information.
    */
-  void setDescription(std::string description);
+  const ont::representation getRepresentation() const;
+
+  /*!
+   * \brief Returns the related entity described by this information.
+   *
+   * Returns the related entity described by this information.
+   */
+  const ont::entity getRelatedEntity() const;
 
   /*!
    * \brief Returns the default data type of the informations as string.
@@ -87,10 +96,33 @@ public:
    */
   void setTypeString(std::string type);
 
+  /*!
+   * \brief Checks if the rhs is equal to this specification.
+   *
+   * Checks if the rhs is equal to this specification.
+   */
+  bool operator==(InformationSpecification const& rhs);
+
+  /*!
+   * \brief Checks if the rhs is equal to this specification.
+   *
+   * Checks if the rhs is equal to this specification.
+   */
+  bool operator==(std::shared_ptr<InformationSpecification> const rhs);
+
+  /*!
+   * \brief Return the information specification as string.
+   *
+   * Return the information specification as string.
+   */
+  std::string toString();
+
 private:
-  const boost::uuids::uuid uuid; /**< universal id of the information type */
-  const std::string name; /**< Name of the information */
-  std::string description; /**< The description of this information */
+  const ont::entity entity; /**< The entity described by this information */
+  const ont::entityType entityType; /**< The type of the described entity */
+  const ont::scope scope; /**< The scope of this information */
+  const ont::representation representation; /**< The representation of this information */
+  const ont::entity relatedEntity; /**< The related entity of this information */
   std::string typeString; /**< The default data type of the informations as string */
 };
 

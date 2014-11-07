@@ -16,7 +16,19 @@ namespace ice
 {
 
 EngineState::EngineState(identifier engineId, std::weak_ptr<ICEngine> engine) :
-    engineId(engineId)
+    engineId(engineId), systemIri(systemIri)
+{
+  this->engine = engine;
+  this->cooperationState = CooperationState::UNKNOWN;
+  this->timeFactory = engine.lock()->getTimeFactory();
+  this->timeLastActivity = this->timeFactory->createTime();
+  this->timeLastStateUpdate = NO_TIME;
+  this->retryCounter = 0;
+  this->_log = Logger::get("EngineState");
+}
+
+EngineState::EngineState(std::string const systemIri, std::weak_ptr<ICEngine> engine) :
+    systemIri(systemIri)
 {
   this->engine = engine;
   this->cooperationState = CooperationState::UNKNOWN;
@@ -35,6 +47,28 @@ EngineState::~EngineState()
 const identifier EngineState::getEngineId() const
 {
   return this->engineId;
+}
+
+void EngineState::setEngineId(const identifier id)
+{
+  this->engineId = id;
+}
+
+const std::string EngineState::getSystemIri() const
+{
+  return this->systemIri;
+}
+
+const std::string EngineState::getSystemIriShort() const
+{
+  int index1 = this->systemIri.find("#");
+
+  if (index1 == std::string::npos)
+    return this->systemIri;
+
+  std::string name = this->systemIri.substr(index1 + 1, this->systemIri.size() - index1 - 1);
+  name[0] = std::tolower(name[0]);
+  return name;
 }
 
 const std::shared_ptr<InformationModel> EngineState::getInformationModel() const
@@ -135,6 +169,91 @@ int EngineState::increaseRetryCounter()
 void EngineState::resetRetryCounter()
 {
   this->retryCounter = 0;
+}
+
+std::shared_ptr<ASPElement> EngineState::getASPElementByName(ASPElementType type, std::string const name)
+{
+  switch (type)
+  {
+    case ASP_COMPUTATION_NODE:
+      for (auto node : this->aspNodes)
+      {
+        if (node->name == name)
+          return node;
+      }
+      break;
+    case ASP_SOURCE_NODE:
+      for (auto node : this->aspSourceNodes)
+      {
+        if (node->name == name)
+          return node;
+      }
+      break;
+    case ASP_IRO:
+      for (auto node : this->aspIro)
+      {
+        if (node->name == name)
+          return node;
+      }
+      break;
+    case ASP_REQUIRED_STREAM:
+      for (auto node : this->aspRequiredStreams)
+      {
+        if (node->name == name)
+          return node;
+      }
+      break;
+  }
+
+  return nullptr;
+}
+
+std::shared_ptr<ASPElement> EngineState::getASPElementByName(std::string const name)
+{
+  for (auto node : this->aspNodes)
+  {
+    if (node->name == name)
+      return node;
+  }
+
+  for (auto node : this->aspSourceNodes)
+  {
+    if (node->name == name)
+      return node;
+  }
+
+  for (auto node : this->aspIro)
+  {
+    if (node->name == name)
+      return node;
+  }
+
+  for (auto node : this->aspRequiredStreams)
+  {
+    if (node->name == name)
+      return node;
+  }
+
+  return nullptr;
+}
+
+void EngineState::addASPElement(std::shared_ptr<ASPElement> node)
+{
+  switch (node->type)
+  {
+    case ASP_COMPUTATION_NODE:
+      this->aspNodes.push_back(node);
+      break;
+    case ASP_SOURCE_NODE:
+      this->aspSourceNodes.push_back(node);
+      break;
+    case ASP_IRO:
+      this->aspIro.push_back(node);
+      break;
+    case ASP_REQUIRED_STREAM:
+      this->aspRequiredStreams.push_back(node);
+      break;
+  }
 }
 
 } /* namespace ice */

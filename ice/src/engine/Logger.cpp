@@ -186,7 +186,7 @@ void ice::Logger::error(std::string methodName, std::string logMsg, ...)
 
   std::string msg = "error    " + this->name + "#" + methodName + ": " + formatted.get();
 
-  std::cerr << msg << std::endl;
+  std::cout << msg << std::endl;
 }
 
 LogLevel Logger::getLogLevel() const
