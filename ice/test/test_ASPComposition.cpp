@@ -422,7 +422,7 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   // maps
   // map(system,map,entityType,scope,rep,entity2,min,max).
   auto map = cw->getExternal("mapTemplate", {"system1", "typeMap", "type", "scope1", "rep1", "none"}, "map",
-                             {"system1", "typeMap", "type", "scope1", "rep1", "none", 2, 3, "max", 1, "avg", 4}, true);
+                             {"system1", "typeMap", "type", "scope1", "rep1", "none", 2, 3, "max", 1, 0, "avg", 0, 0}, true);
 
   // requires
   // requiredMap(system,entity_type,scope,representation,entity2).
@@ -451,6 +451,6 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   EXPECT_EQ(true, cw->query("stream", {1, "system1", "in3", "system3", Gringo::Value("information", {"entity3",
                                                                                                      "scope1", "rep1",
                                                                                                      "none"})}));
-  EXPECT_EQ(true, cw->query("metadataMap", {1,"accuracy", "system1","typeMap","type","scope1","rep1","none",94}));
+  EXPECT_EQ(true, cw->query("metadataMap", {1,"accuracy", "system1","typeMap","type","scope1","rep1","none",102}));
   EXPECT_EQ(true, cw->query("metadataMap", {1,"delay","system1","typeMap","type","scope1","rep1","none",2}));
 }

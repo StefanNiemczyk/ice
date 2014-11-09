@@ -170,20 +170,24 @@ metadataStream(k,delay,SYSTEM,PROVIDER,SOURCE,INFO,D) :- streamDelay(k,SYSTEM,PR
 metadataStream(k,accuracy,SYSTEM,PROVIDER,SOURCE,INFO,D) :- streamAccuracy(k,SYSTEM,PROVIDER,SOURCE,INFO,D).
 
 % computing QoS paramters
-metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,FIX_VALUE+VALUE) :- map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2), metadataMap(METADATA,SYSTEM,MAP,min,FIX_VALUE),
-		VALUE = #min{D,PROVIDER,SOURCE,INFO : connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, SD==#infimum.
+metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,FIX_VALUE+VALUE+COUNT*MOD_VALUE) :- map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2), 
+		metadataMap(METADATA,SYSTEM,MAP,min,FIX_VALUE,MOD_VALUE),
+		VALUE = #min{D,PROVIDER,SOURCE,INFO : connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)},
+		COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}.
 
-metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,RESULT) :- map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2), metadataMap(METADATA,SYSTEM,MAP,avg,FIX_VALUE),
+metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,RESULT) :- map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2), metadataMap(METADATA,SYSTEM,MAP,avg,FIX_VALUE,MOD_VALUE),
 		VALUE = #sum{D,PROVIDER,SOURCE,INFO : connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, 
 		COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)},
-		RESULT = VALUE/COUNT+FIX_VALUE, COUNT!=0. % TODO
-metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,FIX_VALUE) :- map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2), metadataMap(METADATA,SYSTEM,MAP,avg,FIX_VALUE), 
+		RESULT = VALUE/COUNT+FIX_VALUE+COUNT+MOD_VALUE, COUNT!=0.
+metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,FIX_VALUE) :- map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2), metadataMap(METADATA,SYSTEM,MAP,avg,FIX_VALUE,MOD_VALUE), 
 		COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, COUNT==0.
 
-metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,FIX_VALUE) :- map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2), metadataMap(METADATA,SYSTEM,MAP,max,FIX_VALUE),
+metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,FIX_VALUE) :- map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2), metadataMap(METADATA,SYSTEM,MAP,max,FIX_VALUE,MOD_VALUE),
 		VALUE = #max{D,PROVIDER,SOURCE,INFO : connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, VALUE==#infimum.
-metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,FIX_VALUE+VALUE) :- map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2), metadataMap(METADATA,SYSTEM,MAP,max,FIX_VALUE),
-		VALUE = #max{D,PROVIDER,SOURCE,INFO : connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, VALUE!=#infimum.
+metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,FIX_VALUE+VALUE+COUNT*MOD_VALUE) :- map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2), 
+		metadataMap(METADATA,SYSTEM,MAP,max,FIX_VALUE,MOD_VALUE),
+		VALUE = #max{D,PROVIDER,SOURCE,INFO : connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)},
+		COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, VALUE!=#infimum.
 
 
 % checking consistency of ontology
@@ -280,14 +284,14 @@ nodeCost(system,node,cost).
 
 
 %--------------------------------------------------------------------------------------
-#program map(system,map,entityType,scope,rep,entity2,minCount,maxCount,delayType,delayFix,accuracyType,accuracyFix).
+#program map(system,map,entityType,scope,rep,entity2,minCount,maxCount,delayType,delayFix,delayMod,accuracyType,accuracyFix,accuracyMod).
 
 #external mapTemplate(system,map,entityType,scope,rep,entity2). 
 inputMap(system,map,minCount,maxCount).
 %mapDelay(system,map,delayValue).
 %mapAccuracy(system,map,accMod).
-metadataMap(delay,system,map,delayType,delayFix).
-metadataMap(accuracy,system,map,accuracyType,accuracyFix).
+metadataMap(delay,system,map,delayType,delayFix,delayMod).
+metadataMap(accuracy,system,map,accuracyType,accuracyFix,accuracyMod).
 
 
 %--------------------------------------------------------------------------------------
