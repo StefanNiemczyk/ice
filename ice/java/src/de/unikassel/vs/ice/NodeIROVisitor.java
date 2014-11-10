@@ -99,11 +99,11 @@ public class NodeIROVisitor extends IceVisitor {
 	private static final String IRO_PLACEHOLDER = "$IRO";
 
 	enum Type {
-		SOURCE_NODE, NODE, IRO, REQUIRED_STREAM
+		SOURCE_NODE, NODE, IRO, REQUIRED_STREAM, MAP
 	};
 
 	private Type currentType;
-	private OWLClass lastIRO;
+	private OWLClass lastElement;
 	private OWLClass iroScope;
 	private OWLClass iroRelatedScope;
 	private OWLClass currentScope;
@@ -133,6 +133,11 @@ public class NodeIROVisitor extends IceVisitor {
 		log("Creating IROs for system " + system);
 
 		List<List<String>> result = new ArrayList<List<String>>();
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+		result.add(new ArrayList<String>());
+
 		result.add(new ArrayList<String>());
 		result.add(new ArrayList<String>());
 		result.add(new ArrayList<String>());
@@ -285,6 +290,15 @@ public class NodeIROVisitor extends IceVisitor {
 				this.grounding.accept(this);
 
 				result.get(15).add(this.sb.toString());
+			} else if (this.currentType == Type.MAP) {
+				result.get(16).add(this.iRIShortName(this.grounding.getIRI()));
+				result.get(17).add(this.elementString);
+				result.get(18).add(this.sb.toString());
+
+				this.sb = new StringBuffer();
+				this.grounding.accept(this);
+
+				result.get(19).add(this.sb.toString());
 			}
 
 			this.sb = new StringBuffer();
@@ -373,9 +387,9 @@ public class NodeIROVisitor extends IceVisitor {
 		//
 		// foundClasses.add(ce);
 
-		OWLClass lastNode = this.lastIRO;
+		OWLClass lastNode = this.lastElement;
 		List<OWLSubClassOfAxiom> others = new ArrayList<OWLSubClassOfAxiom>();
-		boolean iro = false;
+		boolean doLater = false;
 		for (OWLOntology ont : this.ontologies) {
 			for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(ce)) {
 				if (this.isSubClassOf(ax.getSuperClass(), this.sourceNode)) {
@@ -389,7 +403,7 @@ public class NodeIROVisitor extends IceVisitor {
 
 					this.found = true;
 					this.currentType = Type.SOURCE_NODE;
-					this.lastIRO = ce;
+					this.lastElement = ce;
 
 					// this.sb.append("#program ");
 					// this.sb.append(this.iRIShortName(this.grounding.getIRI()));
@@ -414,7 +428,7 @@ public class NodeIROVisitor extends IceVisitor {
 
 					this.found = true;
 					this.currentType = Type.NODE;
-					this.lastIRO = ce;
+					this.lastElement = ce;
 
 					// this.sb.append("#program ");
 					// this.sb.append(this.iRIShortName(this.grounding.getIRI()));
@@ -439,8 +453,20 @@ public class NodeIROVisitor extends IceVisitor {
 
 					this.found = true;
 					this.currentType = Type.IRO;
-					this.lastIRO = ce;
-					iro = true;
+					this.lastElement = ce;
+					doLater = true;
+
+					// this.sb.append("#program ");
+					// this.sb.append(this.iRIShortName(this.grounding.getIRI()));
+					// this.sb.append(".\n");
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.map)) {
+					if (found)
+						continue;
+
+					this.found = true;
+					this.currentType = Type.MAP;
+					this.lastElement = ce;
+					doLater = true;
 
 					// this.sb.append("#program ");
 					// this.sb.append(this.iRIShortName(this.grounding.getIRI()));
@@ -460,7 +486,7 @@ public class NodeIROVisitor extends IceVisitor {
 			// log(ax.getSuperClass());
 		}
 
-		if (iro) {
+		if (doLater && this.currentType == Type.IRO) {
 			// #external iro(system1,coords2Wgs84,any,position).
 			StringBuffer sb = new StringBuffer();
 			sb.append("iro(");
@@ -492,9 +518,59 @@ public class NodeIROVisitor extends IceVisitor {
 
 			this.iroScope = null;
 			this.iroRelatedScope = null;
+		} else if (doLater && this.currentType == Type.MAP) {
+			OWLClassExpression entityType = null;
+			for (OWLOntology ont : this.ontologies) {
+				// TODO
+				Set<OWLClassExpression> types = this.currentEntity.getTypes(ont);
+
+				if (types.size() > 0) {
+					entityType = types.iterator().next();
+					break;
+				}
+			}
+
+			if (entityType == null) {
+				// TODO
+			} else {
+				// mapTemplate(SYSTEM,MAP,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2).
+				StringBuffer sb = new StringBuffer();
+				sb.append("mapTemplate(");
+				sb.append(this.iRIShortName(this.system.getIRI()));
+				sb.append(",");
+				sb.append(this.iRIShortName(this.grounding.getIRI()));
+				sb.append(",");
+				sb.append(this.iRIShortName(entityType.asOWLClass().getIRI()));
+				sb.append(",");
+				sb.append(this.iRIShortName(this.currentScope.getIRI()));
+				sb.append(",");
+				sb.append(this.iRIShortName(this.currentRepresentation.getIRI()));
+				sb.append(",");
+				sb.append((this.currentEntity != null) ? this.iRIShortName(this.currentEntity.getIRI()) : "any");
+				sb.append(",");
+				sb.append(this.iRIShortName(this.iroScope.getIRI()));
+
+				if (this.iroRelatedScope != null) {
+					sb.append(",");
+					sb.append((this.currentEntity != null) ? this.iRIShortName(this.currentEntity.getIRI()) : "any");
+					sb.append(",");
+					sb.append(this.iRIShortName(this.iroRelatedScope.getIRI()));
+				}
+
+				sb.append(").\n");
+
+				this.elementString = sb.toString();
+				this.sb.append("#external ");
+				this.sb.append(this.elementString);
+
+				int index;
+				while ((index = this.sb.indexOf(IRO_PLACEHOLDER)) >= 0) {
+					this.sb.replace(index, index + IRO_PLACEHOLDER.length(), this.elementString);
+				}
+			}
 		}
 
-		this.lastIRO = lastNode;
+		this.lastElement = lastNode;
 	}
 
 	@Override

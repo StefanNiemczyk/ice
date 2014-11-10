@@ -23,6 +23,7 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 	protected final OWLClass node;
 	protected final OWLClass sourceNode;
 	protected final OWLClass iro;
+	protected final OWLClass map;
 	protected final OWLClass requiredStream;
 	protected final OWLClass system;
 	protected final OWLClass entityType;
@@ -75,6 +76,7 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 		this.node = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Node"));
 		this.sourceNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "SourceNode"));
 		this.iro = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "InterRepresentationOperation"));
+		this.map = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Map"));
 		this.requiredStream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "RequiredStream"));
 		this.system = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "System"));
 		this.stream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Stream"));
