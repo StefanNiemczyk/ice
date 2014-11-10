@@ -260,7 +260,8 @@ metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SUB_SCOPE,RE
 
 %% creating a map
 0 { map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2) } 1 :- 
-	mapTemplate(SYSTEM,MAP,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2), 
+	mapTemplate(SYSTEM,MAP,SCOPE,REPRESENTATION,ENTITY2),
+	hasScope(ENTITY_TYPE,SCOPE), 
 	query(k).
 
 MIN { connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2)) : stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2)) } MAX :- 
@@ -398,9 +399,9 @@ nodeCost(system,node,cost).
 
 
 %--------------------------------------------------------------------------------------
-#program map(system,map,entityType,scope,rep,entity2,minCount,maxCount,delayType,delayFix,delayMod,accuracyType,accuracyFix,accuracyMod).
+#program map(system,map,scope,rep,entity2,minCount,maxCount,delayType,delayFix,delayMod,accuracyType,accuracyFix,accuracyMod).
 
-#external mapTemplate(system,map,entityType,scope,rep,entity2). 
+#external mapTemplate(system,map,scope,rep,entity2). 
 inputMap(system,map,minCount,maxCount).
 metadataMap(delay,system,map,delayType,delayFix,delayMod).
 metadataMap(accuracy,system,map,accuracyType,accuracyFix,accuracyMod).

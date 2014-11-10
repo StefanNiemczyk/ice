@@ -519,55 +519,39 @@ public class NodeIROVisitor extends IceVisitor {
 			this.iroScope = null;
 			this.iroRelatedScope = null;
 		} else if (doLater && this.currentType == Type.MAP) {
-			OWLClassExpression entityType = null;
-			for (OWLOntology ont : this.ontologies) {
-				// TODO
-				Set<OWLClassExpression> types = this.currentEntity.getTypes(ont);
+			// mapTemplate(SYSTEM,MAP,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2).
+			StringBuffer sb = new StringBuffer();
+			sb.append("mapTemplate(");
+			sb.append(this.iRIShortName(this.system.getIRI()));
+			sb.append(",");
+			sb.append(this.iRIShortName(this.grounding.getIRI()));
+			sb.append(",");
+			sb.append(this.iRIShortName(this.currentScope.getIRI()));
+			sb.append(",");
+			sb.append(this.iRIShortName(this.currentRepresentation.getIRI()));
+			sb.append(",");
+			sb.append((this.currentEntity != null) ? this.iRIShortName(this.currentEntity.getIRI()) : "any");
+			sb.append(",");
+			sb.append(this.iRIShortName(this.iroScope.getIRI()));
 
-				if (types.size() > 0) {
-					entityType = types.iterator().next();
-					break;
-				}
-			}
-
-			if (entityType == null) {
-				// TODO
-			} else {
-				// mapTemplate(SYSTEM,MAP,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2).
-				StringBuffer sb = new StringBuffer();
-				sb.append("mapTemplate(");
-				sb.append(this.iRIShortName(this.system.getIRI()));
-				sb.append(",");
-				sb.append(this.iRIShortName(this.grounding.getIRI()));
-				sb.append(",");
-				sb.append(this.iRIShortName(entityType.asOWLClass().getIRI()));
-				sb.append(",");
-				sb.append(this.iRIShortName(this.currentScope.getIRI()));
-				sb.append(",");
-				sb.append(this.iRIShortName(this.currentRepresentation.getIRI()));
+			if (this.iroRelatedScope != null) {
 				sb.append(",");
 				sb.append((this.currentEntity != null) ? this.iRIShortName(this.currentEntity.getIRI()) : "any");
 				sb.append(",");
-				sb.append(this.iRIShortName(this.iroScope.getIRI()));
-
-				if (this.iroRelatedScope != null) {
-					sb.append(",");
-					sb.append((this.currentEntity != null) ? this.iRIShortName(this.currentEntity.getIRI()) : "any");
-					sb.append(",");
-					sb.append(this.iRIShortName(this.iroRelatedScope.getIRI()));
-				}
-
-				sb.append(").\n");
-
-				this.elementString = sb.toString();
-				this.sb.append("#external ");
-				this.sb.append(this.elementString);
-
-				int index;
-				while ((index = this.sb.indexOf(IRO_PLACEHOLDER)) >= 0) {
-					this.sb.replace(index, index + IRO_PLACEHOLDER.length(), this.elementString);
-				}
+				sb.append(this.iRIShortName(this.iroRelatedScope.getIRI()));
 			}
+
+			sb.append(").\n");
+
+			this.elementString = sb.toString();
+			this.sb.append("#external ");
+			this.sb.append(this.elementString);
+
+			int index;
+			while ((index = this.sb.indexOf(IRO_PLACEHOLDER)) >= 0) {
+				this.sb.replace(index, index + IRO_PLACEHOLDER.length(), this.elementString);
+			}
+			
 		}
 
 		this.lastElement = lastNode;
@@ -575,6 +559,7 @@ public class NodeIROVisitor extends IceVisitor {
 
 	@Override
 	public void visit(OWLObjectExactCardinality ce) {
+// TODO auslagern, wichtig!
 		int cardinality = ce.getCardinality();
 		if (ce.getProperty().equals(hasInput)) {
 			// input(system1,node1,scope1,rep1,1,1) :-

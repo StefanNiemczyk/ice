@@ -400,6 +400,7 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   cw->ground("entity", {"entity3", "type"});
   cw->ground("entity", {"entity4", "type"});
   cw->ground("entity", {"entity5", "type"});
+  cw->add("base", {}, "hasScope(type,scope1).");
 
   // systems
   auto system1 = cw->getExternal("system", {"system1", 100}, true);
@@ -421,9 +422,9 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   auto input5 = cw->getExternal("sourceNode", {"system5", "in5", "entity5"}, true);
 
   // maps
-  // map(system,map,entityType,scope,rep,entity2,min,max).
-  auto map = cw->getExternal("mapTemplate", {"system1", "typeMap", "type", "scope1", "rep1", "none"}, "map",
-                             {"system1", "typeMap", "type", "scope1", "rep1", "none", 2, 3, "max", 1, 0, "avg", 0, 4}, true);
+  // map(system,map,scope,rep,entity2,min,max).
+  auto map = cw->getExternal("mapTemplate", {"system1", "typeMap", "scope1", "rep1", "none"}, "map",
+                             {"system1", "typeMap", "scope1", "rep1", "none", 2, 3, "max", 1, 0, "avg", 0, 4}, true);
 
   // requires
   // requiredMap(system,entity_type,scope,representation,entity2).
