@@ -40,13 +40,6 @@
         <rdfs:subClassOf rdf:resource="&Ice;InterRepresentationOperation"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasInput"/>
-                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasRelatedInput"/>
                 <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
@@ -79,6 +72,13 @@
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -89,20 +89,13 @@
         <rdfs:subClassOf rdf:resource="&Ice;ComputationNode"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasInput"/>
-                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
                 <owl:allValuesFrom rdf:resource="&Ice;StreamPositionCoordinateRep"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
                 <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
@@ -110,6 +103,13 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasOutput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
                 <owl:allValuesFrom rdf:resource="&Ice;StreamPositionCoordinateRep"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -363,7 +363,8 @@
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestComputationalNodeAccuracyInd">
         <rdf:type rdf:resource="&Ice;Accuracy"/>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">5</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">5</Ice:hasMetadataValue2>
         <Ice:isMetadataOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd"/>
         <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyMaxASPGrounding"/>
     </owl:NamedIndividual>
@@ -395,6 +396,7 @@
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestComputationalNodeDelayInd">
         <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue2>
         <Ice:hasMetadataValue rdf:datatype="&xsd;integer">1</Ice:hasMetadataValue>
         <Ice:isMetadataOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd"/>
         <Ice:hasGrounding rdf:resource="&Ice;NodeDelayASPGrounding"/>
@@ -424,7 +426,8 @@
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNodeAccuracyInd">
         <rdf:type rdf:resource="&Ice;Accuracy"/>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">90</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">90</Ice:hasMetadataValue2>
         <Ice:isMetadataOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeInd"/>
         <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyFixASPGrounding"/>
     </owl:NamedIndividual>
@@ -456,6 +459,7 @@
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNodeDelayInd">
         <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue2>
         <Ice:hasMetadataValue rdf:datatype="&xsd;integer">1</Ice:hasMetadataValue>
         <Ice:isMetadataOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeInd"/>
         <Ice:hasGrounding rdf:resource="&Ice;NodeDelayFixASPGrounding"/>
@@ -530,6 +534,7 @@
 
     <owl:NamedIndividual rdf:about="&Ice;CoordPositionToRelCoorsIRODelayInd">
         <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue2>
         <Ice:hasMetadataValue rdf:datatype="&xsd;integer">2</Ice:hasMetadataValue>
         <Ice:isMetadataOf rdf:resource="&Ice;CoordinatePositionToRelativeCoordinatePositionInd"/>
         <Ice:hasGrounding rdf:resource="&Ice;IRODelayASPGrounding"/>
@@ -562,6 +567,7 @@
 
     <owl:NamedIndividual rdf:about="&Ice;KalmanFilterDelayInd">
         <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue2>
         <Ice:hasMetadataValue rdf:datatype="&xsd;integer">1</Ice:hasMetadataValue>
         <Ice:isMetadataOf rdf:resource="&Ice;KalmanFilterInd"/>
         <Ice:hasGrounding rdf:resource="&Ice;NodeDelayASPGrounding"/>

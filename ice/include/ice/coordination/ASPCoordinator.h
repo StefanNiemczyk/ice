@@ -52,7 +52,13 @@ private:
                             std::vector<std::string> &strings, std::vector<std::string> &aspStrings,
                             std::vector<std::string> &cppStrings);
   std::map<std::string, std::string> readConfiguration(std::string const config);
-  void readMetadata(std::map<std::string, int> *metadata, std::string const provider, std::string const sourceSystem,
+  void readMetadata(std::map<std::string, int>* metadata, const std::string provider, const std::string sourceSystem,
+                    Gringo::Value information)
+  {
+    this->readMetadata("delay", metadata, provider, sourceSystem, information);
+    this->readMetadata("accuracy", metadata, provider, sourceSystem, information);
+  }
+  void readMetadata(std::string name, std::map<std::string, int> *metadata, std::string const provider, std::string const sourceSystem,
                     Gringo::Value information);
   std::string dataTypeForRepresentation(std::string representation);
   std::shared_ptr<BaseInformationStream> getStream(Gringo::Value info, std::string lastProcessing,

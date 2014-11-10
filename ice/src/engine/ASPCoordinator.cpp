@@ -229,6 +229,7 @@ void ASPCoordinator::optimizeInformationFlow()
 
     // TODO interpret IRO
     // TODO interpret information extraction
+    // TODO interpret map
 
     if (valid)
     {
@@ -507,75 +508,45 @@ std::map<std::string, std::string> ASPCoordinator::readConfiguration(std::string
   return configuration;
 }
 
-void ASPCoordinator::readMetadata(std::map<std::string, int> *metadata, std::string const provider,
+void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *metadata, std::string const provider,
                                   std::string const sourceSystem, Gringo::Value information)
 {
-  // streamDelay(1,testSystem,testComputationalNodeInd,testSystem,information(testEntity1,testScope1,testRepresentation2,none),2)
+  // metadataStream(1,metadata,testSystem,testComputationalNodeInd,testSystem,information(testEntity1,testScope1,testRepresentation2,none),2)
   std::vector<Gringo::Value> values;
   values.push_back(this->queryIndex);
+  values.push_back(Gringo::Value(name));
   values.push_back(std::string(this->self->getSystemIriShort()));
   values.push_back(Gringo::Value(provider));
   values.push_back(Gringo::Value(sourceSystem));
   values.push_back(information);
   values.push_back("?");
 
-  auto delayQuery = std::make_shared<Gringo::Value>("streamDelay", values);
+  auto delayQuery = std::make_shared<Gringo::Value>("metadataStream", values);
   auto delayResult = this->asp->queryAllTrue(delayQuery);
 
   if (delayResult->size() != 1)
   {
     std::stringstream o;
     o << information;
-    _log->warning("readMetadata", "Wrong size '%d' for metadata delay of stream '%s', '%s', '%s'", delayResult->size(),
-                  o.str().c_str(), provider.c_str(), sourceSystem.c_str());
+    _log->warning("readMetadata", "Wrong size '%d' for metadata '%s' of stream '%s', '%s', '%s'", name.c_str(),
+                  delayResult->size(), o.str().c_str(), provider.c_str(), sourceSystem.c_str());
     return;
   }
 
   auto delayValue = delayResult->at(0);
 
-  if (delayValue.args()[5].type() != Gringo::Value::Type::NUM)
+  if (delayValue.args()[6].type() != Gringo::Value::Type::NUM)
   {
-    std::stringstream o;
+    std::stringstream o, o2;
     o << information;
-    _log->warning("readMetadata", "Wrong type '%d' for metadata delay of stream '%s', '%s', '%s'",
-                  delayValue.args()[5].type(), o.str().c_str(), provider.c_str(), sourceSystem.c_str());
+    o2 << delayValue.args()[6];
+    _log->warning("readMetadata", "Wrong type '%d' of '%s' for metadata '%s' of stream '%s', '%s', '%s'",
+                  delayValue.args()[6].type(), o2.str().c_str(), name.c_str(), o.str().c_str(), provider.c_str(),
+                  sourceSystem.c_str());
     return;
   }
 
-  (*metadata)["delay"] = delayValue.args()[5].num();
-
-  values.clear();
-  values.push_back(this->queryIndex);
-  values.push_back(std::string(this->self->getSystemIriShort()));
-  values.push_back(Gringo::Value(provider));
-  values.push_back(Gringo::Value(sourceSystem));
-  values.push_back(information);
-  values.push_back("?");
-
-  auto accuracyQuery = std::make_shared<Gringo::Value>("streamAccuracy", values);
-  auto accuracyResult = this->asp->queryAllTrue(accuracyQuery);
-
-  if (accuracyResult->size() != 1)
-  {
-    std::stringstream o;
-    o << information;
-    _log->warning("readMetadata", "Wrong size '%d' for metadata accuracy of stream '%s', '%s', '%s'",
-                  accuracyResult->size(), o.str().c_str(), provider.c_str(), sourceSystem.c_str());
-    return;
-  }
-
-  auto accuracyValue = accuracyResult->at(0);
-
-  if (accuracyValue.args()[5].type() != Gringo::Value::Type::NUM)
-  {
-    std::stringstream o;
-    o << information;
-    _log->warning("readMetadata", "Wrong type '%d' for metadata accuracy of stream '%s', '%s', '%s'",
-                  accuracyValue.args()[5].type(), o.str().c_str(), provider.c_str(), sourceSystem.c_str());
-    return;
-  }
-
-  (*metadata)["accuracy"] = accuracyValue.args()[5].num();
+  (*metadata)[name] = delayValue.args()[6].num();
 }
 
 std::string ASPCoordinator::dataTypeForRepresentation(std::string representation)

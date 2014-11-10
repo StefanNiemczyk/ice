@@ -62,9 +62,9 @@ TEST(ClingWrap, simpleTest)
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "input(system1,node1,scope2,rep1,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "output(system1,node1,scope3,rep1).");
-  cw->add("node1", {}, "nodeDelay(system1,node1,1).");
+  cw->add("node1", {}, "metadataNode(delay,system1,node1,max,1,0).");
   cw->add("node1", {}, "nodeCost(system1,node1,10).");
-  cw->add("node1", {}, "nodeAccuracyMax(system1,node1,0).");
+  cw->add("node1", {}, "metadataNode(accuracy,system1,node1,max,0,0).");
   cw->ground("node1", {});
 
   // add node2
@@ -73,27 +73,27 @@ TEST(ClingWrap, simpleTest)
   cw->add("node2", {}, "input(system1,node2,scope1,rep1,1,1) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "input(system1,node2,scope2,rep1,2,2) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "output(system1,node2,scope3,rep1).");
-  cw->add("node2", {}, "nodeDelay(system1,node2,1).");
+  cw->add("node2", {}, "metadataNode(delay,system1,node2,max,1,0).");
   cw->add("node2", {}, "nodeCost(system1,node2,5).");
-  cw->add("node1", {}, "nodeAccuracyAvg(system1,node2,1).");
+  cw->add("node1", {}, "metadataNode(accuracy,system1,node2,avg,0,1).");
   cw->ground("node2", {});
 
   auto query1 = cw->getExternal("query", {1}, true);
 
   cw->solve();
-  // cw->printLastModel();
+  //cw->printLastModel();
 
   EXPECT_EQ(true, cw->query("node", {1, "system1", "node1", "entity1"}));
   EXPECT_EQ(false, cw->query("node", {1, "system1", "node2", "entity1"}));
   EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node1", "in2", "system1", Gringo::Value("information", {
       "entity1", "scope2", "rep1", "none"})}));
   EXPECT_EQ(true, cw->query("sumCost", {1, 12}));
-  EXPECT_EQ(true, cw->query("streamDelay", {1, "system1", "node1", "system1", Gringo::Value("information", {"entity1",
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "delay", "system1", "node1", "system1", Gringo::Value("information", {"entity1",
                                                                                                             "scope3",
                                                                                                             "rep1",
                                                                                                             "none"}),
                                             6}));
-  EXPECT_EQ(true, cw->query("streamAccuracy", {1, "system1", "node1", "system1", Gringo::Value("information", {
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "accuracy", "system1", "node1", "system1", Gringo::Value("information", {
       "entity1", "scope3", "rep1", "none"}),
                                                90}));
 
@@ -108,15 +108,15 @@ TEST(ClingWrap, simpleTest)
   EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node1", "in3", "system2", Gringo::Value("information", {
       "entity1", "scope2", "rep1", "none"})}));
   EXPECT_EQ(true, cw->query("sumCost", {1, 12}));
-  EXPECT_EQ(false, cw->query("streamDelay", {1, "system1", "system1", Gringo::Value("information", {"entity1", "scope3",
+  EXPECT_EQ(false, cw->query("metadataStream", {1, "delay", "system1", "system1", Gringo::Value("information", {"entity1", "scope3",
                                                                                                     "rep1", "none"}),
                                              6}));
-  EXPECT_EQ(true, cw->query("streamDelay", {1, "system1", "node1", "system1", Gringo::Value("information", {"entity1",
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "delay", "system1", "node1", "system1", Gringo::Value("information", {"entity1",
                                                                                                             "scope3",
                                                                                                             "rep1",
                                                                                                             "none"}),
                                             2}));
-  EXPECT_EQ(true, cw->query("streamAccuracy", {1, "system1", "node1", "system1", Gringo::Value("information", {
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "accuracy", "system1", "node1", "system1", Gringo::Value("information", {
       "entity1", "scope3", "rep1", "none"}),
                                                99}));
 
@@ -133,15 +133,15 @@ TEST(ClingWrap, simpleTest)
   EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node2", "in3", "system2", Gringo::Value("information", {
       "entity1", "scope2", "rep1", "none"})}));
   EXPECT_EQ(true, cw->query("sumCost", {1, 8}));
-  EXPECT_EQ(true, cw->query("streamDelay", {1, "system1", "node2", "system1", Gringo::Value("information", {"entity1",
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "delay", "system1", "node2", "system1", Gringo::Value("information", {"entity1",
                                                                                                             "scope3",
                                                                                                             "rep1",
                                                                                                             "none"}),
                                             6}));
-  EXPECT_EQ(false, cw->query("streamDelay", {1, "system1", "system1", Gringo::Value("information", {"entity1", "scope3",
+  EXPECT_EQ(false, cw->query("metadataStream", {1, "delay", "system1", "system1", Gringo::Value("information", {"entity1", "scope3",
                                                                                                     "rep1", "none"}),
                                              2}));
-  EXPECT_EQ(true, cw->query("streamAccuracy", {1, "system1", "node2", "system1", Gringo::Value("information", {
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "accuracy", "system1", "node2", "system1", Gringo::Value("information", {
       "entity1", "scope3", "rep1", "none"}),
                                                96}));
 }
@@ -188,7 +188,7 @@ TEST(ClingWrap, threeSystems)
       "entity1", "scope1", "rep1", "none"}),
                                                1, 2}));
   EXPECT_EQ(true,
-            cw->query("streamDelay", {1, "system3", "in1", "system1", Gringo::Value("information", {"entity1", "scope1",
+            cw->query("metadataStream", {1, "delay", "system3", "in1", "system1", Gringo::Value("information", {"entity1", "scope1",
                                                                                                     "rep1", "none"}),
                                       2}));
 }
@@ -228,10 +228,11 @@ TEST(ClingWrap, informationTranslation)
   cw->add("coords2Wgs84", {},
           "inputIro(system1,coords2Wgs84,position,coords,1,1) :- iro(system1,coords2Wgs84,any,position).");
   cw->add("coords2Wgs84", {}, "outputIro(system1,coords2Wgs84,wgs84).");
-  cw->add("coords2Wgs84", {}, "iroDelay(system1,coords2Wgs84,1).");
-  cw->add("coords2Wgs84", {}, "iroAccuracyMax(system1,coords2Wgs84,1).");
+  cw->add("coords2Wgs84", {}, "metadataIro(delay,system1,coords2Wgs84,max,1,0).");
+  cw->add("coords2Wgs84", {}, "metadataIro(accuracy,system1,coords2Wgs84,avg,1,0).");
   cw->add("coords2Wgs84", {}, "iroCost(system1,coords2Wgs84,1).");
   cw->ground("coords2Wgs84", {});
+
 
   auto query1 = cw->getExternal("query", {1}, true);
 
@@ -240,13 +241,13 @@ TEST(ClingWrap, informationTranslation)
 
   EXPECT_EQ(true, cw->query("stream", {1, "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
       "nase", "position", "wgs84", "none"})}));
-  EXPECT_EQ(true, cw->query("streamDelay", {1, "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "delay", "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
       "nase", "position", "wgs84", "none"}),
                                             2}));
-  EXPECT_EQ(false, cw->query("streamCost", {1, "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
+  EXPECT_EQ(false, cw->query("metadataStream", {1, "cost", "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
       "nase", "position", "wgs84", "none"}),
                                             0}));
-  EXPECT_EQ(true, cw->query("streamAccuracy", {1, "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "accuracy", "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
       "nase", "position", "wgs84", "none"}),
                                                91}));
 }
@@ -286,8 +287,8 @@ TEST(ClingWrap, informationExtraction)
   cw->add("coords2Wgs84", {},
           "inputIro(system1,coords2Wgs84,position,coords,1,1) :- iro(system1,coords2Wgs84,any,position).");
   cw->add("coords2Wgs84", {}, "outputIro(system1,coords2Wgs84,wgs84).");
-  cw->add("coords2Wgs84", {}, "iroDelay(system1,coords2Wgs84,1).");
-  cw->add("coords2Wgs84", {}, "iroAccuracyAvg(system1,coords2Wgs84,1).");
+  cw->add("coords2Wgs84", {}, "metadataIro(delay,system1,coords2Wgs84,max,1,0).");
+  cw->add("coords2Wgs84", {}, "metadataIro(accuracy,system1,coords2Wgs84,avg,0,1).");
   cw->add("coords2Wgs84", {}, "iroCost(system1,coords2Wgs84,1).");
   cw->ground("coords2Wgs84", {});
 
@@ -298,19 +299,19 @@ TEST(ClingWrap, informationExtraction)
 
   EXPECT_EQ(true, cw->query("stream", {1, "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
       "nase", "alt", "floatRep", "none"})}));
-  EXPECT_EQ(true, cw->query("streamDelay", {1, "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "delay", "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
       "nase", "alt", "floatRep", "none"}),
                                             2}));
-  EXPECT_EQ(false, cw->query("streamDelay", {1, "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
+  EXPECT_EQ(false, cw->query("metadataStream", {1, "delay", "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
       "nase", "alt", "floatRep", "none"}),
                                              4}));
-  EXPECT_EQ(false, cw->query("streamCost", {1, "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
+  EXPECT_EQ(false, cw->query("metadataStream", {1, "cost", "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
       "nase", "alt", "floatRep", "none"}),
                                             0}));
-  EXPECT_EQ(false, cw->query("streamCost", {1, "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
+  EXPECT_EQ(false, cw->query("metadataStream", {1, "cost", "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
       "nase", "alt", "floatRep", "none"}),
                                             1}));
-  EXPECT_EQ(true, cw->query("streamAccuracy", {1, "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "accuracy", "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
       "nase", "alt", "floatRep", "none"}),
                                                91}));
 }
@@ -356,33 +357,33 @@ TEST(ClingWrap, ego2allo)
   cw->add("allo2ego", {},
           "inputIro(system1,allo2ego,position,coords,1,1) :- iro(system1,allo2ego,any,position,any,position).");
   cw->add("allo2ego", {}, "outputIro(system1,allo2ego,egoCoords).");
-  cw->add("allo2ego", {}, "iroDelay(system1,allo2ego,0).");
-  cw->add("allo2ego", {}, "iroAccuracyAvg(system1,allo2ego,1).");
+  cw->add("allo2ego", {}, "metadataIro(delay,system1,allo2ego,max,0,0).");
+  cw->add("allo2ego", {}, "metadataIro(accuracy,system1,allo2ego,avg,0,1).");
   cw->add("allo2ego", {}, "iroCost(system1,allo2ego,1).");
   cw->ground("allo2ego", {});
 
   auto query1 = cw->getExternal("query", {1}, true);
 
   cw->solve();
-  // cw->printLastModel();
+//   cw->printLastModel();
 
   EXPECT_EQ(true, cw->query("stream", {1, "system1", "allo2ego", "system1", Gringo::Value("information", {"bart",
                                                                                                           "position",
                                                                                                           "egoCoords",
                                                                                                           "nase"})}));
-  EXPECT_EQ(true, cw->query("streamDelay", {1, "system1", "allo2ego", "system1", Gringo::Value("information", {
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "delay", "system1", "allo2ego", "system1", Gringo::Value("information", {
       "bart", "position", "egoCoords", "nase"}),
                                             2}));
-  EXPECT_EQ(false, cw->query("streamDelay", {1, "system1", "allo2ego", "system1", Gringo::Value("information", {
+  EXPECT_EQ(false, cw->query("metadataStream", {1, "delay", "system1", "allo2ego", "system1", Gringo::Value("information", {
       "bart", "position", "egoCoords", "nase"}),
                                              4}));
-  EXPECT_EQ(false, cw->query("streamCost", {1, "system1", "allo2ego", "system1", Gringo::Value("information", {
+  EXPECT_EQ(false, cw->query("metadataStream", {1, "cost", "system1", "allo2ego", "system1", Gringo::Value("information", {
       "bart", "position", "egoCoords", "nase"}),
                                             0}));
-  EXPECT_EQ(false, cw->query("streamCost", {1, "system1", "allo2ego", "system1", Gringo::Value("information", {
+  EXPECT_EQ(false, cw->query("metadataStream", {1, "cost", "system1", "allo2ego", "system1", Gringo::Value("information", {
       "bart", "position", "egoCoords", "nase"}),
                                             1}));
-  EXPECT_EQ(true, cw->query("streamAccuracy", {1, "system1", "allo2ego", "system1", Gringo::Value("information", {
+  EXPECT_EQ(true, cw->query("metadataStream", {1, "accuracy", "system1", "allo2ego", "system1", Gringo::Value("information", {
       "bart", "position", "egoCoords", "nase"}),
                                                92}));
 }
@@ -422,28 +423,28 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   // maps
   // map(system,map,entityType,scope,rep,entity2,min,max).
   auto map = cw->getExternal("mapTemplate", {"system1", "typeMap", "type", "scope1", "rep1", "none"}, "map",
-                             {"system1", "typeMap", "type", "scope1", "rep1", "none", 2, 3, "max", 1, 0, "avg", 0, 0}, true);
+                             {"system1", "typeMap", "type", "scope1", "rep1", "none", 2, 3, "max", 1, 0, "avg", 0, 4}, true);
 
   // requires
   // requiredMap(system,entity_type,scope,representation,entity2).
   auto required = cw->getExternal("requiredMap", {"system1", "type", "scope1", "rep1", "none"}, true);
 
   // add transfer
-  auto transfer1_2 = cw->getExternal("transfer", {"system2", "system1", 1, 2}, true);
-  auto transfer1_3 = cw->getExternal("transfer", {"system3", "system1", 1, 3}, true);
-  auto transfer1_4 = cw->getExternal("transfer", {"system4", "system1", 1, 4}, true);
-  auto transfer1_5 = cw->getExternal("transfer", {"system5", "system1", 1, 5}, true);
-//  auto transfer2_3 = cw->getExternal("transfer", {"system3", "system2", 1, 5}, true);
-//  auto transfer2_4 = cw->getExternal("transfer", {"system2", "system4", 1, 5}, true);
-//  auto transfer2_5 = cw->getExternal("transfer", {"system2", "system5", 1, 5}, true);
-//  auto transfer3_4 = cw->getExternal("transfer", {"system3", "system4", 1, 5}, true);
-//  auto transfer3_5 = cw->getExternal("transfer", {"system3", "system5", 1, 5}, true);
-//  auto transfer5_5 = cw->getExternal("transfer", {"system4", "system5", 1, 5}, true);
+  auto transfer1_2 = cw->getExternal("transfer", {"system2", "system1", 4000, 2}, true);
+  auto transfer1_3 = cw->getExternal("transfer", {"system3", "system1", 4000, 3}, true);
+  auto transfer1_4 = cw->getExternal("transfer", {"system4", "system1", 4000, 4}, true);
+  auto transfer1_5 = cw->getExternal("transfer", {"system5", "system1", 4000, 5}, true);
+  auto transfer2_3 = cw->getExternal("transfer", {"system3", "system2", 4000, 5}, true);
+  auto transfer2_4 = cw->getExternal("transfer", {"system2", "system4", 4000, 5}, true);
+  auto transfer2_5 = cw->getExternal("transfer", {"system2", "system5", 4000, 5}, true);
+  auto transfer3_4 = cw->getExternal("transfer", {"system3", "system4", 4000, 5}, true);
+  auto transfer3_5 = cw->getExternal("transfer", {"system3", "system5", 4000, 5}, true);
+  auto transfer5_5 = cw->getExternal("transfer", {"system4", "system5", 4000, 5}, true);
 
   auto query1 = cw->getExternal("query", {1}, true);
 
   cw->solve();
-  cw->printLastModel();
+//  cw->printLastModel();
 
   EXPECT_EQ(true, cw->query("stream", {1, "system1", "in2", "system2", Gringo::Value("information", {"entity2",
                                                                                                      "scope1", "rep1",
@@ -452,5 +453,5 @@ TEST(ClingWrap, requiredStreamsByEntityType)
                                                                                                      "scope1", "rep1",
                                                                                                      "none"})}));
   EXPECT_EQ(true, cw->query("metadataMap", {1,"accuracy", "system1","typeMap","type","scope1","rep1","none",102}));
-  EXPECT_EQ(true, cw->query("metadataMap", {1,"delay","system1","typeMap","type","scope1","rep1","none",2}));
+  EXPECT_EQ(true, cw->query("metadataMap", {1,"delay","system1","typeMap","type","scope1","rep1","none",4001}));
 }

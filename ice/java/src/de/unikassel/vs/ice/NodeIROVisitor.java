@@ -334,6 +334,17 @@ public class NodeIROVisitor extends IceVisitor {
 				value = literals.iterator().next().getLiteral();
 			}
 
+			Set<OWLLiteral> literals2 = this.reasoner.getDataPropertyValues(individual, this.hasMetadataValue2);
+			String value2;
+
+			if (literals2.size() != 1) {
+				log("Wrong size of hasMetadataValue2 properties " + literals2.size() + " " + individual
+						+ " will be skipped.");
+				value2 = null;
+			} else {
+				value2 = literals2.iterator().next().getLiteral();
+			}
+
 			literals = this.reasoner.getDataPropertyValues(ind, this.hasGroundingValue);
 
 			for (OWLLiteral lit : literals) {
@@ -341,6 +352,8 @@ public class NodeIROVisitor extends IceVisitor {
 
 				if (value != null)
 					pattern = pattern.replace("$value1", value);
+				if (value2 != null)
+					pattern = pattern.replace("$value2", value2);
 
 				sb.append(pattern + "\n");
 			}
@@ -621,7 +634,7 @@ public class NodeIROVisitor extends IceVisitor {
 
 	private String replace(String p_string) {
 		p_string = p_string.replace("$system", this.iRIShortName(this.currentSystem.getIRI()));
-		p_string = p_string.replace("$node", this.iRIShortName(this.grounding.getIRI()));
+		p_string = p_string.replace("$element", this.iRIShortName(this.grounding.getIRI()));
 
 		if (p_string.contains("$information")) {
 			if (this.currentEntity == null || this.currentScope == null || this.currentRepresentation == null) {

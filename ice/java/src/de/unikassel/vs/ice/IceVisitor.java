@@ -55,6 +55,7 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 
 	protected final OWLDataProperty hasGroundingValue;
 	protected final OWLDataProperty hasMetadataValue;
+	protected final OWLDataProperty hasMetadataValue2;
 	protected final OWLDataProperty hasConfiguration;
 
 	protected final Set<OWLOntology> ontologies;
@@ -105,6 +106,7 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 
 		this.hasGroundingValue = p_dataFactory.getOWLDataProperty(IRI.create(ICE_IRI_PREFIX + "hasGroundingValue"));
 		this.hasMetadataValue = p_dataFactory.getOWLDataProperty(IRI.create(ICE_IRI_PREFIX + "hasMetadataValue"));
+		this.hasMetadataValue2 = p_dataFactory.getOWLDataProperty(IRI.create(ICE_IRI_PREFIX + "hasMetadataValue2"));
 		this.hasConfiguration = p_dataFactory.getOWLDataProperty(IRI.create(ICE_IRI_PREFIX + "hasConfiguration"));
 
 		this.sb = new StringBuffer();
