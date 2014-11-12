@@ -329,21 +329,101 @@ void ASPCoordinator::readSystemsFromOntology()
 
     auto nodes = this->ontology->readNodesAndIROsAsASP(ontSystem);
 
-    // computation node
-    this->checkASPFromOntology(ASPElementType::ASP_COMPUTATION_NODE, system, nodes->at(0), nodes->at(1), nodes->at(2),
-                               nodes->at(3));
+    std::vector<std::string> types = nodes->at(0);
+    std::vector<std::string> names = nodes->at(1);
+    std::vector<std::string> strings = nodes->at(2);
+    std::vector<std::string> aspStrings = nodes->at(3);
+    std::vector<std::string> cppStrings = nodes->at(4);
 
-    // source node
-    this->checkASPFromOntology(ASPElementType::ASP_SOURCE_NODE, system, nodes->at(4), nodes->at(5), nodes->at(6),
-                               nodes->at(7));
+    for (int i = 0; i < names.size(); ++i)
+    {
+      std::string name = names.at(i);
+      std::string elementStr = strings.at(i);
+      std::string aspStr = aspStrings.at(i);
+      std::string cppStr = cppStrings.at(i);
+      ASPElementType type;
 
-    // iro
-    this->checkASPFromOntology(ASPElementType::ASP_IRO, system, nodes->at(8), nodes->at(9), nodes->at(10),
-                               nodes->at(11));
+      if (types.at(i) == "COMPUTATION_NODE")
+      {
+        type = ASPElementType::ASP_COMPUTATION_NODE;
+      }
+      else if (types.at(i) == "SOURCE_NODE")
+      {
+        type = ASPElementType::ASP_SOURCE_NODE;
+      }
+      else if (types.at(i) == "REQUIRED_STREAM")
+      {
+        type = ASPElementType::ASP_REQUIRED_STREAM;
+      }
+      else if (types.at(i) == "MAP_NODE")
+      {
+        type = ASPElementType::ASP_MAP_NODE;
+      }
+      else if (types.at(i) == "IRO_NODE")
+      {
+        type = ASPElementType::ASP_IRO_NODE;
+      }
+      else if (types.at(i) == "REQUIRED_MAP")
+      {
+        type = ASPElementType::ASP_REQUIRED_MAP;
+      }
+      else
+      {
+        _log->error("readSystemsFromOntology", "Unknown asp element type '%s', element will be skipped", types.at(i).c_str());
+        continue;
+      }
 
-    // required streams
-    this->checkASPFromOntology(ASPElementType::ASP_REQUIRED_STREAM, system, nodes->at(12), nodes->at(13), nodes->at(14),
-                               nodes->at(15));
+      auto node = system->getASPElementByName(type, name);
+
+      if (!node)
+      {
+        _log->debug("readSystemsFromOntology", "ASP element '%s' not found, creating new element",
+                    std::string(name).c_str());
+        auto element = std::make_shared<ASPElement>();
+        element->aspString = aspStr;
+        element->name = name;
+        element->state = ASPElementState::ADDED_TO_ASP;
+        element->type = type;
+
+        if (cppStr != "")
+        {
+          int index = cppStr.find("\n");
+          element->className = cppStr.substr(0, index);
+          element->config = this->readConfiguration(cppStr.substr(index + 1, cppStr.length()));
+        }
+
+        auto value = this->splitASPExternalString(elementStr);
+//              std::cout << value << std::endl;
+        element->external = this->asp->getExternal(*value.name(), value.args());
+
+        switch (type)
+        {
+          case ASPElementType::ASP_COMPUTATION_NODE:
+          case ASPElementType::ASP_SOURCE_NODE:
+          case ASPElementType::ASP_MAP_NODE:
+          case ASPElementType::ASP_IRO_NODE:
+            if (false == this->nodeStore->existNodeCreator(element->className))
+            {
+              _log->warning("checkASPFromOntology", "Missing creator for node '%s' of type '%s', cpp grounding '%s', asp external set to false",
+                            element->name.c_str(), ASPElementTypeNames[type].c_str(), element->className.c_str());
+              element->external->assign(false);
+            } else {
+              element->external->assign(true);
+            }
+            break;
+          default:
+            element->external->assign(true);
+            break;
+        }
+
+        this->asp->add(name, {}, aspStr);
+//              std::cout << aspStr << std::endl;
+        this->asp->ground(name, {});
+
+        system->addASPElement(element);
+        this->groundingDirty = true;
+      }
+    }
   }
 }
 

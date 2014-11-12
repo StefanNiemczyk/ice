@@ -60,6 +60,8 @@ public class IceOntologyInterface {
 
 	private int someMinCardinality;
 	private int someMaxCardinality;
+	private int defaultMinCardinality;
+	private int defaultMaxCardinality;
 
 	private String mainIRI;
 	private String mainIRIPrefix;
@@ -72,6 +74,8 @@ public class IceOntologyInterface {
 		this.ontologyIries = new ArrayList<String>();
 		this.someMinCardinality = 1;
 		this.someMaxCardinality = 1;
+		this.defaultMinCardinality = 1;
+		this.defaultMaxCardinality = 5;
 		this.dirty = true;
 	}
 
@@ -398,7 +402,7 @@ public class IceOntologyInterface {
 
 		onts.addAll(this.imports);
 
-		InfoStructureVisitor isv = new InfoStructureVisitor(onts, this.getReasoner(), this.dataFactory);
+		InfoStructureVisitor isv = new InfoStructureVisitor(this, onts, this.getReasoner(), this.dataFactory);
 
 		Set<OWLClassExpression> classes = this.entityTypeOWLClass.getSubClasses(onts);
 		// Set<OWLClass> classes =
@@ -426,7 +430,7 @@ public class IceOntologyInterface {
 			this.manager.addAxiom(this.mainOntology, ax);
 		}
 
-		NodeIROVisitor niv = new NodeIROVisitor(onts, this.getReasoner(), this.dataFactory);
+		NodeIROVisitor niv = new NodeIROVisitor(this, onts, this.getReasoner(), this.dataFactory);
 
 		List<List<String>> result = niv.readInformation(system);
 
@@ -531,5 +535,21 @@ public class IceOntologyInterface {
 
 	private void log(String p_msg) {
 		System.out.println("java     " + p_msg);
+	}
+
+	public int getDefaultMinCardinality() {
+		return defaultMinCardinality;
+	}
+
+	public void setDefaultMinCardinality(int defaultMinCardinality) {
+		this.defaultMinCardinality = defaultMinCardinality;
+	}
+
+	public int getDefaultMaxCardinality() {
+		return defaultMaxCardinality;
+	}
+
+	public void setDefaultMaxCardinality(int defaultMaxCardinality) {
+		this.defaultMaxCardinality = defaultMaxCardinality;
 	}
 }

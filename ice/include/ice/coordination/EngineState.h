@@ -39,8 +39,7 @@ namespace ice
  */
 enum ASPElementState
 {
-  NEW_ELEMENT,
-  ADDED_TO_ASP
+  NEW_ELEMENT, ADDED_TO_ASP
 };
 
 //* ASPNodeType
@@ -50,11 +49,10 @@ enum ASPElementState
  */
 enum ASPElementType
 {
-  ASP_COMPUTATION_NODE,
-  ASP_SOURCE_NODE,
-  ASP_IRO,
-  ASP_REQUIRED_STREAM
+  ASP_COMPUTATION_NODE, ASP_SOURCE_NODE, ASP_IRO_NODE, ASP_MAP_NODE, ASP_REQUIRED_STREAM, ASP_REQUIRED_MAP
 };
+const std::string ASPElementTypeNames[] {"ASP_COMPUTATION_NODE", "ASP_SOURCE_NODE", "ASP_IRO_NODE", "ASP_MAP_NODE",
+                                         "ASP_REQUIRED_STREAM", "ASP_REQUIRED_MAP"};
 
 //* ASPNode
 /**
@@ -67,7 +65,7 @@ struct ASPElement
   std::string aspString;
   std::string name;
   std::string className;
-  std::map<std::string,std::string> config;
+  std::map<std::string, std::string> config;
   ASPElementState state;
   ASPElementType type;
 };
@@ -79,7 +77,7 @@ struct ASPElement
  */
 enum CooperationState
 {
-  UNKNOWN, //< 0 Unkown state
+  UNKNOWN, //< 0 Unknown state
   RETRY_NEGOTIATION, //< 1 retry the negotiation process
   INFORMATION_MODEL_REQUESTED, //< 2 information model was requested
   INFORMATION_MODEL_SEND, //< 3 information model was send
@@ -102,9 +100,9 @@ class EngineState
 {
 public:
   /*!
-   * \brief This contructor initialize the object and sets the unique identifier.
+   * \brief This constructor initialize the object and sets the unique identifier.
    *
-   * This contructor initialize the object and sets the unique identifier.
+   * This constructor initialize the object and sets the unique identifier.
    *
    * /param engineId The identifier of the engine.
    * /param systemIri The ontology iri of this system.

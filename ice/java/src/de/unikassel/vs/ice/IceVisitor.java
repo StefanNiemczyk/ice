@@ -19,12 +19,15 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 
 	// public static final String IRI_PREFIX =
 	// "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#";
+	protected final IceOntologyInterface ioi;
 
 	protected final OWLClass node;
+	protected final OWLClass computationNode;
 	protected final OWLClass sourceNode;
 	protected final OWLClass iro;
-	protected final OWLClass map;
+	protected final OWLClass mapNode;
 	protected final OWLClass requiredStream;
+	protected final OWLClass requiredMap;
 	protected final OWLClass system;
 	protected final OWLClass entityType;
 	protected final OWLClass entityScope;
@@ -32,13 +35,16 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 	protected final OWLClass valueScope;
 	protected final OWLClass stream;
 	protected final OWLClass namedStream;
+	protected final OWLClass namedMap;
 	protected final OWLClass groundingOWLClass;
 
 	protected final OWLObjectProperty hasInput;
 	protected final OWLObjectProperty hasRelatedInput;
 	protected final OWLObjectProperty hasOutput;
+	protected final OWLObjectProperty hasOutputMap;
 	protected final OWLObjectProperty isSystemOf;
 	protected final OWLObjectProperty isStreamOf;
+	protected final OWLObjectProperty isMapOf;
 	protected final OWLObjectProperty isGroundingOf;
 	protected final OWLObjectProperty onlyEntity;
 	protected final OWLObjectProperty hasRepresentation;
@@ -64,8 +70,9 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 	protected StringBuffer sb;
 	protected List<OWLClass> foundClasses;
 
-	public IceVisitor(final Set<OWLOntology> p_ontologies, final OWLReasoner p_reasoner,
-			final OWLDataFactory p_dataFactory) {
+	public IceVisitor(final IceOntologyInterface p_ioi, final Set<OWLOntology> p_ontologies,
+			final OWLReasoner p_reasoner, final OWLDataFactory p_dataFactory) {
+		this.ioi = p_ioi;
 		this.ontologies = p_ontologies;
 		this.reasoner = p_reasoner;
 
@@ -74,20 +81,25 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 		this.representation = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Representation"));
 		this.valueScope = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "ValueScope"));
 		this.node = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Node"));
+		this.computationNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "ComputationNode"));
 		this.sourceNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "SourceNode"));
-		this.iro = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "InterRepresentationOperation"));
-		this.map = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Map"));
+		this.iro = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "IRONode"));
+		this.mapNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "MapNode"));
 		this.requiredStream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "RequiredStream"));
+		this.requiredMap = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "RequiredMap"));
 		this.system = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "System"));
 		this.stream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Stream"));
 		this.namedStream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "NamedStream"));
+		this.namedMap = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "NamedMap"));
 		this.groundingOWLClass = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Grounding"));
 
 		this.hasInput = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasInput"));
 		this.hasRelatedInput = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasRelatedInput"));
 		this.hasOutput = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasOutput"));
+		this.hasOutputMap = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasOutputMap"));
 		this.isSystemOf = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "isSystemOf"));
 		this.isStreamOf = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "isStreamOf"));
+		this.isMapOf = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "isMapOf"));
 		this.isGroundingOf = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "isGroundingOf"));
 		this.onlyEntity = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "onlyEntity"));
 		this.hasRepresentation = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasRepresentation"));

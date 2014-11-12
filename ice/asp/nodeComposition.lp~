@@ -52,11 +52,11 @@
 	nodeTemplate(SYSTEM,NODE,any), 
 	entity(ENTITY,ENTITY_TYPE), 
 	hasScope(ENTITY_TYPE,SCOPE), 
-	input(SYSTEM,NODE,SCOPE,_,_,_), 
+	input(SYSTEM,NODE,SCOPE,_,_,_,_), 
 	query(k).
 
-MIN { connectToNode(k,SYSTEM,NODE,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,none)) : stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,none)), PROVIDER != NODE } MAX :- 
-	input(SYSTEM,NODE,SCOPE,REP,MIN,MAX), 
+MIN { connectToNode(k,SYSTEM,NODE,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2)) : stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2)), PROVIDER != NODE } MAX :- 
+	input(SYSTEM,NODE,SCOPE,REP,ENTITY2,MIN,MAX), 
 	node(k,SYSTEM,NODE,ENTITY).
 
 stream(k,SYSTEM,NODE,SYSTEM,information(ENTITY,SCOPE,REP,none)) :- 
@@ -147,95 +147,103 @@ metadataStream(k,METADATA,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,ACCURACY) :-
 
 
 %% translate representation
-0 { informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,none,none) } 1 :- 
-	iro(SYSTEM,IRO,any,SCOPE), 
-	entity(ENTITY,ENTITY_TYPE), 
-	hasScope(ENTITY_TYPE,SCOPE),
-	query(k).
-0 { informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,none,none) } 1 :- 
-	iro(SYSTEM,IRO,ENTITY_TYPE,SCOPE),
-	entity(ENTITY,ENTITY_TYPE), 
-	hasScope(ENTITY_TYPE,SCOPE), 
-	query(k).
-0 { informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,SCOPE2) } 1 :- 
-	iro(SYSTEM,IRO,any,SCOPE,any,SCOPE2), 
-	entity(ENTITY,ENTITY_TYPE), 
-	hasScope(ENTITY_TYPE,SCOPE), 
-	entity(ENTITY2,ENTITY_TYPE2), 
-	hasScope(ENTITY_TYPE2,SCOPE2), 
-	query(k).
-0 { informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,SCOPE2) } 1 :- 
-	iro(SYSTEM,IRO,ENTITY_TYPE,SCOPE,ENTITY_TYPE2,SCOPE2),
-	entity(ENTITY,ENTITY_TYPE),
-	hasScope(ENTITY_TYPE,SCOPE), 
-	entity(ENTITY2,ENTITY_TYPE2), 
-	hasScope(ENTITY_TYPE2,SCOPE2), 
-	query(k).
+%0 { informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,none,none) } 1 :- 
+%	iro(SYSTEM,IRO,any,SCOPE), 
+%	entity(ENTITY,ENTITY_TYPE), 
+%	hasScope(ENTITY_TYPE,SCOPE),
+%	query(k).
+%0 { informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,none,none) } 1 :- 
+%	iro(SYSTEM,IRO,ENTITY_TYPE,SCOPE),
+%	entity(ENTITY,ENTITY_TYPE), 
+%	hasScope(ENTITY_TYPE,SCOPE), 
+%	query(k).
+%0 { informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,SCOPE2) } 1 :- 
+%	iro(SYSTEM,IRO,any,SCOPE,any,SCOPE2), 
+%	entity(ENTITY,ENTITY_TYPE), 
+%	hasScope(ENTITY_TYPE,SCOPE), 
+%	entity(ENTITY2,ENTITY_TYPE2), 
+%	hasScope(ENTITY_TYPE2,SCOPE2), 
+%	query(k).
+%0 { informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,SCOPE2) } 1 :- 
+%	iro(SYSTEM,IRO,ENTITY_TYPE,SCOPE,ENTITY_TYPE2,SCOPE2),
+%	entity(ENTITY,ENTITY_TYPE),
+%	hasScope(ENTITY_TYPE,SCOPE), 
+%	entity(ENTITY2,ENTITY_TYPE2), 
+%	hasScope(ENTITY_TYPE2,SCOPE2), 
+%	query(k).
 
+0 { informationTranslation(k,SYSTEM,IRO,ENTITY,ENTITY2) } 1 :- 
+	iro(SYSTEM,IRO,any), 
+	entity(ENTITY,ENTITY_TYPE), 
+	hasScope(ENTITY_TYPE,SCOPE), 
+	input(SYSTEM,IRO,SCOPE,_,ENTITY2,_,_),
+	query(k).
+% TODO
+
+MIN { connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2)) : stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2)), PROVIDER != IRO } MAX :- 
+	input(SYSTEM,IRO,SCOPE,REP,ENTITY2,MIN,MAX),
+	informationTranslation(k,SYSTEM,IRO,ENTITY,ENTITY2).
 MIN { connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,none)) : stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,none)), PROVIDER != IRO } MAX :- 
-	inputIro(SYSTEM,IRO,SCOPE,REP,MIN,MAX),
-	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,_,_).
-MIN { connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,none)) : stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,none)), PROVIDER != IRO } MAX :- 
-	inputIro2(SYSTEM,IRO,SCOPE,REP,MIN,MAX), 
-	informationTranslation(k,SYSTEM,IRO,_,_,ENTITY,SCOPE).
+	input2(SYSTEM,IRO,SCOPE,REP,MIN,MAX), 
+	informationTranslation(k,SYSTEM,IRO,_,ENTITY).
 
-outputIro(SYSTEM,IRO,SCOPE,REP) :- 
-	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,_,_), 
-	outputIro(SYSTEM,IRO,REP).
+%outputIro(SYSTEM,IRO,SCOPE,REP) :- 
+%	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,_,_), 
+%	outputIro(SYSTEM,IRO,REP).
 
-stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE2,REP,ENTITY2)) :- 
-	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), 
-	outputIro(SYSTEM,IRO,SCOPE2,REP).
+stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- 
+	informationTranslation(k,SYSTEM,IRO,ENTITY,ENTITY2), 
+	output(SYSTEM,IRO,SCOPE,REP).
 
 
 % computing QoS parameters
 %fix
 metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),FIX_VALUE) :- 
-	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), 
-	outputIro(SYSTEM,IRO,SCOPE2,REP), 
+	informationTranslation(k,SYSTEM,IRO,ENTITY,ENTITY2), 
+	output(SYSTEM,IRO,SCOPE,REP), 
 	metadataIro(METADATA,SYSTEM,IRO,fix,FIX_VALUE,MOD_VALUE).
 
 %min
 metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),VALUE+FIX_VALUE+MOD_VALUE*COUNT) :- 
-	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), 
-	outputIro(SYSTEM,IRO,SCOPE2,REP), 
+	informationTranslation(k,SYSTEM,IRO,ENTITY,ENTITY2), 
+	output(SYSTEM,IRO,SCOPE,REP), 
 	metadataIro(METADATA,SYSTEM,IRO,min,FIX_VALUE,MOD_VALUE),
 	VALUE = #max{D,PROVIDER,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, 
-	COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, 
-	COUNT!=0.
-metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),FIX_VALUE) :- 
-	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), 
-	outputIro(SYSTEM,IRO,SCOPE2,REP), 
-	metadataIro(METADATA,SYSTEM,IRO,min,FIX_VALUE,MOD_VALUE),
-	COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)},
-	COUNT==0.
+	COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}.
+%	COUNT!=0.
+%metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),FIX_VALUE) :- 
+%	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), 
+%	output(SYSTEM,IRO,SCOPE2,REP), 
+%	metadataIro(METADATA,SYSTEM,IRO,min,FIX_VALUE,MOD_VALUE),
+%	COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)},
+%	COUNT==0.
 
 %avg
 metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),VALUE/COUNT+FIX_VALUE+MOD_VALUE*COUNT) :- 
-	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), 
-	outputIro(SYSTEM,IRO,SCOPE2,REP), 
+	informationTranslation(k,SYSTEM,IRO,ENTITY,ENTITY2), 
+	output(SYSTEM,IRO,SCOPE,REP), 
 	metadataIro(METADATA,SYSTEM,IRO,avg,FIX_VALUE,MOD_VALUE),
 	VALUE = #sum{D,PROVIDER,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, 
 	COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, 
 	COUNT!=0.
 metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),FIX_VALUE) :- 
-	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), 
-	outputIro(SYSTEM,IRO,SCOPE2,REP),
+	informationTranslation(k,SYSTEM,IRO,ENTITY,ENTITY2), 
+	output(SYSTEM,IRO,SCOPE,REP),
 	metadataIro(METADATA,SYSTEM,IRO,avg,FIX_VALUE,MOD_VALUE),
 	COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, 
 	COUNT==0.
 
 %max
 metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),VALUE+FIX_VALUE+MOD_VALUE*COUNT) :- 
-	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), 
-	outputIro(SYSTEM,IRO,SCOPE2,REP),
+	informationTranslation(k,SYSTEM,IRO,ENTITY,ENTITY2), 
+	output(SYSTEM,IRO,SCOPE,REP),
 	metadataIro(METADATA,SYSTEM,IRO,max,FIX_VALUE,MOD_VALUE),
 	VALUE = #max{D,PROVIDER,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)},
 	COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, 
 	COUNT!=0.
 metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),FIX_VALUE) :- 
-	informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE,ENTITY2,_), 
-	outputIro(SYSTEM,IRO,SCOPE2,REP), metadataIro(METADATA,SYSTEM,IRO,max,FIX_VALUE,MOD_VALUE),
+	informationTranslation(k,SYSTEM,IRO,ENTITY,ENTITY2), 
+	output(SYSTEM,IRO,SCOPE,REP), metadataIro(METADATA,SYSTEM,IRO,max,FIX_VALUE,MOD_VALUE),
 	COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToIro(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, 
 	COUNT==0.
 
@@ -259,14 +267,17 @@ metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SUB_SCOPE,RE
 
 
 %% creating a map
-0 { map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2) } 1 :- 
-	mapTemplate(SYSTEM,MAP,SCOPE,REPRESENTATION,ENTITY2),
-	scope(ENTITY_TYPE,SCOPE), 
+0 { mapNode(k,SYSTEM,NODE,ENTITY_TYPE) } 1 :- 
+	mapNodeTemplate(SYSTEM,NODE,ENTITY_TYPE),
 	query(k).
 
-MIN { connectToMap(k,SYSTEM,MAP,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2)) : stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2)) } MAX :- 
-	map(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2), 
-	inputMap(SYSTEM,MAP,MIN,MAX).
+MIN { connectToMap(k,SYSTEM,NODE,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2)) : stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2)), entity(ENTITY,ENTITY_TYPE) } MAX :- 
+	mapNode(k,SYSTEM,NODE,ENTITY_TYPE), 
+	input(SYSTEM,NODE,SCOPE,REPRESENTATION,ENTITY2,MIN,MAX).
+
+map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2) :- 
+	mapNode(k,SYSTEM,NODE,ENTITY_TYPE), 
+	outputMap(SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2).
 
 
 % computing QoS parameters
@@ -345,7 +356,16 @@ metadata(delay,minimize).
 :~ requiredMap(SYSTEM,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2), not selectedMap(k,SYSTEM,_,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2), query(k). [1@5,requiredMap]
 
 % checking QoS parameters
-% TODO
+:~ selectedMap(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2),
+   requiredMetadata(METADATA,SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2,REQUIRED_VALUE), 
+   metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,VALUE), 
+   metadata(METADATA,maximize),
+   REQUIRED_VALUE < VALUE,query(k). [1@4,requiredStream]
+:~    selectedMap(k,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2),
+   requiredMetadata(METADATA,SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2,REQUIRED_VALUE), 
+   metadataMap(k,METADATA,SYSTEM,MAP,ENTITY_TYPE,SCOPE,REP,ENTITY2,VALUE), 
+   metadata(METADATA,minimize), 
+   REQUIRED_VALUE > VALUE,query(k). [1@4,requiredStream]
 
 
 % checking point budget of systems
@@ -399,12 +419,12 @@ nodeCost(system,node,cost).
 
 
 %--------------------------------------------------------------------------------------
-#program map(system,map,scope,rep,entity2,minCount,maxCount,delayType,delayFix,delayMod,accuracyType,accuracyFix,accuracyMod).
+%#program map(system,map,scope,rep,entity2,minCount,maxCount,delayType,delayFix,delayMod,accuracyType,accuracyFix,accuracyMod).
 
-#external mapTemplate(system,map,scope,rep,entity2). 
-inputMap(system,map,minCount,maxCount).
-metadataMap(delay,system,map,delayType,delayFix,delayMod).
-metadataMap(accuracy,system,map,accuracyType,accuracyFix,accuracyMod).
+%#external nodeTemplate(system,map,scope,rep,entity2). 
+%inputMap(system,map,minCount,maxCount).
+%metadataMap(delay,system,map,delayType,delayFix,delayMod).
+%metadataMap(accuracy,system,map,accuracyType,accuracyFix,accuracyMod).
 
 
 %--------------------------------------------------------------------------------------

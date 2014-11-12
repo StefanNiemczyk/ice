@@ -189,7 +189,7 @@ std::shared_ptr<ASPElement> EngineState::getASPElementByName(ASPElementType type
           return node;
       }
       break;
-    case ASP_IRO:
+    case ASP_IRO_NODE:
       for (auto node : this->aspIro)
       {
         if (node->name == name)
@@ -247,7 +247,7 @@ void EngineState::addASPElement(std::shared_ptr<ASPElement> node)
     case ASP_SOURCE_NODE:
       this->aspSourceNodes.push_back(node);
       break;
-    case ASP_IRO:
+    case ASP_IRO_NODE:
       this->aspIro.push_back(node);
       break;
     case ASP_REQUIRED_STREAM:

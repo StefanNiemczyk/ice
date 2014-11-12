@@ -1,6 +1,7 @@
-de/unikassel/vs/ice/NodeIROVisitor$1.class
-de/unikassel/vs/ice/IceVisitor.class
-de/unikassel/vs/ice/NodeIROVisitor$Type.class
 de/unikassel/vs/ice/InfoStructureVisitor.class
-de/unikassel/vs/ice/IceOntologyInterface.class
+de/unikassel/vs/ice/NodeIROVisitor$CardinalityContainer.class
 de/unikassel/vs/ice/NodeIROVisitor.class
+de/unikassel/vs/ice/NodeIROVisitor$Type.class
+de/unikassel/vs/ice/NodeIROVisitor$1.class
+de/unikassel/vs/ice/IceOntologyInterface.class
+de/unikassel/vs/ice/IceVisitor.class

@@ -104,9 +104,9 @@ public class InfoStructureVisitor extends IceVisitor {
 	private OWLClass lastValueScope;
 	private OWLClass lastRepresentation;
 
-	public InfoStructureVisitor(final Set<OWLOntology> p_ontologies, final OWLReasoner p_reasoner,
-			final OWLDataFactory p_dataFactory) {
-		super(p_ontologies, p_reasoner, p_dataFactory);
+	public InfoStructureVisitor(final IceOntologyInterface p_ioi, final Set<OWLOntology> p_ontologies,
+			final OWLReasoner p_reasoner, final OWLDataFactory p_dataFactory) {
+		super(p_ioi, p_ontologies, p_reasoner, p_dataFactory);
 
 		this.anonymiousThings = new HashSet<String>();
 	}
