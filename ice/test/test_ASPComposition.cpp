@@ -223,11 +223,11 @@ TEST(ClingWrap, informationTranslation)
   auto transfer1_2 = cw->getExternal("transfer", {"system2", "system1", 1, 2}, true);
 
   // add translation
-  cw->add("coords2Wgs84", {}, "#external iro(system1,coords2Wgs84,any).");
-  auto coords2Wgs84 = cw->getExternal("iro", {"system1", "coords2Wgs84", "any"}, "coords2Wgs84", {}, true);
+  cw->add("coords2Wgs84", {}, "#external iro(system1,coords2Wgs84,any,none).");
+  auto coords2Wgs84 = cw->getExternal("iro", {"system1", "coords2Wgs84", "any", "none"}, "coords2Wgs84", {}, true);
   cw->add("coords2Wgs84", {},
-          "input(system1,coords2Wgs84,position,coords,none,1,1) :- iro(system1,coords2Wgs84,any).");
-  cw->add("coords2Wgs84", {}, "output(system1,coords2Wgs84,position,wgs84).");
+          "input(system1,coords2Wgs84,position,coords,none,1,1) :- iro(system1,coords2Wgs84,any,none).");
+  cw->add("coords2Wgs84", {}, "output(system1,coords2Wgs84,position,wgs84,none).");
   cw->add("coords2Wgs84", {}, "metadataIro(delay,system1,coords2Wgs84,max,1,0).");
   cw->add("coords2Wgs84", {}, "metadataIro(accuracy,system1,coords2Wgs84,avg,1,0).");
   cw->add("coords2Wgs84", {}, "iroCost(system1,coords2Wgs84,1).");
@@ -282,11 +282,11 @@ TEST(ClingWrap, informationExtraction)
   auto transfer1_2 = cw->getExternal("transfer", {"system2", "system1", 1, 2}, true);
 
   // add translation
-  cw->add("coords2Wgs84", {}, "#external iro(system1,coords2Wgs84,any).");
-  auto coords2Wgs84 = cw->getExternal("iro", {"system1", "coords2Wgs84", "any"}, "coords2Wgs84", {}, true);
+  cw->add("coords2Wgs84", {}, "#external iro(system1,coords2Wgs84,any,none).");
+  auto coords2Wgs84 = cw->getExternal("iro", {"system1", "coords2Wgs84", "any", "none"}, "coords2Wgs84", {}, true);
   cw->add("coords2Wgs84", {},
-          "input(system1,coords2Wgs84,position,coords,none,1,1) :- iro(system1,coords2Wgs84,any).");
-  cw->add("coords2Wgs84", {}, "output(system1,coords2Wgs84,position,wgs84).");
+          "input(system1,coords2Wgs84,position,coords,none,1,1) :- iro(system1,coords2Wgs84,any,none).");
+  cw->add("coords2Wgs84", {}, "output(system1,coords2Wgs84,position,wgs84,none).");
   cw->add("coords2Wgs84", {}, "metadataIro(delay,system1,coords2Wgs84,max,1,0).");
   cw->add("coords2Wgs84", {}, "metadataIro(accuracy,system1,coords2Wgs84,avg,0,1).");
   cw->add("coords2Wgs84", {}, "iroCost(system1,coords2Wgs84,1).");
@@ -349,14 +349,14 @@ TEST(ClingWrap, ego2allo)
   auto transfer1_2 = cw->getExternal("transfer", {"system2", "system1", 2, 1}, true);
 
   // add translation
-  cw->add("allo2ego", {}, "#external iro(system1,allo2ego,any).");
-  auto allo2ego = cw->getExternal("iro", {"system1", "allo2ego", "any"}, "allo2ego", {},
+  cw->add("allo2ego", {}, "#external iro(system1,allo2ego,any,any).");
+  auto allo2ego = cw->getExternal("iro", {"system1", "allo2ego", "any", "any"}, "allo2ego", {},
                                   true);
   cw->add("allo2ego", {},
-          "input2(system1,allo2ego,position,coords,1,1) :- iro(system1,allo2ego,any).");
+          "input2(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).");
   cw->add("allo2ego", {},
-          "input(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any).");
-  cw->add("allo2ego", {}, "output(system1,allo2ego,position,egoCoords).");
+          "input(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).");
+  cw->add("allo2ego", {}, "output(system1,allo2ego,position,egoCoords,any).");
   cw->add("allo2ego", {}, "metadataIro(delay,system1,allo2ego,max,0,0).");
   cw->add("allo2ego", {}, "metadataIro(accuracy,system1,allo2ego,avg,0,1).");
   cw->add("allo2ego", {}, "iroCost(system1,allo2ego,1).");

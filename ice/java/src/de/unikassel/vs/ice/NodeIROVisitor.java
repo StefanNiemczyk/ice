@@ -574,7 +574,8 @@ public class NodeIROVisitor extends IceVisitor {
 			case SOURCE_NODE:
 			case IRO_NODE:
 			case MAP_NODE:
-				pattern = "input($system,$element,$scope,$representation,$relatedEntity," + min + "," + max + ").\n";
+				pattern = "input($system,$element,$scope,$representation,$checkRelatedEntity," + min + "," + max
+						+ ").\n";
 				// + this.elementString;
 				break;
 			default:
@@ -586,7 +587,7 @@ public class NodeIROVisitor extends IceVisitor {
 			case SOURCE_NODE:
 			case IRO_NODE:
 			case MAP_NODE:
-				pattern = "output($system,$element,$scope,$representation).\n";
+				pattern = "output($system,$element,$scope,$representation,$checkRelatedEntity).\n";
 				break;
 			default:
 				// TODO
@@ -596,10 +597,10 @@ public class NodeIROVisitor extends IceVisitor {
 			case COMPUTATION_NODE:
 			case SOURCE_NODE:
 			case IRO_NODE:
-				pattern = "outputMap($system,$element,$scope,$representation).\n";
+				pattern = "outputMap($system,$element,$scope,$representation,$checkRelatedEntity).\n";
 				break;
 			case MAP_NODE:
-				pattern = "outputMap($system,$element,$type,$scope,$representation,$relatedEntity).\n";
+				pattern = "outputMap($system,$element,$type,$scope,$representation,$checkRelatedEntity).\n";
 				break;
 			default:
 				// TODO
@@ -610,7 +611,7 @@ public class NodeIROVisitor extends IceVisitor {
 			case SOURCE_NODE:
 			case IRO_NODE:
 			case MAP_NODE:
-				pattern = "input2($system,$element,$scope,$representation," + min + "," + max + ").\n";
+				pattern = "input2($system,$element,$scope,$representation,$checkEntity," + min + "," + max + ").\n";
 				// + this.elementString;
 				break;
 			default:
@@ -649,40 +650,72 @@ public class NodeIROVisitor extends IceVisitor {
 		p_string = p_string.replace("$system", this.iRIShortName(this.currentSystem.getIRI()));
 		p_string = p_string.replace("$element", this.iRIShortName(this.grounding.getIRI()));
 
+		p_string = p_string.replace("$information", "information($entity,$scope,$representation,$relatedEntity)");
+
+		// entity
 		if (this.currentEntity != null)
 			p_string = p_string.replace("$entity", this.iRIShortName(this.currentEntity.getIRI()));
 		else
 			p_string = p_string.replace("$entity", "any");
+
+		// checkEntity
+		if (this.isSubClassOf(this.currentRepresentation, this.relatedRepresentation)) {
+			if (this.currentEntity != null)
+				p_string = p_string.replace("$checkEntity", this.iRIShortName(this.currentEntity.getIRI()));
+			else
+				p_string = p_string.replace("$checkEntity", "any");
+		} else
+			p_string = p_string.replace("$checkEntity", "none");
+
+		// type
 		if (this.currentEntityType != null)
 			p_string = p_string.replace("$type", this.iRIShortName(this.currentEntityType.getIRI()));
+
+		// scope
 		if (this.currentScope != null)
 			p_string = p_string.replace("$scope", this.iRIShortName(this.currentScope.getIRI()));
+
+		// representation
 		if (this.currentRepresentation != null)
 			p_string = p_string.replace("$representation", this.iRIShortName(this.currentRepresentation.getIRI()));
+
+		// relatedEntity
 		if (this.currentRelatedEntity != null)
 			p_string = p_string.replace("$relatedEntity", this.iRIShortName(this.currentRelatedEntity.getIRI()));
 		else
 			p_string = p_string.replace("$relatedEntity", "none");
 
-		if (p_string.contains("$information")) {
-			if (this.currentEntity == null || this.currentScope == null || this.currentRepresentation == null) {
-				this.log(String.format(
-						"Missing information description elements '%s' (entity), '%s' (scope) '%s' (representation)",
-						this.currentEntity, this.currentScope, this.currentRepresentation));
-			} else {
-				String info = "information("
-						+ this.iRIShortName(this.currentEntity.getIRI())
-						+ ","
-						+ this.iRIShortName(this.currentScope.getIRI())
-						+ ","
-						+ this.iRIShortName(this.currentRepresentation.getIRI())
-						+ ","
-						+ (this.currentRelatedEntity != null ? this.iRIShortName(this.currentRelatedEntity.getIRI())
-								: "none") + ")";
+		// checkRelatedEntity
+		if (this.isSubClassOf(this.currentRepresentation, this.relatedRepresentation)) {
+			if (this.currentRelatedEntity != null)
+				p_string = p_string.replace("$checkRelatedEntity",
+						this.iRIShortName(this.currentRelatedEntity.getIRI()));
+			else
+				p_string = p_string.replace("$checkRelatedEntity", "any");
+		} else
+			p_string = p_string.replace("$checkRelatedEntity", "none");
 
-				p_string = p_string.replace("$information", info);
-			}
-		}
+		// if (p_string.contains("$information")) {
+		// if (this.currentEntity == null || this.currentScope == null ||
+		// this.currentRepresentation == null) {
+		// this.log(String.format(
+		// "Missing information description elements '%s' (entity), '%s' (scope) '%s' (representation)",
+		// this.currentEntity, this.currentScope, this.currentRepresentation));
+		// } else {
+		// String info = "information("
+		// + this.iRIShortName(this.currentEntity.getIRI())
+		// + ","
+		// + this.iRIShortName(this.currentScope.getIRI())
+		// + ","
+		// + this.iRIShortName(this.currentRepresentation.getIRI())
+		// + ","
+		// + (this.currentRelatedEntity != null ?
+		// this.iRIShortName(this.currentRelatedEntity.getIRI())
+		// : "none") + ")";
+		//
+		// p_string = p_string.replace("$information", info);
+		// }
+		// }
 
 		return p_string;
 	}

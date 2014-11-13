@@ -417,7 +417,7 @@ void ASPCoordinator::readSystemsFromOntology()
         }
 
         this->asp->add(name, {}, aspStr);
-//              std::cout << aspStr << std::endl;
+        std::cout << aspStr << std::endl;
         this->asp->ground(name, {});
 
         system->addASPElement(element);
