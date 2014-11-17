@@ -102,6 +102,7 @@ void ASPCoordinator::optimizeInformationFlow()
     values.push_back(std::string(this->self->getSystemIriShort()));
     values.push_back("?");
     values.push_back("?");
+    values.push_back("?");
     auto nodeQuery = std::make_shared<Gringo::Value>("node", values);
 
     auto queryResult = this->asp->queryAllTrue(nodeQuery);
@@ -369,7 +370,8 @@ void ASPCoordinator::readSystemsFromOntology()
       }
       else
       {
-        _log->error("readSystemsFromOntology", "Unknown asp element type '%s', element will be skipped", types.at(i).c_str());
+        _log->error("readSystemsFromOntology", "Unknown asp element type '%s', element will be skipped",
+                    types.at(i).c_str());
         continue;
       }
 
@@ -404,10 +406,13 @@ void ASPCoordinator::readSystemsFromOntology()
           case ASPElementType::ASP_IRO_NODE:
             if (false == this->nodeStore->existNodeCreator(element->className))
             {
-              _log->warning("checkASPFromOntology", "Missing creator for node '%s' of type '%s', cpp grounding '%s', asp external set to false",
+              _log->warning("checkASPFromOntology",
+                            "Missing creator for node '%s' of type '%s', cpp grounding '%s', asp external set to false",
                             element->name.c_str(), ASPElementTypeNames[type].c_str(), element->className.c_str());
               element->external->assign(false);
-            } else {
+            }
+            else
+            {
               element->external->assign(true);
             }
             break;
@@ -423,63 +428,6 @@ void ASPCoordinator::readSystemsFromOntology()
         system->addASPElement(element);
         this->groundingDirty = true;
       }
-    }
-  }
-}
-
-void ASPCoordinator::checkASPFromOntology(ASPElementType type, std::shared_ptr<EngineState> system,
-                                          std::vector<std::string> &names, std::vector<std::string> &strings,
-                                          std::vector<std::string> &aspStrings, std::vector<std::string> &cppStrings)
-{
-
-  for (int i = 0; i < names.size(); ++i)
-  {
-    std::string name = names.at(i);
-    std::string elementStr = strings.at(i);
-    std::string aspStr = aspStrings.at(i);
-    std::string cppStr = cppStrings.at(i);
-
-    auto node = system->getASPElementByName(type, name);
-
-    if (!node)
-    {
-      _log->debug("readSystemsFromOntology", "ASP element '%s' not found, creating new element",
-                  std::string(name).c_str());
-      auto element = std::make_shared<ASPElement>();
-      element->aspString = aspStr;
-      element->name = name;
-      element->state = ASPElementState::ADDED_TO_ASP;
-      element->type = type;
-
-      if (cppStr != "")
-      {
-        int index = cppStr.find("\n");
-        element->className = cppStr.substr(0, index);
-        element->config = this->readConfiguration(cppStr.substr(index + 1, cppStr.length()));
-      }
-
-      auto value = this->splitASPExternalString(elementStr);
-//      std::cout << value << std::endl;
-      element->external = this->asp->getExternal(*value.name(), value.args());
-
-      element->external->assign(true);
-
-      if (type == ASPElementType::ASP_COMPUTATION_NODE || type == ASPElementType::ASP_SOURCE_NODE)
-      {
-        if (false == this->nodeStore->existNodeCreator(element->className))
-        {
-          _log->warning("checkASPFromOntology", "Node '%s' from ontology can not be instanced, missing creator",
-                        element->className.c_str());
-          element->external->assign(false);
-        }
-      }
-
-      this->asp->add(name, {}, aspStr);
-//      std::cout << aspStr << std::endl;
-      this->asp->ground(name, {});
-
-      system->addASPElement(element);
-      this->groundingDirty = true;
     }
   }
 }
@@ -588,6 +536,13 @@ std::map<std::string, std::string> ASPCoordinator::readConfiguration(std::string
   return configuration;
 }
 
+void ASPCoordinator::readMetadata(std::map<std::string, int>* metadata, const std::string provider,
+                                  const std::string sourceSystem, Gringo::Value information)
+{
+  this->readMetadata("delay", metadata, provider, sourceSystem, information);
+  this->readMetadata("accuracy", metadata, provider, sourceSystem, information);
+}
+
 void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *metadata, std::string const provider,
                                   std::string const sourceSystem, Gringo::Value information)
 {
@@ -608,8 +563,8 @@ void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *
   {
     std::stringstream o;
     o << information;
-    _log->warning("readMetadata", "Wrong size '%d' for metadata '%s' of stream '%s', '%s', '%s'", name.c_str(),
-                  delayResult->size(), o.str().c_str(), provider.c_str(), sourceSystem.c_str());
+    _log->warning("readMetadata", "Wrong size '%d' for metadata '%s' of stream '%s', '%s', '%s'", delayResult->size(),
+                  name.c_str(), o.str().c_str(), provider.c_str(), sourceSystem.c_str());
     return;
   }
 

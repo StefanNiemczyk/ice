@@ -61,7 +61,7 @@ TEST(ClingWrap, simpleTest)
   auto node1 = cw->getExternal("nodeTemplate", {"system1", "node1", "any"}, "node1", {}, true);
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "input(system1,node1,scope2,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
-  cw->add("node1", {}, "output(system1,node1,scope3,rep1).");
+  cw->add("node1", {}, "output(system1,node1,scope3,rep1,none).");
   cw->add("node1", {}, "metadataNode(delay,system1,node1,max,1,0).");
   cw->add("node1", {}, "nodeCost(system1,node1,10).");
   cw->add("node1", {}, "metadataNode(accuracy,system1,node1,max,0,0).");
@@ -72,7 +72,7 @@ TEST(ClingWrap, simpleTest)
   auto node2 = cw->getExternal("nodeTemplate", {"system1", "node2", "any"}, "node2", {}, true);
   cw->add("node2", {}, "input(system1,node2,scope1,rep1,none,1,1) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "input(system1,node2,scope2,rep1,none,2,2) :- nodeTemplate(system1,node2,any).");
-  cw->add("node2", {}, "output(system1,node2,scope3,rep1).");
+  cw->add("node2", {}, "output(system1,node2,scope3,rep1,none).");
   cw->add("node2", {}, "metadataNode(delay,system1,node2,max,1,0).");
   cw->add("node2", {}, "nodeCost(system1,node2,5).");
   cw->add("node1", {}, "metadataNode(accuracy,system1,node2,avg,0,1).");
@@ -83,8 +83,8 @@ TEST(ClingWrap, simpleTest)
   cw->solve();
 //  cw->printLastModel();
 
-  EXPECT_EQ(true, cw->query("node", {1, "system1", "node1", "entity1"}));
-  EXPECT_EQ(false, cw->query("node", {1, "system1", "node2", "entity1"}));
+  EXPECT_EQ(true, cw->query("node", {1, "system1", "node1", "entity1","none"}));
+  EXPECT_EQ(false, cw->query("node", {1, "system1", "node2", "entity1","none"}));
   EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node1", "in2", "system1", Gringo::Value("information", {
       "entity1", "scope2", "rep1", "none"})}));
   EXPECT_EQ(true, cw->query("sumCost", {1, 12}));
@@ -101,8 +101,8 @@ TEST(ClingWrap, simpleTest)
   cw->solve();
   //cw->printLastModel();
 
-  EXPECT_EQ(true, cw->query("node", {1, "system1", "node1", "entity1"}));
-  EXPECT_EQ(false, cw->query("node", {1, "system1", "node2", "entity1"}));
+  EXPECT_EQ(true, cw->query("node", {1, "system1", "node1", "entity1", "none"}));
+  EXPECT_EQ(false, cw->query("node", {1, "system1", "node2", "entity1", "none"}));
   EXPECT_EQ(false, cw->query("connectToNode", {1, "system1", "node1", "system1", Gringo::Value("information", {
       "entity1", "scope2", "rep1", "none"})}));
   EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node1", "in3", "system2", Gringo::Value("information", {
@@ -124,8 +124,8 @@ TEST(ClingWrap, simpleTest)
   cw->solve();
 //  cw->printLastModel();
 
-  EXPECT_EQ(false, cw->query("node", {1, "system1", "node1", "entity1"}));
-  EXPECT_EQ(true, cw->query("node", {1, "system1", "node2", "entity1"}));
+  EXPECT_EQ(false, cw->query("node", {1, "system1", "node1", "entity1", "none"}));
+  EXPECT_EQ(true, cw->query("node", {1, "system1", "node2", "entity1", "none"}));
   EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node2", "in1", "system1", Gringo::Value("information", {
       "entity1", "scope1", "rep1", "none"})}));
   EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node2", "in2", "system1", Gringo::Value("information", {
@@ -228,8 +228,8 @@ TEST(ClingWrap, informationTranslation)
   cw->add("coords2Wgs84", {},
           "input(system1,coords2Wgs84,position,coords,none,1,1) :- iro(system1,coords2Wgs84,any,none).");
   cw->add("coords2Wgs84", {}, "output(system1,coords2Wgs84,position,wgs84,none).");
-  cw->add("coords2Wgs84", {}, "metadataIro(delay,system1,coords2Wgs84,max,1,0).");
-  cw->add("coords2Wgs84", {}, "metadataIro(accuracy,system1,coords2Wgs84,avg,1,0).");
+  cw->add("coords2Wgs84", {}, "metadataNode(delay,system1,coords2Wgs84,max,1,0).");
+  cw->add("coords2Wgs84", {}, "metadataNode(accuracy,system1,coords2Wgs84,avg,1,0).");
   cw->add("coords2Wgs84", {}, "iroCost(system1,coords2Wgs84,1).");
   cw->ground("coords2Wgs84", {});
 
@@ -287,8 +287,8 @@ TEST(ClingWrap, informationExtraction)
   cw->add("coords2Wgs84", {},
           "input(system1,coords2Wgs84,position,coords,none,1,1) :- iro(system1,coords2Wgs84,any,none).");
   cw->add("coords2Wgs84", {}, "output(system1,coords2Wgs84,position,wgs84,none).");
-  cw->add("coords2Wgs84", {}, "metadataIro(delay,system1,coords2Wgs84,max,1,0).");
-  cw->add("coords2Wgs84", {}, "metadataIro(accuracy,system1,coords2Wgs84,avg,0,1).");
+  cw->add("coords2Wgs84", {}, "metadataNode(delay,system1,coords2Wgs84,max,1,0).");
+  cw->add("coords2Wgs84", {}, "metadataNode(accuracy,system1,coords2Wgs84,avg,0,1).");
   cw->add("coords2Wgs84", {}, "iroCost(system1,coords2Wgs84,1).");
   cw->ground("coords2Wgs84", {});
 
@@ -357,8 +357,8 @@ TEST(ClingWrap, ego2allo)
   cw->add("allo2ego", {},
           "input(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).");
   cw->add("allo2ego", {}, "output(system1,allo2ego,position,egoCoords,any).");
-  cw->add("allo2ego", {}, "metadataIro(delay,system1,allo2ego,max,0,0).");
-  cw->add("allo2ego", {}, "metadataIro(accuracy,system1,allo2ego,avg,0,1).");
+  cw->add("allo2ego", {}, "metadataNode(delay,system1,allo2ego,max,0,0).");
+  cw->add("allo2ego", {}, "metadataNode(accuracy,system1,allo2ego,avg,0,1).");
   cw->add("allo2ego", {}, "iroCost(system1,allo2ego,1).");
   cw->ground("allo2ego", {});
 
@@ -430,9 +430,6 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   cw->add("mapNode", {}, "nodeCost(system1,mapNode,1).");
   cw->add("mapNode", {}, "metadataMap(accuracy,system1,mapNode,avg,0,4).");
   cw->ground("mapNode", {});
-  // map(system,map,scope,rep,entity2,min,max).
-//  auto map = cw->getExternal("mapTemplate", {"system1", "typeMap", "scope1", "rep1", "none"}, "map",
-//                             {"system1", "typeMap", "scope1", "rep1", "none", 2, 3, "max", 1, 0, "avg", 0, 4}, true);
 
   // requires
   // requiredMap(system,entity_type,scope,representation,entity2).
@@ -463,4 +460,77 @@ TEST(ClingWrap, requiredStreamsByEntityType)
                                                                                                      "none"})}));
   EXPECT_EQ(true, cw->query("metadataMap", {1,"accuracy", "system1","mapNode","type","scope1","rep1","none",102}));
   EXPECT_EQ(true, cw->query("metadataMap", {1,"delay","system1","mapNode","type","scope1","rep1","none",4001}));
+}
+
+TEST(ClingWrap, simpleChainTest)
+{
+  std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
+  cw->addKnowledgeFile("../asp/nodeComposition.lp");
+  cw->init();
+
+  // ontology
+  cw->add("base", {}, "entityType(robot).");
+  cw->add("base", {}, "scope(scope1).");
+  cw->add("base", {}, "representation(rep1).");
+  cw->add("base", {}, "hasScope(robot,scope1).");
+  cw->add("base", {}, "hasRepresentation(scope1,rep1).");
+
+//  for (int i=0; i < 100; ++i)
+//  {
+//    std::stringstream ss;
+//
+//    ss << "value(" << i << ").";
+//    cw->add("base", {}, ss.str());
+//  }
+
+
+  cw->ground("base", {});
+
+  // entities
+  cw->ground("entity", {"entity1", "robot"});
+
+  // systems
+  auto system1 = cw->getExternal("system", {"system1", 100}, true);
+
+  // inputs
+  cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
+  auto input1 = cw->getExternal("sourceNode", {"system1", "in1", "entity1"}, true);
+
+  // requireds
+  auto required = cw->getExternal("requiredStream", {"system1", Gringo::Value("information", {"entity1", "scope1",
+                                                                                              "rep1", "none"})},
+                                  "requiredStream", {"system1", Gringo::Value("information", {"entity1", "scope1",
+                                                                                              "rep1", "none"}),
+                                                     10000, -100},
+                                  true);
+
+  // add node1
+  cw->add("node1", {}, "#external nodeTemplate(system1,node1,any).");
+  auto node1 = cw->getExternal("nodeTemplate", {"system1", "node1", "any"}, "node1", {}, true);
+  cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
+  cw->add("node1", {}, "output(system1,node1,scope1,rep1,none).");
+  cw->add("node1", {}, "metadataNode(delay,system1,node1,min,0,0).");
+  cw->add("node1", {}, "nodeCost(system1,node1,10).");
+  cw->add("node1", {}, "metadataNode(accuracy,system1,node1,min,1,0).");
+  cw->ground("node1", {});
+
+  // add node2
+  cw->add("node2", {}, "#external nodeTemplate(system1,node2,any).");
+  auto node2 = cw->getExternal("nodeTemplate", {"system1", "node2", "any"}, "node2", {}, true);
+  cw->add("node2", {}, "input(system1,node2,scope1,rep1,none,1,1) :- nodeTemplate(system1,node2,any).");
+  cw->add("node2", {}, "output(system1,node2,scope1,rep1,none).");
+  cw->add("node2", {}, "metadataNode(delay,system1,node2,min,0,0).");
+  cw->add("node2", {}, "nodeCost(system1,node2,5).");
+  cw->add("node1", {}, "metadataNode(accuracy,system1,node2,min,1,0).");
+  cw->ground("node2", {});
+
+  auto query1 = cw->getExternal("query", {1}, true);
+
+  cw->solve();
+  cw->printLastModel();
+
+  EXPECT_EQ(true, cw->query("node", {1, "system1", "in1", "entity1","none"}));
+  EXPECT_EQ(true, cw->query("node", {1, "system1", "node1", "entity1","none"}));
+  EXPECT_EQ(true, cw->query("node", {1, "system1", "node2", "entity1","none"}));
+  EXPECT_EQ(true, cw->query("sumCost", {1, 12}));
 }

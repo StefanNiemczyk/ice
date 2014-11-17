@@ -130,6 +130,9 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 	}
 
 	protected boolean isSubClassOf(final OWLClassExpression p_child, final OWLClass p_parent) {
+		if (p_child == null)
+			return false;
+
 		// owlapi 4.0 remove this
 		if (p_child.isAnonymous()) {
 			return false;

@@ -207,30 +207,16 @@ public class NodeIROVisitor extends IceVisitor {
 
 			if (this.currentType == Type.REQUIRED_STREAM) {
 				// #external requiredStream(system,information).
-				if (this.currentEntity == null || this.currentScope == null || this.currentRepresentation == null) {
-					this.log(String
-							.format("Missing information description elements '%s' (entity), '%s' (scope) '%s' (representation)",
-									this.currentEntity, this.currentScope, this.currentRepresentation));
-				} else {
-					this.elementString = this.replace("requiredStream($system,$information).\n");
-					this.sb.append("#external ");
-					this.sb.append(this.elementString);
-				}
+				this.elementString = this.replace("requiredStream($system,$information).\n");
+				this.sb.append("#external ");
+				this.sb.append(this.elementString);
 			} else if (this.currentType == Type.REQUIRED_MAP) {
 				// #external
 				// requiredMap(SYSTEM,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2)
-				String info = this.replace("requiredMap($system,$type,$scope,$representation,$relatedEntity).\n");
-
-				if (info.indexOf("$") >= 0) {
-					this.log(String
-							.format("Missing information description elements '%s' (entityType), '%s' (scope), '%s' (representation), '%s' (entity2)",
-									this.currentEntityType, this.currentScope, this.currentRepresentation,
-									this.currentRelatedEntity));
-				} else {
-					this.elementString = info;
-					this.sb.append("#external ");
-					this.sb.append(this.elementString);
-				}
+				this.elementString = this
+						.replace("requiredMap($system,$type,$scope,$representation,$relatedEntity).\n");
+				this.sb.append("#external ");
+				this.sb.append(this.elementString);
 			}
 
 			// check metadata
@@ -363,17 +349,7 @@ public class NodeIROVisitor extends IceVisitor {
 					this.currentType = Type.SOURCE_NODE;
 					this.lastElement = ce;
 
-					// #external nodeTemplate(system1,node1,any).
-					StringBuffer sb = new StringBuffer();
-					sb.append("sourceNode(");
-					sb.append(this.iRIShortName(this.currentSystem.getIRI()));
-					sb.append(",");
-					sb.append(this.iRIShortName(this.grounding.getIRI()));
-					sb.append(",");
-					sb.append(this.iRIShortName(this.currentEntity.getIRI()));
-					sb.append(").\n");
-
-					this.elementString = sb.toString();
+					this.elementString = this.replace("sourceNode($system,$element,$entity).\n");
 					this.sb.append("#external ");
 					this.sb.append(this.elementString);
 				} else if (this.isSubClassOf(ax.getSuperClass(), this.computationNode)) {
@@ -384,17 +360,7 @@ public class NodeIROVisitor extends IceVisitor {
 					this.currentType = Type.COMPUTATION_NODE;
 					this.lastElement = ce;
 
-					// #external nodeTemplate(system1,node1,any).
-					StringBuffer sb = new StringBuffer();
-					sb.append("nodeTemplate(");
-					sb.append(this.iRIShortName(this.currentSystem.getIRI()));
-					sb.append(",");
-					sb.append(this.iRIShortName(this.grounding.getIRI()));
-					sb.append(",");
-					sb.append((this.currentEntity != null) ? this.iRIShortName(this.currentEntity.getIRI()) : "any");
-					sb.append(").\n");
-
-					this.elementString = sb.toString();
+					this.elementString = this.replace("nodeTemplate($system,$element,$entity).\n");
 					this.sb.append("#external ");
 					this.sb.append(this.elementString);
 				} else if (this.isSubClassOf(ax.getSuperClass(), this.iro)) {
@@ -430,27 +396,6 @@ public class NodeIROVisitor extends IceVisitor {
 		if (doLater && this.currentType == Type.IRO_NODE) {
 			// #external iro(system1,coords2Wgs84,any,position).
 			String string = this.replace("iro($system,%element,$entity,$relatedEntity).\n");
-
-			// StringBuffer sb = new StringBuffer();
-			// sb.append("iro(");
-			// sb.append(this.iRIShortName(this.system.getIRI()));
-			// sb.append(",");
-			// sb.append(this.iRIShortName(this.grounding.getIRI()));
-			// sb.append(",");
-			// sb.append((this.currentEntity != null) ?
-			// this.iRIShortName(this.currentEntity.getIRI()) : "any");
-			// sb.append(",");
-			// sb.append(this.iRIShortName(this.iroScope.getIRI()));
-			//
-			// if (this.iroRelatedScope != null) {
-			// sb.append(",");
-			// sb.append((this.currentEntity != null) ?
-			// this.iRIShortName(this.currentEntity.getIRI()) : "any");
-			// sb.append(",");
-			// sb.append(this.iRIShortName(this.iroRelatedScope.getIRI()));
-			// }
-			//
-			// sb.append(").\n");
 
 			this.elementString = string;
 			this.sb.append("#external ");
@@ -694,28 +639,6 @@ public class NodeIROVisitor extends IceVisitor {
 				p_string = p_string.replace("$checkRelatedEntity", "any");
 		} else
 			p_string = p_string.replace("$checkRelatedEntity", "none");
-
-		// if (p_string.contains("$information")) {
-		// if (this.currentEntity == null || this.currentScope == null ||
-		// this.currentRepresentation == null) {
-		// this.log(String.format(
-		// "Missing information description elements '%s' (entity), '%s' (scope) '%s' (representation)",
-		// this.currentEntity, this.currentScope, this.currentRepresentation));
-		// } else {
-		// String info = "information("
-		// + this.iRIShortName(this.currentEntity.getIRI())
-		// + ","
-		// + this.iRIShortName(this.currentScope.getIRI())
-		// + ","
-		// + this.iRIShortName(this.currentRepresentation.getIRI())
-		// + ","
-		// + (this.currentRelatedEntity != null ?
-		// this.iRIShortName(this.currentRelatedEntity.getIRI())
-		// : "none") + ")";
-		//
-		// p_string = p_string.replace("$information", info);
-		// }
-		// }
 
 		return p_string;
 	}
