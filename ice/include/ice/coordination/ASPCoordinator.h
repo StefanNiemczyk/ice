@@ -50,12 +50,12 @@ private:
   std::shared_ptr<EngineState> getEngineStateByIRI(std::string p_iri);
   std::map<std::string, std::string> readConfiguration(std::string const config);
   void readMetadata(std::map<std::string, int>* metadata, const std::string provider, const std::string sourceSystem,
-                    Gringo::Value information);
+                    Gringo::Value information, Gringo::Value step);
   void readMetadata(std::string name, std::map<std::string, int> *metadata, std::string const provider, std::string const sourceSystem,
-                    Gringo::Value information);
+                    Gringo::Value information, Gringo::Value step);
   std::string dataTypeForRepresentation(std::string representation);
   std::shared_ptr<BaseInformationStream> getStream(Gringo::Value info, std::string lastProcessing,
-                                                   std::string sourceSystem);
+                                                   std::string sourceSystem, Gringo::Value step);
 
 private:
   std::shared_ptr<OntologyInterface> ontology; /*< Interface to access the ontology */

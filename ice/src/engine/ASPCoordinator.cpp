@@ -111,6 +111,7 @@ void ASPCoordinator::optimizeInformationFlow()
     {
       auto nodeName = *nodeValue.args()[2].name();
       auto nodeEntity = *nodeValue.args()[3].name();
+      auto nodeEntity2 = *nodeValue.args()[4].name();
 
       _log->debug("optimizeInformationFlow", "Look up node '%s' to process entity '%s'", nodeName.c_str(),
                   nodeEntity.c_str());
@@ -152,6 +153,9 @@ void ASPCoordinator::optimizeInformationFlow()
       values.push_back(this->queryIndex);
       values.push_back(std::string(this->self->getSystemIriShort()));
       values.push_back(Gringo::Value(aspNode->name));
+      values.push_back(Gringo::Value(nodeEntity));
+      values.push_back(Gringo::Value(nodeEntity2));
+      values.push_back("?");
       values.push_back("?");
       values.push_back("?");
       values.push_back("?");
@@ -171,10 +175,11 @@ void ASPCoordinator::optimizeInformationFlow()
         {
           _log->debug("optimizeInformationFlow", "Look up connected stream for node '%s'", nodeName.c_str());
 
-          auto lastProcessing = *connect.args()[3].name();
-          auto sourceSystem = *connect.args()[4].name();
-          auto info = connect.args()[5];
-          auto stream = this->getStream(info, lastProcessing, sourceSystem);
+          auto lastProcessing = *connect.args()[5].name();
+          auto sourceSystem = *connect.args()[6].name();
+          auto info = connect.args()[7];
+          auto step = connect.args()[8];
+          auto stream = this->getStream(info, lastProcessing, sourceSystem, step);
 
           if (false == stream)
           {
@@ -190,12 +195,13 @@ void ASPCoordinator::optimizeInformationFlow()
         }
       }
 
-      // stream(1,testSystem,testSourceNodeInd,testSystem,information(testEntity1,testScope1,testRepresentation1,none))
+      // stream(1,testSystem,testSourceNodeInd,testSystem,information(testEntity1,testScope1,testRepresentation1,none),step)
       values.clear();
       values.push_back(this->queryIndex);
       values.push_back(std::string(this->self->getSystemIriShort()));
       values.push_back(Gringo::Value(aspNode->name));
       values.push_back(std::string(this->self->getSystemIriShort()));
+      values.push_back("?");
       values.push_back("?");
       auto streamQuery = std::make_shared<Gringo::Value>("stream", values);
       auto streamResult = this->asp->queryAllTrue(streamQuery);
@@ -207,7 +213,8 @@ void ASPCoordinator::optimizeInformationFlow()
         auto lastProcessing = *output.args()[2].name();
         auto sourceSystem = *output.args()[3].name();
         auto info = output.args()[4];
-        auto stream = this->getStream(info, lastProcessing, sourceSystem);
+        auto step = output.args()[5];
+        auto stream = this->getStream(info, lastProcessing, sourceSystem, step);
 
         if (false == stream)
         {
@@ -537,14 +544,14 @@ std::map<std::string, std::string> ASPCoordinator::readConfiguration(std::string
 }
 
 void ASPCoordinator::readMetadata(std::map<std::string, int>* metadata, const std::string provider,
-                                  const std::string sourceSystem, Gringo::Value information)
+                                  const std::string sourceSystem, Gringo::Value information, Gringo::Value step)
 {
-  this->readMetadata("delay", metadata, provider, sourceSystem, information);
-  this->readMetadata("accuracy", metadata, provider, sourceSystem, information);
+  this->readMetadata("delay", metadata, provider, sourceSystem, information, step);
+  this->readMetadata("accuracy", metadata, provider, sourceSystem, information, step);
 }
 
 void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *metadata, std::string const provider,
-                                  std::string const sourceSystem, Gringo::Value information)
+                                  std::string const sourceSystem, Gringo::Value information, Gringo::Value step)
 {
   // metadataStream(1,metadata,testSystem,testComputationalNodeInd,testSystem,information(testEntity1,testScope1,testRepresentation2,none),2)
   std::vector<Gringo::Value> values;
@@ -554,6 +561,7 @@ void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *
   values.push_back(Gringo::Value(provider));
   values.push_back(Gringo::Value(sourceSystem));
   values.push_back(information);
+  values.push_back(step);
   values.push_back("?");
 
   auto delayQuery = std::make_shared<Gringo::Value>("metadataStream", values);
@@ -570,18 +578,26 @@ void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *
 
   auto delayValue = delayResult->at(0);
 
-  if (delayValue.args()[6].type() != Gringo::Value::Type::NUM)
+  Gringo::Value value = delayValue.args()[7];
+
+  if (value.type() != Gringo::Value::Type::NUM)
   {
     std::stringstream o, o2;
     o << information;
-    o2 << delayValue.args()[6];
+    o2 << value;
     _log->warning("readMetadata", "Wrong type '%d' of '%s' for metadata '%s' of stream '%s', '%s', '%s'",
-                  delayValue.args()[6].type(), o2.str().c_str(), name.c_str(), o.str().c_str(), provider.c_str(),
+                  value.type(), o2.str().c_str(), name.c_str(), o.str().c_str(), provider.c_str(),
                   sourceSystem.c_str());
     return;
   }
 
-  (*metadata)[name] = delayValue.args()[6].num();
+  std::stringstream o;
+     o << information;
+  _log->warning("readMetadata", "Metadata '%s' of stream '%s', '%s', '%s' has value '%d'",
+                    name.c_str(), o.str().c_str(), provider.c_str(),
+                    sourceSystem.c_str(), value.num());
+
+  (*metadata)[name] = value.num();
 }
 
 std::string ASPCoordinator::dataTypeForRepresentation(std::string representation)
@@ -591,7 +607,7 @@ std::string ASPCoordinator::dataTypeForRepresentation(std::string representation
 }
 
 std::shared_ptr<BaseInformationStream> ASPCoordinator::getStream(Gringo::Value info, std::string lastProcessing,
-                                                                 std::string sourceSystem)
+                                                                 std::string sourceSystem, Gringo::Value step)
 {
   auto entity = *info.args()[0].name();
   auto relatedEntity = *info.args()[3].name();
@@ -608,7 +624,7 @@ std::shared_ptr<BaseInformationStream> ASPCoordinator::getStream(Gringo::Value i
   if (false == stream)
   {
     std::map<std::string, int> metadata;
-    this->readMetadata(&metadata, lastProcessing, sourceSystem, info);
+    this->readMetadata(&metadata, lastProcessing, sourceSystem, info, step);
 
     //        std::shared_ptr<InformationSpecification> specification,
     //        const std::string name,
