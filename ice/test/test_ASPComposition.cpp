@@ -433,12 +433,12 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   auto transfer1_3 = cw->getExternal("transfer", {"system3", "system1", 4000, 3}, true);
   auto transfer1_4 = cw->getExternal("transfer", {"system4", "system1", 4000, 4}, true);
   auto transfer1_5 = cw->getExternal("transfer", {"system5", "system1", 4000, 5}, true);
-  auto transfer2_3 = cw->getExternal("transfer", {"system3", "system2", 4000, 5}, true);
-  auto transfer2_4 = cw->getExternal("transfer", {"system2", "system4", 4000, 5}, true);
-  auto transfer2_5 = cw->getExternal("transfer", {"system2", "system5", 4000, 5}, true);
-  auto transfer3_4 = cw->getExternal("transfer", {"system3", "system4", 4000, 5}, true);
-  auto transfer3_5 = cw->getExternal("transfer", {"system3", "system5", 4000, 5}, true);
-  auto transfer5_5 = cw->getExternal("transfer", {"system4", "system5", 4000, 5}, true);
+//  auto transfer2_3 = cw->getExternal("transfer", {"system3", "system2", 4000, 5}, true);
+//  auto transfer2_4 = cw->getExternal("transfer", {"system2", "system4", 4000, 5}, true);
+//  auto transfer2_5 = cw->getExternal("transfer", {"system2", "system5", 4000, 5}, true);
+//  auto transfer3_4 = cw->getExternal("transfer", {"system3", "system4", 4000, 5}, true);
+//  auto transfer3_5 = cw->getExternal("transfer", {"system3", "system5", 4000, 5}, true);
+//  auto transfer5_5 = cw->getExternal("transfer", {"system4", "system5", 4000, 5}, true);
 
   auto query1 = cw->getExternal("query", {1}, true);
 
