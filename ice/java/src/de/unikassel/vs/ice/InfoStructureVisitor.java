@@ -20,7 +20,6 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataAllValuesFrom;
 import org.semanticweb.owlapi.model.OWLDataComplementOf;
 import org.semanticweb.owlapi.model.OWLDataExactCardinality;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataHasValue;
 import org.semanticweb.owlapi.model.OWLDataIntersectionOf;
 import org.semanticweb.owlapi.model.OWLDataMaxCardinality;
@@ -105,8 +104,8 @@ public class InfoStructureVisitor extends IceVisitor {
 	private OWLClass lastRepresentation;
 
 	public InfoStructureVisitor(final IceOntologyInterface p_ioi, final Set<OWLOntology> p_ontologies,
-			final OWLReasoner p_reasoner, final OWLDataFactory p_dataFactory) {
-		super(p_ioi, p_ontologies, p_reasoner, p_dataFactory);
+			final OWLReasoner p_reasoner, final IceIris p_iceIris) {
+		super(p_ioi, p_ontologies, p_reasoner, p_iceIris);
 
 		this.anonymiousThings = new HashSet<String>();
 	}
@@ -128,7 +127,7 @@ public class InfoStructureVisitor extends IceVisitor {
 		for (OWLOntology ont : this.ontologies) {
 
 			for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(ce)) {
-				if (this.isSubClassOf(ax.getSuperClass(), entityType)) {
+				if (this.isSubClassOf(ax.getSuperClass(), this.ii.entityType)) {
 					sb.append("entityType(");
 					sb.append(this.iRIShortName(ce.getIRI()));
 					this.lastEntity = ce;
@@ -140,19 +139,19 @@ public class InfoStructureVisitor extends IceVisitor {
 					for (OWLNamedIndividual ind : entities) {
 						ind.accept(this);
 					}
-				} else if (this.isSubClassOf(ax.getSuperClass(), entityScope)) {
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.entityScope)) {
 					sb.append("scope(");
 					sb.append(this.iRIShortName(ce.getIRI()));
 					this.lastEntityScope = ce;
 					this.lastScope = ce;
 					sb.append(").\n");
-				} else if (this.isSubClassOf(ax.getSuperClass(), valueScope)) {
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.valueScope)) {
 					sb.append("valueScope(");
 					sb.append(this.iRIShortName(ce.getIRI()));
 					this.lastValueScope = ce;
 					this.lastScope = ce;
 					sb.append(").\n");
-				} else if (this.isSubClassOf(ax.getSuperClass(), representation)) {
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.representation)) {
 					sb.append("representation(");
 					sb.append(this.iRIShortName(ce.getIRI()));
 					this.lastRepresentation = ce;
@@ -178,7 +177,7 @@ public class InfoStructureVisitor extends IceVisitor {
 
 	@Override
 	public void visit(OWLObjectSomeValuesFrom ce) {
-		if (ce.getProperty().equals(hasScope)) {
+		if (ce.getProperty().equals(this.ii.hasScope)) {
 			Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
 			for (OWLClass c : subs) {
@@ -190,7 +189,7 @@ public class InfoStructureVisitor extends IceVisitor {
 
 				c.accept(this);
 			}
-		} else if (ce.getProperty().equals(hasRepresentation)) {
+		} else if (ce.getProperty().equals(this.ii.hasRepresentation)) {
 			Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
 			for (OWLClass c : subs) {
@@ -202,7 +201,7 @@ public class InfoStructureVisitor extends IceVisitor {
 
 				c.accept(this);
 			}
-		} else if (ce.getProperty().equals(hasDimension)) {
+		} else if (ce.getProperty().equals(this.ii.hasDimension)) {
 			Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
 			for (OWLClass c : subs) {
@@ -214,9 +213,9 @@ public class InfoStructureVisitor extends IceVisitor {
 
 				c.accept(this);
 			}
-		} else if (ce.getProperty().equals(hasRelatedDimension)) {
+		} else if (ce.getProperty().equals(this.ii.hasRelatedDimension)) {
 			if (ce.getFiller().isAnonymous()) {
-				this.createAnonymiousRelatedDimension(ce.getFiller(), hasRepresentation,
+				this.createAnonymiousRelatedDimension(ce.getFiller(), this.ii.hasRepresentation,
 						"hasRelatedDimension(%s,%s,%s,%d,%d).\n", 1, 1);
 			} else {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
@@ -248,7 +247,7 @@ public class InfoStructureVisitor extends IceVisitor {
 	@Override
 	public void visit(OWLObjectExactCardinality ce) {
 
-		if (ce.getProperty().equals(hasDimension)) {
+		if (ce.getProperty().equals(this.ii.hasDimension)) {
 			Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
 			for (OWLClass c : subs) {
@@ -264,9 +263,10 @@ public class InfoStructureVisitor extends IceVisitor {
 
 				c.accept(this);
 			}
-		} else if (ce.getProperty().equals(hasRepresentation)) {
+		} else if (ce.getProperty().equals(this.ii.hasRepresentation)) {
 			if (ce.getFiller().isAnonymous()) {
-				this.createAnonymiousUnit(ce.getFiller(), hasUnit, "hasRepresentation(%s,%s).\n", "hasUnit(%s,%s).\n");
+				this.createAnonymiousUnit(ce.getFiller(), this.ii.hasUnit, "hasRepresentation(%s,%s).\n",
+						"hasUnit(%s,%s).\n");
 			} else {
 				// cardinalities are ignored
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());

@@ -34,12 +34,18 @@ public:
   bool isConsistent();
   std::unique_ptr<std::vector<std::string>> getSystems();
   bool addSystem(std::string const p_system);
+
+  bool addEntityType(std::string const p_entityType, std::vector<std::string> p_entityScopes);
+  bool addEntityScope(std::string const p_entityScope, std::vector<std::string> p_representations);
+  bool addValueScope(std::string const p_superValueScope, std::string const p_valueScope);
+  bool addRepresentation(std::string const p_superRepresentation, std::string const p_representation, std::vector<std::string> p_dimensions);
+
   bool addOntologyIRI(std::string const p_iri);
   bool removeOntologyIRI(std::string const p_iri);
   std::string readInformationStructureAsASP();
   std::unique_ptr<std::vector<std::vector<std::string>>> readNodesAndIROsAsASP(std::string const p_system);
   bool addNodeIndividual(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::vector<std::string> p_metadatas,
-               std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings);
+                         std::vector<int> p_metadataValues, std::vector<int> p_metadataValues2, std::vector<std::string> p_metadataGroundings);
   bool addIROIndividual(std::string const p_iro, std::string const p_iroClass, std::string const p_system, std::vector<std::string> p_metadatas,
                std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings);
   int getSomeMinCardinality();
@@ -68,6 +74,11 @@ private:
   jmethodID isConsistentMethod; /**< Method id */
   jmethodID getSystemsMethod; /**< Method id */
   jmethodID addSystemMethod; /**< Method id */
+  jmethodID addEntityTypeMethod; /**< Method id */
+  jmethodID addEntityScopeMethod; /**< Method id */
+  jmethodID addValueScopeMethod; /**< Method id */
+  jmethodID addRepresentationMethod; /**< Method id */
+
   jmethodID addOntologyIRIMethod; /**< Method id */
   jmethodID removeOntologyIRIMethod; /**< Method id */
   jmethodID readInformationStructureAsASPMethod; /**< Method id */

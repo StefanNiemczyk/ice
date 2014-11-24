@@ -1,4 +1,5 @@
 "java/src/de/unikassel/vs/ice/IceOntologyInterface.java"
+"java/src/de/unikassel/vs/ice/IceIris.java"
 "java/src/de/unikassel/vs/ice/IceVisitor.java"
 "java/src/de/unikassel/vs/ice/InfoStructureVisitor.java"
 "java/src/de/unikassel/vs/ice/NodeIROVisitor.java"

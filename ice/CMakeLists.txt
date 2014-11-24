@@ -119,6 +119,7 @@ catkin_package(
 add_jar(
   java_ontology_interface 
   SOURCES java/src/de/unikassel/vs/ice/IceOntologyInterface.java
+  java/src/de/unikassel/vs/ice/IceIris.java
   java/src/de/unikassel/vs/ice/IceVisitor.java
   java/src/de/unikassel/vs/ice/InfoStructureVisitor.java
   java/src/de/unikassel/vs/ice/NodeIROVisitor.java
@@ -245,8 +246,8 @@ target_link_libraries(ice_node
 catkin_add_gtest(${PROJECT_NAME}-test 
  # test/etc/TestTime.cpp
  # test/etc/EngineStuff.cpp
-  test/test_ASPComposition.cpp
- # test/test_JNI.cpp
+ # test/test_ASPComposition.cpp
+  test/test_JNI.cpp
  # test/test_ASPCoordinator.cpp
  # test/test_Logger.cpp
  # test/test_RingBuffer.cpp

@@ -76,6 +76,12 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->isConsistentMethod = this->env->GetMethodID(this->javaOntologyInterface, "isConsistent", "()Z");
   this->getSystemsMethod = this->env->GetMethodID(this->javaOntologyInterface, "getSystems", "()[Ljava/lang/String;");
   this->addSystemMethod = this->env->GetMethodID(this->javaOntologyInterface, "addSystem", "(Ljava/lang/String;)Z");
+
+  this->addEntityTypeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addEntityType", "(Ljava/lang/String;[Ljava/lang/String;)Z");
+  this->addEntityScopeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addEntityScope", "(Ljava/lang/String;[Ljava/lang/String;)Z");
+  this->addValueScopeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addValueScope", "(Ljava/lang/String;Ljava/lang/String;)Z");
+  this->addRepresentationMethod = this->env->GetMethodID(this->javaOntologyInterface, "addRepresentation", "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Z");
+
   this->addOntologyIRIMethod = this->env->GetMethodID(this->javaOntologyInterface, "addOntologyIRI",
                                                       "(Ljava/lang/String;)Z");
   this->removeOntologyIRIMethod = this->env->GetMethodID(this->javaOntologyInterface, "removeOntologyIRI",
@@ -87,7 +93,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
                                                              "(Ljava/lang/String;)[[Ljava/lang/String;");
   this->addNodeIndividualMethod = this->env->GetMethodID(
       this->javaOntologyInterface, "addNodeIndividual",
-      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;[I[Ljava/lang/String;)Z");
+      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;[I[I[Ljava/lang/String;)Z");
   this->addIROIndividualMethod = this->env->GetMethodID(
       this->javaOntologyInterface, "addIROIndividual",
       "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;[I[Ljava/lang/String;)Z");
@@ -208,6 +214,97 @@ bool OntologyInterface::addSystem(std::string const p_system)
   return result;
 }
 
+bool OntologyInterface::addEntityType(std::string const p_entityType, std::vector<std::string> p_entityScopes)
+{
+  this->checkError("addEntityType", "Error exists, method addEntityType will not be executed");
+
+  int size = p_entityScopes.size();
+  jstring entityType = env->NewStringUTF(p_entityType.c_str());
+  jobjectArray entityScopes = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
+                                                             env->NewStringUTF(""));
+
+  for (int i = 0; i < size; ++i)
+  {
+    env->SetObjectArrayElement(entityScopes, i, env->NewStringUTF(p_entityScopes[i].c_str()));
+  }
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addEntityTypeMethod, entityType, entityScopes);
+
+  if (this->checkError("addEntityType", "Error occurred adding a entity type " + p_entityType))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
+bool OntologyInterface::addEntityScope(std::string const p_entityScope, std::vector<std::string> p_representations)
+{
+  this->checkError("addEntityScope", "Error exists, method addEntityScope will not be executed");
+
+  int size = p_representations.size();
+  jstring entityScope = env->NewStringUTF(p_entityScope.c_str());
+  jobjectArray representations = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
+                                                             env->NewStringUTF(""));
+
+  for (int i = 0; i < size; ++i)
+  {
+    env->SetObjectArrayElement(representations, i, env->NewStringUTF(p_representations[i].c_str()));
+  }
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addEntityScopeMethod, entityScope, representations);
+
+  if (this->checkError("addEntityScope", "Error occurred adding a entity scope " + p_entityScope))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
+bool OntologyInterface::addValueScope(std::string const p_superValueScope, std::string const p_valueScope)
+{
+  this->checkError("addValueScope", "Error exists, method addValueScope will not be executed");
+
+  jstring superValueScope = env->NewStringUTF(p_superValueScope.c_str());
+  jstring valueScope = env->NewStringUTF(p_valueScope.c_str());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addValueScopeMethod, superValueScope, valueScope);
+
+  if (this->checkError("addValueScope", "Error occurred adding a value scope " + p_valueScope))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
+bool OntologyInterface::addRepresentation(std::string const p_superRepresentation, std::string const p_representation,
+                                          std::vector<std::string> p_dimensions)
+{
+  this->checkError("addRepresentation", "Error exists, method addRepresentation will not be executed");
+
+  int size = p_dimensions.size();
+  jstring superRepresentation = env->NewStringUTF(p_superRepresentation.c_str());
+  jstring representation = env->NewStringUTF(p_representation.c_str());
+  jobjectArray dimensions = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
+                                                             env->NewStringUTF(""));
+
+  for (int i = 0; i < size; ++i)
+  {
+    env->SetObjectArrayElement(dimensions, i, env->NewStringUTF(p_dimensions[i].c_str()));
+  }
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addRepresentationMethod, superRepresentation, representation, dimensions);
+
+  if (this->checkError("addRepresentation", "Error occurred adding a representation " + p_representation))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
 bool OntologyInterface::addOntologyIRI(std::string const p_iri)
 {
   this->checkError("addOntologyIRI", "Error exists, method addOntologyIRI will not be executed");
@@ -287,7 +384,7 @@ std::unique_ptr<std::vector<std::vector<std::string>>>OntologyInterface::readNod
 
 bool OntologyInterface::addNodeIndividual(std::string const p_node, std::string const p_nodeClass,
                                           std::string const p_system, std::vector<std::string> p_metadatas,
-                                          std::vector<int> p_metadataValues,
+                                          std::vector<int> p_metadataValues, std::vector<int> p_metadataValues2,
                                           std::vector<std::string> p_metadataGroundings)
 {
   this->checkError("addNodeIndividual", "Error exists, addNodeIndividual will not be executed");
@@ -300,6 +397,7 @@ bool OntologyInterface::addNodeIndividual(std::string const p_node, std::string 
   jobjectArray metadatas = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
                                                              env->NewStringUTF(""));
   jintArray metadataValues = env->NewIntArray(size);
+  jintArray metadataValues2 = env->NewIntArray(size);
   jobjectArray metadataGroundings = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
                                                                       env->NewStringUTF(""));
 
@@ -309,9 +407,10 @@ bool OntologyInterface::addNodeIndividual(std::string const p_node, std::string 
     env->SetObjectArrayElement(metadataGroundings, i, env->NewStringUTF(p_metadataGroundings[i].c_str()));
   }
   env->SetIntArrayRegion(metadataValues, 0, size, p_metadataValues.data());
+  env->SetIntArrayRegion(metadataValues2, 0, size, p_metadataValues2.data());
 
   bool result = env->CallBooleanMethod(this->javaInterface, this->addNodeIndividualMethod, node, nodeClass, system,
-                                       metadatas, metadataValues, metadataGroundings);
+                                       metadatas, metadataValues, metadataValues2, metadataGroundings);
 
   if (this->checkError("addNodeIndividual", "Error occurred at adding a node " + p_node))
     return false;

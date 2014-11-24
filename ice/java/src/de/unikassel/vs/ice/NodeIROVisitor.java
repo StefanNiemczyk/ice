@@ -20,7 +20,6 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataAllValuesFrom;
 import org.semanticweb.owlapi.model.OWLDataComplementOf;
 import org.semanticweb.owlapi.model.OWLDataExactCardinality;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataHasValue;
 import org.semanticweb.owlapi.model.OWLDataIntersectionOf;
 import org.semanticweb.owlapi.model.OWLDataMaxCardinality;
@@ -120,12 +119,12 @@ public class NodeIROVisitor extends IceVisitor {
 	private OWLNamedIndividual grounding;
 
 	public NodeIROVisitor(final IceOntologyInterface p_ioi, final Set<OWLOntology> p_ontologies,
-			final OWLReasoner p_reasoner, final OWLDataFactory p_dataFactory) {
-		super(p_ioi, p_ontologies, p_reasoner, p_dataFactory);
+			final OWLReasoner p_reasoner, final IceIris p_iceIris) {
+		super(p_ioi, p_ontologies, p_reasoner, p_iceIris);
 	}
 
 	public void start() {
-		Set<OWLNamedIndividual> systems = this.reasoner.getInstances(this.system, true).getFlattened();
+		Set<OWLNamedIndividual> systems = this.reasoner.getInstances(this.ii.system, true).getFlattened();
 
 		for (OWLNamedIndividual system : systems) {
 			this.readInformation(system);
@@ -133,7 +132,7 @@ public class NodeIROVisitor extends IceVisitor {
 	}
 
 	public List<List<String>> readInformation(OWLNamedIndividual system) {
-		log("Creating IROs for system " + system);
+		log("Creating node elements for system " + system);
 
 		List<List<String>> result = new ArrayList<List<String>>();
 		result.add(new ArrayList<String>());
@@ -144,7 +143,8 @@ public class NodeIROVisitor extends IceVisitor {
 
 		this.currentSystem = system;
 
-		Set<OWLNamedIndividual> groundings = this.reasoner.getObjectPropertyValues(system, isSystemOf).getFlattened();
+		Set<OWLNamedIndividual> groundings = this.reasoner.getObjectPropertyValues(system, this.ii.isSystemOf)
+				.getFlattened();
 
 		for (OWLNamedIndividual grounding : groundings) {
 			log(String.format("Checking grounding %s in system %s", grounding, system));
@@ -160,7 +160,7 @@ public class NodeIROVisitor extends IceVisitor {
 			this.sb = new StringBuffer();
 
 			// check about entity
-			Set<OWLNamedIndividual> entities = this.reasoner.getObjectPropertyValues(grounding, this.aboutEntity)
+			Set<OWLNamedIndividual> entities = this.reasoner.getObjectPropertyValues(grounding, this.ii.aboutEntity)
 					.getFlattened();
 
 			if (entities.size() == 1) {
@@ -170,7 +170,7 @@ public class NodeIROVisitor extends IceVisitor {
 			}
 
 			// check about related entity
-			entities = this.reasoner.getObjectPropertyValues(grounding, this.aboutRelatedEntity).getFlattened();
+			entities = this.reasoner.getObjectPropertyValues(grounding, this.ii.aboutRelatedEntity).getFlattened();
 
 			if (entities.size() == 1) {
 				this.currentRelatedEntity = entities.iterator().next();
@@ -188,13 +188,13 @@ public class NodeIROVisitor extends IceVisitor {
 			// types.addAll(EntitySearcher.getTypes(grounding, ont));
 
 			for (OWLClassExpression type : types) {
-				if (this.isSubClassOf(type, this.requiredStream)) {
+				if (this.isSubClassOf(type, this.ii.requiredStream)) {
 					if (found)
 						continue;
 
 					this.found = true;
 					this.currentType = Type.REQUIRED_STREAM;
-				} else if (this.isSubClassOf(type, this.requiredMap)) {
+				} else if (this.isSubClassOf(type, this.ii.requiredMap)) {
 					if (found)
 						continue;
 
@@ -220,7 +220,7 @@ public class NodeIROVisitor extends IceVisitor {
 			}
 
 			// check metadata
-			Set<OWLNamedIndividual> metadatas = this.reasoner.getObjectPropertyValues(grounding, this.hasMetadata)
+			Set<OWLNamedIndividual> metadatas = this.reasoner.getObjectPropertyValues(grounding, this.ii.hasMetadata)
 					.getFlattened();
 
 			for (OWLNamedIndividual metadata : metadatas) {
@@ -259,7 +259,7 @@ public class NodeIROVisitor extends IceVisitor {
 	@Override
 	public void visit(OWLNamedIndividual individual) {
 
-		Set<OWLNamedIndividual> groundings = this.reasoner.getObjectPropertyValues(individual, this.hasGrounding)
+		Set<OWLNamedIndividual> groundings = this.reasoner.getObjectPropertyValues(individual, this.ii.hasGrounding)
 				.getFlattened();
 
 		if (groundings.size() != 1) {
@@ -277,7 +277,7 @@ public class NodeIROVisitor extends IceVisitor {
 			int count = 0;
 
 			for (OWLClassExpression type : types) {
-				if (this.isSubClassOf(type, this.groundingOWLClass))
+				if (this.isSubClassOf(type, this.ii.groundingOWLClass))
 					++count;
 			}
 
@@ -286,7 +286,7 @@ public class NodeIROVisitor extends IceVisitor {
 				return;
 			}
 
-			Set<OWLLiteral> literals = this.reasoner.getDataPropertyValues(individual, this.hasMetadataValue);
+			Set<OWLLiteral> literals = this.reasoner.getDataPropertyValues(individual, this.ii.hasMetadataValue);
 			String value;
 
 			if (literals.size() != 1) {
@@ -297,7 +297,7 @@ public class NodeIROVisitor extends IceVisitor {
 				value = literals.iterator().next().getLiteral();
 			}
 
-			Set<OWLLiteral> literals2 = this.reasoner.getDataPropertyValues(individual, this.hasMetadataValue2);
+			Set<OWLLiteral> literals2 = this.reasoner.getDataPropertyValues(individual, this.ii.hasMetadataValue2);
 			String value2;
 
 			if (literals2.size() != 1) {
@@ -308,7 +308,7 @@ public class NodeIROVisitor extends IceVisitor {
 				value2 = literals2.iterator().next().getLiteral();
 			}
 
-			literals = this.reasoner.getDataPropertyValues(ind, this.hasGroundingValue);
+			literals = this.reasoner.getDataPropertyValues(ind, this.ii.hasGroundingValue);
 
 			for (OWLLiteral lit : literals) {
 				String pattern = this.replace(lit.getLiteral());
@@ -321,7 +321,7 @@ public class NodeIROVisitor extends IceVisitor {
 				sb.append(pattern + "\n");
 			}
 
-			literals = this.reasoner.getDataPropertyValues(ind, this.hasConfiguration);
+			literals = this.reasoner.getDataPropertyValues(ind, this.ii.hasConfiguration);
 
 			for (OWLLiteral lit : literals) {
 				sb.append(lit.getLiteral() + "\n");
@@ -336,7 +336,7 @@ public class NodeIROVisitor extends IceVisitor {
 		boolean doLater = false;
 		for (OWLOntology ont : this.ontologies) {
 			for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(ce)) {
-				if (this.isSubClassOf(ax.getSuperClass(), this.sourceNode)) {
+				if (this.isSubClassOf(ax.getSuperClass(), this.ii.sourceNode)) {
 					if (found)
 						continue;
 
@@ -352,7 +352,7 @@ public class NodeIROVisitor extends IceVisitor {
 					this.elementString = this.replace("sourceNode($system,$element,$entity).\n");
 					this.sb.append("#external ");
 					this.sb.append(this.elementString);
-				} else if (this.isSubClassOf(ax.getSuperClass(), this.computationNode)) {
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.computationNode)) {
 					if (found)
 						continue;
 
@@ -363,7 +363,7 @@ public class NodeIROVisitor extends IceVisitor {
 					this.elementString = this.replace("nodeTemplate($system,$element,$entity).\n");
 					this.sb.append("#external ");
 					this.sb.append(this.elementString);
-				} else if (this.isSubClassOf(ax.getSuperClass(), this.iro)) {
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.iro)) {
 					if (found)
 						continue;
 
@@ -371,7 +371,7 @@ public class NodeIROVisitor extends IceVisitor {
 					this.currentType = Type.IRO_NODE;
 					this.lastElement = ce;
 					doLater = true;
-				} else if (this.isSubClassOf(ax.getSuperClass(), this.mapNode)) {
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.mapNode)) {
 					if (found)
 						continue;
 
@@ -379,7 +379,7 @@ public class NodeIROVisitor extends IceVisitor {
 					this.currentType = Type.MAP_NODE;
 					this.lastElement = ce;
 					doLater = true;
-				} else if (this.isSubClassOf(ax.getSuperClass(), this.entityScope)) {
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.entityScope)) {
 					this.currentScope = ce;
 				} else {
 					// log(ax);
@@ -420,31 +420,31 @@ public class NodeIROVisitor extends IceVisitor {
 
 	public void visit(OWLObjectSomeValuesFrom ce) {
 
-		if (ce.getProperty().equals(isStreamOf)) {
+		if (ce.getProperty().equals(this.ii.isStreamOf)) {
 			if (ce.getFiller().isAnonymous()) {
 				ce.getFiller().accept(this);
 			} else {
 				this.currentScope = ce.getFiller().asOWLClass();
 			}
-		} else if (ce.getProperty().equals(isMapOf)) {
+		} else if (ce.getProperty().equals(this.ii.isMapOf)) {
 			if (ce.getFiller().isAnonymous()) {
 				ce.getFiller().accept(this);
 			} else {
 				this.currentScope = ce.getFiller().asOWLClass();
 			}
-		} else if (ce.getProperty().equals(hasRepresentation)) {
+		} else if (ce.getProperty().equals(this.ii.hasRepresentation)) {
 			if (ce.getFiller().isAnonymous()) {
 				log("Anonymous Representation? " + ce.getFiller());
 			} else {
 				this.currentRepresentation = ce.getFiller().asOWLClass();
 			}
-		} else if (ce.getProperty().equals(aboutEntity)) {
+		} else if (ce.getProperty().equals(this.ii.aboutEntity)) {
 			this.currentEntityType = ce.getFiller().asOWLClass();
-		} else if (ce.getProperty().equals(hasStreamMetadata)) {
+		} else if (ce.getProperty().equals(this.ii.hasStreamMetadata)) {
 			// currently ignored
-		} else if (ce.getProperty().equals(improveInformationMetadata)) {
+		} else if (ce.getProperty().equals(this.ii.improveInformationMetadata)) {
 			// currently ignored
-		} else if (ce.getProperty().equals(impairInformationMetadata)) {
+		} else if (ce.getProperty().equals(this.ii.impairInformationMetadata)) {
 			// currently ignored
 		} else {
 			if (false == this.processNodeStreamRelation(ce.getProperty(), ce.getFiller(),
@@ -513,7 +513,7 @@ public class NodeIROVisitor extends IceVisitor {
 
 		String pattern = null;
 
-		if (p_property.equals(hasInput)) {
+		if (p_property.equals(this.ii.hasInput)) {
 			switch (this.currentType) {
 			case COMPUTATION_NODE:
 			case SOURCE_NODE:
@@ -526,7 +526,7 @@ public class NodeIROVisitor extends IceVisitor {
 			default:
 				// TODO
 			}
-		} else if (p_property.equals(hasOutput)) {
+		} else if (p_property.equals(this.ii.hasOutput)) {
 			switch (this.currentType) {
 			case COMPUTATION_NODE:
 			case SOURCE_NODE:
@@ -537,7 +537,7 @@ public class NodeIROVisitor extends IceVisitor {
 			default:
 				// TODO
 			}
-		} else if (p_property.equals(hasOutputMap)) {
+		} else if (p_property.equals(this.ii.hasOutputMap)) {
 			switch (this.currentType) {
 			case COMPUTATION_NODE:
 			case SOURCE_NODE:
@@ -550,7 +550,7 @@ public class NodeIROVisitor extends IceVisitor {
 			default:
 				// TODO
 			}
-		} else if (p_property.equals(hasRelatedInput)) {
+		} else if (p_property.equals(this.ii.hasRelatedInput)) {
 			switch (this.currentType) {
 			case COMPUTATION_NODE:
 			case SOURCE_NODE:
@@ -579,7 +579,7 @@ public class NodeIROVisitor extends IceVisitor {
 		} else {
 			OWLClass c = p_ce.asOWLClass();
 
-			if (this.isSubClassOf(c, this.namedStream) || this.isSubClassOf(c, this.namedMap)) {
+			if (this.isSubClassOf(c, this.ii.namedStream) || this.isSubClassOf(c, this.ii.namedMap)) {
 				for (OWLOntology ont : this.ontologies) {
 					for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(c)) {
 						ax.getSuperClass().accept(this);
@@ -604,7 +604,7 @@ public class NodeIROVisitor extends IceVisitor {
 			p_string = p_string.replace("$entity", "any");
 
 		// checkEntity
-		if (this.isSubClassOf(this.currentRepresentation, this.relatedRepresentation)) {
+		if (this.isSubClassOf(this.currentRepresentation, this.ii.relatedRepresentation)) {
 			if (this.currentEntity != null)
 				p_string = p_string.replace("$checkEntity", this.iRIShortName(this.currentEntity.getIRI()));
 			else
@@ -631,7 +631,7 @@ public class NodeIROVisitor extends IceVisitor {
 			p_string = p_string.replace("$relatedEntity", "none");
 
 		// checkRelatedEntity
-		if (this.isSubClassOf(this.currentRepresentation, this.relatedRepresentation)) {
+		if (this.isSubClassOf(this.currentRepresentation, this.ii.relatedRepresentation)) {
 			if (this.currentRelatedEntity != null)
 				p_string = p_string.replace("$checkRelatedEntity",
 						this.iRIShortName(this.currentRelatedEntity.getIRI()));
