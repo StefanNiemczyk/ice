@@ -76,11 +76,17 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->isConsistentMethod = this->env->GetMethodID(this->javaOntologyInterface, "isConsistent", "()Z");
   this->getSystemsMethod = this->env->GetMethodID(this->javaOntologyInterface, "getSystems", "()[Ljava/lang/String;");
   this->addSystemMethod = this->env->GetMethodID(this->javaOntologyInterface, "addSystem", "(Ljava/lang/String;)Z");
+  this->addNodesToSystemMethod = this->env->GetMethodID(this->javaOntologyInterface, "addNodesToSystem", "(Ljava/lang/String;[Ljava/lang/String;)Z");
+  this->addIndividualMethod = this->env->GetMethodID(this->javaOntologyInterface, "addIndividual", "(Ljava/lang/String;Ljava/lang/String;)Z");
 
   this->addEntityTypeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addEntityType", "(Ljava/lang/String;[Ljava/lang/String;)Z");
   this->addEntityScopeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addEntityScope", "(Ljava/lang/String;[Ljava/lang/String;)Z");
   this->addValueScopeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addValueScope", "(Ljava/lang/String;Ljava/lang/String;)Z");
   this->addRepresentationMethod = this->env->GetMethodID(this->javaOntologyInterface, "addRepresentation", "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Z");
+  this->addNamedStreamMethod = this->env->GetMethodID(this->javaOntologyInterface, "addNamedStream", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+  this->addSourceNodeClassMethod = this->env->GetMethodID(this->javaOntologyInterface, "addSourceNodeClass", "(Ljava/lang/String;[Ljava/lang/String;[I[I)Z");
+  this->addComputationNodeClassMethod = this->env->GetMethodID(this->javaOntologyInterface, "addComputationNodeClass", "(Ljava/lang/String;[Ljava/lang/String;[I[I[Ljava/lang/String;[I[I)Z");
+  this->addIroNodeClassMethod = this->env->GetMethodID(this->javaOntologyInterface, "addIroNodeClass", "(Ljava/lang/String;[Ljava/lang/String;[I[I[Ljava/lang/String;[I[I[Ljava/lang/String;[I[I)Z");
 
   this->addOntologyIRIMethod = this->env->GetMethodID(this->javaOntologyInterface, "addOntologyIRI",
                                                       "(Ljava/lang/String;)Z");
@@ -93,7 +99,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
                                                              "(Ljava/lang/String;)[[Ljava/lang/String;");
   this->addNodeIndividualMethod = this->env->GetMethodID(
       this->javaOntologyInterface, "addNodeIndividual",
-      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;[I[I[Ljava/lang/String;)Z");
+      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;[I[I[Ljava/lang/String;)Z");
   this->addIROIndividualMethod = this->env->GetMethodID(
       this->javaOntologyInterface, "addIROIndividual",
       "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;[I[Ljava/lang/String;)Z");
@@ -214,6 +220,47 @@ bool OntologyInterface::addSystem(std::string const p_system)
   return result;
 }
 
+bool OntologyInterface::addNodesToSystem(std::string const p_system, std::vector<std::string> p_toAdd)
+{
+  this->checkError("addNodesToSystem", "Error exists, method addNodesToSystem will not be executed");
+
+  int size = p_toAdd.size();
+  jstring system = env->NewStringUTF(p_system.c_str());
+  jobjectArray toAdd = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
+                                                             env->NewStringUTF(""));
+
+  for (int i = 0; i < size; ++i)
+  {
+    env->SetObjectArrayElement(toAdd, i, env->NewStringUTF(p_toAdd[i].c_str()));
+  }
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addNodesToSystemMethod, system, toAdd);
+
+  if (this->checkError("addNodesToSystem", "Error occurred adding nodes to a system " + p_system))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
+bool OntologyInterface::addIndividual(std::string const p_individual, std::string const p_class)
+{
+  this->checkError("addIndividual", "Error exists, method addIndividual will not be executed");
+
+  jstring individual = env->NewStringUTF(p_individual.c_str());
+  jstring cls = env->NewStringUTF(p_class.c_str());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addIndividualMethod, individual, cls);
+
+  if (this->checkError("addIndividual", "Error occurred adding a individual " + p_individual))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
 bool OntologyInterface::addEntityType(std::string const p_entityType, std::vector<std::string> p_entityScopes)
 {
   this->checkError("addEntityType", "Error exists, method addEntityType will not be executed");
@@ -305,6 +352,159 @@ bool OntologyInterface::addRepresentation(std::string const p_superRepresentatio
   return result;
 }
 
+bool OntologyInterface::addNamedStream(std::string const p_stream, std::string const p_entityScope, std::string const p_representation)
+{
+  this->checkError("addNamedStream", "Error exists, method addNamedStream will not be executed");
+
+  jstring stream = env->NewStringUTF(p_stream.c_str());
+  jstring entityScope = env->NewStringUTF(p_entityScope.c_str());
+  jstring representation = env->NewStringUTF(p_representation.c_str());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addNamedStreamMethod, stream, entityScope, representation);
+
+  if (this->checkError("addNamedStream", "Error occurred adding a stream " + p_stream))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
+bool OntologyInterface::addSourceNodeClass(std::string const p_node, std::vector<std::string> p_outputs,
+                       std::vector<int> p_outputsMinSize, std::vector<int> p_outputsMaxSize)
+{
+  this->checkError("addSourceNodeClass", "Error exists, addSourceNodeClass will not be executed");
+
+  int sizeOutput = p_outputs.size();
+
+  jstring node = env->NewStringUTF(p_node.c_str());
+  jobjectArray outputs = (jobjectArray)env->NewObjectArray(sizeOutput, env->FindClass("java/lang/String"),
+                                                           env->NewStringUTF(""));
+  jintArray outputsMinSize = env->NewIntArray(sizeOutput);
+  jintArray outputsMaxSize = env->NewIntArray(sizeOutput);
+
+  for (int i = 0; i < sizeOutput; ++i)
+  {
+    env->SetObjectArrayElement(outputs, i, env->NewStringUTF(p_outputs[i].c_str()));
+  }
+  env->SetIntArrayRegion(outputsMinSize, 0, sizeOutput, p_outputsMinSize.data());
+  env->SetIntArrayRegion(outputsMaxSize, 0, sizeOutput, p_outputsMaxSize.data());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addSourceNodeClassMethod, node, outputs, outputsMinSize, outputsMaxSize);
+
+  if (this->checkError("addSourceNodeClass", "Error occurred at adding a node class " + p_node))
+    return false;
+
+  this->systemDirty = true;
+
+   return result;
+}
+
+bool OntologyInterface::addComputationNodeClass(std::string const p_node, std::vector<std::string> p_inputs, std::vector<int> p_inputsMinSize,
+                       std::vector<int> p_inputsMaxSize, std::vector<std::string> p_outputs,
+                       std::vector<int> p_outputsMinSize, std::vector<int> p_outputsMaxSize)
+{
+  this->checkError("addComputationNodeClass", "Error exists, addComputationNodeClass will not be executed");
+
+  int sizeInput = p_inputs.size();
+  int sizeOutput = p_outputs.size();
+
+  jstring node = env->NewStringUTF(p_node.c_str());
+  jobjectArray inputs = (jobjectArray)env->NewObjectArray(sizeInput, env->FindClass("java/lang/String"),
+                                                          env->NewStringUTF(""));
+  jobjectArray outputs = (jobjectArray)env->NewObjectArray(sizeOutput, env->FindClass("java/lang/String"),
+                                                           env->NewStringUTF(""));
+  jintArray inputsMinSize = env->NewIntArray(sizeInput);
+  jintArray inputsMaxSize = env->NewIntArray(sizeInput);
+
+  jintArray outputsMinSize = env->NewIntArray(sizeOutput);
+  jintArray outputsMaxSize = env->NewIntArray(sizeOutput);
+
+  for (int i = 0; i < sizeInput; ++i)
+  {
+    env->SetObjectArrayElement(inputs, i, env->NewStringUTF(p_inputs[i].c_str()));
+  }
+  env->SetIntArrayRegion(inputsMinSize, 0, sizeInput, p_inputsMinSize.data());
+  env->SetIntArrayRegion(inputsMaxSize, 0, sizeInput, p_inputsMaxSize.data());
+
+  for (int i = 0; i < sizeOutput; ++i)
+  {
+    env->SetObjectArrayElement(outputs, i, env->NewStringUTF(p_outputs[i].c_str()));
+  }
+  env->SetIntArrayRegion(outputsMinSize, 0, sizeOutput, p_outputsMinSize.data());
+  env->SetIntArrayRegion(outputsMaxSize, 0, sizeOutput, p_outputsMaxSize.data());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addComputationNodeClassMethod, node, inputs, inputsMinSize,
+                                       inputsMaxSize, outputs, outputsMinSize, outputsMaxSize);
+
+  if (this->checkError("addComputationNodeClass", "Error occurred at adding a node class " + p_node))
+    return false;
+
+  this->systemDirty = true;
+
+   return result;
+}
+
+bool OntologyInterface::addIroNodeClass(std::string const p_node, std::vector<std::string> p_inputs, std::vector<int> p_inputsMinSize,
+                                        std::vector<int> p_inputsMaxSize, std::vector<std::string> p_inputsRelated, std::vector<int> p_inputsRelatedMinSize,
+                                        std::vector<int> p_inputsRelatedMaxSize, std::vector<std::string> p_outputs,
+                                        std::vector<int> p_outputsMinSize, std::vector<int> p_outputsMaxSize)
+{
+  this->checkError("addIroNodeClass", "Error exists, addIroNodeClass will not be executed");
+
+  int sizeInput = p_inputs.size();
+  int sizeInputRelated = p_inputsRelated.size();
+  int sizeOutput = p_outputs.size();
+
+  jstring node = env->NewStringUTF(p_node.c_str());
+  jobjectArray inputs = (jobjectArray)env->NewObjectArray(sizeInput, env->FindClass("java/lang/String"),
+                                                          env->NewStringUTF(""));
+  jobjectArray inputsRelated = (jobjectArray)env->NewObjectArray(sizeInputRelated, env->FindClass("java/lang/String"),
+                                                                 env->NewStringUTF(""));
+  jobjectArray outputs = (jobjectArray)env->NewObjectArray(sizeOutput, env->FindClass("java/lang/String"),
+                                                           env->NewStringUTF(""));
+  jintArray inputsMinSize = env->NewIntArray(sizeInput);
+  jintArray inputsMaxSize = env->NewIntArray(sizeInput);
+
+  jintArray inputsRelatedMinSize = env->NewIntArray(sizeInputRelated);
+  jintArray inputsRelatedMaxSize = env->NewIntArray(sizeInputRelated);
+
+  jintArray outputsMinSize = env->NewIntArray(sizeOutput);
+  jintArray outputsMaxSize = env->NewIntArray(sizeOutput);
+
+  for (int i = 0; i < sizeInput; ++i)
+  {
+    env->SetObjectArrayElement(inputs, i, env->NewStringUTF(p_inputs[i].c_str()));
+  }
+  env->SetIntArrayRegion(inputsMinSize, 0, sizeInput, p_inputsMinSize.data());
+  env->SetIntArrayRegion(inputsMaxSize, 0, sizeInput, p_inputsMaxSize.data());
+
+  for (int i = 0; i < sizeInputRelated; ++i)
+  {
+    env->SetObjectArrayElement(inputsRelated, i, env->NewStringUTF(p_inputsRelated[i].c_str()));
+  }
+  env->SetIntArrayRegion(inputsRelatedMinSize, 0, sizeInputRelated, p_inputsRelatedMinSize.data());
+  env->SetIntArrayRegion(inputsRelatedMaxSize, 0, sizeInputRelated, p_inputsRelatedMaxSize.data());
+
+  for (int i = 0; i < sizeOutput; ++i)
+  {
+    env->SetObjectArrayElement(outputs, i, env->NewStringUTF(p_outputs[i].c_str()));
+  }
+  env->SetIntArrayRegion(outputsMinSize, 0, sizeOutput, p_outputsMinSize.data());
+  env->SetIntArrayRegion(outputsMaxSize, 0, sizeOutput, p_outputsMaxSize.data());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addIroNodeClassMethod, node, inputs, inputsMinSize,
+                                       inputsMaxSize, inputsRelated, inputsRelatedMinSize, inputsRelatedMaxSize,
+                                       outputs, outputsMinSize, outputsMaxSize);
+
+  if (this->checkError("addIroNodeClass", "Error occurred at adding a node class " + p_node))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
 bool OntologyInterface::addOntologyIRI(std::string const p_iri)
 {
   this->checkError("addOntologyIRI", "Error exists, method addOntologyIRI will not be executed");
@@ -383,7 +583,8 @@ std::unique_ptr<std::vector<std::vector<std::string>>>OntologyInterface::readNod
 }
 
 bool OntologyInterface::addNodeIndividual(std::string const p_node, std::string const p_nodeClass,
-                                          std::string const p_system, std::vector<std::string> p_metadatas,
+                                          std::string const p_system, std::string const p_aboutEntity,
+                                          std::string const p_aboutRelatedEntity, std::vector<std::string> p_metadatas,
                                           std::vector<int> p_metadataValues, std::vector<int> p_metadataValues2,
                                           std::vector<std::string> p_metadataGroundings)
 {
@@ -394,6 +595,8 @@ bool OntologyInterface::addNodeIndividual(std::string const p_node, std::string 
   jstring node = env->NewStringUTF(p_node.c_str());
   jstring nodeClass = env->NewStringUTF(p_nodeClass.c_str());
   jstring system = env->NewStringUTF(p_system.c_str());
+  jstring aboutEntity = env->NewStringUTF(p_aboutEntity.c_str());
+  jstring aboutRelatedEntity = env->NewStringUTF(p_aboutRelatedEntity.c_str());
   jobjectArray metadatas = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
                                                              env->NewStringUTF(""));
   jintArray metadataValues = env->NewIntArray(size);
@@ -410,7 +613,8 @@ bool OntologyInterface::addNodeIndividual(std::string const p_node, std::string 
   env->SetIntArrayRegion(metadataValues2, 0, size, p_metadataValues2.data());
 
   bool result = env->CallBooleanMethod(this->javaInterface, this->addNodeIndividualMethod, node, nodeClass, system,
-                                       metadatas, metadataValues, metadataValues2, metadataGroundings);
+                                       aboutEntity, aboutRelatedEntity, metadatas, metadataValues, metadataValues2,
+                                       metadataGroundings);
 
   if (this->checkError("addNodeIndividual", "Error occurred at adding a node " + p_node))
     return false;

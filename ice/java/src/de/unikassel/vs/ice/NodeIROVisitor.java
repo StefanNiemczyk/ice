@@ -363,7 +363,7 @@ public class NodeIROVisitor extends IceVisitor {
 					this.elementString = this.replace("nodeTemplate($system,$element,$entity).\n");
 					this.sb.append("#external ");
 					this.sb.append(this.elementString);
-				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.iro)) {
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.iroNode)) {
 					if (found)
 						continue;
 
@@ -395,7 +395,7 @@ public class NodeIROVisitor extends IceVisitor {
 
 		if (doLater && this.currentType == Type.IRO_NODE) {
 			// #external iro(system1,coords2Wgs84,any,position).
-			String string = this.replace("iro($system,%element,$entity,$relatedEntity).\n");
+			String string = this.replace("iro($system,$element,$entity,$relatedEntity).\n");
 
 			this.elementString = string;
 			this.sb.append("#external ");

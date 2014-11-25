@@ -13,7 +13,7 @@ public class IceIris {
 	public final OWLClass node;
 	public final OWLClass computationNode;
 	public final OWLClass sourceNode;
-	public final OWLClass iro;
+	public final OWLClass iroNode;
 	public final OWLClass mapNode;
 	public final OWLClass requiredStream;
 	public final OWLClass requiredMap;
@@ -71,7 +71,7 @@ public class IceIris {
 		this.node = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Node"));
 		this.computationNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "ComputationNode"));
 		this.sourceNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "SourceNode"));
-		this.iro = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "IRONode"));
+		this.iroNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "IRONode"));
 		this.mapNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "MapNode"));
 		this.requiredStream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "RequiredStream"));
 		this.requiredMap = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "RequiredMap"));

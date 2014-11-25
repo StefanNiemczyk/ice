@@ -157,6 +157,39 @@ public class IceOntologyInterface {
 		return true;
 	}
 
+	public boolean addNodesToSystem(final String p_system, final String[] p_toAdd) {
+		// check existing systems
+		OWLIndividual systemInd = this.findOWLIndividual(this.ii.system, p_system, false);
+		if (systemInd == null) {
+			log(String.format("No system '%s' found, isSystemOf will not be established", p_system));
+			return false;
+		}
+
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+
+		for (String toAdd : p_toAdd) {
+			OWLIndividual nodeInd = this.findOWLIndividual(this.ii.node, toAdd, false);
+
+			if (nodeInd == null) {
+				log(String.format("No node '%s' found, isSystemOf for system '%s' will not be established.", toAdd,
+						p_system));
+				return false;
+			}
+
+			OWLObjectPropertyAssertionAxiom assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(
+					this.ii.isSystemOf, systemInd, nodeInd);
+			AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			changes.add(addAxiomChange);
+		}
+
+		// apply changes
+		this.manager.applyChanges(changes);
+
+		this.dirty = true;
+
+		return true;
+	}
+
 	public boolean addEntityType(final String p_entityType, final String[] p_entityScopes) {
 		IRI entityIRI = IRI.create(this.mainIRIPrefix + p_entityType);
 		if (this.mainOntology.containsClassInSignature(entityIRI))
@@ -315,8 +348,259 @@ public class IceOntologyInterface {
 		return true;
 	}
 
+	public boolean addNamedStream(final String p_stream, final String p_entityScope, final String p_representation) {
+		IRI streamIRI = IRI.create(this.mainIRIPrefix + p_stream);
+		if (this.mainOntology.containsClassInSignature(streamIRI))
+			return false;
+
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+
+		// featch scope and representation
+		OWLClass entityScope = this.findOWLClass(this.ii.entityScope, p_entityScope);
+		OWLClass representation = this.findOWLClass(this.ii.representation, p_representation);
+
+		if (entityScope == null) {
+			log(String.format("Unknown entity scope class '%s' for stream '%s', stream not created.", p_entityScope,
+					p_stream));
+			return false;
+		}
+		if (representation == null) {
+			log(String.format("Unknown representation class '%s' for stream '%s', stream not created.",
+					p_representation, p_stream));
+			return false;
+		}
+
+		// create value scope
+		OWLClass stream = this.dataFactory.getOWLClass(streamIRI);
+		OWLSubClassOfAxiom axiom = dataFactory.getOWLSubClassOfAxiom(stream, this.ii.namedStream);
+		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, axiom);
+		changes.add(addAxiomChange);
+
+		OWLClassExpression hasRepresentation = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.hasRepresentation,
+				representation);
+		OWLClassExpression scope = this.dataFactory.getOWLObjectIntersectionOf(entityScope, hasRepresentation);
+		OWLClassExpression isStreamOf = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.isStreamOf, scope);
+		OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(stream, isStreamOf);
+		addAxiomChange = new AddAxiom(this.mainOntology, ax);
+		changes.add(addAxiomChange);
+
+		// apply changes
+		for (OWLOntologyChange change : changes) {
+			this.manager.applyChange(change);
+		}
+
+		this.dirty = true;
+
+		return true;
+	}
+
+	public boolean addSourceNodeClass(final String p_node, final String p_outputs[], final int p_outputsMinSize[],
+			final int p_outputsMaxSize[]) {
+		return this.addNodeClass(p_node, this.ii.sourceNode, null, null, null, null, null, null, p_outputs,
+				p_outputsMinSize, p_outputsMaxSize);
+	}
+
+	public boolean addComputationNodeClass(final String p_node, final String p_inputs[], final int p_inputsMinSize[],
+			final int p_inputsMaxSize[], final String p_outputs[], final int p_outputsMinSize[],
+			final int p_outputsMaxSize[]) {
+		return this.addNodeClass(p_node, this.ii.computationNode, p_inputs, p_inputsMinSize, p_inputsMaxSize, null,
+				null, null, p_outputs, p_outputsMinSize, p_outputsMaxSize);
+	}
+
+	public boolean addIroNodeClass(final String p_node, final String p_inputs[], final int p_inputsMinSize[],
+			final int p_inputsMaxSize[], final String p_inputsRelated[], final int p_inputsRelatedMinSize[],
+			final int p_inputsRelatedMaxSize[], final String p_outputs[], final int p_outputsMinSize[],
+			final int p_outputsMaxSize[]) {
+		return this.addNodeClass(p_node, this.ii.iroNode, p_inputs, p_inputsMinSize, p_inputsMaxSize, p_inputsRelated,
+				p_inputsRelatedMinSize, p_inputsRelatedMaxSize, p_outputs, p_outputsMinSize, p_outputsMaxSize);
+	}
+
+	public boolean addNodeClass(final String p_node, final OWLClass p_nodeClass, final String p_inputs[],
+			final int p_inputsMinSize[], final int p_inputsMaxSize[], final String p_inputsRelated[],
+			final int p_inputsRelatedMinSize[], final int p_inputsRelatedMaxSize[], final String p_outputs[],
+			final int p_outputsMinSize[], final int p_outputsMaxSize[]) {
+		IRI nodeIRI = IRI.create(this.mainIRIPrefix + p_node);
+		if (this.mainOntology.containsClassInSignature(nodeIRI))
+			return false;
+
+		if (p_inputs != null
+				&& (p_inputs.length != p_inputsMinSize.length || p_inputs.length != p_inputsMaxSize.length)) {
+			log(String.format("Wrong size of inputs '%d' and sizes of min '%s' and max '%s', node not created.",
+					p_node, p_inputs.length, p_inputsMinSize.length, p_inputsMaxSize.length));
+			return false;
+		}
+
+		if (p_inputsRelated != null
+				&& (p_inputsRelated.length != p_inputsRelatedMinSize.length || p_inputs.length != p_inputsRelatedMaxSize.length)) {
+			log(String.format(
+					"Wrong size of related inputs '%d' and sizes of min '%s' and max '%s', node not created.", p_node,
+					p_inputsRelated.length, p_inputsRelatedMinSize.length, p_inputsRelatedMaxSize.length));
+			return false;
+		}
+
+		if (p_outputs != null
+				&& (p_outputs.length != p_outputsMinSize.length || p_outputs.length != p_outputsMaxSize.length)) {
+			log(String.format("Wrong size of outputs '%d' and sizes of min '%s' and max '%s', node not created.",
+					p_node, p_outputs.length, p_outputsMinSize.length, p_outputsMaxSize.length));
+			return false;
+		}
+
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+
+		// create value scope
+		OWLClass node = this.dataFactory.getOWLClass(nodeIRI);
+		OWLSubClassOfAxiom axiom = dataFactory.getOWLSubClassOfAxiom(node, p_nodeClass);
+		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, axiom);
+		changes.add(addAxiomChange);
+
+		// create inputs
+		if (p_inputs != null) {
+			for (int i = 0; i < p_inputs.length; ++i) {
+				OWLClass input = this.findOWLClass(this.ii.namedStream, p_inputs[i]);
+
+				if (input == null) {
+					log(String.format("Unknown named input stream class '%s' for node '%s', node not created.",
+							p_inputs[i], p_node));
+					return false;
+				}
+
+				OWLClassExpression hasInput = null;
+
+				if (p_inputsMinSize[i] == p_inputsMaxSize[i]) {
+					hasInput = this.dataFactory.getOWLObjectExactCardinality(p_inputsMinSize[i], this.ii.hasInput,
+							input);
+					OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(node, hasInput);
+					addAxiomChange = new AddAxiom(this.mainOntology, ax);
+					changes.add(addAxiomChange);
+				} else {
+					hasInput = this.dataFactory.getOWLObjectMinCardinality(p_inputsMinSize[i], this.ii.hasInput, input);
+					OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(node, hasInput);
+					addAxiomChange = new AddAxiom(this.mainOntology, ax);
+					changes.add(addAxiomChange);
+
+					hasInput = this.dataFactory.getOWLObjectMaxCardinality(p_inputsMaxSize[i], this.ii.hasInput, input);
+					ax = this.dataFactory.getOWLSubClassOfAxiom(node, hasInput);
+					addAxiomChange = new AddAxiom(this.mainOntology, ax);
+					changes.add(addAxiomChange);
+				}
+			}
+		}
+
+		// create related inputs
+		if (p_inputsRelated != null) {
+			for (int i = 0; i < p_inputsRelated.length; ++i) {
+				OWLClass inputRelated = this.findOWLClass(this.ii.namedStream, p_inputsRelated[i]);
+
+				if (inputRelated == null) {
+					log(String.format("Unknown named related input stream class '%s' for node '%s', node not created.",
+							p_inputsRelated[i], p_node));
+					return false;
+				}
+
+				OWLClassExpression hasInputRelated = null;
+
+				if (p_inputsRelatedMinSize[i] == p_inputsRelatedMaxSize[i]) {
+					hasInputRelated = this.dataFactory.getOWLObjectExactCardinality(p_inputsRelatedMinSize[i],
+							this.ii.hasRelatedInput, inputRelated);
+					OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(node, hasInputRelated);
+					addAxiomChange = new AddAxiom(this.mainOntology, ax);
+					changes.add(addAxiomChange);
+				} else {
+					hasInputRelated = this.dataFactory.getOWLObjectMinCardinality(p_inputsRelatedMinSize[i],
+							this.ii.hasRelatedInput, inputRelated);
+					OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(node, hasInputRelated);
+					addAxiomChange = new AddAxiom(this.mainOntology, ax);
+					changes.add(addAxiomChange);
+
+					hasInputRelated = this.dataFactory.getOWLObjectMaxCardinality(p_inputsRelatedMaxSize[i],
+							this.ii.hasRelatedInput, inputRelated);
+					ax = this.dataFactory.getOWLSubClassOfAxiom(node, hasInputRelated);
+					addAxiomChange = new AddAxiom(this.mainOntology, ax);
+					changes.add(addAxiomChange);
+				}
+			}
+		}
+
+		// create outputs
+		if (p_outputs != null) {
+			for (int i = 0; i < p_outputs.length; ++i) {
+				OWLClass output = this.findOWLClass(this.ii.namedStream, p_outputs[i]);
+
+				if (output == null) {
+					log(String.format("Unknown named output stream class '%s' for node '%s', node not created.",
+							p_outputs[i], p_node));
+					return false;
+				}
+
+				OWLClassExpression hasOutput = null;
+
+				if (p_outputsMinSize[i] == p_outputsMaxSize[i]) {
+					hasOutput = this.dataFactory.getOWLObjectExactCardinality(p_outputsMinSize[i], this.ii.hasOutput,
+							output);
+					OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(node, hasOutput);
+					addAxiomChange = new AddAxiom(this.mainOntology, ax);
+					changes.add(addAxiomChange);
+				} else {
+					hasOutput = this.dataFactory.getOWLObjectMinCardinality(p_outputsMinSize[i], this.ii.hasOutput,
+							output);
+					OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(node, hasOutput);
+					addAxiomChange = new AddAxiom(this.mainOntology, ax);
+					changes.add(addAxiomChange);
+
+					hasOutput = this.dataFactory.getOWLObjectMaxCardinality(p_outputsMaxSize[i], this.ii.hasOutput,
+							output);
+					ax = this.dataFactory.getOWLSubClassOfAxiom(node, hasOutput);
+					addAxiomChange = new AddAxiom(this.mainOntology, ax);
+					changes.add(addAxiomChange);
+				}
+			}
+		}
+
+		// apply changes
+		this.manager.applyChanges(changes);
+
+		this.dirty = true;
+
+		return true;
+	}
+
+	public boolean addIndividual(final String p_individual, final String p_class) {
+		IRI iri = IRI.create(this.mainIRIPrefix + p_individual);
+		if (this.mainOntology.containsIndividualInSignature(iri))
+			return false;
+
+		IRI clsIri = IRI.create(this.mainIRIPrefix + p_class);
+		if (false == this.mainOntology.containsClassInSignature(clsIri))
+			return false;
+
+		OWLClass cls = this.dataFactory.getOWLClass(clsIri);
+
+		OWLIndividual ind = this.dataFactory.getOWLNamedIndividual(iri);
+		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(cls, ind);
+		this.manager.addAxiom(this.mainOntology, ax);
+
+		this.dirty = true;
+
+		return true;
+	}
+
+	public boolean addIndividual(final String p_individual, final OWLClass p_class) {
+		IRI iri = IRI.create(this.mainIRIPrefix + p_individual);
+		if (this.mainOntology.containsIndividualInSignature(iri))
+			return false;
+
+		OWLIndividual ind = this.dataFactory.getOWLNamedIndividual(iri);
+		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(p_class, ind);
+		this.manager.addAxiom(this.mainOntology, ax);
+
+		this.dirty = true;
+
+		return true;
+	}
+
 	public boolean addNodeIndividual(final String p_node, final String p_nodeClass, final String p_system,
-			String[] p_metadatas, int[] p_metadataValues, int[] p_metadataValues2, String[] p_metadataGroundings) {
+			final String p_aboutEntity, final String p_aboutRelatedEntity, String[] p_metadatas,
+			int[] p_metadataValues, int[] p_metadataValues2, String[] p_metadataGroundings) {
 		// check if node exists
 		IRI nodeIRI = IRI.create(this.mainIRIPrefix + p_node);
 		if (this.mainOntology.containsIndividualInSignature(nodeIRI))
@@ -335,7 +619,7 @@ public class IceOntologyInterface {
 		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 		OWLIndividual nodeInd = this.dataFactory.getOWLNamedIndividual(nodeIRI);
 
-		OWLClass nodeCls = this.findOWLClass(this.ii.computationNode, p_nodeClass);
+		OWLClass nodeCls = this.findOWLClass(this.ii.node, p_nodeClass);
 
 		if (nodeCls == null) {
 			log(String.format("Unknown node class '%s' for node '%s' in system '%s', node not created.", p_nodeClass,
@@ -351,6 +635,37 @@ public class IceOntologyInterface {
 				this.ii.isSystemOf, system, nodeInd);
 		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
 		changes.add(addAxiomChange);
+
+		// check about entity
+		if (p_aboutEntity != null && false == p_aboutEntity.isEmpty()) {
+			OWLIndividual aboutEntity = this.findOWLIndividual(this.ii.entityType, p_aboutEntity, false);
+
+			if (aboutEntity == null) {
+				log(String.format("Unknown about entity '%s' for node '%s' in system '%s', node not created.",
+						p_aboutEntity, p_node, p_system));
+				return false;
+			}
+
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.aboutEntity, nodeInd, aboutEntity);
+			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			changes.add(addAxiomChange);
+		}
+
+		// check about related entity
+		if (p_aboutRelatedEntity != null && false == p_aboutRelatedEntity.isEmpty()) {
+			OWLIndividual aboutRelatedEntity = this.findOWLIndividual(this.ii.entityType, p_aboutRelatedEntity, false);
+
+			if (aboutRelatedEntity == null) {
+				log(String.format("Unknown about related entity '%s' for node '%s' in system '%s', node not created.",
+						p_aboutRelatedEntity, p_node, p_system));
+				return false;
+			}
+
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.aboutRelatedEntity, nodeInd,
+					aboutRelatedEntity);
+			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			changes.add(addAxiomChange);
+		}
 
 		// ---
 		// Required for structure reasoner
@@ -436,9 +751,7 @@ public class IceOntologyInterface {
 		}
 
 		// apply changes
-		for (OWLOntologyChange change : changes) {
-			this.manager.applyChange(change);
-		}
+		this.manager.applyChanges(changes);
 
 		this.dirty = true;
 
@@ -465,7 +778,7 @@ public class IceOntologyInterface {
 		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 		OWLIndividual iroInd = this.dataFactory.getOWLNamedIndividual(iroIRI);
 
-		OWLClass iroCls = this.findOWLClass(this.ii.iro, p_iroClass);
+		OWLClass iroCls = this.findOWLClass(this.ii.iroNode, p_iroClass);
 
 		if (iroCls == null) {
 			log(String.format("Unknown IRO class '%s' for IRO '%s' in system '%s', IRO not created.", p_iroClass,

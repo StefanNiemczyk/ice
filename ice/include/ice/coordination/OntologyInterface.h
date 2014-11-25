@@ -34,20 +34,34 @@ public:
   bool isConsistent();
   std::unique_ptr<std::vector<std::string>> getSystems();
   bool addSystem(std::string const p_system);
-
+  bool addNodesToSystem(std::string const p_system, std::vector<std::string> p_toAdd);
+  bool addIndividual(std::string const p_individual, std::string const p_class);
   bool addEntityType(std::string const p_entityType, std::vector<std::string> p_entityScopes);
   bool addEntityScope(std::string const p_entityScope, std::vector<std::string> p_representations);
   bool addValueScope(std::string const p_superValueScope, std::string const p_valueScope);
-  bool addRepresentation(std::string const p_superRepresentation, std::string const p_representation, std::vector<std::string> p_dimensions);
+  bool addRepresentation(std::string const p_superRepresentation, std::string const p_representation,
+                         std::vector<std::string> p_dimensions);
+  bool addNamedStream(std::string const p_stream, std::string const p_entityScope, std::string const p_representation);
+  bool addSourceNodeClass(std::string const p_node, std::vector<std::string> p_outputs,
+                          std::vector<int> p_outputsMinSize, std::vector<int> p_outputsMaxSize);
+  bool addComputationNodeClass(std::string const p_node, std::vector<std::string> p_inputs,
+                               std::vector<int> p_inputsMinSize, std::vector<int> p_inputsMaxSize,
+                               std::vector<std::string> p_outputs, std::vector<int> p_outputsMinSize,
+                               std::vector<int> p_outputsMaxSize);
+  bool addIroNodeClass(std::string const p_node, std::vector<std::string> p_inputs, std::vector<int> p_inputsMinSize,
+                       std::vector<int> p_inputsMaxSize, std::vector<std::string> p_inputsRelated,
+                       std::vector<int> p_inputsRelatedMinSize, std::vector<int> p_inputsRelatedMaxSize,
+                       std::vector<std::string> p_outputs, std::vector<int> p_outputsMinSize,
+                       std::vector<int> p_outputsMaxSize);
 
   bool addOntologyIRI(std::string const p_iri);
   bool removeOntologyIRI(std::string const p_iri);
   std::string readInformationStructureAsASP();
-  std::unique_ptr<std::vector<std::vector<std::string>>> readNodesAndIROsAsASP(std::string const p_system);
-  bool addNodeIndividual(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::vector<std::string> p_metadatas,
-                         std::vector<int> p_metadataValues, std::vector<int> p_metadataValues2, std::vector<std::string> p_metadataGroundings);
+  std::unique_ptr<std::vector<std::vector<std::string>>>readNodesAndIROsAsASP(std::string const p_system);
+  bool addNodeIndividual(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::string const p_aboutEntity, std::string const p_aboutRelatedEntity, std::vector<std::string> p_metadatas,
+      std::vector<int> p_metadataValues, std::vector<int> p_metadataValues2, std::vector<std::string> p_metadataGroundings);
   bool addIROIndividual(std::string const p_iro, std::string const p_iroClass, std::string const p_system, std::vector<std::string> p_metadatas,
-               std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings);
+      std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings);
   int getSomeMinCardinality();
   bool setSomeMinCardinality(int p_value);
   int getSomeMaxCardinality();
@@ -74,10 +88,16 @@ private:
   jmethodID isConsistentMethod; /**< Method id */
   jmethodID getSystemsMethod; /**< Method id */
   jmethodID addSystemMethod; /**< Method id */
+  jmethodID addNodesToSystemMethod; /**< Method id */
+  jmethodID addIndividualMethod; /**< Method id */
   jmethodID addEntityTypeMethod; /**< Method id */
   jmethodID addEntityScopeMethod; /**< Method id */
   jmethodID addValueScopeMethod; /**< Method id */
   jmethodID addRepresentationMethod; /**< Method id */
+  jmethodID addNamedStreamMethod; /**< Method id */
+  jmethodID addSourceNodeClassMethod; /**< Method id */
+  jmethodID addComputationNodeClassMethod; /**< Method id */
+  jmethodID addIroNodeClassMethod; /**< Method id */
 
   jmethodID addOntologyIRIMethod; /**< Method id */
   jmethodID removeOntologyIRIMethod; /**< Method id */
@@ -91,6 +111,7 @@ private:
   jmethodID setSomeMaxCardinalityMethod; /**< Method id */
 };
 
-} /* namespace ice */
+}
+/* namespace ice */
 
 #endif /* ONTOLOGYINTERFACE_H_ */
