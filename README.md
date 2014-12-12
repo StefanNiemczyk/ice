@@ -1,4 +1,2 @@
 ice
 ===
-
-Information Coordination Engine
