@@ -30,6 +30,7 @@ public:
   virtual ~OntologyInterface();
   bool errorOccurred();
   void addIRIMapper(std::string const p_mapper);
+  bool saveOntology(std::string const p_path);
   bool loadOntologies();
   bool isConsistent();
   std::unique_ptr<std::vector<std::string>> getSystems();
@@ -85,6 +86,7 @@ private:
   jobject javaInterface; /**< java interface object */
   jmethodID addIRIMapperMethod; /**< Method id */
   jmethodID loadOntologiesMethod; /**< Method id */
+  jmethodID saveOntologyMethod; /**< Method id */
   jmethodID isConsistentMethod; /**< Method id */
   jmethodID getSystemsMethod; /**< Method id */
   jmethodID addSystemMethod; /**< Method id */

@@ -43,9 +43,11 @@ public:
   std::shared_ptr<OntologyInterface> getOntologyInterface();
   std::shared_ptr<supplementary::ClingWrapper> getClingWrapper();
 
-private:
+protected:
   void readInfoStructureFromOntology();
   void readSystemsFromOntology();
+
+private:
   Gringo::Value splitASPExternalString(std::string p_aspString);
   std::shared_ptr<EngineState> getEngineStateByIRI(std::string p_iri);
   std::map<std::string, std::string> readConfiguration(std::string const config);

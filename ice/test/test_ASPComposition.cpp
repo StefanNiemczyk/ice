@@ -174,7 +174,7 @@ TEST(ClingWrap, threeSystems)
   auto query1 = cw->getExternal("query", {1}, true);
 
   cw->solve();
-//  cw->printLastModel();
+  cw->printLastModel();
 
   EXPECT_EQ(true, cw->query("streamTransfer", {1, "system1", "in1", "system2", "system1", Gringo::Value("information", {
       "entity1", "scope1", "rep1", "none"}), 0, 1, 2}));

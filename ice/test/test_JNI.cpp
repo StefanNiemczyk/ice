@@ -181,7 +181,7 @@ TEST(JNITest, addSourceNode)
   inputsMin.push_back(1);
   inputsMax.push_back(1);
 
-  result = oi.addSourceNodeClass("TestSourceNode", outputs, outputsMin, outputsMax);
+  result = oi.addSourceNodeClass("TestSourceNode", inputs, inputsMin, inputsMax);
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
@@ -228,6 +228,7 @@ TEST(JNITest, addSourceNode)
   EXPECT_TRUE(returnValues->at(3).at(0).find("nodeCost(testSystem,testSourceNodeInd,5).") != std::string::npos);
   EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(delay,testSystem,testSourceNodeInd,fix,5,5).") != std::string::npos);
   EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(accuracy,testSystem,testSourceNodeInd,fix,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(returnValues->at(3).at(0).find("output(testSystem,testSourceNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
 
   EXPECT_TRUE(returnValues->at(4).at(0) == "");
 }
@@ -481,6 +482,102 @@ TEST(JNITest, addNodeToSystem)
   EXPECT_TRUE(returnValues->at(3).at(0).find("nodeCost(testSystem2,testSourceNodeInd,5).") != std::string::npos);
   EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(delay,testSystem2,testSourceNodeInd,fix,5,5).") != std::string::npos);
   EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(accuracy,testSystem2,testSourceNodeInd,fix,-1,-1).") != std::string::npos);
+
+  EXPECT_TRUE(returnValues->at(4).at(0) == "");
+}
+
+
+TEST(JNITest, save)
+{
+  std::string path = ros::package::getPath("ice");
+  bool result;
+  std::vector<std::string> inputs;
+  std::vector<int> inputsMin;
+  std::vector<int> inputsMax;
+  std::vector<std::string> outputs;
+  std::vector<int> outputsMin;
+  std::vector<int> outputsMax;
+  std::vector<std::string> metadatas;
+  std::vector<int> metadataValues;
+  std::vector<int> metadataValues2;
+  std::vector<std::string> metadataGroundings;
+
+  ice::OntologyInterface oi(path + "/java/lib/");
+
+  oi.addIRIMapper(path + "/ontology/");
+  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.loadOntologies();
+
+  oi.addSystem("TestSystem");
+
+  result = oi.addNamedStream("TestStream","Position","CoordinatePositionRep");
+
+  inputs.push_back("TestStream");
+  inputsMin.push_back(1);
+  inputsMax.push_back(2);
+  outputs.push_back("TestStream");
+  outputsMin.push_back(1);
+  outputsMax.push_back(1);
+
+  result = oi.addComputationNodeClass("TestNode", inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  metadatas.push_back("Delay");
+  metadataValues.push_back(5);
+  metadataValues2.push_back(5);
+  metadataGroundings.push_back("NodeDelayASPGrounding");
+  metadatas.push_back("Cost");
+  metadataValues.push_back(5);
+  metadataValues2.push_back(5);
+  metadataGroundings.push_back("NodeCostASPGrounding");
+  metadatas.push_back("Accuracy");
+  metadataValues.push_back(-1);
+  metadataValues2.push_back(-1);
+  metadataGroundings.push_back("NodeAccuracyMaxASPGrounding");
+
+  result = oi.addNodeIndividual("TestNodeInd", "TestNode", "TestSystem", "", "", metadatas, metadataValues, metadataValues2,
+                                metadataGroundings);
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.saveOntology("/tmp/testSaveOnt.owl");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  ice::OntologyInterface oi2("/java/lib/");
+
+  oi2.addIRIMapper(path + "/ontology/");
+  oi2.addIRIMapper("/tmp/");
+  oi2.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi2.loadOntologies();
+  auto returnValues = oi2.readNodesAndIROsAsASP("TestSystem");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  ASSERT_EQ(returnValues->size(), 5);
+
+  ASSERT_EQ(returnValues->at(0).size(), 1);
+  ASSERT_EQ(returnValues->at(1).size(), 1);
+  ASSERT_EQ(returnValues->at(2).size(), 1);
+  ASSERT_EQ(returnValues->at(3).size(), 1);
+  ASSERT_EQ(returnValues->at(4).size(), 1);
+
+  EXPECT_EQ("COMPUTATION_NODE", returnValues->at(0).at(0));
+  EXPECT_EQ("testNodeInd", returnValues->at(1).at(0));
+  EXPECT_EQ("nodeTemplate(testSystem,testNodeInd,any).\n", returnValues->at(2).at(0));
+
+  EXPECT_TRUE(returnValues->at(3).at(0).find("#external nodeTemplate(testSystem,testNodeInd,any).") != std::string::npos);
+  EXPECT_TRUE(returnValues->at(3).at(0).find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(returnValues->at(3).at(0).find("input(testSystem,testNodeInd,position,coordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(delay,testSystem,testNodeInd,max,5,5).") != std::string::npos);
+  EXPECT_TRUE(returnValues->at(3).at(0).find("nodeCost(testSystem,testNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(accuracy,testSystem,testNodeInd,max,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(returnValues->at(3).at(0).find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
 
   EXPECT_TRUE(returnValues->at(4).at(0) == "");
 }

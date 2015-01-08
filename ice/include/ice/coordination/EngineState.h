@@ -27,10 +27,22 @@ class InformationModel;
 class IntersectionInformationModel;
 class Logger;
 class TimeFactory;
+class EngineState;
 } /* namespace ice */
 
 namespace ice
 {
+
+//* EngineConnection
+/**
+ * Containter that stores information about a connection to another engine.
+ *
+ */
+struct EngineConnection
+{
+  std::shared_ptr<EngineState> connectionToEngine;
+  int delay;
+};
 
 //* ASPNodeState
 /**
@@ -307,6 +319,8 @@ public:
 
   void addASPElement(std::shared_ptr<ASPElement> node);
 
+  std::vector<std::shared_ptr<EngineConnection>> getConnections();
+
 private:
   identifier engineId; /**< Unique identifier of the engine */
   const std::string systemIri; /**< The iri of this system */
@@ -326,6 +340,7 @@ private:
   std::vector<std::shared_ptr<BaseInformationStream>> streamsOffered; /**< List of streams offered from the main to this engine */
   std::vector<std::shared_ptr<BaseInformationStream>> streamsRequested; /**< List of streams requested from the main */
   int retryCounter; /**< Counts the retrys of the current activity */
+  std::vector<std::shared_ptr<EngineConnection>> connections; /**< Connections of the engine to other engines */
   Logger* _log; /**< Logger */
 };
 

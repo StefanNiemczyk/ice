@@ -72,6 +72,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
 
   this->addIRIMapperMethod = this->env->GetMethodID(this->javaOntologyInterface, "addIRIMapper",
                                                     "(Ljava/lang/String;)V");
+  this->saveOntologyMethod = this->env->GetMethodID(this->javaOntologyInterface, "saveOntology", "(Ljava/lang/String;)Z");
   this->loadOntologiesMethod = this->env->GetMethodID(this->javaOntologyInterface, "loadOntologies", "()Z");
   this->isConsistentMethod = this->env->GetMethodID(this->javaOntologyInterface, "isConsistent", "()Z");
   this->getSystemsMethod = this->env->GetMethodID(this->javaOntologyInterface, "getSystems", "()[Ljava/lang/String;");
@@ -154,6 +155,20 @@ void OntologyInterface::addIRIMapper(std::string const p_mapper)
   env->CallVoidMethod(this->javaInterface, this->addIRIMapperMethod, env->NewStringUTF(p_mapper.c_str()));
 
   this->checkError("addIRIMapper", "Error occurred during add iri mapper: " + p_mapper);
+}
+
+bool OntologyInterface::saveOntology(std::string const p_path)
+{
+  this->checkError("saveOntology", "Error exists, method saveOntology will not be executed");
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->saveOntologyMethod, env->NewStringUTF(p_path.c_str()));
+
+  if (this->checkError("saveOntology", "Error occurred saving ontology " + p_path))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
 }
 
 bool OntologyInterface::loadOntologies()

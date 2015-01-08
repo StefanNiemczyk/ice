@@ -137,6 +137,17 @@ public class IceOntologyInterface {
 		return true;
 	}
 
+	public boolean saveOntology(final String p_saveTo) {
+		try {
+			File file = new File(p_saveTo);
+			manager.saveOntology(this.mainOntology, IRI.create(file.toURI()));
+			return true;
+		} catch (Exception e) {
+			this.log("Exception during saving the ontology " + e.getMessage());
+			return false;
+		}
+	}
+
 	public boolean isConsistent() {
 		return this.getReasoner().isConsistent();
 	}

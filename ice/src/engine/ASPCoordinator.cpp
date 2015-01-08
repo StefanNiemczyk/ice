@@ -238,6 +238,7 @@ void ASPCoordinator::optimizeInformationFlow()
     // TODO interpret IRO
     // TODO interpret information extraction
     // TODO interpret map
+    // TODO selected stream
 
     if (valid)
     {

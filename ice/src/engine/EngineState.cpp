@@ -256,4 +256,9 @@ void EngineState::addASPElement(std::shared_ptr<ASPElement> node)
   }
 }
 
+std::vector<std::shared_ptr<EngineConnection>> EngineState::getConnections()
+{
+  return this->connections;
+}
+
 } /* namespace ice */
