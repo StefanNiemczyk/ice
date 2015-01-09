@@ -9,15 +9,28 @@
 #include "ice/coordination/OntologyInterface.h"
 
 #include "ClingWrapper.h"
+#include "External.h"
 
 struct ModelGenerationResult
 {
   long long totalTime;
   long long ontologyReadTime;
+  long long ontologyReasonerTime;
   long long ontologyToASPTime;
   long long aspGroundingTime;
   long long aspSolvingTime;
   bool successful;
+
+  void print()
+  {
+    std::cout << "Result\t\t\t\t" << (successful ? "true" : "false") << std::endl;
+    std::cout << "Total\t\t\t\t" << totalTime << " ms" << std::endl;
+    std::cout << "Ontology read\t\t" << ontologyReadTime << " ms" << std::endl;
+    std::cout << "Ontology reasoning\t" << ontologyReasonerTime << " ms" << std::endl;
+    std::cout << "Ontology 2 ASP\t\t" << ontologyToASPTime << " ms" << std::endl;
+    std::cout << "ASP grounding\t\t" << aspGroundingTime << " ms" << std::endl;
+    std::cout << "ASP Solving\t\t\t" << aspSolvingTime << " ms" << std::endl;
+  }
 };
 
 class ModelGeneration
@@ -30,8 +43,9 @@ public:
     std::vector<std::string> entities;
     std::vector<std::shared_ptr<supplementary::External>> externals;
     std::chrono::time_point<std::chrono::system_clock> start, end, startOntologyRead, endOntologyRead,
-                                                       startOntologyToASP, endOntologyToASP, startAspGrounding,
-                                                       endAspGrounding, startAspSolving, endAspSolving;
+                                                       startOntologyReasoner, endOntologyReasoner, startOntologyToASP,
+                                                       endOntologyToASP, startAspGrounding, endAspGrounding,
+                                                       startAspSolving, endAspSolving;
 
     // Initializing ASP
     supplementary::ClingWrapper asp;
@@ -41,11 +55,19 @@ public:
     // Initializing OwlAPI
     ice::OntologyInterface ontology(path + "/java/lib/");
     ontology.addIRIMapper(path + "/ontology/");
+    ontology.loadOntology(p_ontPath);
+
+    start = std::chrono::system_clock::now();
 
     // Load ontology
     startOntologyRead = std::chrono::system_clock::now();
     ontology.loadOntologies();
     endOntologyRead = std::chrono::system_clock::now();
+
+    // Reasoning ontology
+    startOntologyReasoner = std::chrono::system_clock::now();
+    ontology.initReasoner(true);
+    endOntologyReasoner = std::chrono::system_clock::now();
 
     // Ontology 2 ASP
     startOntologyToASP = std::chrono::system_clock::now();
@@ -152,33 +174,42 @@ public:
     endOntologyToASP = std::chrono::system_clock::now();
 
     // Grounding
+    startAspGrounding = std::chrono::system_clock::now();
     asp.ground(programPart, {});
 
     auto lastQuery = asp.getExternal("query", {1}, true);
     asp.ground("query", {1});
+    endAspGrounding = std::chrono::system_clock::now();
 
     // Solving
     startAspSolving = std::chrono::system_clock::now();
     auto solveResult = asp.solve();
     endAspSolving = std::chrono::system_clock::now();
-    result.successful = true;
 
     end = std::chrono::system_clock::now();
 
-    result.totalTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-    result.ontologyReadTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endOntologyRead - startOntologyRead).count();
-    result.ontologyToASPTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endOntologyToASP - startOntologyToASP).count();
-    result.aspGroundingTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endAspGrounding - startAspGrounding).count();
-    result.aspSolvingTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endAspSolving - startAspSolving).count();
+    result.successful = true;
+    result.totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    result.ontologyReadTime =
+        std::chrono::duration_cast<std::chrono::milliseconds>(endOntologyRead - startOntologyRead).count();
+    result.ontologyReasonerTime =
+        std::chrono::duration_cast<std::chrono::milliseconds>(endOntologyReasoner - startOntologyReasoner).count();
+    result.ontologyToASPTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+        endOntologyToASP - startOntologyToASP).count();
+    result.aspGroundingTime =
+        std::chrono::duration_cast<std::chrono::milliseconds>(endAspGrounding - startAspGrounding).count();
+    result.aspSolvingTime =
+        std::chrono::duration_cast<std::chrono::milliseconds>(endAspSolving - startAspSolving).count();
 
     if (solveResult == Gringo::SolveResult::SAT)
     {
       asp.printLastModel(false);
 
-      for (auto toCheck : requiredModelElements)
+      for (auto toCheck : *requiredModelElements)
       {
         auto value = this->splitASPExternalString(toCheck);
-        if (false == asp.query(value.name(), value.args()))
+        std::string name = *value.name();
+        if (false == asp.query(name, value.args()))
         {
           result.successful = false;
           break;
@@ -186,9 +217,12 @@ public:
       }
     }
 
+    externals.clear();
+
     return result;
   }
 
+private:
   Gringo::Value splitASPExternalString(std::string p_aspString)
   {
     if (p_aspString == "")
@@ -247,7 +281,5 @@ public:
 
     return Gringo::Value(name, vec);
   }
-
-private:
 
 };

@@ -81,6 +81,30 @@ public class IceOntologyInterface {
 		this.manager.addIRIMapper(aim);
 	}
 
+	public boolean loadOntology(final String p_ontPath) {
+		if (p_ontPath == null)
+			return false;
+
+		try {
+			File ont = new File(p_ontPath);
+			this.mainOntology = this.manager.loadOntologyFromOntologyDocument(ont);
+			this.mainIRI = this.mainOntology.getOntologyID().getOntologyIRI().toString();
+			this.mainIRIPrefix = this.mainIRI + "#";
+			System.out.println(this.mainIRI);
+			this.imports = this.manager.getImports(this.mainOntology);
+
+			// Fetching ontology things: class, properties, usw.
+			this.ii = new IceIris(this.dataFactory);
+
+			this.dirty = true;
+
+			return true;
+		} catch (Exception e) {
+			this.log("Exception during loading the ontology " + e.getMessage());
+			return false;
+		}
+	}
+
 	public boolean loadOntologies() throws OWLOntologyCreationException {
 		if (this.ontologyIries.size() == 0)
 			return false;
@@ -94,43 +118,6 @@ public class IceOntologyInterface {
 
 		// Fetching ontology things: class, properties, usw.
 		this.ii = new IceIris(this.dataFactory);
-		// this.systemOWLClass =
-		// this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "System"));
-		// this.nodeOWLClass =
-		// this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Node"));
-		// this.iroOWLClass =
-		// this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX +
-		// "InterRepresentationOperation"));
-		// this.metadataOWLClass =
-		// this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX +
-		// "Metadata"));
-		// this.entityTypeOWLClass =
-		// this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX +
-		// "EntityType"));
-		// this.aspMetadataGroundingOWLClass =
-		// this.dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX
-		// + "ASPMetadataGrounding"));
-		// this.hasSystemOWLProperty =
-		// this.dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX +
-		// "hasSystem"));
-		// this.isSystemOfOWLProperty =
-		// this.dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX +
-		// "isSystemOf"));
-		// this.hasMetadataOWLProperty =
-		// this.dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX +
-		// "hasMetadata"));
-		// this.isMetadataOfOWLProperty =
-		// this.dataFactory.getOWLObjectProperty(IRI
-		// .create(ICE_IRI_PREFIX + "isMetadataOf"));
-		// this.hasGroundingOWLProperty =
-		// this.dataFactory.getOWLObjectProperty(IRI
-		// .create(ICE_IRI_PREFIX + "hasGrounding"));
-		// this.isGroundingOfOWLProperty =
-		// this.dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX
-		// + "isGroundingOf"));
-		// this.hasMetadataValueOWLDataProperty =
-		// this.dataFactory.getOWLDataProperty(IRI.create(ICE_IRI_PREFIX
-		// + "hasMetadataValue"));
 
 		this.dirty = true;
 
@@ -392,6 +379,47 @@ public class IceOntologyInterface {
 		OWLClassExpression scope = this.dataFactory.getOWLObjectIntersectionOf(entityScope, hasRepresentation);
 		OWLClassExpression isStreamOf = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.isStreamOf, scope);
 		OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(stream, isStreamOf);
+		addAxiomChange = new AddAxiom(this.mainOntology, ax);
+		changes.add(addAxiomChange);
+
+		// apply changes
+		for (OWLOntologyChange change : changes) {
+			this.manager.applyChange(change);
+		}
+
+		this.dirty = true;
+
+		return true;
+	}
+
+	public boolean addRequiredStream(final String p_namedStream, final String p_namedStreamClass, final String p_system) {
+		IRI namedStreamIRI = IRI.create(this.mainIRIPrefix + p_namedStream);
+		if (this.mainOntology.containsIndividualInSignature(namedStreamIRI))
+			return false;
+
+		OWLClass namedStreamClass = this.findOWLClass(this.ii.namedStream, p_namedStreamClass);
+
+		if (namedStreamClass == null) {
+			log(String.format("Unknown named stream class '%s' for named stream '%s', stream not created.",
+					p_namedStreamClass, p_namedStream));
+			return false;
+		}
+
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+
+		OWLIndividual namedStream = this.dataFactory.getOWLNamedIndividual(namedStreamIRI);
+		OWLIndividual system = this.dataFactory.getOWLNamedIndividual(IRI.create(p_system));
+
+		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(namedStreamClass, namedStream);
+		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, ax);
+		changes.add(addAxiomChange);
+
+		OWLObjectPropertyAssertionAxiom assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(
+				this.ii.isSystemOf, system, namedStream);
+		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+		changes.add(addAxiomChange);
+
+		ax = this.dataFactory.getOWLClassAssertionAxiom(this.ii.requiredStream, namedStream);
 		addAxiomChange = new AddAxiom(this.mainOntology, ax);
 		changes.add(addAxiomChange);
 
@@ -961,6 +989,15 @@ public class IceOntologyInterface {
 		}
 
 		return result;
+	}
+
+	public boolean initReasoner(boolean p_force) {
+		if (p_force || this.dirty || this.internalReasoner == null) {
+			this.internalReasoner = this.reasonerFactory.createReasoner(this.mainOntology);
+			return true;
+		}
+
+		return false;
 	}
 
 	private OWLReasoner getReasoner() {

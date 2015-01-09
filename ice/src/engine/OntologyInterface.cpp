@@ -72,8 +72,10 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
 
   this->addIRIMapperMethod = this->env->GetMethodID(this->javaOntologyInterface, "addIRIMapper",
                                                     "(Ljava/lang/String;)V");
-  this->saveOntologyMethod = this->env->GetMethodID(this->javaOntologyInterface, "saveOntology", "(Ljava/lang/String;)Z");
   this->loadOntologiesMethod = this->env->GetMethodID(this->javaOntologyInterface, "loadOntologies", "()Z");
+  this->loadOntologyMethod = this->env->GetMethodID(this->javaOntologyInterface, "loadOntology", "(Ljava/lang/String;)Z");
+  this->saveOntologyMethod = this->env->GetMethodID(this->javaOntologyInterface, "saveOntology", "(Ljava/lang/String;)Z");
+  this->initReasonerMethod = this->env->GetMethodID(this->javaOntologyInterface, "initReasoner", "(Z)Z");
   this->isConsistentMethod = this->env->GetMethodID(this->javaOntologyInterface, "isConsistent", "()Z");
   this->getSystemsMethod = this->env->GetMethodID(this->javaOntologyInterface, "getSystems", "()[Ljava/lang/String;");
   this->addSystemMethod = this->env->GetMethodID(this->javaOntologyInterface, "addSystem", "(Ljava/lang/String;)Z");
@@ -85,6 +87,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->addValueScopeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addValueScope", "(Ljava/lang/String;Ljava/lang/String;)Z");
   this->addRepresentationMethod = this->env->GetMethodID(this->javaOntologyInterface, "addRepresentation", "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Z");
   this->addNamedStreamMethod = this->env->GetMethodID(this->javaOntologyInterface, "addNamedStream", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+  this->addRequiredStreamMethod = this->env->GetMethodID(this->javaOntologyInterface, "addRequiredStream", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
   this->addSourceNodeClassMethod = this->env->GetMethodID(this->javaOntologyInterface, "addSourceNodeClass", "(Ljava/lang/String;[Ljava/lang/String;[I[I)Z");
   this->addComputationNodeClassMethod = this->env->GetMethodID(this->javaOntologyInterface, "addComputationNodeClass", "(Ljava/lang/String;[Ljava/lang/String;[I[I[Ljava/lang/String;[I[I)Z");
   this->addIroNodeClassMethod = this->env->GetMethodID(this->javaOntologyInterface, "addIroNodeClass", "(Ljava/lang/String;[Ljava/lang/String;[I[I[Ljava/lang/String;[I[I[Ljava/lang/String;[I[I)Z");
@@ -157,6 +160,36 @@ void OntologyInterface::addIRIMapper(std::string const p_mapper)
   this->checkError("addIRIMapper", "Error occurred during add iri mapper: " + p_mapper);
 }
 
+bool OntologyInterface::loadOntologies()
+{
+  this->checkError("loadOntologies", "Error exists, method loadOntologies will not be executed");
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->loadOntologiesMethod);
+
+  if (this->checkError("loadOntologies", "Error occurred at loading the ontologies"))
+    return false;
+
+  this->informationDirty = true;
+  this->systemDirty = true;
+  this->loadDirty = false;
+
+  return result;
+}
+
+bool OntologyInterface::loadOntology(std::string const p_path)
+{
+  this->checkError("loadOntology", "Error exists, method loadOntology will not be executed");
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->loadOntologyMethod, env->NewStringUTF(p_path.c_str()));
+
+  if (this->checkError("loadOntology", "Error occurred loading ontology " + p_path))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
 bool OntologyInterface::saveOntology(std::string const p_path)
 {
   this->checkError("saveOntology", "Error exists, method saveOntology will not be executed");
@@ -171,18 +204,16 @@ bool OntologyInterface::saveOntology(std::string const p_path)
   return result;
 }
 
-bool OntologyInterface::loadOntologies()
+bool OntologyInterface::initReasoner(bool const p_force)
 {
-  this->checkError("loadOntologies", "Error exists, method loadOntologies will not be executed");
+  this->checkError("initReasoner", "Error exists, method initReasoner will not be executed");
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->loadOntologiesMethod);
+  bool result = env->CallBooleanMethod(this->javaInterface, this->initReasonerMethod, p_force);
 
-  if (this->checkError("loadOntologies", "Error occurred at loading the ontologies"))
+  if (this->checkError("initReasoner", "Error occurred at init reasoner " + p_force))
     return false;
 
-  this->informationDirty = true;
   this->systemDirty = true;
-  this->loadDirty = false;
 
   return result;
 }
@@ -378,6 +409,24 @@ bool OntologyInterface::addNamedStream(std::string const p_stream, std::string c
   bool result = env->CallBooleanMethod(this->javaInterface, this->addNamedStreamMethod, stream, entityScope, representation);
 
   if (this->checkError("addNamedStream", "Error occurred adding a stream " + p_stream))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
+bool OntologyInterface::addRequiredStream(std::string const p_namedStream, std::string const p_namedStreamClass, std::string const p_system)
+{
+  this->checkError("addRequiredStream", "Error exists, method addRequiredStream will not be executed");
+
+  jstring namedStream = env->NewStringUTF(p_namedStream.c_str());
+  jstring namedStreamClass = env->NewStringUTF(p_namedStreamClass.c_str());
+  jstring system = env->NewStringUTF(p_system.c_str());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addRequiredStreamMethod, namedStream, namedStreamClass, system);
+
+  if (this->checkError("addRequiredStream", "Error occurred adding a required stream " + p_namedStream + " to system " + p_system))
     return false;
 
   this->systemDirty = true;

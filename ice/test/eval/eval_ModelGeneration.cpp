@@ -44,7 +44,7 @@ TEST(EvalModelGeneration, simpleTest)
 
   oi.addNamedStream("ReqStream", "TestScope", "TestRep1");
 
-  inputs.push_back("TestStream");
+  inputs.push_back("ReqStream");
   inputsMin.push_back(1);
   inputsMax.push_back(1);
 
@@ -74,4 +74,6 @@ TEST(EvalModelGeneration, simpleTest)
   std::vector<std::string> toCheck;
 
   auto result = mg.readOntology("/tmp/evalSimpleTest.owl", &toCheck);
+
+  result.print();
 }

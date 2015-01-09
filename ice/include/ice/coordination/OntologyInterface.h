@@ -30,8 +30,10 @@ public:
   virtual ~OntologyInterface();
   bool errorOccurred();
   void addIRIMapper(std::string const p_mapper);
-  bool saveOntology(std::string const p_path);
   bool loadOntologies();
+  bool loadOntology(std::string const p_path);
+  bool saveOntology(std::string const p_path);
+  bool initReasoner(bool const p_force);
   bool isConsistent();
   std::unique_ptr<std::vector<std::string>> getSystems();
   bool addSystem(std::string const p_system);
@@ -43,6 +45,7 @@ public:
   bool addRepresentation(std::string const p_superRepresentation, std::string const p_representation,
                          std::vector<std::string> p_dimensions);
   bool addNamedStream(std::string const p_stream, std::string const p_entityScope, std::string const p_representation);
+  bool addRequiredStream(std::string const p_namedStream, std::string const p_namedStreamClass, std::string const p_system);
   bool addSourceNodeClass(std::string const p_node, std::vector<std::string> p_outputs,
                           std::vector<int> p_outputsMinSize, std::vector<int> p_outputsMaxSize);
   bool addComputationNodeClass(std::string const p_node, std::vector<std::string> p_inputs,
@@ -86,7 +89,9 @@ private:
   jobject javaInterface; /**< java interface object */
   jmethodID addIRIMapperMethod; /**< Method id */
   jmethodID loadOntologiesMethod; /**< Method id */
+  jmethodID loadOntologyMethod; /**< Method id */
   jmethodID saveOntologyMethod; /**< Method id */
+  jmethodID initReasonerMethod; /**< Method id */
   jmethodID isConsistentMethod; /**< Method id */
   jmethodID getSystemsMethod; /**< Method id */
   jmethodID addSystemMethod; /**< Method id */
@@ -97,6 +102,7 @@ private:
   jmethodID addValueScopeMethod; /**< Method id */
   jmethodID addRepresentationMethod; /**< Method id */
   jmethodID addNamedStreamMethod; /**< Method id */
+  jmethodID addRequiredStreamMethod; /**< Method id */
   jmethodID addSourceNodeClassMethod; /**< Method id */
   jmethodID addComputationNodeClassMethod; /**< Method id */
   jmethodID addIroNodeClassMethod; /**< Method id */

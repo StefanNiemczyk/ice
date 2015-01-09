@@ -152,6 +152,49 @@ TEST(JNITest, addStreamClass)
   ASSERT_FALSE(result);
 }
 
+TEST(JNITest, addRequiredStream)
+{
+  std::string path = ros::package::getPath("ice");
+  bool result;
+
+  ice::OntologyInterface oi(path + "/java/lib/");
+
+  oi.addIRIMapper(path + "/ontology/");
+  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.loadOntologies();
+
+  oi.addSystem("TestSystem");
+
+  result = oi.addNamedStream("TestStream","Position","CoordinatePositionRep");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.addRequiredStream("TestReqStream", "TestStream", "TestSystem");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  auto returnValues = oi.readNodesAndIROsAsASP("TestSystem");
+
+    ASSERT_FALSE(oi.errorOccurred());
+    ASSERT_TRUE(result);
+
+    ASSERT_EQ(returnValues->size(), 5);
+
+    ASSERT_EQ(returnValues->at(0).size(), 1);
+    ASSERT_EQ(returnValues->at(1).size(), 1);
+    ASSERT_EQ(returnValues->at(2).size(), 1);
+    ASSERT_EQ(returnValues->at(3).size(), 1);
+    ASSERT_EQ(returnValues->at(4).size(), 1);
+
+    EXPECT_EQ("REQUIRED_STREAM", returnValues->at(0).at(0));
+    EXPECT_EQ("testReqStream", returnValues->at(1).at(0));
+    EXPECT_EQ("requiredStream(testSystem,information(any,position,coordinatePositionRep,none)).\n", returnValues->at(2).at(0));
+
+    EXPECT_TRUE(returnValues->at(4).at(0) == "");
+}
+
 TEST(JNITest, addSourceNode)
 {
   std::string path = ros::package::getPath("ice");
@@ -551,9 +594,14 @@ TEST(JNITest, save)
   ice::OntologyInterface oi2("/java/lib/");
 
   oi2.addIRIMapper(path + "/ontology/");
-  oi2.addIRIMapper("/tmp/");
-  oi2.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
-  oi2.loadOntologies();
+  oi2.loadOntology("/tmp/testSaveOnt.owl");
+
+  //oi2.getSystems();
+  ASSERT_FALSE(oi.errorOccurred());
+
+  oi2.readInformationStructureAsASP();
+  ASSERT_FALSE(oi.errorOccurred());
+
   auto returnValues = oi2.readNodesAndIROsAsASP("TestSystem");
 
   ASSERT_FALSE(oi.errorOccurred());
@@ -561,11 +609,11 @@ TEST(JNITest, save)
 
   ASSERT_EQ(returnValues->size(), 5);
 
-  ASSERT_EQ(returnValues->at(0).size(), 1);
-  ASSERT_EQ(returnValues->at(1).size(), 1);
-  ASSERT_EQ(returnValues->at(2).size(), 1);
-  ASSERT_EQ(returnValues->at(3).size(), 1);
-  ASSERT_EQ(returnValues->at(4).size(), 1);
+  ASSERT_EQ(1, returnValues->at(0).size());
+  ASSERT_EQ(1, returnValues->at(1).size());
+  ASSERT_EQ(1, returnValues->at(2).size());
+  ASSERT_EQ(1, returnValues->at(3).size());
+  ASSERT_EQ(1, returnValues->at(4).size());
 
   EXPECT_EQ("COMPUTATION_NODE", returnValues->at(0).at(0));
   EXPECT_EQ("testNodeInd", returnValues->at(1).at(0));
