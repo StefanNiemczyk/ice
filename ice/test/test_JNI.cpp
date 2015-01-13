@@ -170,7 +170,17 @@ TEST(JNITest, addRequiredStream)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  result = oi.addRequiredStream("TestReqStream", "TestStream", "TestSystem");
+  result = oi.addRequiredStream("TestReqStream", "TestStream", "TestSystem", "", "");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_FALSE(result);
+
+  result = oi.addIndividual("TestEntity", "Robot");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.addRequiredStream("TestReqStream", "TestStream", "TestSystem", "TestEntity", "");
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
@@ -190,7 +200,7 @@ TEST(JNITest, addRequiredStream)
 
     EXPECT_EQ("REQUIRED_STREAM", returnValues->at(0).at(0));
     EXPECT_EQ("testReqStream", returnValues->at(1).at(0));
-    EXPECT_EQ("requiredStream(testSystem,information(any,position,coordinatePositionRep,none)).\n", returnValues->at(2).at(0));
+    EXPECT_EQ("requiredStream(testSystem,information(testEntity,position,coordinatePositionRep,none)).\n", returnValues->at(2).at(0));
 
     EXPECT_TRUE(returnValues->at(4).at(0) == "");
 }

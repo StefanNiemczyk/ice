@@ -88,6 +88,9 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 	}
 
 	protected void log(String p_msg) {
+		if (false == this.ioi.isLogging())
+			return;
+
 		System.out.println("java     " + p_msg);
 	}
 }

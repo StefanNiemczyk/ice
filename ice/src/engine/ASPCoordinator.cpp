@@ -274,7 +274,7 @@ void ASPCoordinator::readInfoStructureFromOntology()
   if (false == this->ontology->isInformationDirty())
     return;
 
-  std::string infoStructure = this->ontology->readInformationStructureAsASP();
+  const char* infoStructure = this->ontology->readInformationStructureAsASP();
 
   _log->debug("readInfoStructureFromOntology", "Extracted structure from ontology");
   _log->verbose("readInfoStructureFromOntology", infoStructure);
@@ -283,8 +283,10 @@ void ASPCoordinator::readInfoStructureFromOntology()
 
   std::string programPart = "ontology" + this->queryIndex;
   std::stringstream ss;
-  ss << infoStructure;
   std::string item;
+
+  ss << infoStructure;
+  delete infoStructure;
 
   while (std::getline(ss, item, '\n'))
   {
@@ -333,53 +335,61 @@ void ASPCoordinator::readSystemsFromOntology()
 
   for (auto ontSystem : *ontSystems)
   {
-    _log->debug("readSystemsFromOntology", "Checking system " + ontSystem);
+    _log->debug("readSystemsFromOntology", "Checking system " + std::string(ontSystem));
     system = this->getEngineStateByIRI(ontSystem);
 
     auto nodes = this->ontology->readNodesAndIROsAsASP(ontSystem);
 
-    std::vector<std::string> types = nodes->at(0);
-    std::vector<std::string> names = nodes->at(1);
-    std::vector<std::string> strings = nodes->at(2);
-    std::vector<std::string> aspStrings = nodes->at(3);
-    std::vector<std::string> cppStrings = nodes->at(4);
+    std::vector<const char*>* types = nodes->at(0);
+    std::vector<const char*>* names = nodes->at(1);
+    std::vector<const char*>* strings = nodes->at(2);
+    std::vector<const char*>* aspStrings = nodes->at(3);
+    std::vector<const char*>* cppStrings = nodes->at(4);
 
-    for (int i = 0; i < names.size(); ++i)
+    for (int i = 0; i < names->size(); ++i)
     {
-      std::string name = names.at(i);
-      std::string elementStr = strings.at(i);
-      std::string aspStr = aspStrings.at(i);
-      std::string cppStr = cppStrings.at(i);
+      const char* name = names->at(i);
+      const char* elementStr = strings->at(i);
+      const char* aspStr = aspStrings->at(i);
+      const char* cppStr = cppStrings->at(i);
+      const char* typeStr = types->at(i);
       ASPElementType type;
 
-      if (types.at(i) == "COMPUTATION_NODE")
+      if (typeStr == "COMPUTATION_NODE")
       {
         type = ASPElementType::ASP_COMPUTATION_NODE;
       }
-      else if (types.at(i) == "SOURCE_NODE")
+      else if (typeStr == "SOURCE_NODE")
       {
         type = ASPElementType::ASP_SOURCE_NODE;
       }
-      else if (types.at(i) == "REQUIRED_STREAM")
+      else if (typeStr == "REQUIRED_STREAM")
       {
         type = ASPElementType::ASP_REQUIRED_STREAM;
       }
-      else if (types.at(i) == "MAP_NODE")
+      else if (typeStr == "MAP_NODE")
       {
         type = ASPElementType::ASP_MAP_NODE;
       }
-      else if (types.at(i) == "IRO_NODE")
+      else if (typeStr == "IRO_NODE")
       {
         type = ASPElementType::ASP_IRO_NODE;
       }
-      else if (types.at(i) == "REQUIRED_MAP")
+      else if (typeStr == "REQUIRED_MAP")
       {
         type = ASPElementType::ASP_REQUIRED_MAP;
       }
       else
       {
         _log->error("readSystemsFromOntology", "Unknown asp element type '%s', element will be skipped",
-                    types.at(i).c_str());
+                    types->at(i));
+
+        delete name;
+        delete elementStr;
+        delete aspStr;
+        delete cppStr;
+        delete typeStr;
+
         continue;
       }
 
@@ -395,11 +405,11 @@ void ASPCoordinator::readSystemsFromOntology()
         element->state = ASPElementState::ADDED_TO_ASP;
         element->type = type;
 
-        if (cppStr != "")
+        if (std::strlen(cppStr) != 0)
         {
-          int index = cppStr.find("\n");
-          element->className = cppStr.substr(0, index);
-          element->config = this->readConfiguration(cppStr.substr(index + 1, cppStr.length()));
+          const char* index = std::strchr(cppStr, '\n');
+          element->className = std::string(cppStr, index);
+          element->config = this->readConfiguration(std::string(index + 1, std::strlen(cppStr)));
         }
 
         auto value = this->splitASPExternalString(elementStr);
@@ -436,7 +446,20 @@ void ASPCoordinator::readSystemsFromOntology()
         system->addASPElement(element);
         this->groundingDirty = true;
       }
+
+      delete name;
+      delete elementStr;
+      delete aspStr;
+      delete cppStr;
+      delete typeStr;
     }
+    delete types;
+    delete names;
+    delete strings;
+    delete aspStrings;
+    delete cppStrings;
+
+    delete ontSystem;
   }
 }
 
@@ -476,6 +499,11 @@ Gringo::Value ASPCoordinator::splitASPExternalString(std::string p_aspString)
 //    std::cout << values << std::endl;
     int index1 = values.find("(");
     int index2 = values.find(",");
+
+    if (index2 == 0) {
+      values = values.substr(1, values.size());
+      continue;
+    }
 
     if (index2 != std::string::npos && index1 == std::string::npos)
     {

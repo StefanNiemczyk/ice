@@ -35,7 +35,7 @@ public:
   bool saveOntology(std::string const p_path);
   bool initReasoner(bool const p_force);
   bool isConsistent();
-  std::unique_ptr<std::vector<std::string>> getSystems();
+  std::unique_ptr<std::vector<const char*>> getSystems();
   bool addSystem(std::string const p_system);
   bool addNodesToSystem(std::string const p_system, std::vector<std::string> p_toAdd);
   bool addIndividual(std::string const p_individual, std::string const p_class);
@@ -45,7 +45,7 @@ public:
   bool addRepresentation(std::string const p_superRepresentation, std::string const p_representation,
                          std::vector<std::string> p_dimensions);
   bool addNamedStream(std::string const p_stream, std::string const p_entityScope, std::string const p_representation);
-  bool addRequiredStream(std::string const p_namedStream, std::string const p_namedStreamClass, std::string const p_system);
+  bool addRequiredStream(std::string const p_namedStream, std::string const p_namedStreamClass, std::string const p_system, std::string const p_entity, std::string const p_entityRelated);
   bool addSourceNodeClass(std::string const p_node, std::vector<std::string> p_outputs,
                           std::vector<int> p_outputsMinSize, std::vector<int> p_outputsMaxSize);
   bool addComputationNodeClass(std::string const p_node, std::vector<std::string> p_inputs,
@@ -60,8 +60,8 @@ public:
 
   bool addOntologyIRI(std::string const p_iri);
   bool removeOntologyIRI(std::string const p_iri);
-  std::string readInformationStructureAsASP();
-  std::unique_ptr<std::vector<std::vector<std::string>>>readNodesAndIROsAsASP(std::string const p_system);
+  const char* readInformationStructureAsASP();
+  std::unique_ptr<std::vector<std::vector<const char*>*>>readNodesAndIROsAsASP(std::string const p_system);
   bool addNodeIndividual(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::string const p_aboutEntity, std::string const p_aboutRelatedEntity, std::vector<std::string> p_metadatas,
       std::vector<int> p_metadataValues, std::vector<int> p_metadataValues2, std::vector<std::string> p_metadataGroundings);
   bool addIROIndividual(std::string const p_iro, std::string const p_iroClass, std::string const p_system, std::vector<std::string> p_metadatas,
@@ -70,6 +70,8 @@ public:
   bool setSomeMinCardinality(int p_value);
   int getSomeMaxCardinality();
   bool setSomeMaxCardinality(int p_value);
+  bool isLogging();
+  bool setLogging(bool p_logging);
   bool isInformationDirty();
   bool isSystemDirty();
   bool isLoadDirty();
@@ -117,6 +119,8 @@ private:
   jmethodID setSomeMinCardinalityMethod; /**< Method id */
   jmethodID getSomeMaxCardinalityMethod; /**< Method id */
   jmethodID setSomeMaxCardinalityMethod; /**< Method id */
+  jmethodID isLoggingMethod; /**< Method id */
+  jmethodID setLoggingMethod; /**< Method id */
 };
 
 }

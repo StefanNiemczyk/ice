@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
@@ -26,6 +25,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 
 public class IceOntologyInterface {
@@ -60,20 +60,24 @@ public class IceOntologyInterface {
 	private int defaultMinCardinality;
 	private int defaultMaxCardinality;
 
+	private boolean logging;
+
 	private String mainIRI;
 	private String mainIRIPrefix;
 
 	public IceOntologyInterface() {
 		this.manager = OWLManager.createOWLOntologyManager();
 		this.dataFactory = manager.getOWLDataFactory();
-		this.reasonerFactory = new Reasoner.ReasonerFactory();
-		// this.reasonerFactory = new StructuralReasonerFactory();
+		// this.reasonerFactory = new Reasoner.ReasonerFactory();
+		this.reasonerFactory = new StructuralReasonerFactory();
 		this.ontologyIries = new ArrayList<String>();
 		this.someMinCardinality = 1;
 		this.someMaxCardinality = 1;
 		this.defaultMinCardinality = 1;
 		this.defaultMaxCardinality = 5;
 		this.dirty = true;
+		this.logging = true;
+		// System.gc();
 	}
 
 	public void addIRIMapper(final String p_path) {
@@ -90,7 +94,6 @@ public class IceOntologyInterface {
 			this.mainOntology = this.manager.loadOntologyFromOntologyDocument(ont);
 			this.mainIRI = this.mainOntology.getOntologyID().getOntologyIRI().toString();
 			this.mainIRIPrefix = this.mainIRI + "#";
-			System.out.println(this.mainIRI);
 			this.imports = this.manager.getImports(this.mainOntology);
 
 			// Fetching ontology things: class, properties, usw.
@@ -392,36 +395,68 @@ public class IceOntologyInterface {
 		return true;
 	}
 
-	public boolean addRequiredStream(final String p_namedStream, final String p_namedStreamClass, final String p_system) {
-		IRI namedStreamIRI = IRI.create(this.mainIRIPrefix + p_namedStream);
-		if (this.mainOntology.containsIndividualInSignature(namedStreamIRI))
+	public boolean addRequiredStream(final String p_requirdStream, final String p_namedStreamClass,
+			final String p_system, final String p_entity, final String p_relatedEntity) {
+		IRI requiredStreamIRI = IRI.create(this.mainIRIPrefix + p_requirdStream);
+		if (this.mainOntology.containsIndividualInSignature(requiredStreamIRI))
 			return false;
+
+		IRI entityIRI = IRI.create(this.mainIRIPrefix + p_entity);
+
+		if (p_entity == null || p_entity.isEmpty()
+				|| false == this.mainOntology.containsIndividualInSignature(entityIRI)) {
+			log(String.format("Unknown entity '%s' for required stream '%s', stream not created.", p_entity,
+					p_requirdStream));
+			return false;
+		}
 
 		OWLClass namedStreamClass = this.findOWLClass(this.ii.namedStream, p_namedStreamClass);
 
 		if (namedStreamClass == null) {
 			log(String.format("Unknown named stream class '%s' for named stream '%s', stream not created.",
-					p_namedStreamClass, p_namedStream));
+					p_namedStreamClass, p_requirdStream));
 			return false;
 		}
 
 		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 
-		OWLIndividual namedStream = this.dataFactory.getOWLNamedIndividual(namedStreamIRI);
-		OWLIndividual system = this.dataFactory.getOWLNamedIndividual(IRI.create(p_system));
+		OWLIndividual requiredStream = this.dataFactory.getOWLNamedIndividual(requiredStreamIRI);
+		OWLIndividual system = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_system));
 
-		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(namedStreamClass, namedStream);
+		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(namedStreamClass, requiredStream);
 		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, ax);
 		changes.add(addAxiomChange);
 
 		OWLObjectPropertyAssertionAxiom assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(
-				this.ii.isSystemOf, system, namedStream);
+				this.ii.isSystemOf, system, requiredStream);
 		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
 		changes.add(addAxiomChange);
 
-		ax = this.dataFactory.getOWLClassAssertionAxiom(this.ii.requiredStream, namedStream);
+		ax = this.dataFactory.getOWLClassAssertionAxiom(this.ii.requiredStream, requiredStream);
 		addAxiomChange = new AddAxiom(this.mainOntology, ax);
 		changes.add(addAxiomChange);
+
+		OWLIndividual entityInd = this.dataFactory.getOWLNamedIndividual(entityIRI);
+
+		assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.aboutEntity, requiredStream, entityInd);
+		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+		changes.add(addAxiomChange);
+
+		if (p_relatedEntity != null && false == p_relatedEntity.isEmpty()) {
+			IRI relatedEntityIRI = IRI.create(this.mainIRIPrefix + p_relatedEntity);
+			if (false == this.mainOntology.containsIndividualInSignature(relatedEntityIRI)) {
+				log(String.format("Unknown related entity '%s' for required stream '%s', stream not created.",
+						p_entity, p_requirdStream));
+				return false;
+			}
+
+			OWLIndividual relatedEntityInd = this.dataFactory.getOWLNamedIndividual(relatedEntityIRI);
+
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.aboutRelatedEntity, requiredStream,
+					relatedEntityInd);
+			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			changes.add(addAxiomChange);
+		}
 
 		// apply changes
 		for (OWLOntologyChange change : changes) {
@@ -605,12 +640,16 @@ public class IceOntologyInterface {
 
 	public boolean addIndividual(final String p_individual, final String p_class) {
 		IRI iri = IRI.create(this.mainIRIPrefix + p_individual);
-		if (this.mainOntology.containsIndividualInSignature(iri))
+		if (this.mainOntology.containsIndividualInSignature(iri)) {
+			this.log(String.format("Individual '%s' for class 's' already exists.", p_individual, p_class));
 			return false;
+		}
 
 		IRI clsIri = IRI.create(this.mainIRIPrefix + p_class);
-		if (false == this.mainOntology.containsClassInSignature(clsIri))
+		if (false == this.mainOntology.containsClassInSignature(clsIri)) {
+			this.log(String.format("Class '%s' for new individual '%s' is unknown.", p_class, p_individual));
 			return false;
+		}
 
 		OWLClass cls = this.dataFactory.getOWLClass(clsIri);
 
@@ -929,18 +968,30 @@ public class IceOntologyInterface {
 	}
 
 	public String readInformationStructureAsASP() {
+		// long start = System.currentTimeMillis();
 		Set<OWLOntology> onts = new HashSet<OWLOntology>();
 		onts.add(this.mainOntology);
 
 		onts.addAll(this.imports);
 
 		InfoStructureVisitor isv = new InfoStructureVisitor(this, onts, this.getReasoner(), this.ii);
+		long mid = System.currentTimeMillis();
 
 		Set<OWLClass> classes = this.getReasoner().getSubClasses(this.ii.entityType, false).getFlattened();
+		long mid2 = System.currentTimeMillis();
 
 		for (OWLClassExpression cls : classes) {
 			cls.accept(isv);
 		}
+		// long stop = System.currentTimeMillis();
+		// if (stop - start > 100) {
+		// System.out.println("Time readInformationStructureAsASP " + (mid -
+		// start));
+		// System.out.println("Time readInformationStructureAsASP " + (mid2 -
+		// start));
+		// System.out.println("Time readInformationStructureAsASP " + (stop -
+		// start));
+		// }
 
 		return isv.toString();
 	}
@@ -1097,6 +1148,9 @@ public class IceOntologyInterface {
 	}
 
 	private void log(String p_msg) {
+		if (false == this.logging)
+			return;
+
 		System.out.println("java     " + p_msg);
 	}
 
@@ -1114,5 +1168,13 @@ public class IceOntologyInterface {
 
 	public void setDefaultMaxCardinality(int defaultMaxCardinality) {
 		this.defaultMaxCardinality = defaultMaxCardinality;
+	}
+
+	public boolean isLogging() {
+		return logging;
+	}
+
+	public void setLogging(boolean logging) {
+		this.logging = logging;
 	}
 }
