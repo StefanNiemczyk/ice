@@ -109,7 +109,7 @@ const CooperationState EngineState::getCooperationState() const
 
 void EngineState::setCooperationState(CooperationState cooperationState)
 {
-  _log->debug("setCooperationState", "Update cooperation state of engine %s from %i to %i",
+  _log->debug("Update cooperation state of engine %s from %i to %i",
               IDGenerator::toString(this->engineId).c_str(), this->cooperationState, cooperationState);
   this->cooperationState = cooperationState;
   this->timeLastStateUpdate = this->timeFactory->createTime();

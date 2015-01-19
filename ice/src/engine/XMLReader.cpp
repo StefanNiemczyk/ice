@@ -309,7 +309,7 @@ bool XMLReader::readStreamSharing(TiXmlElement* element, XMLStream* stream)
 
   if (!name || strcmp("Sharing", name) != 0 || !state)
   {
-    _log->error("readStreamSharing", "Invalid sharing element %s, with state %s", (name ? name : "null"),
+    _log->error("Invalid sharing element %s, with state %s", (name ? name : "null"),
                 (state ? state : "null"));
     return false;
   }
@@ -325,7 +325,7 @@ bool XMLReader::readStreamSharing(TiXmlElement* element, XMLStream* stream)
     const char *child = streamElement->Value();
     if (!child)
     {
-      _log->error("readStreamSharing", "Invalid child of sharing element %s: %s", (name ? name : "null"), "null");
+      _log->error("Invalid child of sharing element %s: %s", (name ? name : "null"), "null");
       return false;
     }
     else if (strcmp("MaxSharingCount", child) == 0)
@@ -334,7 +334,7 @@ bool XMLReader::readStreamSharing(TiXmlElement* element, XMLStream* stream)
     }
     else
     {
-      _log->error("readStreamSharing", "Invalid child of sharing element %s: %s", (name ? name : "null"),
+      _log->error("Invalid child of sharing element %s: %s", (name ? name : "null"),
                   (child ? child : "null"));
       return false;
     }

@@ -275,7 +275,7 @@ template<typename T>
     auto desc = std::make_shared<StreamDescription>(specification, name, provider, sourceSystem, metadata);
     auto stream = std::make_shared<InformationStream<T>>(desc, this->eventHandler, streamSize);
 
-    _log->debug("registerStream", "Created stream with '%s', '%s', '%s'", specification->toString().c_str(),
+    _log->debug("Created stream with '%s', '%s', '%s'", specification->toString().c_str(),
                 provider.c_str(), sourceSystem.c_str());
     this->streams.push_back(stream);
 

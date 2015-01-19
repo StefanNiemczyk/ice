@@ -69,7 +69,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   if (this->checkError("Constructor", "Failed to instantiate class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
 
-  _log->verbose("Constructor", "Ontology interface created successfully");
+  _log->verbose(1, "Ontology interface created successfully");
 
   this->addIRIMapperMethod = this->env->GetMethodID(this->javaOntologyInterface, "addIRIMapper",
                                                     "(Ljava/lang/String;)V");
@@ -140,7 +140,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   if (this->checkError("Constructor", "Failed to lookup method ids for class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
 
-  _log->verbose("Constructor", "Ontology interface created successfully");
+  _log->verbose(1, "Ontology interface created successfully");
 }
 
 OntologyInterface::~OntologyInterface()

@@ -68,7 +68,7 @@ std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::st
 
   if (node)
   {
-    _log->info("registerNode", "Node '%s' already registered for entity '%s'", name.c_str(), entity.c_str());
+    _log->info("Node '%s' already registered for entity '%s'", name.c_str(), entity.c_str());
     return node;
   }
 
@@ -83,7 +83,7 @@ std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::st
 
   if (false == node)
   {
-    _log->error("registerNode", "Node '%s' could not be created for entity '%s'. Register missing?", name.c_str(),
+    _log->error("Node '%s' could not be created for entity '%s'. Register missing?", name.c_str(),
                 entity.c_str());
     return node;
   }
@@ -101,7 +101,7 @@ bool NodeStore::existNodeCreator(const std::string className)
 
 void NodeStore::cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes)
 {
-  _log->verbose("cleanUpUnusedNodes", "Start removing unused nodes");
+  _log->verbose(1, "Start removing unused nodes");
   int counter = 0;
 
   for (int i = 0; i < this->nodes.size(); ++i)
@@ -121,7 +121,7 @@ void NodeStore::cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes
     if (found)
       continue;
 
-    _log->info("cleanUpUnusedNodes", "Remove unused node %s", node->toString().c_str());
+    _log->info("Remove unused node %s", node->toString().c_str());
     counter++;
 
     node->deactivate();
@@ -130,24 +130,24 @@ void NodeStore::cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes
     --i;
   }
 
-  _log->info("cleanUpUnusedNodes", "Clean up node store: '%d' nodes are removed", counter);
+  _log->info("Clean up node store: '%d' nodes are removed", counter);
 }
 
 void NodeStore::cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp)
 {
-  _log->verbose("cleanUpUnusedNodes", "Start removing nodes");
+  _log->verbose(1, "Start removing nodes");
   int counter = 0;
 
   for (auto node : nodesToCleanUp)
   {
-    _log->info("cleanUpUnusedNodes", "Remove node %s", node->toString().c_str());
+    _log->info("Remove node %s", node->toString().c_str());
     counter++;
 
     node->deactivate();
     node->destroy();
   }
 
-  _log->info("cleanUpUnusedNodes", "Clean up node store: '%d' nodes are removed", counter);
+  _log->info("Clean up node store: '%d' nodes are removed", counter);
 }
 
 //bool NodeStore::addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel)
