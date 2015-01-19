@@ -11,6 +11,7 @@
 #include "ice/Logger.h"
 #include "ice/coordination/Coordinator.h"
 #include "ice/processing/EventHandler.h"
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -18,7 +19,7 @@ namespace ice
 Communication::Communication(std::weak_ptr<ICEngine> engine)
 {
   this->engine = engine;
-  this->_log = Logger::get("Communication");
+  this->_log = el::Loggers::getLogger("Communication");
 }
 
 Communication::~Communication()

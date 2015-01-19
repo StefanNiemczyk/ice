@@ -8,13 +8,14 @@
 #include "ice/processing/NodeStore.h"
 #include "ice/ICEngine.h"
 #include "ice/Logger.h"
+#include "easylogging++.h"
 
 namespace ice
 {
 
 NodeStore::NodeStore(std::weak_ptr<ICEngine> engine)
 {
-  _log = Logger::get("NodeStore");
+  _log = el::Loggers::getLogger("NodeStore");
   this->engine = engine;
 }
 

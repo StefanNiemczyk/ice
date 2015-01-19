@@ -8,6 +8,7 @@
 #include "ice/coordination/OntologyInterface.h"
 
 #include "ice/Logger.h"
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -16,7 +17,7 @@ JavaVM *OntologyInterface::jvm = nullptr;
 
 OntologyInterface::OntologyInterface(std::string const p_jarPath)
 {
-  this->_log = Logger::get("OntologyInterface");
+  this->_log = el::Loggers::getLogger("OntologyInterface");
 
   this->error = false;
   this->informationDirty = true;

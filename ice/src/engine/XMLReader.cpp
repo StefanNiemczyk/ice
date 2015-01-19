@@ -6,13 +6,14 @@
  */
 
 #include "ice/XMLReader.h"
+#include "easylogging++.h"
 
 namespace ice
 {
 
 XMLReader::XMLReader()
 {
-  this->_log = Logger::get("XMLReader");
+  this->_log = el::Loggers::getLogger("XMLReader");
 }
 
 XMLReader::~XMLReader()

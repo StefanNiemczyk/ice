@@ -18,13 +18,14 @@
 #include "ice/coordination/IntersectionInformationModel.h"
 #include "ice/coordination/ModelComperator.h"
 #include "ice/information/InformationStore.h"
+#include "easylogging++.h"
 
 namespace ice
 {
 
 Coordinator::Coordinator(std::weak_ptr<ICEngine> engine)
 {
-  this->_log = Logger::get("Coordinator");
+  this->_log = el::Loggers::getLogger("Coordinator");
   this->engine = engine;
   this->running = false;
 

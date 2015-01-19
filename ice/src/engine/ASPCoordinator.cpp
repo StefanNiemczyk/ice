@@ -11,13 +11,14 @@
 #include "ice/information/InformationSpecification.h"
 #include "ice/information/InformationStore.h"
 #include "ice/processing/NodeStore.h"
+#include "easylogging++.h"
 
 namespace ice
 {
 
 ASPCoordinator::ASPCoordinator(std::weak_ptr<ICEngine> engine, std::string const ownName)
 {
-  this->_log = Logger::get("ASPCoordinator");
+  this->_log = el::Loggers::getLogger("ASPCoordinator");
   _log->verbose("Constructor", "Constructor called");
 
   auto en = engine.lock();

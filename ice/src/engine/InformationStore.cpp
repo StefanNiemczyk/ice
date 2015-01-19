@@ -9,6 +9,7 @@
 
 #include "ice/ICEngine.h"
 #include "ice/information/StreamFactory.h"
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -26,13 +27,13 @@ InformationStore::InformationStore(std::weak_ptr<ICEngine> engine)
   this->eventHandler = engineObject->getEventHandler();
   this->config = engineObject->getConfig();
   this->streamFactory = engineObject->getStreamFactory();
-  this->_log = Logger::get("InformationStore");
+  this->_log = el::Loggers::getLogger("InformationStore");
 }
 
 InformationStore::InformationStore(std::shared_ptr<EventHandler> eventHandler)
 {
   this->eventHandler = eventHandler;
-  this->_log = Logger::get("InformationStore");
+  this->_log = el::Loggers::getLogger("InformationStore");
 }
 
 InformationStore::~InformationStore()

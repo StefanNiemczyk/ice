@@ -16,6 +16,7 @@
 #include "ice/ros/RosTimeFactory.h"
 
 #include "ice_msgs/Position.h"
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -23,7 +24,7 @@ namespace ice
 RosCommunication::RosCommunication(std::weak_ptr<ICEngine> engine) :
     Communication(engine)
 {
-  this->_log = Logger::get("RosCommunication");
+  this->_log = el::Loggers::getLogger("RosCommunication");
   this->running = false;
 }
 
