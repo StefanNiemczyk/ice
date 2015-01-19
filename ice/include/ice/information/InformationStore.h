@@ -267,7 +267,7 @@ template<typename T>
     //stream already registered
     if (ptr)
     {
-      _log->warn("InformationStore: Duplicated Stream with '%s', '%s', '%s'",
+      _log->warn("InformationStore: Duplicated Stream with '%v', '%v', '%v'",
                     specification->toString().c_str(), provider.c_str(), sourceSystem.c_str());
       return ptr;
     }
@@ -275,7 +275,7 @@ template<typename T>
     auto desc = std::make_shared<StreamDescription>(specification, name, provider, sourceSystem, metadata);
     auto stream = std::make_shared<InformationStream<T>>(desc, this->eventHandler, streamSize);
 
-    _log->debug("Created stream with '%s', '%s', '%s'", specification->toString().c_str(),
+    _log->debug("Created stream with '%v', '%v', '%v'", specification->toString().c_str(),
                 provider.c_str(), sourceSystem.c_str());
     this->streams.push_back(stream);
 

@@ -68,7 +68,7 @@ std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::st
 
   if (node)
   {
-    _log->info("Node '%s' already registered for entity '%s'", name.c_str(), entity.c_str());
+    _log->info("Node '%v' already registered for entity '%v'", name.c_str(), entity.c_str());
     return node;
   }
 
@@ -83,7 +83,7 @@ std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::st
 
   if (false == node)
   {
-    _log->error("Node '%s' could not be created for entity '%s'. Register missing?", name.c_str(),
+    _log->error("Node '%v' could not be created for entity '%v'. Register missing?", name.c_str(),
                 entity.c_str());
     return node;
   }
@@ -121,7 +121,7 @@ void NodeStore::cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes
     if (found)
       continue;
 
-    _log->info("Remove unused node %s", node->toString().c_str());
+    _log->info("Remove unused node %v", node->toString().c_str());
     counter++;
 
     node->deactivate();
@@ -130,7 +130,7 @@ void NodeStore::cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes
     --i;
   }
 
-  _log->info("Clean up node store: '%d' nodes are removed", counter);
+  _log->info("Clean up node store: '%v' nodes are removed", counter);
 }
 
 void NodeStore::cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp)
@@ -140,14 +140,14 @@ void NodeStore::cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp)
 
   for (auto node : nodesToCleanUp)
   {
-    _log->info("Remove node %s", node->toString().c_str());
+    _log->info("Remove node %v", node->toString().c_str());
     counter++;
 
     node->deactivate();
     node->destroy();
   }
 
-  _log->info("Clean up node store: '%d' nodes are removed", counter);
+  _log->info("Clean up node store: '%v' nodes are removed", counter);
 }
 
 //bool NodeStore::addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel)

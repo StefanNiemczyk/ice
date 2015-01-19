@@ -50,7 +50,7 @@ std::shared_ptr<BaseInformationStream> InformationStore::registerBaseStream(
   //stream already registered
   if (ptr)
   {
-    _log->warn("InformationStore: Duplicated Stream with '%s', '%s', '%s'",
+    _log->warn("InformationStore: Duplicated Stream with '%v', '%v', '%v'",
                   specification->toString().c_str(), provider.c_str(), sourceSystem.c_str());
     return ptr;
   }
@@ -60,13 +60,13 @@ std::shared_ptr<BaseInformationStream> InformationStore::registerBaseStream(
 
   if (stream)
   {
-    _log->debug("Created stream with '%s', '%s', '%s'", specification->toString().c_str(),
+    _log->debug("Created stream with '%v', '%v', '%v'", specification->toString().c_str(),
                 provider.c_str(), sourceSystem.c_str());
     this->streams.push_back(stream);
   }
   else
   {
-    _log->error("Stream with '%s', '%s', '%s' could not be created", specification->toString().c_str(),
+    _log->error("Stream with '%v', '%v', '%v' could not be created", specification->toString().c_str(),
                 provider.c_str(), sourceSystem.c_str());
   }
   return stream;
@@ -159,7 +159,7 @@ std::shared_ptr<EventHandler> InformationStore::getEventHandler() const
 //    return 1;
 //  }
 //
-//  _log->debug("Adding stream %s to map", stream->getName().c_str());
+//  _log->debug("Adding stream %v to map", stream->getName().c_str());
 //
 //  this->streamMap[stream->getName()] = stream;
 //
@@ -173,7 +173,7 @@ std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(Informati
 std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(InformationSpecification *specification,
                                                                        std::string provider, std::string sourceSystem)
 {
-  _log->debug("Get stream by '%s', '%s', '%s'", specification->toString().c_str(), provider.c_str(),
+  _log->debug("Get stream by '%v', '%v', '%v'", specification->toString().c_str(), provider.c_str(),
               sourceSystem.c_str());
 
   std::vector<std::shared_ptr<BaseInformationStream>> selected;
@@ -297,11 +297,11 @@ void InformationStore::cleanUpStreams()
   for (int i=0; i < this->streams.size(); ++i)
   {
     auto stream = this->streams.at(i);
-    _log->info("Checking stream '%s', reference count %d", stream->toString().c_str(), stream.use_count());
+    _log->info("Checking stream '%v', reference count %v", stream->toString().c_str(), stream.use_count());
 
     if (stream.use_count() == 2)
     {
-      _log->info("Remove unused stream '%s'", stream->toString().c_str());
+      _log->info("Remove unused stream '%v'", stream->toString().c_str());
 
       ++counter;
       this->streams.erase(this->streams.begin() + i);
@@ -309,7 +309,7 @@ void InformationStore::cleanUpStreams()
     }
   }
 
-  _log->info("Clean up information store: '%d' streams are removed", counter);
+  _log->info("Clean up information store: '%v' streams are removed", counter);
 }
 
 } /* namespace ice */

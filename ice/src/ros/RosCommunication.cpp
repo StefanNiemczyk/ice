@@ -90,7 +90,7 @@ void RosCommunication::sendHeartbeat()
 
 void RosCommunication::sendInformationRequest(identifier receiverId)
 {
-  _log->info("Send information model request from engine %s to engine %s",
+  _log->info("Send information model request from engine %v to engine %v",
              IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
 
   this->sendCommand(receiverId, RosCoordinationCommand::REQUEST_INFORMATION_MODEL);
@@ -98,7 +98,7 @@ void RosCommunication::sendInformationRequest(identifier receiverId)
 
 void RosCommunication::sendInformationModel(identifier receiverId, std::shared_ptr<InformationModel> informationModel)
 {
-  _log->info("Send information model from engine %s to engine %s",
+  _log->info("Send information model from engine %v to engine %v",
              IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
 
 //  ice_msgs::InformationModel model;
@@ -178,7 +178,7 @@ void RosCommunication::sendInformationModel(identifier receiverId, std::shared_p
 void RosCommunication::sendCooperationRequest(identifier receiverId,
                                               std::shared_ptr<CooperationRequest> cooperationRequest)
 {
-  _log->info("Send cooperation request from engine %s to engine %s",
+  _log->info("Send cooperation request from engine %v to engine %v",
              IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
 
 //  ice_msgs::CooperationRequest request;
@@ -219,7 +219,7 @@ void RosCommunication::sendCooperationRequest(identifier receiverId,
 void RosCommunication::sendCooperationResponse(identifier receiverId,
                                                std::shared_ptr<CooperationResponse> cooperationResponse)
 {
-  _log->info("Send cooperation response from engine %s to engine %s",
+  _log->info("Send cooperation response from engine %v to engine %v",
              IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
 
 //  ice_msgs::CooperationRequest response;
@@ -259,7 +259,7 @@ void RosCommunication::sendCooperationResponse(identifier receiverId,
 
 void RosCommunication::sendCooperationRefuse(identifier receiverId)
 {
-  _log->info("Send cooperation refuse from engine %s to engine %s",
+  _log->info("Send cooperation refuse from engine %v to engine %v",
              IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
 
   this->sendCommand(receiverId, RosCoordinationCommand::COOPERATION_REFUSE);
@@ -267,7 +267,7 @@ void RosCommunication::sendCooperationRefuse(identifier receiverId)
 
 void RosCommunication::sendCooperationAccept(identifier receiverId)
 {
-  _log->info("Send cooperation accept from engine %s to engine %s",
+  _log->info("Send cooperation accept from engine %v to engine %v",
              IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
 
   this->sendCommand(receiverId, RosCoordinationCommand::COOPERATION_ACCEPT);
@@ -275,7 +275,7 @@ void RosCommunication::sendCooperationAccept(identifier receiverId)
 
 void RosCommunication::sendNegotiationFinished(identifier receiverId)
 {
-  _log->info("Send negotiation finished from engine %s to engine %s",
+  _log->info("Send negotiation finished from engine %v to engine %v",
              IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
 
   this->sendCommand(receiverId, RosCoordinationCommand::NEGOTIATION_FINISHED);
@@ -283,7 +283,7 @@ void RosCommunication::sendNegotiationFinished(identifier receiverId)
 
 void RosCommunication::sendRetryNegotiation(identifier receiverId)
 {
-  _log->info("Send retry negotiation from engine %s to engine %s",
+  _log->info("Send retry negotiation from engine %v to engine %v",
              IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
 
   this->sendCommand(receiverId, RosCoordinationCommand::NEGOTIATION_RETRY);
@@ -291,7 +291,7 @@ void RosCommunication::sendRetryNegotiation(identifier receiverId)
 
 void RosCommunication::sendStopCooperation(identifier receiverId)
 {
-  _log->info("Send stop cooperation from engine %s to engine %s",
+  _log->info("Send stop cooperation from engine %v to engine %v",
              IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
 
   this->sendCommand(receiverId, RosCoordinationCommand::STOP_COOPERATION);
@@ -299,7 +299,7 @@ void RosCommunication::sendStopCooperation(identifier receiverId)
 
 void RosCommunication::sendCooperationStopped(identifier receiverId)
 {
-  _log->info("Send cooperation stopped from engine %s to engine %s",
+  _log->info("Send cooperation stopped from engine %v to engine %v",
              IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
 
   this->sendCommand(receiverId, RosCoordinationCommand::COOPERATION_STOPPED);
@@ -315,7 +315,7 @@ std::shared_ptr<BaseInformationSender> RosCommunication::registerStreamAsSender(
   if (false == ptr)
   {
     auto type = stream->getTypeInfo();
-    _log->error("Unknown information type %s of stream %s with type string %s",
+    _log->error("Unknown information type %v of stream %v with type string %v",
                 (*type).name(), stream->getName().c_str(), stream->getSpecification()->getTypeString().c_str());
   }
 
@@ -332,7 +332,7 @@ std::shared_ptr<InformationReceiver> RosCommunication::registerStreamAsReceiver(
   if (false == ptr)
   {
     auto type = stream->getTypeInfo();
-    _log->error("Unknown information type %s of stream %s with type string %s",
+    _log->error("Unknown information type %v of stream %v with type string %v",
                 (*type).name(), stream->getName().c_str(), stream->getSpecification()->getTypeString().c_str());
   }
 
@@ -345,14 +345,14 @@ std::shared_ptr<BaseInformationSender> RosCommunication::createSender(std::share
 
   if (typeid(Position) == *type)
   { // ice::Position -> ice_msgs::Position
-    _log->debug("Creating sender for stream %s with mapping ice::Position -> ice_msgs::Position",
+    _log->debug("Creating sender for stream %v with mapping ice::Position -> ice_msgs::Position",
                 stream->getName().c_str());
     transformC2M<Position, ice_msgs::Position> method = &RosMessageTransform::transformC2MPosition;
     return this->_createSender<Position, ice_msgs::Position>(stream, method);
   }
   else if (typeid(std::vector<Position>) == *type)
   { // ice::Position[] -> ice_msgs::Positions
-    _log->debug("Creating sender for stream %s with mapping ice::Position[] -> ice_msgs::Positions",
+    _log->debug("Creating sender for stream %v with mapping ice::Position[] -> ice_msgs::Positions",
                 stream->getName().c_str());
     transformC2M<std::vector<Position>, ice_msgs::Positions> method = &RosMessageTransform::transformC2MPositions;
     return this->_createSender<std::vector<Position>, ice_msgs::Positions>(stream, method);
@@ -368,14 +368,14 @@ std::shared_ptr<InformationReceiver> RosCommunication::createReceiver(std::share
 
   if (typeid(Position) == *type)
   { // ice_msgs::Position -> ice::Position
-    _log->debug("Creating receiver for stream %s with mapping ice_msgs::Position -> ice::Position",
+    _log->debug("Creating receiver for stream %v with mapping ice_msgs::Position -> ice::Position",
                 stream->getName().c_str());
     transformM2C<Position, ice_msgs::Position> method = &RosMessageTransform::transformM2CPosition;
     return this->_createReceiver<Position, ice_msgs::Position>(stream, method);
   }
   else if (typeid(std::vector<Position>) == *type)
   { // ice_msgs::Positions -> ice::Position[]
-    _log->debug("Creating receiver for stream %s with mapping ice_msgs::Positions -> ice::Position[]",
+    _log->debug("Creating receiver for stream %v with mapping ice_msgs::Positions -> ice::Position[]",
                 stream->getName().c_str());
     transformM2C<std::vector<Position>, ice_msgs::Positions> method = &RosMessageTransform::transformM2CPositions;
     return this->_createReceiver<std::vector<Position>, ice_msgs::Positions>(stream, method);
@@ -418,7 +418,7 @@ void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
 {
   identifier senderId = IDGenerator::getInstance()->getIdentifier(msg->header.senderId.id);
 
-  _log->verbose(1, "Heartbeat from engine %s", IDGenerator::toString(senderId).c_str());
+  _log->verbose(1, "Heartbeat from engine %v", IDGenerator::toString(senderId).c_str());
 
   if (senderId == this->engineId)
     return;
@@ -435,7 +435,7 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
   if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)
     return;
 
-  _log->debug("Coordination command from engine %s with command %i",
+  _log->debug("Coordination command from engine %v with command %v",
               IDGenerator::toString(senderId).c_str(), msg->command);
 
   switch (msg->command)
@@ -469,7 +469,7 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
       { return this->coordinator->onCooperationStopped(senderId);}));
       break;
     default:
-      _log->error("Unknown coordination command from engine %s with command %i",
+      _log->error("Unknown coordination command from engine %v with command %v",
                   IDGenerator::toString(senderId).c_str(), msg->command);
   }
 }
@@ -481,7 +481,7 @@ void RosCommunication::onInformationModel(const ice_msgs::InformationModel::Cons
 //  if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)
 //    return;
 //
-//  _log->debug("Information model received from engine %s",
+//  _log->debug("Information model received from engine %v",
 //              IDGenerator::toString(senderId).c_str());
 //
 //  auto model = std::make_shared<InformationModel>();
@@ -550,7 +550,7 @@ void RosCommunication::onCooperationRequest(const ice_msgs::CooperationRequest::
 //  if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)
 //    return;
 //
-//  _log->debug("Cooperation request received from engine %s",
+//  _log->debug("Cooperation request received from engine %v",
 //              IDGenerator::toString(senderId).c_str());
 //
 //  auto request = std::make_shared<CooperationRequest>(senderId);
@@ -582,7 +582,7 @@ void RosCommunication::onCooperationResponse(const ice_msgs::CooperationResponse
 //  if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)
 //    return;
 //
-//  _log->debug("Cooperation response received from engine %s",
+//  _log->debug("Cooperation response received from engine %v",
 //              IDGenerator::toString(senderId).c_str());
 //
 //  auto response = std::make_shared<CooperationResponse>(senderId);
