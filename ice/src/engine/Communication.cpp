@@ -13,6 +13,8 @@
 #include "ice/processing/EventHandler.h"
 #include "easylogging++.h"
 
+INITIALIZE_EASYLOGGINGPP
+
 namespace ice
 {
 

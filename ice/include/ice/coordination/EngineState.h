@@ -30,7 +30,7 @@ class EngineState;
 } /* namespace ice */
 namespace el
 {
-class Logger
+class Logger;
 } /* namespace el */
 
 namespace ice

@@ -14,7 +14,6 @@
 #include "ice/information/StreamDescription.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/processing/AsynchronousTask.h"
-#include "easylogging++.h"
 
 // Forward declaration
 namespace ice
@@ -27,6 +26,10 @@ class InformationType;
 class EngineState;
 class EventHandler;
 }
+namespace el {
+class Logger;
+}
+
 
 namespace ice
 {

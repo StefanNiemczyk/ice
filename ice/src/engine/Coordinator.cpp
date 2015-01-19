@@ -926,7 +926,7 @@ void Coordinator::workerTask()
     {
       auto e = this->engine.lock();
       if (e)
-        _log->verbose("Sending heartbeat %v, %v", counter, IDGenerator::toString(e->getId()).c_str());
+        _log->verbose(1, "Sending heartbeat %v, %v", counter, IDGenerator::toString(e->getId()).c_str());
     }
 
     {
@@ -936,7 +936,7 @@ void Coordinator::workerTask()
 
       for (auto engine : this->engineStates)
       {
-        _log->verbose("Checking engine %v in engine state %v since %v",
+        _log->verbose(1, "Checking engine %v in engine state %v since %v",
                       IDGenerator::toString(engine->getEngineId()).c_str(), engine->getCooperationState(),
                       engine->getTimeLastStateUpdate());
 

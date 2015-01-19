@@ -11,7 +11,6 @@
 #include "ice/information/InformationSpecification.h"
 #include "ice/information/InformationStore.h"
 #include "ice/processing/NodeStore.h"
-#include "easylogging++.h"
 
 namespace ice
 {
@@ -87,8 +86,8 @@ void ASPCoordinator::optimizeInformationFlow()
 
   // Solving
   auto solveResult = this->asp->solve();
-
-  _log->info("Solving finished: %v", solveResult);
+	//FIXME: implement loggable interface?
+  //_log->info("Solving finished: %v", solveResult);
 
   if (solveResult == Gringo::SolveResult::SAT)
   {

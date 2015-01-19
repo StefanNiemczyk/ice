@@ -162,7 +162,7 @@ bool OntologyInterface::checkError(std::string p_method, std::string p_error)
   if (env->ExceptionOccurred())
   {
     this->error = true;
-    this->_log->error(p_method, p_error);
+    this->_log->error("%v, %v", p_method, p_error);
     env->ExceptionDescribe();
   }
   else
