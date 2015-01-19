@@ -425,8 +425,7 @@ void ASPCoordinator::readSystemsFromOntology()
           case ASPElementType::ASP_IRO_NODE:
             if (false == this->nodeStore->existNodeCreator(element->className))
             {
-              _log->warning("checkASPFromOntology",
-                            "Missing creator for node '%s' of type '%s', cpp grounding '%s', asp external set to false",
+              _log->warn("Missing creator for node '%s' of type '%s', cpp grounding '%s', asp external set to false",
                             element->name.c_str(), ASPElementTypeNames[type].c_str(), element->className.c_str());
               element->external->assign(false);
             }
@@ -564,7 +563,7 @@ std::map<std::string, std::string> ASPCoordinator::readConfiguration(std::string
 
     if (index == std::string::npos)
     {
-      _log->warning("readConfiguration", "Broken configuration '%s', skipped", item.c_str());
+      _log->warn("Broken configuration '%s', skipped", item.c_str());
     }
 
     configuration[item.substr(0, index)] = item.substr(index + 1, item.size());
@@ -601,7 +600,7 @@ void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *
   {
     std::stringstream o;
     o << information;
-    _log->warning("readMetadata", "Wrong size '%d' for metadata '%s' of stream '%s', '%s', '%s'", delayResult->size(),
+    _log->warn("Wrong size '%d' for metadata '%s' of stream '%s', '%s', '%s'", delayResult->size(),
                   name.c_str(), o.str().c_str(), provider.c_str(), sourceSystem.c_str());
     return;
   }
@@ -615,7 +614,7 @@ void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *
     std::stringstream o, o2;
     o << information;
     o2 << value;
-    _log->warning("readMetadata", "Wrong type '%d' of '%s' for metadata '%s' of stream '%s', '%s', '%s'",
+    _log->warn("Wrong type '%d' of '%s' for metadata '%s' of stream '%s', '%s', '%s'",
                   value.type(), o2.str().c_str(), name.c_str(), o.str().c_str(), provider.c_str(),
                   sourceSystem.c_str());
     return;
@@ -623,7 +622,7 @@ void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *
 
   std::stringstream o;
      o << information;
-  _log->warning("readMetadata", "Metadata '%s' of stream '%s', '%s', '%s' has value '%d'",
+  _log->warn("Metadata '%s' of stream '%s', '%s', '%s' has value '%d'",
                     name.c_str(), o.str().c_str(), provider.c_str(),
                     sourceSystem.c_str(), value.num());
 

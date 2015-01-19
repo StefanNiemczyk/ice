@@ -170,7 +170,7 @@ int Coordinator::onInformationModelRequest(identifier engineId)
       && engineState->getCooperationState() != CooperationState::INFORMATION_MODEL_REQUESTED
       && engineState->getCooperationState() != CooperationState::RETRY_NEGOTIATION)
   {
-    _log->warning("onInformationModelRequest", "Information model request from engine %s in wrong state %i",
+    _log->warn("Information model request from engine %s in wrong state %i",
                   IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
 
     return 1;
@@ -232,7 +232,7 @@ int Coordinator::onInformationModel(identifier engineId, std::shared_ptr<Informa
 //
 //  if (engineState->getCooperationState() != CooperationState::INFORMATION_MODEL_REQUESTED)
 //  {
-//    _log->warning("onInformationModel", "Information model received from engine %s in wrong state %i",
+//    _log->warn("Information model received from engine %s in wrong state %i",
 //                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
 //
 //    this->communication->sendRetryNegotiation(engineId);
@@ -321,7 +321,7 @@ int Coordinator::onCooperationRequest(identifier engineId, std::shared_ptr<Coope
 //
 //  if (engineState->getCooperationState() != CooperationState::INFORMATION_MODEL_SEND)
 //  {
-//    _log->warning("onCooperationRequest", "Cooperation request received from engine %s in wrong state %i",
+//    _log->warn("Cooperation request received from engine %s in wrong state %i",
 //                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
 //
 //    this->communication->sendRetryNegotiation(engineId);
@@ -442,7 +442,7 @@ int Coordinator::onCooperationResponse(identifier engineId, std::shared_ptr<Coop
 //
 //  if (engineState->getCooperationState() != CooperationState::COOPERATION_REQUEST_SEND)
 //  {
-//    _log->warning("onCooperationResponse", "Cooperation response received from engine %s in wrong state %i",
+//    _log->warn("Cooperation response received from engine %s in wrong state %i",
 //                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
 //
 //    this->communication->sendRetryNegotiation(engineId);
@@ -558,7 +558,7 @@ int Coordinator::onCooperationAccept(identifier engineId)
 //
 //  if (engineState->getCooperationState() != CooperationState::COOPERATION_RESPONSE_SEND)
 //  {
-//    _log->warning("onCooperationAccept", "Cooperation accept received from engine %s in wrong state %i",
+//    _log->warn("Cooperation accept received from engine %s in wrong state %i",
 //                  IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
 //
 //    this->communication->sendRetryNegotiation(engineId);
@@ -655,7 +655,7 @@ int Coordinator::onCooperationRefuse(identifier engineId)
       && engineState->getCooperationState() != CooperationState::COOPERATION_REQUEST_SEND
       && engineState->getCooperationState() != CooperationState::INFORMATION_MODEL_SEND)
   {
-    _log->warning("onCooperationRefuse", "Cooperation refuse received from engine %s in wrong state %i",
+    _log->warn("Cooperation refuse received from engine %s in wrong state %i",
                   IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
 
     this->communication->sendRetryNegotiation(engineId);
@@ -713,7 +713,7 @@ int Coordinator::onNegotiationFinished(identifier engineId)
   if (engineState->getCooperationState() != CooperationState::COOPERATION_REFUSE_SEND
       && engineState->getCooperationState() != CooperationState::COOPERATION_ACCEPT_SEND)
   {
-    _log->warning("onNegotiationFinished", "Negotiation finished received from engine %s in wrong state %i",
+    _log->warn("Negotiation finished received from engine %s in wrong state %i",
                   IDGenerator::toString(engineId).c_str(), engineState->getCooperationState());
 
     this->communication->sendRetryNegotiation(engineId);
@@ -1031,7 +1031,7 @@ void Coordinator::workerTask()
             this->communication->sendStopCooperation(engine->getEngineId());
             break;
           default:
-            _log->warning("workerTask", "Unknown cooperation state %i", engine->getCooperationState());
+            _log->warn("Unknown cooperation state %i", engine->getCooperationState());
         }
       }
     }

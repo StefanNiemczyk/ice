@@ -267,7 +267,7 @@ template<typename T>
     //stream already registered
     if (ptr)
     {
-      _log->warning("registerStream", "InformationStore: Duplicated Stream with '%s', '%s', '%s'",
+      _log->warn("InformationStore: Duplicated Stream with '%s', '%s', '%s'",
                     specification->toString().c_str(), provider.c_str(), sourceSystem.c_str());
       return ptr;
     }
