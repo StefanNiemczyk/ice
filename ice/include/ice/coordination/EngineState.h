@@ -25,10 +25,13 @@ class CooperationResponse;
 class ICEngine;
 class InformationModel;
 class IntersectionInformationModel;
-class Logger;
 class TimeFactory;
 class EngineState;
 } /* namespace ice */
+namespace el
+{
+class Logger
+} /* namespace el */
 
 namespace ice
 {
@@ -341,7 +344,7 @@ private:
   std::vector<std::shared_ptr<BaseInformationStream>> streamsRequested; /**< List of streams requested from the main */
   int retryCounter; /**< Counts the retrys of the current activity */
   std::vector<std::shared_ptr<EngineConnection>> connections; /**< Connections of the engine to other engines */
-  Logger* _log; /**< Logger */
+  el::Logger* _log; /**< Logger */
 };
 
 } /* namespace ice */

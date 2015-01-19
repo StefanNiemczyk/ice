@@ -15,8 +15,8 @@
 
 #include "tinyxml.h"
 
-#include "ice/Logger.h"
 #include "ice/processing/Node.h"
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -91,7 +91,7 @@ private:
   std::vector<XMLStream*> streams;
   std::vector<XMLStreamTeamplate*> streamTemplates;
   std::vector<XMLNode*> nodes;
-  Logger* _log;
+  el::Logger* _log;
 };
 
 } /* namespace ice */

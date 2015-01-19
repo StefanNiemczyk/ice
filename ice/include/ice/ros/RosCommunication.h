@@ -26,6 +26,7 @@
 #include "ice_msgs/Heartbeat.h"
 #include "ice_msgs/ICECoordination.h"
 #include "ice_msgs/InformationModel.h"
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -120,7 +121,7 @@ private:
   ros::Subscriber cooperationResponseSubscriber; /**< Subscriber on the  cooperation response channel */
   bool running; /**< True if the worker thread is running, else false */
   std::thread worker; /**< Worker thread to perform the spin */
-  Logger* _log; /**< Logger for communication */
+  el::Logger* _log; /**< Logger for communication */
 };
 
 template<typename ICEType, typename ROSType>

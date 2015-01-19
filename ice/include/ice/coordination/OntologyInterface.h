@@ -15,7 +15,7 @@
 #include <vector>
 
 // Forward declaration
-namespace ice
+namespace el
 {
 class Logger;
 }

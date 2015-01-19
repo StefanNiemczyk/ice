@@ -13,13 +13,13 @@
 #include <ros/package.h>
 #include <gringo/value.hh>
 
-#include "ice/Logger.h"
 #include "ice/TypeDefs.h"
 #include "ice/coordination/EngineState.h"
 #include "ice/coordination/OntologyInterface.h"
 
 #include "ClingWrapper.h"
 #include "External.h"
+#include "easylogging++.h"
 
 //Forward declarations
 namespace ice
@@ -72,7 +72,7 @@ private:
   bool groundingDirty; /**< Flag to check if the grounding is dirty */
   int queryIndex; /**< Index of the query */
   std::shared_ptr<supplementary::External> lastQuery; /**< The last query */
-  Logger* _log; /**< Logger */
+  el::Logger* _log; /**< Logger */
   std::mutex mtx_; /**< Mutex */
 };
 

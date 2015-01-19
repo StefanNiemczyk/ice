@@ -11,10 +11,10 @@
 #include <memory>
 #include <mutex>
 
-#include "ice/Logger.h"
 #include "ice/information/StreamDescription.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/processing/AsynchronousTask.h"
+#include "easylogging++.h"
 
 // Forward declaration
 namespace ice
@@ -254,7 +254,7 @@ protected:
   std::vector<std::shared_ptr<AsynchronousTask>> taskSynchronous; /**< List of events which are executed synchronous if a new element is addes */
   std::vector<std::shared_ptr<EngineState>> remoteListeners; /**< List of engine states of remote engines registered */
   const std::shared_ptr<StreamDescription> streamDescription; /**< Description of this stream used for information coordination */
-  Logger* _log; /**< Logger */
+  el::Logger* _log; /**< Logger */
   std::mutex _mtx; /**< Mutex */
 
 private:

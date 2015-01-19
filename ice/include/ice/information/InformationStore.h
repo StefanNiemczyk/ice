@@ -15,11 +15,11 @@
 #include "boost/uuid/uuid.hpp"
 
 #include "ice/Configuration.h"
-#include "ice/Logger.h"
 #include "ice/information/StreamDescription.h"
 #include "ice/coordination/StreamTemplateDescription.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/information/InformationSpecification.h"
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -246,7 +246,7 @@ private:
 //  std::map<std::string, std::shared_ptr<BaseInformationStream>> streamMap; /**< Map of stream name -> information stream */
 //  std::map<std::string, std::shared_ptr<InformationStreamTemplate>> streamTemplates; /**< Map of stream name -> information stream */
   std::mutex _mtx; /**< Mutex */
-  Logger* _log; /**< Logger */
+  el::Logger* _log; /**< Logger */
 };
 
 } /* namespace ice */
