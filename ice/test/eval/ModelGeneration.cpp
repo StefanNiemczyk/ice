@@ -3,7 +3,6 @@
 #include <gringo/value.hh>
 #include <chrono>
 
-#include "ice/Logger.h"
 #include "ice/TypeDefs.h"
 #include "ice/coordination/EngineState.h"
 #include "ice/coordination/OntologyInterface.h"

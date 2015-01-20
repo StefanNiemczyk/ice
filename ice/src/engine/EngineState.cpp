@@ -9,7 +9,6 @@
 #include <ice/coordination/CooperationResponse.h>
 #include <ice/coordination/EngineState.h>
 #include <ice/ICEngine.h>
-#include <ice/Logger.h>
 #include <ice/TimeFactory.h>
 #include "easylogging++.h"
 

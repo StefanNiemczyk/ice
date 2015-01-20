@@ -7,7 +7,6 @@
 
 #include "ice/coordination/OntologyInterface.h"
 
-#include "ice/Logger.h"
 #include "easylogging++.h"
 
 namespace ice

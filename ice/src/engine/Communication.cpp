@@ -8,7 +8,6 @@
 #include "ice/communication/Communication.h"
 
 #include "ice/ICEngine.h"
-#include "ice/Logger.h"
 #include "ice/coordination/Coordinator.h"
 #include "ice/processing/EventHandler.h"
 #include "easylogging++.h"
