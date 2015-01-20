@@ -176,7 +176,6 @@ add_library(${PROJECT_NAME}
   src/engine/Configuration.cpp
   src/engine/Identifier.cpp
   src/engine/ICEngine.cpp 
-  src/engine/Logger.cpp
   src/engine/TimeFactory.cpp
   src/engine/XMLReader.cpp
   
@@ -252,7 +251,6 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/test_ASPComposition.cpp
  # test/test_JNI.cpp
  # test/test_ASPCoordinator.cpp
- # test/test_Logger.cpp
  # test/test_RingBuffer.cpp
  # test/test_Buffer.cpp
  # test/test_InformationStore.cpp

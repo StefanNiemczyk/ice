@@ -20,7 +20,6 @@
 #include "boost/lexical_cast.hpp"
 #include "boost/uuid/uuid.hpp"
 
-#include "ice/Logger.h"
 #include "ice/ICEngine.h"
 #include "ice/container/Position.h"
 #include "ice/coordination/InformationModel.h"

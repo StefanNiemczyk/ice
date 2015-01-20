@@ -19,7 +19,6 @@ namespace ice
 {
 //Forward declarations
 class ICEngine;
-class Logger;
 
 //* NodeStore
 /**
@@ -84,7 +83,7 @@ private:
   std::weak_ptr<ICEngine> engine; /**< Weak ptr to the engine */
   std::vector<std::shared_ptr<Node>> nodes; /**< Nodes registered in this store */
   std::mutex mtx_; /** Mutex */
-  Logger* _log; /**< Logger */
+  el::Logger* _log; /**< Logger */
 };
 
 } /* namespace ice */

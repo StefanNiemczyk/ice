@@ -17,8 +17,8 @@ namespace ice
 
 ASPCoordinator::ASPCoordinator(std::weak_ptr<ICEngine> engine, std::string const ownName)
 {
-  this->_log = Logger::get("ASPCoordinator");
-  _log->verbose("Constructor", "Constructor called");
+  this->_log = el::Loggers::getLogger("ASPCoordinator");
+  _log->verbose(1, "Constructor called");
 
   auto en = engine.lock();
   this->nodeStore = en->getNodeStore();
@@ -30,7 +30,7 @@ ASPCoordinator::ASPCoordinator(std::weak_ptr<ICEngine> engine, std::string const
   this->self = this->getEngineStateByIRI(ownName);
 
   std::string path = ros::package::getPath("ice");
-  _log->debug("Constructor", "Default ontology path %s", path.c_str());
+  _log->debug("Default ontology path %v", path.c_str());
 
   // Initializing ASP
   this->asp = std::make_shared<supplementary::ClingWrapper>();
@@ -49,30 +49,30 @@ ASPCoordinator::~ASPCoordinator()
 
 void ASPCoordinator::optimizeInformationFlow()
 {
-  _log->verbose("optimizeInformationFlow", "Start optimizing");
+  _log->verbose(1, "Start optimizing");
 
   if (this->ontology->isLoadDirty())
   {
-    _log->debug("optimizeInformationFlow", "Load flag dirty, reload ontologies");
+    _log->debug("Load flag dirty, reload ontologies");
     this->ontology->loadOntologies();
   }
 
   if (this->ontology->isInformationDirty())
   {
-    _log->debug("optimizeInformationFlow", "Information model flag dirty, reload information structure");
+    _log->debug("Information model flag dirty, reload information structure");
     this->readInfoStructureFromOntology();
   }
 
   if (this->ontology->isSystemDirty())
   {
-    _log->debug("optimizeInformationFlow", "System flag dirty, reload systems");
+    _log->debug("System flag dirty, reload systems");
     this->readSystemsFromOntology();
   }
 
   if (groundingDirty)
   {
     this->groundingDirty = false;
-    _log->debug("optimizeInformationFlow", "Grounding flag dirty, grounding asp program");
+    _log->debug("Grounding flag dirty, grounding asp program");
 
     if (this->lastQuery)
     {
@@ -86,12 +86,12 @@ void ASPCoordinator::optimizeInformationFlow()
 
   // Solving
   auto solveResult = this->asp->solve();
-
-  _log->info("optimizeInformationFlow", "Solving finished: %d", solveResult);
+	//FIXME: implement loggable interface?
+  //_log->info("Solving finished: %v", solveResult);
 
   if (solveResult == Gringo::SolveResult::SAT)
   {
-    //_log->verbose("optimizeInformationFlow","Resulting Model \n%s", this->asp->printLastModel());
+    //_log->verbose(1, "Resulting Model \n%v", this->asp->printLastModel());
     this->asp->printLastModel();
     bool valid = true;
     std::vector<std::shared_ptr<Node>> nodes;
@@ -113,14 +113,14 @@ void ASPCoordinator::optimizeInformationFlow()
       auto nodeEntity = *nodeValue.args()[3].name();
       auto nodeEntity2 = *nodeValue.args()[4].name();
 
-      _log->debug("optimizeInformationFlow", "Look up node '%s' to process entity '%s'", nodeName.c_str(),
+      _log->debug("Look up node '%v' to process entity '%v'", nodeName.c_str(),
                   nodeEntity.c_str());
 
       auto aspNode = this->self->getASPElementByName(nodeName);
 
       if (aspNode == nullptr)
       {
-        _log->error("optimizeInformationFlow", "No node '%s' found, asp system description is invalid!",
+        _log->error("No node '%v' found, asp system description is invalid!",
                     nodeName.c_str());
         valid = false;
         break;
@@ -141,8 +141,7 @@ void ASPCoordinator::optimizeInformationFlow()
 
       if (node == nullptr)
       {
-        _log->error("optimizeInformationFlow",
-                    "Node '%s' (%s) could not be created, asp system description is invalid!", nodeName.c_str(),
+        _log->error("Node '%v' (%v) could not be created, asp system description is invalid!", nodeName.c_str(),
                     aspNode->className.c_str());
         valid = false;
         break;
@@ -164,7 +163,7 @@ void ASPCoordinator::optimizeInformationFlow()
 
       if (false == connectResult)
       {
-        _log->error("optimizeInformationFlow", "No asp model by look up of connected streams to node '%s'",
+        _log->error("No asp model by look up of connected streams to node '%v'",
                     aspNode->name.c_str());
         valid = false;
         break;
@@ -173,7 +172,7 @@ void ASPCoordinator::optimizeInformationFlow()
       {
         for (auto connect : *connectResult)
         {
-          _log->debug("optimizeInformationFlow", "Look up connected stream for node '%s'", nodeName.c_str());
+          _log->debug("Look up connected stream for node '%v'", nodeName.c_str());
 
           auto lastProcessing = *connect.args()[5].name();
           auto sourceSystem = *connect.args()[6].name();
@@ -185,8 +184,7 @@ void ASPCoordinator::optimizeInformationFlow()
           {
             std::stringstream o;
             o << connect;
-            _log->error("optimizeInformationFlow",
-                        "Stream '%s' could not be created, asp system description is invalid!", o.str().c_str());
+            _log->error("Stream '%v' could not be created, asp system description is invalid!", o.str().c_str());
             valid = false;
             break;
           }
@@ -208,7 +206,7 @@ void ASPCoordinator::optimizeInformationFlow()
 
       for (auto output : *streamResult)
       {
-        _log->debug("optimizeInformationFlow", "Look up output stream for node '%s'", nodeName.c_str());
+        _log->debug("Look up output stream for node '%v'", nodeName.c_str());
 
         auto lastProcessing = *output.args()[2].name();
         auto sourceSystem = *output.args()[3].name();
@@ -220,7 +218,7 @@ void ASPCoordinator::optimizeInformationFlow()
         {
           std::stringstream o;
           o << output;
-          _log->error("optimizeInformationFlow", "Stream '%s' could not be created, asp system description is invalid!",
+          _log->error("Stream '%v' could not be created, asp system description is invalid!",
                       o.str().c_str());
           valid = false;
           break;
@@ -242,7 +240,7 @@ void ASPCoordinator::optimizeInformationFlow()
 
     if (valid)
     {
-      _log->info("optimizeInformationFlow", "Optimizing successfully completed");
+      _log->info("Optimizing successfully completed");
       this->nodeStore->cleanUpUnusedNodes(nodes);
       for (auto node : nodes)
       {
@@ -251,7 +249,7 @@ void ASPCoordinator::optimizeInformationFlow()
     }
     else
     {
-      _log->error("optimizeInformationFlow", "Optimizing failed, no processing was established");
+      _log->error("Optimizing failed, no processing was established");
       for (auto node : nodes)
       {
         this->nodeStore->cleanUpNodes(nodes);
@@ -261,12 +259,12 @@ void ASPCoordinator::optimizeInformationFlow()
     this->informationStore->cleanUpStreams();
   }
 
-  _log->verbose("optimizeInformationFlow", "End optimizing");
+  _log->verbose(1, "End optimizing");
 }
 
 void ASPCoordinator::readInfoStructureFromOntology()
 {
-  _log->verbose("readInfoStructureFromOntology", "Read information structure from ontology");
+  _log->verbose(1, "Read information structure from ontology");
 
   if (this->ontology->isLoadDirty())
     this->ontology->loadOntologies();
@@ -276,8 +274,8 @@ void ASPCoordinator::readInfoStructureFromOntology()
 
   const char* infoStructure = this->ontology->readInformationStructureAsASP();
 
-  _log->debug("readInfoStructureFromOntology", "Extracted structure from ontology");
-  _log->verbose("readInfoStructureFromOntology", infoStructure);
+  _log->debug("Extracted structure from ontology");
+  _log->verbose(1, infoStructure);
 
   this->entityTypeMap.clear();
 
@@ -315,7 +313,7 @@ void ASPCoordinator::readInfoStructureFromOntology()
 
 void ASPCoordinator::readSystemsFromOntology()
 {
-  _log->verbose("readSystemsFromOntology", "Read systems from ontology");
+  _log->verbose(1, "Read systems from ontology");
 
   if (this->ontology->isLoadDirty())
     this->ontology->loadOntologies();
@@ -327,7 +325,7 @@ void ASPCoordinator::readSystemsFromOntology()
 
   if (ontSystems == nullptr)
   {
-    _log->error("readSystemsFromOntology", "Error occurred while reading systems");
+    _log->error("Error occurred while reading systems");
     return;
   }
 
@@ -335,7 +333,7 @@ void ASPCoordinator::readSystemsFromOntology()
 
   for (auto ontSystem : *ontSystems)
   {
-    _log->debug("readSystemsFromOntology", "Checking system " + std::string(ontSystem));
+    _log->debug("Checking system " + std::string(ontSystem));
     system = this->getEngineStateByIRI(ontSystem);
 
     auto nodes = this->ontology->readNodesAndIROsAsASP(ontSystem);
@@ -381,7 +379,7 @@ void ASPCoordinator::readSystemsFromOntology()
       }
       else
       {
-        _log->error("readSystemsFromOntology", "Unknown asp element type '%s', element will be skipped",
+        _log->error("Unknown asp element type '%v', element will be skipped",
                     types->at(i));
 
         delete name;
@@ -397,7 +395,7 @@ void ASPCoordinator::readSystemsFromOntology()
 
       if (!node)
       {
-        _log->debug("readSystemsFromOntology", "ASP element '%s' not found, creating new element",
+        _log->debug("ASP element '%v' not found, creating new element",
                     std::string(name).c_str());
         auto element = std::make_shared<ASPElement>();
         element->aspString = aspStr;
@@ -424,8 +422,7 @@ void ASPCoordinator::readSystemsFromOntology()
           case ASPElementType::ASP_IRO_NODE:
             if (false == this->nodeStore->existNodeCreator(element->className))
             {
-              _log->warning("checkASPFromOntology",
-                            "Missing creator for node '%s' of type '%s', cpp grounding '%s', asp external set to false",
+              _log->warn("Missing creator for node '%v' of type '%v', cpp grounding '%v', asp external set to false",
                             element->name.c_str(), ASPElementTypeNames[type].c_str(), element->className.c_str());
               element->external->assign(false);
             }
@@ -545,7 +542,7 @@ std::shared_ptr<EngineState> ASPCoordinator::getEngineStateByIRI(std::string p_i
       return system;
   }
 
-  _log->info("getEngineStateByIRI", "New system found %s", p_iri.c_str());
+  _log->info("New system found %v", p_iri.c_str());
   std::shared_ptr<EngineState> system = std::make_shared<EngineState>(p_iri, this->engine);
   this->systems.push_back(system);
 
@@ -563,7 +560,7 @@ std::map<std::string, std::string> ASPCoordinator::readConfiguration(std::string
 
     if (index == std::string::npos)
     {
-      _log->warning("readConfiguration", "Broken configuration '%s', skipped", item.c_str());
+      _log->warn("Broken configuration '%v', skipped", item.c_str());
     }
 
     configuration[item.substr(0, index)] = item.substr(index + 1, item.size());
@@ -600,7 +597,7 @@ void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *
   {
     std::stringstream o;
     o << information;
-    _log->warning("readMetadata", "Wrong size '%d' for metadata '%s' of stream '%s', '%s', '%s'", delayResult->size(),
+    _log->warn("Wrong size '%v' for metadata '%v' of stream '%v', '%v', '%v'", delayResult->size(),
                   name.c_str(), o.str().c_str(), provider.c_str(), sourceSystem.c_str());
     return;
   }
@@ -614,7 +611,7 @@ void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *
     std::stringstream o, o2;
     o << information;
     o2 << value;
-    _log->warning("readMetadata", "Wrong type '%d' of '%s' for metadata '%s' of stream '%s', '%s', '%s'",
+    _log->warn("Wrong type '%v' of '%v' for metadata '%v' of stream '%v', '%v', '%v'",
                   value.type(), o2.str().c_str(), name.c_str(), o.str().c_str(), provider.c_str(),
                   sourceSystem.c_str());
     return;
@@ -622,7 +619,7 @@ void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *
 
   std::stringstream o;
      o << information;
-  _log->warning("readMetadata", "Metadata '%s' of stream '%s', '%s', '%s' has value '%d'",
+  _log->warn("Metadata '%v' of stream '%v', '%v', '%v' has value '%v'",
                     name.c_str(), o.str().c_str(), provider.c_str(),
                     sourceSystem.c_str(), value.num());
 

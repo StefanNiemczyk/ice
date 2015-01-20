@@ -7,7 +7,7 @@
 
 #include "ice/coordination/OntologyInterface.h"
 
-#include "ice/Logger.h"
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -16,7 +16,7 @@ JavaVM *OntologyInterface::jvm = nullptr;
 
 OntologyInterface::OntologyInterface(std::string const p_jarPath)
 {
-  this->_log = Logger::get("OntologyInterface");
+  this->_log = el::Loggers::getLogger("OntologyInterface");
 
   this->error = false;
   this->informationDirty = true;
@@ -68,7 +68,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   if (this->checkError("Constructor", "Failed to instantiate class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
 
-  _log->verbose("Constructor", "Ontology interface created successfully");
+  _log->verbose(1, "Ontology interface created successfully");
 
   this->addIRIMapperMethod = this->env->GetMethodID(this->javaOntologyInterface, "addIRIMapper",
                                                     "(Ljava/lang/String;)V");
@@ -139,7 +139,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   if (this->checkError("Constructor", "Failed to lookup method ids for class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
 
-  _log->verbose("Constructor", "Ontology interface created successfully");
+  _log->verbose(1, "Ontology interface created successfully");
 }
 
 OntologyInterface::~OntologyInterface()
@@ -161,7 +161,7 @@ bool OntologyInterface::checkError(std::string p_method, std::string p_error)
   if (env->ExceptionOccurred())
   {
     this->error = true;
-    this->_log->error(p_method, p_error);
+    this->_log->error("%v, %v", p_method, p_error);
     env->ExceptionDescribe();
   }
   else

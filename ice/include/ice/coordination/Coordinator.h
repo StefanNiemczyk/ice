@@ -15,9 +15,8 @@
 #include <vector>
 
 #include "ice/Identifier.h"
-#include "ice/Logger.h"
 #include "ice/Time.h"
-
+#include "easylogging++.h"
 
 //Forward declaration
 namespace ice
@@ -221,7 +220,7 @@ private:
   std::shared_ptr<InformationStore> informationStore; /**< The information store */
   std::vector<std::shared_ptr<EngineState>> engineStates; /**< List of known engines */
 //  ModelComperator modelComperator; /**< Comparator to find intersections in information models */
-  Logger* _log; /**< Logger */
+  el::Logger* _log; /**< Logger */
   std::mutex mtx_; /**< Mutex */
   std::condition_variable cv; /**< Condition variable for synchronizing threads */
 };
