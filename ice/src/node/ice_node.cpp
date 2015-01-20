@@ -8,11 +8,13 @@
 #include "boost/shared_ptr.hpp"
 #include "boost/uuid/uuid.hpp"
 #include "boost/uuid/uuid_generators.hpp"
+#include "easylogging++.h"
 
 #include <exception>
 #include <iostream>
 #include <memory>
 
+INITIALIZE_EASYLOGGINGPP
 
 /**
  * This tutorial demonstrates simple receipt of messages over the ROS system.
