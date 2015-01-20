@@ -35,7 +35,6 @@ public:
   virtual int performTask()
   {
     this->value = this->expected;
-
     return 0;
   }
 
@@ -125,6 +124,30 @@ TEST_F(EventHandlerTest, drop_event)
   }
 
 }
+
+TEST_F(EventHandlerTest, timertask)
+{
+  ice::EventHandler handler(3, 1);
+  std::shared_ptr<ice::AsynchronousTask> event = std::make_shared<SimpleAsyncEvent>(0, 5);
+  SimpleAsyncEvent* e = (SimpleAsyncEvent*) event.get();
+
+  EXPECT_NE(e->value, e->expected);
+
+  handler.addTimerTask(event, 1000);
+  cout << "Waiting a second for the task to start" << endl;
+
+  std::this_thread::sleep_for(std::chrono::milliseconds {500});
+
+  // As the task should start after around 500 ms the test values should still be diffrerent
+  EXPECT_NE(e->value, e->expected);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds {600});
+
+  // Now after total 1100 ms the task should be done and the test values equal
+  EXPECT_EQ(e->value, e->expected);
+}
+
+
 /*
 TEST_F(EventHandlerTest, handle_10_sec_full_automatic_fire)
 {
