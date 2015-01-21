@@ -12,6 +12,7 @@
 #include "ice/coordination/EngineState.h"
 #include "ice/information/InformationType.h"
 #include "ice/processing/EventHandler.h"
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -26,7 +27,7 @@ BaseInformationStream::BaseInformationStream(std::shared_ptr<StreamDescription> 
   this->eventHandler = eventHandler;
 //  this->description = description;
   this->sharingMaxCount = sharingMaxCount;
-  this->_log = Logger::get("InformationStream");
+  this->_log = el::Loggers::getLogger("InformationStream");
 }
 
 BaseInformationStream::~BaseInformationStream()

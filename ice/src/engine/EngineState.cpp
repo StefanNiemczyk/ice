@@ -9,8 +9,8 @@
 #include <ice/coordination/CooperationResponse.h>
 #include <ice/coordination/EngineState.h>
 #include <ice/ICEngine.h>
-#include <ice/Logger.h>
 #include <ice/TimeFactory.h>
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -24,7 +24,7 @@ EngineState::EngineState(identifier engineId, std::weak_ptr<ICEngine> engine) :
   this->timeLastActivity = this->timeFactory->createTime();
   this->timeLastStateUpdate = NO_TIME;
   this->retryCounter = 0;
-  this->_log = Logger::get("EngineState");
+  this->_log = el::Loggers::getLogger("EngineState");
 }
 
 EngineState::EngineState(std::string const systemIri, std::weak_ptr<ICEngine> engine) :
@@ -36,7 +36,7 @@ EngineState::EngineState(std::string const systemIri, std::weak_ptr<ICEngine> en
   this->timeLastActivity = this->timeFactory->createTime();
   this->timeLastStateUpdate = NO_TIME;
   this->retryCounter = 0;
-  this->_log = Logger::get("EngineState");
+  this->_log = el::Loggers::getLogger("EngineState");
 }
 
 EngineState::~EngineState()
@@ -108,7 +108,7 @@ const CooperationState EngineState::getCooperationState() const
 
 void EngineState::setCooperationState(CooperationState cooperationState)
 {
-  _log->debug("setCooperationState", "Update cooperation state of engine %s from %i to %i",
+  _log->debug("Update cooperation state of engine %v from %v to %v",
               IDGenerator::toString(this->engineId).c_str(), this->cooperationState, cooperationState);
   this->cooperationState = cooperationState;
   this->timeLastStateUpdate = this->timeFactory->createTime();

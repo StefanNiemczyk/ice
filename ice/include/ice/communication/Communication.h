@@ -28,8 +28,11 @@ template<typename T>
 class InformationModel;
 class InformationReceiver;
 class ICEngine;
-class Logger;
 } /* namespace ice */
+namespace el
+{
+class Logger;
+}
 
 namespace ice
 {
@@ -75,7 +78,7 @@ protected:
   std::shared_ptr<EventHandler> eventHandler; /**< The event handler */
   identifier engineId; /**< identifier of the main engine */
   std::shared_ptr<Coordinator> coordinator; /**< Coordinator which coordinates die communication between engines */
-  Logger* _log; /**< Logger for communication */
+  el::Logger* _log; /**< Logger for communication */
 };
 
 } /* namespace ice */

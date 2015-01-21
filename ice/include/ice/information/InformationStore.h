@@ -15,11 +15,11 @@
 #include "boost/uuid/uuid.hpp"
 
 #include "ice/Configuration.h"
-#include "ice/Logger.h"
 #include "ice/information/StreamDescription.h"
 #include "ice/coordination/StreamTemplateDescription.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/information/InformationSpecification.h"
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -246,7 +246,7 @@ private:
 //  std::map<std::string, std::shared_ptr<BaseInformationStream>> streamMap; /**< Map of stream name -> information stream */
 //  std::map<std::string, std::shared_ptr<InformationStreamTemplate>> streamTemplates; /**< Map of stream name -> information stream */
   std::mutex _mtx; /**< Mutex */
-  Logger* _log; /**< Logger */
+  el::Logger* _log; /**< Logger */
 };
 
 } /* namespace ice */
@@ -267,7 +267,7 @@ template<typename T>
     //stream already registered
     if (ptr)
     {
-      _log->warning("registerStream", "InformationStore: Duplicated Stream with '%s', '%s', '%s'",
+      _log->warn("InformationStore: Duplicated Stream with '%v', '%v', '%v'",
                     specification->toString().c_str(), provider.c_str(), sourceSystem.c_str());
       return ptr;
     }
@@ -275,7 +275,7 @@ template<typename T>
     auto desc = std::make_shared<StreamDescription>(specification, name, provider, sourceSystem, metadata);
     auto stream = std::make_shared<InformationStream<T>>(desc, this->eventHandler, streamSize);
 
-    _log->debug("registerStream", "Created stream with '%s', '%s', '%s'", specification->toString().c_str(),
+    _log->debug("Created stream with '%v', '%v', '%v'", specification->toString().c_str(),
                 provider.c_str(), sourceSystem.c_str());
     this->streams.push_back(stream);
 

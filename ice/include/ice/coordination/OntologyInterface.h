@@ -15,7 +15,7 @@
 #include <vector>
 
 // Forward declaration
-namespace ice
+namespace el
 {
 class Logger;
 }
@@ -81,7 +81,7 @@ private:
   bool checkError(std::string p_method, std::string p_error);
 
 private:
-  Logger* _log; /**< Logger */
+  el::Logger* _log; /**< Logger */
   static JavaVM *jvm; /**< a Java VM */
   JNIEnv *env; /**< pointer to native method interface */
   bool error; /**< an error has occurred */

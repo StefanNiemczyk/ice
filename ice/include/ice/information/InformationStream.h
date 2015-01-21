@@ -24,6 +24,7 @@
 #include "ice/information/StreamDescription.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/processing/InformationEvent.h"
+#include "easylogging++.h"
 
 //Forward declaration
 namespace ice
@@ -294,7 +295,7 @@ template<typename T>
       }
       else
       {
-        _log->error("add", "No sender for stream %s", std::string(this->streamDescription->getName()).c_str());
+        _log->error("No sender for stream %v", std::string(this->streamDescription->getName()).c_str());
       }
     }
 
@@ -333,7 +334,7 @@ template<typename T>
 
     if (false == comResult)
     {
-      _log->error("registerSender", "No sender returned for stream %s", std::string(this->streamDescription->getName()).c_str());
+      _log->error("No sender returned for stream %v", std::string(this->streamDescription->getName()).c_str());
       std::shared_ptr<ice::BaseInformationSender> ptr;
       return ptr;
     }
@@ -345,7 +346,7 @@ template<typename T>
     }
     else
     {
-      _log->error("registerSender", "Incorrect type of sender %s for stream %s", comResult->getTypeInfo(),
+      _log->error("Incorrect type of sender %s for stream %s", comResult->getTypeInfo(),
                   std::string(this->streamDescription->getName()).c_str());
       std::shared_ptr<ice::BaseInformationSender> ptr;
       return ptr;
@@ -361,7 +362,7 @@ template<typename T>
 
     if (false == comResult)
     {
-      _log->error("registerReceiver", "No receiver returned for stream %s", std::string(this->streamDescription->getName()).c_str());
+      _log->error("No receiver returned for stream %s", std::string(this->streamDescription->getName()).c_str());
       std::shared_ptr<ice::InformationReceiver> ptr;
       return ptr;
     }
