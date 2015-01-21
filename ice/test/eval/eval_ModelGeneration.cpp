@@ -197,8 +197,8 @@ TEST(EvalModelGeneration, chainTest)
   int chainSizeMax = 10;
   int chainSizeStep = 1;
 
-  int nodesMin = 5;
-  int nodesMax = 5;
+  int nodesMin = 7;
+  int nodesMax = 7;
   int nodesStep = 1;
 
   int runs = 10;
@@ -384,16 +384,16 @@ TEST(EvalModelGeneration, chainTest)
       std::vector<std::string> toCheck;
 
       ss.str("");
-      ss << "metadataStream(1,accuracy,evalSystem,evalNode0_" << chainSize - 1
+      ss << "metadataStream(1,accuracy,stream(1,evalSystem,evalNode0_" << chainSize - 1
           << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
-          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize - 1 << ","
+          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize - 1 << "),"
           << chainSize * nodesMax << ")";
       toCheck.push_back(ss.str());
 
       ss.str("");
-      ss << "metadataStream(1,delay,evalSystem,evalNode0_" << chainSize - 1
+      ss << "metadataStream(1,delay,stream(1,evalSystem,evalNode0_" << chainSize - 1
           << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
-          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize - 1 << ",5)";
+          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize - 1 << "),5)";
       toCheck.push_back(ss.str());
 
       ss.str("");
