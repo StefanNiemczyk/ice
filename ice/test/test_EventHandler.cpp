@@ -30,7 +30,6 @@ public:
   }
   virtual ~SimpleAsyncEvent()
   {
-
   }
   virtual int performTask()
   {
@@ -134,7 +133,6 @@ TEST_F(EventHandlerTest, timertask)
   EXPECT_NE(e->value, e->expected);
 
   handler.addTimerTask(event, 1000);
-  cout << "Waiting a second for the task to start" << endl;
 
   std::this_thread::sleep_for(std::chrono::milliseconds {500});
 
@@ -145,6 +143,18 @@ TEST_F(EventHandlerTest, timertask)
 
   // Now after total 1100 ms the task should be done and the test values equal
   EXPECT_EQ(e->value, e->expected);
+}
+
+TEST_F(EventHandlerTest, timertask_kill)
+{
+  //ice::EventHandler handler(3, 1);
+  std::shared_ptr<ice::EventHandler> handler = std::make_shared<ice::EventHandler>(3, 1);
+  std::shared_ptr<ice::AsynchronousTask> event = std::make_shared<SimpleAsyncEvent>(0, 5);
+  SimpleAsyncEvent* e = (SimpleAsyncEvent*) event.get();
+
+  handler->addTimerTask(event, 1000);
+
+  // As the handler gets out of scocpe and the destructor is called wait 1 second for task to finish
 }
 
 
