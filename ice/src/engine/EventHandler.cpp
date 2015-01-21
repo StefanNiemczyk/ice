@@ -76,10 +76,12 @@ const int EventHandler::addTask(std::shared_ptr<AsynchronousTask> event)
 
 const int EventHandler::addTimerTask(std::shared_ptr<AsynchronousTask> task, long time)
 {
-  threadPool.push_back(std::thread([this, task, time]() {
-    std::this_thread::sleep_for(std::chrono::milliseconds(time));
+  std::thread([this, time, task]() {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //addTask(task);
     task->performTask();
-  }));
+  }).detach();
+
   return 0;
 }
 
