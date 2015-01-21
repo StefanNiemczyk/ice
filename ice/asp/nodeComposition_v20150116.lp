@@ -5,7 +5,7 @@
 %--------------------------------------------------------------------------------------
 % paramters
 #const maxHopCount=2.
-#const maxStepCount=6.
+#const maxStepCount=11.
 #const priorityDelay=3.
 #const priorityAccuracy=3.
 #const priorityTransferCost=2.
@@ -529,9 +529,13 @@ metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2
 %	COUNT = #count{D,PROVIDER,SOURCE,INFO : connectToNode(k,SYSTEM,IRO,PROVIDER,SOURCE,INFO), metadataStream(k,METADATA,SYSTEM,PROVIDER,SOURCE,INFO,D)}, 
 %	COUNT==0.
 
-:- metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP,VALUE), 
-   metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP,VALUE2),
+:- metadataStream(k,METADATA,SYSTEM,PROCESSING_STEP,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP,VALUE), 
+   metadataStream(k,METADATA,SYSTEM,PROCESSING_STEP,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP,VALUE2),
    VALUE != VALUE2.
+
+%:- stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP2), stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP), STEP != STEP2.
+
+
 
 %% transfer a stream between systems
 0 { streamTransfer(k,SYSTEM_SOURCE,PROVIDER,SYSTEM_TARGET,SOURCE,INFO,STEP,TRANSFER_DELAY,TRANSFER_COST) } 1 :- 
@@ -539,8 +543,6 @@ metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2
 	stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP), 
 	STEP < maxStepCount,
 	SYSTEM_TARGET != SOURCE.
-
-:- stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP2), stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP), STEP != STEP2.
 
 stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP+1) :- 
 	streamTransfer(k,SYSTEM_SOURCE,PROVIDER,SYSTEM_TARGET,SOURCE,INFO,STEP,TRANSFER_DELAY,TRANSFER_COST).

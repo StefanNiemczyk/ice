@@ -40,9 +40,10 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
     vm_args.options = options;
     vm_args.ignoreUnrecognized = false;
 
+    this->env = nullptr;
     JNI_CreateJavaVM(&this->jvm, (void**)&this->env, &vm_args);
 
-    delete options;
+    delete[] options;
   }
   else
   {
@@ -87,6 +88,8 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
                                                      "(Ljava/lang/String;Ljava/lang/String;)Z");
 
   this->addEntityTypeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addEntityType",
+                                                     "(Ljava/lang/String;[Ljava/lang/String;)Z");
+  this->addScopesToEntityTypeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addScopesToEntityType",
                                                      "(Ljava/lang/String;[Ljava/lang/String;)Z");
   this->addEntityScopeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addEntityScope",
                                                       "(Ljava/lang/String;[Ljava/lang/String;)Z");
@@ -353,6 +356,39 @@ bool OntologyInterface::addIndividual(std::string const p_individual, std::strin
     return false;
 
   this->systemDirty = true;
+  this->informationDirty = true;
+
+  return result;
+}
+
+
+bool OntologyInterface::addScopesToEntityType(std::string const p_entityType, std::vector<std::string> p_entityScopes)
+{
+  this->checkError("addScopesToEntityType", "Error exists, method addScopesToEntityType will not be executed");
+
+  int size = p_entityScopes.size();
+  jstring entityType = env->NewStringUTF(p_entityType.c_str());
+  jobjectArray entityScopes = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
+                                                                env->NewStringUTF(""));
+
+  for (int i = 0; i < size; ++i)
+  {
+    env->SetObjectArrayElement(entityScopes, i, env->NewStringUTF(p_entityScopes[i].c_str()));
+  }
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addScopesToEntityTypeMethod, entityType, entityScopes);
+
+  for (int i = 0; i < size; ++i)
+  {
+    env->DeleteLocalRef(env->GetObjectArrayElement(entityScopes, i));
+  }
+
+  env->DeleteLocalRef(entityType);
+  env->DeleteLocalRef(entityScopes);
+
+  if (this->checkError("addScopesToEntityType", "Error occurred adding scopes to entity type " + p_entityType))
+    return false;
+
   this->informationDirty = true;
 
   return result;

@@ -41,27 +41,84 @@ struct ModelGenerationSeriesResult
   ModelGenerationResult worst;
   ModelGenerationResult avg;
 
+  double totalTimeVar;
+  double ontologyReadTimeVar;
+  double ontologyReasonerTimeVar;
+  double ontologyToASPTimeVar;
+  double aspGroundingTimeVar;
+  double aspSolvingTimeVar;
+
   void print()
   {
-    std::cout << "Result\t\t\t\t" << numberSuccessful << "/" << numberTotal << std::endl;
-    std::cout << "Total\t\t\t\t" << avg.totalTime << " ms (avg)\t" << best.totalTime << " ms (best)\t"
-        << worst.totalTime << " ms (worst)" << std::endl;
-    std::cout << "Ontology read\t\t" << avg.ontologyReadTime << " ms (avg)\t" << best.ontologyReadTime << " ms (best)\t"
-        << worst.ontologyReadTime << " ms (worst)" << std::endl;
-    std::cout << "Ontology reasoning\t" << avg.ontologyReasonerTime << " ms (avg)\t" << best.ontologyReasonerTime
-        << " ms (best)\t" << worst.ontologyReasonerTime << " ms (worst)" << std::endl;
-    std::cout << "Ontology 2 ASP\t\t" << avg.ontologyToASPTime << " ms (avg)\t" << best.ontologyToASPTime
-        << " ms (best)\t" << worst.ontologyToASPTime << " ms (worst)" << std::endl;
-    std::cout << "ASP grounding\t\t" << avg.aspGroundingTime << " ms (avg)\t" << best.aspGroundingTime << " ms (best)\t"
-        << worst.aspGroundingTime << " ms (worst)" << std::endl;
-    std::cout << "ASP Solving\t\t\t" << avg.aspSolvingTime << " ms (avg)\t" << best.aspSolvingTime << " ms (best)\t"
-        << worst.aspSolvingTime << " ms (worst)" << std::endl;
+    printf("Result              %5d / %5d successful runs\n", numberSuccessful, numberTotal);
+    printf("Total                  %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.totalTime,
+           totalTimeVar, best.totalTime, worst.totalTime);
+    printf("Ontology read          %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.ontologyReadTime,
+           ontologyReadTimeVar, best.ontologyReadTime, worst.ontologyReadTime);
+    printf("Ontology reasoning     %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n",
+           avg.ontologyReasonerTime, ontologyReasonerTimeVar, best.ontologyReasonerTime, worst.ontologyReasonerTime);
+    printf("Ontology 2 ASP         %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.ontologyToASPTime,
+           ontologyToASPTimeVar, best.ontologyToASPTime, worst.ontologyToASPTime);
+    printf("ASP grounding          %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.aspGroundingTime,
+           aspGroundingTimeVar, best.aspGroundingTime, worst.aspGroundingTime);
+    printf("ASP Solving            %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.aspSolvingTime,
+           aspSolvingTimeVar, best.aspSolvingTime, worst.aspSolvingTime);
   }
+};
+
+class VarianceOnline
+{
+public:
+  void add(double x)
+  {
+    n = n + 1;
+    double delta = x - mean;
+    mean = mean + delta / n;
+    M2 = M2 + delta * (x - mean);
+  }
+
+  void remove(double x)
+  {
+    n = n - 1;
+    double delta = x - mean;
+    mean = mean - delta / n;
+    M2 = M2 - delta * (x - mean);
+  }
+
+  void update(double oldX, double newX)
+  {
+    double delta = newX - oldX;
+    double dold = oldX - mean;
+    mean = mean + delta / n;
+    double dnew = newX - mean;
+    M2 = M2 + delta * (dold + dnew);
+  }
+
+  double getVariance()
+  {
+    if (n < 2)
+      return 0;
+
+    return M2 / (n - 1);
+  }
+
+private:
+  int n = 0;
+  double mean = 0;
+  double M2 = 0;
 };
 
 class ModelGeneration
 {
+private:
+  std::string path;
+
 public:
+  ModelGeneration(std::string path)
+  {
+    this->path = path;
+  }
+
   ModelGenerationSeriesResult testSeries(std::string p_ontPath, std::vector<std::string>* p_requiredModelElements,
                                          int p_count)
   {
@@ -71,17 +128,48 @@ public:
     std::vector<ModelGenerationResult> testResults(p_count + 1);
     std::chrono::time_point<std::chrono::system_clock> start, end;
 
+    result.totalTimeVar = 0;
+    result.ontologyReadTimeVar = 0;
+    result.ontologyReasonerTimeVar = 0;
+    result.ontologyToASPTimeVar = 0;
+    result.aspGroundingTimeVar = 0;
+    result.aspSolvingTimeVar = 0;
+
+    VarianceOnline totalTimeVar, ontologyReadTimeVar, ontologyReasonerTimeVar, ontologyToASPTimeVar,
+                   aspGroundingTimeVar, aspSolvingTimeVar;
+
+    std::cout << "Starting warm up " << std::flush;
+
+    for (int i = 1; i < 101; ++i)
+    {
+      this->test(p_ontPath, p_requiredModelElements, true);
+
+      if (i % 10 == 0)
+      {
+        std::cout << ".";
+        std::cout << std::flush;
+      }
+    }
+    std::cout << " done." << std::endl;
+
     for (int i = 0; i < p_count; ++i)
     {
-      std::cout << "Starting run " << (i+1) << " ... ";
+      std::cout << "Starting run " << (i + 1) << " ... ";
       start = std::chrono::system_clock::now();
 
-      auto r = this->test(p_ontPath, p_requiredModelElements);
+      auto r = this->test(p_ontPath, p_requiredModelElements, false);
 
       if (r.successful)
         ++result.numberSuccessful;
 
       testResults.push_back(r);
+
+      totalTimeVar.add(r.totalTime);
+      ontologyReadTimeVar.add(r.ontologyReadTime);
+      ontologyReasonerTimeVar.add(r.ontologyReasonerTime);
+      ontologyToASPTimeVar.add(r.ontologyToASPTime);
+      aspGroundingTimeVar.add(r.aspGroundingTime);
+      aspSolvingTimeVar.add(r.aspSolvingTime);
 
       if (i == 0)
       {
@@ -101,37 +189,46 @@ public:
         if (r.totalTime < result.best.totalTime)
           result.best.totalTime = r.totalTime;
         else if (r.totalTime > result.worst.totalTime)
-            result.worst.totalTime = r.totalTime;
+          result.worst.totalTime = r.totalTime;
 
         if (r.ontologyReadTime < result.best.ontologyReadTime)
           result.best.ontologyReadTime = r.ontologyReadTime;
         else if (r.ontologyReadTime > result.worst.ontologyReadTime)
-            result.worst.ontologyReadTime = r.ontologyReadTime;
+          result.worst.ontologyReadTime = r.ontologyReadTime;
 
         if (r.ontologyReasonerTime < result.best.ontologyReasonerTime)
           result.best.ontologyReasonerTime = r.ontologyReasonerTime;
         else if (r.ontologyReasonerTime > result.worst.ontologyReasonerTime)
-            result.worst.ontologyReasonerTime = r.ontologyReasonerTime;
+          result.worst.ontologyReasonerTime = r.ontologyReasonerTime;
 
         if (r.ontologyToASPTime < result.best.ontologyToASPTime)
           result.best.ontologyToASPTime = r.ontologyToASPTime;
         else if (r.ontologyToASPTime > result.worst.ontologyToASPTime)
-            result.worst.ontologyToASPTime = r.ontologyToASPTime;
+          result.worst.ontologyToASPTime = r.ontologyToASPTime;
 
         if (r.aspGroundingTime < result.best.aspGroundingTime)
           result.best.aspGroundingTime = r.aspGroundingTime;
         else if (r.aspGroundingTime > result.worst.aspGroundingTime)
-            result.worst.aspGroundingTime = r.aspGroundingTime;
+          result.worst.aspGroundingTime = r.aspGroundingTime;
 
         if (r.aspSolvingTime < result.best.aspSolvingTime)
           result.best.aspSolvingTime = r.aspSolvingTime;
         else if (r.aspSolvingTime > result.worst.aspSolvingTime)
-            result.worst.aspSolvingTime = r.aspSolvingTime;
+          result.worst.aspSolvingTime = r.aspSolvingTime;
       }
 
       end = std::chrono::system_clock::now();
-      std::cout << "finished " << (r.successful ? "successful" : "unsuccessful") << " after: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms, processing time: " << r.totalTime << " ms" << std::endl;;
+      std::cout << "finished " << (r.successful ? "successful" : "unsuccessful") << " after: "
+          << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms, processing time: "
+          << r.totalTime << " ms" << std::endl;
     }
+
+    result.totalTimeVar = totalTimeVar.getVariance();
+    result.ontologyReadTimeVar = ontologyReadTimeVar.getVariance();
+    result.ontologyReasonerTimeVar = ontologyReasonerTimeVar.getVariance();
+    result.ontologyToASPTimeVar = ontologyToASPTimeVar.getVariance();
+    result.aspGroundingTimeVar = aspGroundingTimeVar.getVariance();
+    result.aspSolvingTimeVar = aspSolvingTimeVar.getVariance();
 
     result.avg.totalTime /= p_count;
     result.avg.ontologyReadTime /= p_count;
@@ -143,16 +240,15 @@ public:
     return result;
   }
 
-  ModelGenerationResult test(std::string p_ontPath, std::vector<std::string>* p_requiredModelElements)
+  ModelGenerationResult test(std::string p_ontPath, std::vector<std::string>* p_requiredModelElements, bool warmUp =
+                                 false)
   {
     ModelGenerationResult result;
-    std::string path = ros::package::getPath("ice");
     std::vector<std::string> entities;
     std::vector<std::shared_ptr<supplementary::External>> externals;
     std::chrono::time_point<std::chrono::system_clock> start, end, startOntologyRead, endOntologyRead,
                                                        startOntologyReasoner, endOntologyReasoner, startOntologyToASP,
-                                                       endOntologyToASP, startAspGrounding, endAspGrounding,
-                                                       startAspSolving, endAspSolving;
+                                                       endOntologyToASP, startAsp, endAsp;
 
     // Initializing ASP
     supplementary::ClingWrapper asp;
@@ -178,6 +274,8 @@ public:
     endOntologyReasoner = std::chrono::system_clock::now();
 
     // Ontology 2 ASP
+//    if (false == warmUp)
+//    std::cout << "Ontology 2 ASP" << std::endl;
     startOntologyToASP = std::chrono::system_clock::now();
     const char* infoStructure = ontology.readInformationStructureAsASP();
     //this->entityTypeMap.clear();
@@ -289,8 +387,6 @@ public:
             external->assign(true);
             break;
         }
-//        std::cout << elementStr << std::endl;
-//        std::cout << aspStr << std::endl;
 
         asp.add(name, {}, aspStr);
 
@@ -313,18 +409,25 @@ public:
 
     endOntologyToASP = std::chrono::system_clock::now();
 
+    if (warmUp)
+    {
+      externals.clear();
+      return result;
+    }
+
     // Grounding
-    startAspGrounding = std::chrono::system_clock::now();
+//    std::cout << "ASP ground call" << std::endl;
+    startAsp = std::chrono::system_clock::now();
     asp.ground(programPart, {});
 
     auto lastQuery = asp.getExternal("query", {1}, true);
     asp.ground("query", {1});
-    endAspGrounding = std::chrono::system_clock::now();
 
     // Solving
-    startAspSolving = std::chrono::system_clock::now();
+//    std::cout << "ASP solving" << std::endl;
     auto solveResult = asp.solve();
-    endAspSolving = std::chrono::system_clock::now();
+//    std::cout << "ASP done" << std::endl;
+    endAsp = std::chrono::system_clock::now();
 
     end = std::chrono::system_clock::now();
 
@@ -336,14 +439,13 @@ public:
         endOntologyReasoner - startOntologyReasoner).count();
     result.ontologyToASPTime = std::chrono::duration_cast<std::chrono::milliseconds>(
         endOntologyToASP - startOntologyToASP).count();
-    result.aspGroundingTime =
-        std::chrono::duration_cast<std::chrono::milliseconds>(endAspGrounding - startAspGrounding).count();
-    result.aspSolvingTime =
-        std::chrono::duration_cast<std::chrono::milliseconds>(endAspSolving - startAspSolving).count();
+    result.aspSolvingTime = asp.getSolvingTime();
+    result.aspGroundingTime = std::chrono::duration_cast<std::chrono::milliseconds>(endAsp - startAsp).count()
+        - result.aspSolvingTime;
 
     if (solveResult == Gringo::SolveResult::SAT)
     {
-//      asp.printLastModel(false);
+      asp.printLastModel(false);
 
       for (auto toCheck : *p_requiredModelElements)
       {
@@ -354,120 +456,15 @@ public:
           value.print(std::cout);
           std::cout << std::endl;
           result.successful = false;
-//          break;
         }
       }
     }
 
     externals.clear();
 
+    result.print();
+
     return result;
   }
-
-//private:
-//  Gringo::Value splitASPExternalString(std::string p_aspString)
-//  {
-//    if (p_aspString == "")
-//      return Gringo::Value();
-//
-//    std::vector<Gringo::Value> vec;
-//
-//    int start = p_aspString.find("(");
-//    int end = p_aspString.find_last_of(")");
-//
-//    if (start == std::string::npos || end == std::string::npos || start > end)
-//    {
-//      return Gringo::Value(p_aspString);
-//    }
-//
-//    std::string name = p_aspString.substr(0, start);
-//    std::string values = p_aspString.substr(start + 1, end - start - 1);
-//
-//    istringstream f(values);
-//    std::string s;
-//    int intNumber;
-//
-//    while (values != "")
-//    {
-//      //    std::cout << values << std::endl;
-//      int index1 = values.find("(");
-//      int index2 = values.find(",");
-//
-//      if (index2 == 0)
-//      {
-//        values = values.substr(1, values.size());
-//        continue;
-//      }
-//
-//      if (index2 != std::string::npos && index1 == std::string::npos)
-//      {
-//        s = values.substr(0, index2);
-//        if (isNumber(&s, &intNumber))
-//        {
-//          vec.push_back(Gringo::Value(intNumber));
-//        }
-//        else
-//        {
-//          vec.push_back(Gringo::Value(s));
-//        }
-//        values = values.substr(index2 + 1, values.size());
-//      }
-//      else if (index2 == std::string::npos && index1 != std::string::npos)
-//      {
-//        index1 = values.find_last_of(")") + 1;
-//        vec.push_back(this->splitASPExternalString(values.substr(0, index1)));
-//        values = values.substr(index1, values.size());
-//      }
-//      else if (index2 == std::string::npos && index1 == std::string::npos)
-//      {
-//        s = values;
-//        if (isNumber(&s, &intNumber))
-//        {
-//          vec.push_back(Gringo::Value(intNumber));
-//        }
-//        else
-//        {
-//          vec.push_back(Gringo::Value(s));
-//        }
-//        values = "";
-//      }
-//      else if (index2 < index1)
-//      {
-//        s = values.substr(0, index2);
-//        if (isNumber(&s, &intNumber))
-//        {
-//          vec.push_back(Gringo::Value(intNumber));
-//        }
-//        else
-//        {
-//          vec.push_back(Gringo::Value(s));
-//        }
-//        values = values.substr(index2 + 1, values.size());
-//      }
-//      else
-//      {
-//        index1 = values.find_last_of(")") + 1;
-//        vec.push_back(this->splitASPExternalString(values.substr(0, index1)));
-//        values = values.substr(index1, values.size());
-//      }
-//    }
-//
-//    return Gringo::Value(name, vec);
-//  }
-//
-//  bool isNumber(std::string* p_string, int* p_number)
-//  {
-//    std::string::size_type end;
-//
-//    try
-//    {
-//      *p_number = std::stoi(*p_string, &end, 10);
-//    }
-//    catch (std::invalid_argument &e)
-//    {
-//      return false;
-//    }
-//    return end == p_string->size();
-//  }
 
 };

@@ -228,6 +228,40 @@ public class IceOntologyInterface {
 		return true;
 	}
 
+	public boolean addScopesToEntityType(final String p_entityType, final String[] p_entityScopes) {
+		IRI entityIRI = IRI.create(this.mainIRIPrefix + p_entityType);
+		if (false == this.mainOntology.containsClassInSignature(entityIRI))
+			return false;
+
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+
+		// create entity scope
+		OWLClass entity = this.dataFactory.getOWLClass(entityIRI);
+
+		// create entity scopes
+		for (String entityScope : p_entityScopes) {
+			OWLClass es = this.findOWLClass(this.ii.entityScope, entityScope);
+
+			if (es == null) {
+				log(String.format("Unknown entity scope class '%s' for entity '%s', entity type not created.",
+						entityScope, p_entityType));
+				return false;
+			}
+
+			OWLClassExpression hasScope = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.hasScope, es);
+			OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(entity, hasScope);
+			AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, ax);
+			changes.add(addAxiomChange);
+		}
+
+		// apply changes
+		this.manager.applyChanges(changes);
+
+		this.dirty = true;
+
+		return true;
+	}
+
 	public boolean addEntityScope(final String p_entityScope, final String[] p_representations) {
 		IRI entityScopeIRI = IRI.create(this.mainIRIPrefix + p_entityScope);
 		if (this.mainOntology.containsClassInSignature(entityScopeIRI))

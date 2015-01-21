@@ -40,6 +40,7 @@ public:
   bool addNodesToSystem(std::string const p_system, std::vector<std::string> p_toAdd);
   bool addIndividual(std::string const p_individual, std::string const p_class);
   bool addEntityType(std::string const p_entityType, std::vector<std::string> p_entityScopes);
+  bool addScopesToEntityType(std::string const p_entityType, std::vector<std::string> p_entityScopes);
   bool addEntityScope(std::string const p_entityScope, std::vector<std::string> p_representations);
   bool addValueScope(std::string const p_superValueScope, std::string const p_valueScope);
   bool addRepresentation(std::string const p_superRepresentation, std::string const p_representation,
@@ -101,6 +102,7 @@ private:
   jmethodID addIndividualMethod; /**< Method id */
   jmethodID addEntityTypeMethod; /**< Method id */
   jmethodID addEntityScopeMethod; /**< Method id */
+  jmethodID addScopesToEntityTypeMethod; /**< Method id */
   jmethodID addValueScopeMethod; /**< Method id */
   jmethodID addRepresentationMethod; /**< Method id */
   jmethodID addNamedStreamMethod; /**< Method id */
