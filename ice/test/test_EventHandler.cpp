@@ -134,7 +134,6 @@ TEST_F(EventHandlerTest, timertask)
   EXPECT_NE(e->value, e->expected);
 
   handler.addTimerTask(event, 1000);
-  cout << "Waiting a second for the task to start" << endl;
 
   std::this_thread::sleep_for(std::chrono::milliseconds {500});
 
