@@ -83,62 +83,39 @@ TEST(ClingWrap, simpleTest)
   cw->solve();
 //  cw->printLastModel();
 
-  EXPECT_EQ(true, cw->query("node", {1, "system1", "node1", "entity1","none"}));
-  EXPECT_EQ(false, cw->query("node", {1, "system1", "node2", "entity1","none"}));
-  EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node1", "entity1", "none", "in2", "system1", Gringo::Value("information", {
-      "entity1", "scope2", "rep1", "none"}), 0}));
-  EXPECT_EQ(true, cw->query("sumCost", {1, 12}));
-  EXPECT_EQ(true, cw->query("metadataStream", {1, "delay", "system1", "node1", "system1", Gringo::Value("information", {"entity1",
-                                                                                                            "scope3",
-                                                                                                            "rep1",
-                                                                                                            "none"}), 1,
-                                            6}));
-  EXPECT_EQ(true, cw->query("metadataStream", {1, "accuracy", "system1", "node1", "system1", Gringo::Value("information", {
-      "entity1", "scope3", "rep1", "none"}),
-                                               1,90}));
+  EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
+  EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,in2,system1,information(entity1,scope2,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("sumCost(1,12)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),6)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),90)"));
 
   input3->assign(true);
   cw->solve();
 //  cw->printLastModel();
 
-  EXPECT_EQ(true, cw->query("node", {1, "system1", "node1", "entity1", "none"}));
-  EXPECT_EQ(false, cw->query("node", {1, "system1", "node2", "entity1", "none"}));
-  EXPECT_EQ(false, cw->query("connectToNode", {1, "system1", "node1", "entity1", "none", "in2", "system1", Gringo::Value("information", {
-      "entity1", "scope2", "rep1", "none"}), 0}));
-  EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node1", "entity1", "none", "in3", "system2", Gringo::Value("information", {
-      "entity1", "scope2", "rep1", "none"}), 1}));
-  EXPECT_EQ(true, cw->query("sumCost", {1, 12}));
-  EXPECT_EQ(false, cw->query("metadataStream", {1, "delay", "system1", "system1",
-                                                Gringo::Value("information", {"entity1", "scope3", "rep1", "none"}), 2, 6}));
-  EXPECT_EQ(true, cw->query("metadataStream", {1, "delay", "system1", "node1", "system1",
-                                               Gringo::Value("information", {"entity1", "scope3", "rep1", "none"}), 2, 2}));
-  EXPECT_EQ(true, cw->query("metadataStream", {1, "accuracy", "system1", "node1", "system1",
-                                               Gringo::Value("information", {"entity1", "scope3", "rep1", "none"}), 2, 99}));
+  EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
+  EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
+  EXPECT_EQ(false, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,in2,system1,information(entity1,scope2,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,in3,system2,information(entity1,scope2,rep1,none),2))"));
+  EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),6)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),2)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),99)"));
+  EXPECT_EQ(true, cw->query("sumCost(1,12)"));
 
   node1->assign(false);
   cw->solve();
 //  cw->printLastModel();
 
-  EXPECT_EQ(false, cw->query("node", {1, "system1", "node1", "entity1", "none"}));
-  EXPECT_EQ(true, cw->query("node", {1, "system1", "node2", "entity1", "none"}));
-  EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node2", "entity1", "none", "in1", "system1", Gringo::Value("information", {
-      "entity1", "scope1", "rep1", "none"}), 0}));
-  EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node2", "entity1", "none", "in2", "system1", Gringo::Value("information", {
-      "entity1", "scope2", "rep1", "none"}), 0}));
-  EXPECT_EQ(true, cw->query("connectToNode", {1, "system1", "node2", "entity1", "none", "in3", "system2", Gringo::Value("information", {
-      "entity1", "scope2", "rep1", "none"}), 1}));
-  EXPECT_EQ(true, cw->query("sumCost", {1, 8}));
-  EXPECT_EQ(true, cw->query("metadataStream", {1, "delay", "system1", "node2", "system1", Gringo::Value("information", {"entity1",
-                                                                                                            "scope3",
-                                                                                                            "rep1",
-                                                                                                            "none"}),
-                                            2, 6}));
-  EXPECT_EQ(false, cw->query("metadataStream", {1, "delay", "system1", "system1", Gringo::Value("information", {"entity1", "scope3",
-                                                                                                    "rep1", "none"}),
-                                             2}));
-  EXPECT_EQ(true, cw->query("metadataStream", {1, "accuracy", "system1", "node2", "system1", Gringo::Value("information", {
-      "entity1", "scope3", "rep1", "none"}),
-                                               2, 96}));
+  EXPECT_EQ(false, cw->query("node(1,system1,node1,entity1,none)"));
+  EXPECT_EQ(true, cw->query("node(1,system1,node2,entity1,none)"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node2,entity1,none),stream(1,system1,in1,system1,information(entity1,scope1,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node2,entity1,none),stream(1,system1,in2,system1,information(entity1,scope2,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node2,entity1,none),stream(1,system1,in3,system2,information(entity1,scope2,rep1,none),2))"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),6)"));
+  EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),2)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),96)"));
+  EXPECT_EQ(true, cw->query("sumCost(1,8)"));
 }
 
 TEST(ClingWrap, threeSystems)
@@ -174,16 +151,11 @@ TEST(ClingWrap, threeSystems)
   auto query1 = cw->getExternal("query", {1}, true);
 
   cw->solve();
-  cw->printLastModel();
+//  cw->printLastModel();
 
-  EXPECT_EQ(true, cw->query("streamTransfer", {1, "system1", "in1", "system2", "system1", Gringo::Value("information", {
-      "entity1", "scope1", "rep1", "none"}), 0, 1, 2}));
-  EXPECT_EQ(true, cw->query("streamTransfer", {1, "system2", "in1", "system3", "system1", Gringo::Value("information", {
-      "entity1", "scope1", "rep1", "none"}), 1, 1, 2}));
-  // metadataStream(1,delay,system3,in1,system1,information(entity1,scope1,rep1,none),2,2)
-  EXPECT_EQ(true,
-            cw->query("metadataStream", {1, "delay", "system3", "in1", "system1",
-                                         Gringo::Value("information", {"entity1", "scope1", "rep1", "none"}), 2, 2}));
+  EXPECT_EQ(true, cw->query("streamTransfer(1,system1,in1,system2,system1,information(entity1,scope1,rep1,none),1,1,2)"));
+  EXPECT_EQ(true, cw->query("streamTransfer(1,system2,in1,system3,system1,information(entity1,scope1,rep1,none),2,1,2)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system3,in1,system1,information(entity1,scope1,rep1,none),3),2)"));
 }
 
 TEST(ClingWrap, informationTranslation)
@@ -232,17 +204,9 @@ TEST(ClingWrap, informationTranslation)
   cw->solve();
 // cw->printLastModel();
 
-  EXPECT_EQ(true, cw->query("stream", {1, "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
-      "nase", "position", "wgs84", "none"}), 2}));
-  EXPECT_EQ(true, cw->query("metadataStream", {1, "delay", "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
-      "nase", "position", "wgs84", "none"}), 2,
-                                            2}));
-  EXPECT_EQ(false, cw->query("metadataStream", {1, "cost", "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
-      "nase", "position", "wgs84", "none"}), 2,
-                                            0}));
-  EXPECT_EQ(true, cw->query("metadataStream", {1, "accuracy", "system2", "coords2Wgs84", "system1", Gringo::Value("information", {
-      "nase", "position", "wgs84", "none"}),2,
-                                               91}));
+  EXPECT_EQ(true, cw->query("stream(1,system2,coords2Wgs84,system1,information(nase,position,wgs84,none),3)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system2,coords2Wgs84,system1,information(nase,position,wgs84,none),3),2)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system2,coords2Wgs84,system1,information(nase,position,wgs84,none),3),91)"));
 }
 
 //TEST(ClingWrap, informationExtraction)
@@ -360,25 +324,10 @@ TEST(ClingWrap, ego2allo)
   cw->solve();
 //   cw->printLastModel();
 
-  EXPECT_EQ(true, cw->query("stream", {1, "system1", "allo2ego", "system1", Gringo::Value("information", {"bart",
-                                                                                                          "position",
-                                                                                                          "egoCoords",
-                                                                                                          "nase"}), 2}));
-  EXPECT_EQ(true, cw->query("metadataStream", {1, "delay", "system1", "allo2ego", "system1", Gringo::Value("information", {
-      "bart", "position", "egoCoords", "nase"}), 2,
-                                            2}));
-  EXPECT_EQ(false, cw->query("metadataStream", {1, "delay", "system1", "allo2ego", "system1", Gringo::Value("information", {
-      "bart", "position", "egoCoords", "nase"}), 2,
-                                             4}));
-  EXPECT_EQ(false, cw->query("metadataStream", {1, "cost", "system1", "allo2ego", "system1", Gringo::Value("information", {
-      "bart", "position", "egoCoords", "nase"}), 2,
-                                            0}));
-  EXPECT_EQ(false, cw->query("metadataStream", {1, "cost", "system1", "allo2ego", "system1", Gringo::Value("information", {
-      "bart", "position", "egoCoords", "nase"}), 2,
-                                            1}));
-  EXPECT_EQ(true, cw->query("metadataStream", {1, "accuracy", "system1", "allo2ego", "system1", Gringo::Value("information", {
-      "bart", "position", "egoCoords", "nase"}), 2,
-                                               92}));
+  EXPECT_EQ(true, cw->query("stream(1,system1,allo2ego,system1,information(bart,position,egoCoords,nase),3)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,allo2ego,system1,information(bart,position,egoCoords,nase),3),2)"));
+  EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,allo2ego,system1,information(bart,position,egoCoords,nase),3),3)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,allo2ego,system1,information(bart,position,egoCoords,nase),3),92)"));
 }
 
 TEST(ClingWrap, requiredStreamsByEntityType)
@@ -445,14 +394,11 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   cw->solve();
 //  cw->printLastModel();
 
-  EXPECT_EQ(true, cw->query("stream", {1, "system1", "in2", "system2", Gringo::Value("information", {"entity2",
-                                                                                                     "scope1", "rep1",
-                                                                                                     "none"}),1}));
-  EXPECT_EQ(true, cw->query("stream", {1, "system1", "in3", "system3", Gringo::Value("information", {"entity3",
-                                                                                                     "scope1", "rep1",
-                                                                                                     "none"}),1}));
-  EXPECT_EQ(true, cw->query("metadataMap", {1,"accuracy", "system1","mapNode","type","scope1","rep1","none",2,102}));
-  EXPECT_EQ(true, cw->query("metadataMap", {1,"delay","system1","mapNode","type","scope1","rep1","none",2,4001}));
+  EXPECT_EQ(true, cw->query("stream(1,system1,in1,system1,information(entity1,scope1,rep1,none),1)"));
+  EXPECT_EQ(true, cw->query("stream(1,system1,in2,system2,information(entity2,scope1,rep1,none),2)"));
+  EXPECT_EQ(true, cw->query("stream(1,system1,in3,system3,information(entity3,scope1,rep1,none),2)"));
+  EXPECT_EQ(true, cw->query("metadataMap(1,accuracy,map(1,system1,mapNode,type,scope1,rep1,none,3),102)"));
+  EXPECT_EQ(true, cw->query("metadataMap(1,delay,map(1,system1,mapNode,type,scope1,rep1,none,3),4001)"));
 }
 
 TEST(ClingWrap, simpleChainTest)
@@ -522,14 +468,13 @@ TEST(ClingWrap, simpleChainTest)
   cw->solve();
 //  cw->printLastModel();
 
-  EXPECT_EQ(true, cw->query("node", {1, "system1", "in1", "entity1", "none"}));
-  EXPECT_EQ(true, cw->query("node", {1, "system1", "node1", "entity1","none"}));
-  EXPECT_EQ(true, cw->query("node", {1, "system1", "node2", "entity1","none"}));
+  EXPECT_EQ(true, cw->query("node(1,system1,in1,entity1,none)"));
+  EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
+  EXPECT_EQ(true, cw->query("node(1,system1,node2,entity1,none)"));
   // metadataStream(1,accuracy,system1,node2,system1,information(entity1,scope1,rep1,none),2,94
-  bool result = cw->query("metadataStream", {1, "accuracy", "system1", "node2", "system1",
-                                             Gringo::Value("information", {"entity1", "scope1", "rep1", "none"}),2,98});
-  result |= cw->query("metadataStream", {1, "accuracy", "system1", "node1", "system1",
-                                         Gringo::Value("information", {"entity1", "scope1", "rep1", "none"}),2,98});
+  bool result = cw->query("metadataStream(1,accuracy,stream(1,system1,node2,system1,information(entity1,scope1,rep1,none),3),98)");
+  result |= cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope1,rep1,none),3),98)");
+
   EXPECT_EQ(true, result);
-  EXPECT_EQ(true, cw->query("sumCost", {1, 16}));
+  EXPECT_EQ(true, cw->query("sumCost(1,16)"));
 }

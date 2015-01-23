@@ -197,11 +197,11 @@ TEST(EvalModelGeneration, chainTest)
   int chainSizeMax = 10;
   int chainSizeStep = 1;
 
-  int nodesMin = 7;
-  int nodesMax = 7;
+  int nodesMin = 10;
+  int nodesMax = 10;
   int nodesStep = 1;
 
-  int runs = 10;
+  int runs = 100;
 
   bool tree = false;
 
@@ -239,7 +239,6 @@ TEST(EvalModelGeneration, chainTest)
 
       for (int i = 0; i < chainSize; ++i)
       {
-        std::cout << i << std::endl;
         inputs.clear();
         inputsMin.clear();
         inputsMax.clear();
@@ -320,30 +319,6 @@ TEST(EvalModelGeneration, chainTest)
                                  metadataGroundings);
 //            }
           }
-          else if (i == 1)
-          {
-//            if (j < 1)
-//            {
-            oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
-
-            metadatas.push_back("Delay");
-            metadataValues.push_back(0);
-            metadataValues2.push_back(0);
-            metadataGroundings.push_back("NodeDelayASPGrounding");
-            metadatas.push_back("Cost");
-            metadataValues.push_back(1);
-            metadataValues2.push_back(1);
-            metadataGroundings.push_back("NodeCostASPGrounding");
-            metadatas.push_back("Accuracy");
-            metadataValues.push_back(nodesMax - j);
-            metadataValues2.push_back(0);
-            metadataGroundings.push_back("NodeAccuracyMaxASPGrounding");
-
-            // TODO fix
-            oi.addNodeIndividual(node + "Ind", node, system, "", "", metadatas, metadataValues, metadataValues2,
-                                 metadataGroundings);
-//            }
-          }
           else// if (j < 1)
           {
             oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
@@ -386,20 +361,20 @@ TEST(EvalModelGeneration, chainTest)
       ss.str("");
       ss << "metadataStream(1,accuracy,stream(1,evalSystem,evalNode0_" << chainSize - 1
           << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
-          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize - 1 << "),"
+          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
           << chainSize * nodesMax << ")";
       toCheck.push_back(ss.str());
 
       ss.str("");
       ss << "metadataStream(1,delay,stream(1,evalSystem,evalNode0_" << chainSize - 1
           << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
-          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize - 1 << "),5)";
+          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),5)";
       toCheck.push_back(ss.str());
 
       ss.str("");
       ss << "selectedStream(1,evalSystem,evalNode0_" << chainSize - 1
           << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
-          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize - 1 << ")";
+          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << ")";
       toCheck.push_back(ss.str());
 
       ss.str("");
@@ -432,6 +407,7 @@ TEST(EvalModelGeneration, chainTest)
       file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
           << result.worst.aspSolvingTime << std::endl;
 
+      // gnuplot -persist -e "set hidden3d; set dgrid3d 20,20 qnorm 2; splot './results1-10_1-10.txt' using 1:2:5 with lines"
       file.flush();
     }
   }

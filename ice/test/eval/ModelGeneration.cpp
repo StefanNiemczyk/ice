@@ -444,11 +444,11 @@ public:
 
     if (solveResult == Gringo::SolveResult::SAT)
     {
-      asp.printLastModel(false);
+//      asp.printLastModel(false);
 
       for (auto toCheck : *p_requiredModelElements)
       {
-        auto value = supplementary::ClingWrapper::splitASPExternalString(toCheck.c_str());
+        auto value = supplementary::ClingWrapper::stringToValue(toCheck.c_str());
         std::string name = *value.name();
         if (false == asp.query(name, value.args()))
         {

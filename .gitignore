@@ -1,4 +1,7 @@
 ice/java/lib/java_ontology_interface.jar
+
+*.class
+*.lp~
 # Compiled Object files
 *.slo
 *.lo
