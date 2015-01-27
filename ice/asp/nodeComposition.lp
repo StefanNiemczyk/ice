@@ -4,8 +4,8 @@
 % output/6 		:		(system,node,scope,rep,acc_mode,acc_modifier)
 %--------------------------------------------------------------------------------------
 % paramters
-#const maxHopCount=2.
-#const maxStepCount=10.
+#const maxHopCount=3.
+#const maxStepCount=5.
 #const priorityDelay=3.
 #const priorityAccuracy=3.
 #const priorityTransferCost=2.
@@ -18,6 +18,11 @@
 %#show stream/5.
 %#show connectToNode/6.
 %#show streamTransfer/7.
+
+
+
+metadata(accuracy,maximize).
+metadata(delay,minimize).
 
 
 %--------------------------------------------------------------------------------------
@@ -35,6 +40,8 @@ after(NODE1,NODE2) :- connectToNode(k,SYSTEM,NODE2,_,_,NODE1,SOURCE,_,_).
 after(NODE1,NODE2) :- connectToMap(k,SYSTEM,NODE2,ENTITY_TYPE,ENTITY2,NODE1,SOURCE,_,STEP).
 after(NODE1,NODE3) :- after(NODE1,NODE2), after(NODE2,NODE3).
 :- after(NODE,NODE).
+
+
 
 %% creating a node
 0 { node(k,SYSTEM,NODE,ENTITY,none) } 1 :- 
@@ -620,33 +627,58 @@ metadataStream(k,METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2
 %:- nodeMeta(NODE, STEP_MAX, COUNT), nodeMeta(NODE, STEP_MAX2, COUNT2), STEP_MAX != STEP_MAX2.
 %:- nodeMeta(NODE, STEP_MAX, COUNT), nodeMeta(NODE, STEP_MAX2, COUNT2), COUNT != COUNT2.
 
-%:- stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP), STEP != STEP2.
+:- stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2), 
+   stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP), 
+   STEP != STEP2.
+
+%transfer(SYSTEM_1,SYSTEM_3,TRANSFER_DELAY_1+TRANSFER_DELAY_2,TRANSFER_COST_1+TRANSFER_COST_2) :- 
+%	transfer(SYSTEM_1,SYSTEM_2,TRANSFER_DELAY_1,TRANSFER_COST_1),
+%	transfer(SYSTEM_2,SYSTEM_3,TRANSFER_DELAY_2,TRANSFER_COST_2).
+
+%requiredInformation(k,SYSTEM,INFO) :- requiredStream(SYSTEM,INFO).
+%requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,ENTITY2,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,none)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,none,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,any,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY2,SCOPE,REP,ENTITY)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input2(SYSTEM,NODE,SCOPE,REP,ENTITY,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY2,SCOPE,REP,none)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,none,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY2,SCOPE,REP,ENTITY)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,any,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), entity(ENTITY,ENTITY_TYPE), input(SYSTEM,NODE,SCOPE,REP,_,MIN,MAX).
 
 
+%:- streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE1,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,_), streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE2,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,_), SYSTEM_SOURCE1 != SYSTEM_SOURCE2.
 
 %% transfer a stream between systems
-0 { streamTransfer(k,SYSTEM_SOURCE,PROVIDER,SYSTEM_TARGET,SOURCE,INFO,STEP,TRANSFER_DELAY,TRANSFER_COST) } 1 :- 
+0 { streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,HOPS+1) } 1 :- 
 	transfer(SYSTEM_SOURCE,SYSTEM_TARGET,TRANSFER_DELAY,TRANSFER_COST),
+	streamTransfer(k,SYSTEM_SOURCE,stream(k,SYSTEM_TRANSFER_SOURCE,PROVIDER,SOURCE,INFO,STEP-1),_,_,HOPS),
+	SYSTEM_TRANSFER_SOURCE != SYSTEM_TARGET,
+	SYSTEM_TRANSFER_SOURCE != SYSTEM_SOURCE,
+	%requiredInformation(k,SYSTEM_TARGET,INFO),
 	stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP), 
-	STEP < maxStepCount,
+	HOPS < maxHopCount,
+	SYSTEM_TARGET != SOURCE.
+
+0 { streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,1) } 1 :- 
+	transfer(SYSTEM_SOURCE,SYSTEM_TARGET,TRANSFER_DELAY,TRANSFER_COST),
+	SOURCE = SYSTEM_SOURCE,
+	%requiredInformation(k,SYSTEM_TARGET,INFO),
+	stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP), 
 	SYSTEM_TARGET != SOURCE.
 
 stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP+1) :- 
-	streamTransfer(k,SYSTEM_SOURCE,PROVIDER,SYSTEM_TARGET,SOURCE,INFO,STEP,TRANSFER_DELAY,TRANSFER_COST).
+	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,_).
 
 
 % computing QoS parameters	
 metadataStream(k,METADATA,stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP+1),VALUE) :- 
-	streamTransfer(k,SYSTEM_SOURCE,PROVIDER,SYSTEM_TARGET,SOURCE,INFO,STEP,TRANSFER_DELAY,TRANSFER_COST), 
+	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,_), 
 	metadataStream(k,METADATA,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),VALUE), 
-	STEP < maxStepCount,
 	METADATA != delay.	
 
 % hack to bound the delay computation. max 5 duplicated computations
 metadataStream(k,delay,stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP+1),TRANSFER_DELAY+DELAY) :-
-	streamTransfer(k,SYSTEM_SOURCE,PROVIDER,SYSTEM_TARGET,SOURCE,INFO,STEP,TRANSFER_DELAY,_), 
-	metadataStream(k,delay,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),DELAY), 
-	STEP < maxStepCount.
+	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,_), 
+	metadataStream(k,delay,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),DELAY).
 
 
 
@@ -795,9 +827,6 @@ metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),FIX
 %%% soft optimization contraint instead of a hard constraint to enable partial solutions
 %%%
 
-metadata(accuracy,maximize).
-metadata(delay,minimize).
-
 %% streams
 0 { selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP) : stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP) } 1 :- requiredStream(SYSTEM,INFO), query(k).
 :~ requiredStream(SYSTEM,INFO), not selectedStream(k,SYSTEM,_,_,INFO,_), query(k). [1@5,requiredStream]
@@ -841,8 +870,8 @@ metadata(delay,minimize).
 
 
 % checking point budget of systems
-:- system(SYSTEM,POINTS), SUM_STREAMS = #sum{COST,SYSTEM_SOURCE,PROVIDER,SYSTEM_TARGET,SOURCE,INFO,STEP : streamTransfer(k,SYSTEM_SOURCE,PROVIDER,SYSTEM_TARGET,SOURCE,INFO,STEP,_,COST)}, 
-		SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY : node(k,SYSTEM,NODE,ENTITY), nodeCost(SYSTEM,NODE,COST)}, (SUM_NODES + SUM_STREAMS) > POINTS, query(k).
+:- system(SYSTEM,POINTS), SUM_STREAMS = #sum{COST,SYSTEM,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP : streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),_,COST,_)}, 
+		SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), nodeCost(SYSTEM,NODE,COST)}, (SUM_NODES + SUM_STREAMS) > POINTS, query(k).
 
 
 
@@ -862,8 +891,8 @@ metadata(delay,minimize).
 		metadataMap(k,accuracy,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),VALUE), query(k) }.
 
 % transfer cost
-#minimize { TRANSFER_COST@priorityTransferCost,SYSTEM_SOURCE,PROVIDER,SYSTEM_TARGET,SOURCE,INFO,STEP : 
-		streamTransfer(k,SYSTEM_SOURCE,PROVIDER,SYSTEM_TARGET,SOURCE,INFO,STEP,_,TRANSFER_COST), query(k) }.
+#minimize { TRANSFER_COST@priorityTransferCost,SYSTEM,STREAM : 
+		streamTransfer(k,SYSTEM,STREAM,_,TRANSFER_COST,_), query(k) }.
 
 % cost
 sumCost(k,SUM_NODES + SUM_EXTRACTIONS) :- 

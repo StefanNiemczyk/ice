@@ -118,6 +118,119 @@ TEST(ClingWrap, simpleTest)
   EXPECT_EQ(true, cw->query("sumCost(1,8)"));
 }
 
+TEST(ClingWrap, simpleTestQuery)
+{
+  std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
+  cw->addKnowledgeFile("../asp/nodeComposition.lp");
+  cw->init();
+
+  // ontology
+  cw->add("base", {}, "entityType(robot).");
+  cw->add("base", {}, "scope(scope1).");
+  cw->add("base", {}, "scope(scope2).");
+  cw->add("base", {}, "scope(scope3).");
+  cw->add("base", {}, "representation(rep1).");
+  cw->add("base", {}, "hasScope(robot,scope1).");
+  cw->add("base", {}, "hasScope(robot,scope2).");
+  cw->add("base", {}, "hasScope(robot,scope3).");
+  cw->add("base", {}, "hasRepresentation(scope1,rep1).");
+  cw->add("base", {}, "hasRepresentation(scope2,rep1).");
+  cw->add("base", {}, "hasRepresentation(scope3,rep1).");
+  cw->ground("base", {});
+
+  // entities
+  cw->ground("entity", {"entity1", "robot"});
+
+  // systems
+  auto system1 = cw->getExternal("system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2", 10}, true);
+
+  // inputs
+  cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
+  auto input1 = cw->getExternal("sourceNode", {"system1", "in1", "entity1"}, true);
+  cw->ground("sourceNode", {"in2", "system1", "system1", "entity1", "scope2", "rep1", "none", 5, 90, 1});
+  auto input2 = cw->getExternal("sourceNode", {"system1", "in2", "entity1"}, true);
+  cw->ground("sourceNode", {"in3", "system2", "system2", "entity1", "scope2", "rep1", "none", 0, 99, 1});
+  auto input3 = cw->getExternal("sourceNode", {"system2", "in3", "entity1"}, false);
+
+  // requireds
+  auto required = cw->getExternal("requiredStream", {"system1", Gringo::Value("information", {"entity1", "scope3",
+                                                                                              "rep1", "none"})},
+                                  "requiredStream", {"system1", Gringo::Value("information", {"entity1", "scope3",
+                                                                                              "rep1", "none"}),
+                                                     10000, -100},
+                                  true);
+
+  // add transfer
+  auto transfer = cw->getExternal("transfer", {"system2", "system1", 1, 2}, true);
+
+  // add node1
+  cw->add("node1", {}, "#external nodeTemplate(system1,node1,any).");
+  auto node1 = cw->getExternal("nodeTemplate", {"system1", "node1", "any"}, "node1", {}, true);
+  cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
+  cw->add("node1", {}, "input(system1,node1,scope2,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
+  cw->add("node1", {}, "output(system1,node1,scope3,rep1,none).");
+  cw->add("node1", {}, "metadataNode(delay,system1,node1,max,1,0).");
+  cw->add("node1", {}, "nodeCost(system1,node1,10).");
+  cw->add("node1", {}, "metadataNode(accuracy,system1,node1,max,0,0).");
+  cw->ground("node1", {});
+
+  // add node2
+  cw->add("node2", {}, "#external nodeTemplate(system1,node2,any).");
+  auto node2 = cw->getExternal("nodeTemplate", {"system1", "node2", "any"}, "node2", {}, true);
+  cw->add("node2", {}, "input(system1,node2,scope1,rep1,none,1,1) :- nodeTemplate(system1,node2,any).");
+  cw->add("node2", {}, "input(system1,node2,scope2,rep1,none,2,2) :- nodeTemplate(system1,node2,any).");
+  cw->add("node2", {}, "output(system1,node2,scope3,rep1,none).");
+  cw->add("node2", {}, "metadataNode(delay,system1,node2,max,1,0).");
+  cw->add("node2", {}, "nodeCost(system1,node2,5).");
+  cw->add("node1", {}, "metadataNode(accuracy,system1,node2,avg,0,1).");
+  cw->ground("node2", {});
+
+  auto query1 = cw->getExternal("query", {1}, true);
+
+  cw->solve();
+//  cw->printLastModel();
+
+  EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
+  EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,in2,system1,information(entity1,scope2,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("sumCost(1,12)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),6)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),90)"));
+
+  query1->assign(false);
+  auto query2 = cw->getExternal("query", {2}, true);
+
+  input3->assign(true);
+  cw->solve();
+//  cw->printLastModel();
+
+  EXPECT_EQ(true, cw->query("node(2,system1,node1,entity1,none)"));
+  EXPECT_EQ(false, cw->query("node(2,system1,node2,entity1,none)"));
+  EXPECT_EQ(false, cw->query("connectToNode(node(2,system1,node1,entity1,none),stream(2,system1,in2,system1,information(entity1,scope2,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(2,system1,node1,entity1,none),stream(2,system1,in3,system2,information(entity1,scope2,rep1,none),2))"));
+  EXPECT_EQ(false, cw->query("metadataStream(2,delay,stream(2,system1,node1,system1,information(entity1,scope3,rep1,none),3),6)"));
+  EXPECT_EQ(true, cw->query("metadataStream(2,delay,stream(2,system1,node1,system1,information(entity1,scope3,rep1,none),3),2)"));
+  EXPECT_EQ(true, cw->query("metadataStream(2,accuracy,stream(2,system1,node1,system1,information(entity1,scope3,rep1,none),3),99)"));
+  EXPECT_EQ(true, cw->query("sumCost(2,12)"));
+
+  node1->assign(false);
+  query2->assign(false);
+  auto query3 = cw->getExternal("query", {3}, true);
+  cw->solve();
+//  cw->printLastModel();
+
+  EXPECT_EQ(false, cw->query("node(3,system1,node1,entity1,none)"));
+  EXPECT_EQ(true, cw->query("node(3,system1,node2,entity1,none)"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(3,system1,node2,entity1,none),stream(3,system1,in1,system1,information(entity1,scope1,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(3,system1,node2,entity1,none),stream(3,system1,in2,system1,information(entity1,scope2,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(3,system1,node2,entity1,none),stream(3,system1,in3,system2,information(entity1,scope2,rep1,none),2))"));
+  EXPECT_EQ(true, cw->query("metadataStream(3,delay,stream(3,system1,node2,system1,information(entity1,scope3,rep1,none),3),6)"));
+  EXPECT_EQ(false, cw->query("metadataStream(3,delay,stream(3,system1,node2,system1,information(entity1,scope3,rep1,none),3),2)"));
+  EXPECT_EQ(true, cw->query("metadataStream(3,accuracy,stream(3,system1,node2,system1,information(entity1,scope3,rep1,none),3),96)"));
+  EXPECT_EQ(true, cw->query("sumCost(3,8)"));
+}
+
 TEST(ClingWrap, threeSystems)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
@@ -153,8 +266,8 @@ TEST(ClingWrap, threeSystems)
   cw->solve();
 //  cw->printLastModel();
 
-  EXPECT_EQ(true, cw->query("streamTransfer(1,system1,in1,system2,system1,information(entity1,scope1,rep1,none),1,1,2)"));
-  EXPECT_EQ(true, cw->query("streamTransfer(1,system2,in1,system3,system1,information(entity1,scope1,rep1,none),2,1,2)"));
+  EXPECT_EQ(true, cw->query("streamTransfer(1,system2,stream(1,system1,in1,system1,information(entity1,scope1,rep1,none),1),1,2,1)"));
+  EXPECT_EQ(true, cw->query("streamTransfer(1,system3,stream(1,system2,in1,system1,information(entity1,scope1,rep1,none),2),1,2,2)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system3,in1,system1,information(entity1,scope1,rep1,none),3),2)"));
 }
 
@@ -382,17 +495,18 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   auto transfer1_3 = cw->getExternal("transfer", {"system3", "system1", 4000, 3}, true);
   auto transfer1_4 = cw->getExternal("transfer", {"system4", "system1", 4000, 4}, true);
   auto transfer1_5 = cw->getExternal("transfer", {"system5", "system1", 4000, 5}, true);
-//  auto transfer2_3 = cw->getExternal("transfer", {"system3", "system2", 4000, 5}, true);
-//  auto transfer2_4 = cw->getExternal("transfer", {"system2", "system4", 4000, 5}, true);
-//  auto transfer2_5 = cw->getExternal("transfer", {"system2", "system5", 4000, 5}, true);
-//  auto transfer3_4 = cw->getExternal("transfer", {"system3", "system4", 4000, 5}, true);
-//  auto transfer3_5 = cw->getExternal("transfer", {"system3", "system5", 4000, 5}, true);
-//  auto transfer5_5 = cw->getExternal("transfer", {"system4", "system5", 4000, 5}, true);
+  auto transfer2_3 = cw->getExternal("transfer", {"system3", "system2", 4000, 5}, true);
+  auto transfer2_4 = cw->getExternal("transfer", {"system2", "system4", 4000, 5}, true);
+  auto transfer2_5 = cw->getExternal("transfer", {"system2", "system5", 4000, 5}, true);
+  auto transfer3_4 = cw->getExternal("transfer", {"system3", "system4", 4000, 5}, true);
+  auto transfer3_5 = cw->getExternal("transfer", {"system3", "system5", 4000, 5}, true);
+  auto transfer5_5 = cw->getExternal("transfer", {"system4", "system5", 4000, 5}, true);
 
   auto query1 = cw->getExternal("query", {1}, true);
 
   cw->solve();
 //  cw->printLastModel();
+//  std::cout << cw->getSolvingTime() << " ms" << std::endl;
 
   EXPECT_EQ(true, cw->query("stream(1,system1,in1,system1,information(entity1,scope1,rep1,none),1)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,in2,system2,information(entity2,scope1,rep1,none),2)"));
@@ -429,7 +543,7 @@ TEST(ClingWrap, simpleChainTest)
   cw->ground("entity", {"entity1", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1", 11}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -449,7 +563,7 @@ TEST(ClingWrap, simpleChainTest)
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "output(system1,node1,scope1,rep1,none).");
   cw->add("node1", {}, "metadataNode(delay,system1,node1,min,1,0).");
-  cw->add("node1", {}, "nodeCost(system1,node1,10).");
+  cw->add("node1", {}, "nodeCost(system1,node1,8).");
   cw->add("node1", {}, "metadataNode(accuracy,system1,node1,min,5,0).");
   cw->ground("node1", {});
 
@@ -460,8 +574,18 @@ TEST(ClingWrap, simpleChainTest)
   cw->add("node2", {}, "output(system1,node2,scope1,rep1,none).");
   cw->add("node2", {}, "metadataNode(delay,system1,node2,min,1,0).");
   cw->add("node2", {}, "nodeCost(system1,node2,5).");
-  cw->add("node1", {}, "metadataNode(accuracy,system1,node2,min,1,2).");
+  cw->add("node2", {}, "metadataNode(accuracy,system1,node2,min,5,0).");
   cw->ground("node2", {});
+
+  // add node3
+  cw->add("node3", {}, "#external nodeTemplate(system1,node3,any).");
+  auto node3 = cw->getExternal("nodeTemplate", {"system1", "node3", "any"}, "node3", {}, true);
+  cw->add("node3", {}, "input(system1,node3,scope1,rep1,none,1,1) :- nodeTemplate(system1,node3,any).");
+  cw->add("node3", {}, "output(system1,node3,scope1,rep1,none).");
+  cw->add("node3", {}, "metadataNode(delay,system1,node3,min,1,0).");
+  cw->add("node3", {}, "nodeCost(system1,node3,5).");
+  cw->add("node3", {}, "metadataNode(accuracy,system1,node3,min,1,2).");
+  cw->ground("node3", {});
 
   auto query1 = cw->getExternal("query", {1}, true);
 
@@ -469,12 +593,13 @@ TEST(ClingWrap, simpleChainTest)
 //  cw->printLastModel();
 
   EXPECT_EQ(true, cw->query("node(1,system1,in1,entity1,none)"));
-  EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
+  EXPECT_EQ(false, cw->query("node(1,system1,node1,entity1,none)"));
   EXPECT_EQ(true, cw->query("node(1,system1,node2,entity1,none)"));
+  EXPECT_EQ(true, cw->query("node(1,system1,node3,entity1,none)"));
   // metadataStream(1,accuracy,system1,node2,system1,information(entity1,scope1,rep1,none),2,94
   bool result = cw->query("metadataStream(1,accuracy,stream(1,system1,node2,system1,information(entity1,scope1,rep1,none),3),98)");
-  result |= cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope1,rep1,none),3),98)");
+  result |= cw->query("metadataStream(1,accuracy,stream(1,system1,node3,system1,information(entity1,scope1,rep1,none),3),98)");
 
   EXPECT_EQ(true, result);
-  EXPECT_EQ(true, cw->query("sumCost(1,16)"));
+  EXPECT_EQ(true, cw->query("sumCost(1,11)"));
 }

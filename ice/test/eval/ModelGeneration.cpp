@@ -444,7 +444,7 @@ public:
 
     if (solveResult == Gringo::SolveResult::SAT)
     {
-//      asp.printLastModel(false);
+      asp.printLastModel(false);
 
       for (auto toCheck : *p_requiredModelElements)
       {

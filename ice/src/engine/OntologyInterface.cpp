@@ -735,7 +735,7 @@ bool OntologyInterface::addIroNodeClass(std::string const p_node, std::vector<st
     env->DeleteLocalRef(env->GetObjectArrayElement(inputs, i));
   }
 
-  for (int i = 0; i < sizeInput; ++i)
+  for (int i = 0; i < sizeInputRelated; ++i)
   {
     env->DeleteLocalRef(env->GetObjectArrayElement(inputsRelated, i));
   }

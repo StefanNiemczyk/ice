@@ -539,6 +539,7 @@ public class IceOntologyInterface {
 		}
 
 		if (p_inputsRelated != null
+				&& p_inputsRelated.length != 0
 				&& (p_inputsRelated.length != p_inputsRelatedMinSize.length || p_inputs.length != p_inputsRelatedMaxSize.length)) {
 			log(String.format(
 					"Wrong size of related inputs '%d' and sizes of min '%s' and max '%s', node not created.", p_node,
@@ -595,7 +596,7 @@ public class IceOntologyInterface {
 		}
 
 		// create related inputs
-		if (p_inputsRelated != null) {
+		if (p_inputsRelated != null && p_inputsRelated.length > 0) {
 			for (int i = 0; i < p_inputsRelated.length; ++i) {
 				OWLClass inputRelated = this.findOWLClass(this.ii.namedStream, p_inputsRelated[i]);
 
