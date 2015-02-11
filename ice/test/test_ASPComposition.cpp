@@ -78,7 +78,7 @@ TEST(ClingWrap, simpleTest)
   cw->add("node1", {}, "metadataNode(accuracy,system1,node2,avg,0,1).");
   cw->ground("node2", {});
 
-  auto query1 = cw->getExternal("query", {1}, true);
+  auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
 //  cw->printLastModel();
@@ -186,7 +186,7 @@ TEST(ClingWrap, simpleTestQuery)
   cw->add("node1", {}, "metadataNode(accuracy,system1,node2,avg,0,1).");
   cw->ground("node2", {});
 
-  auto query1 = cw->getExternal("query", {1}, true);
+  auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
 //  cw->printLastModel();
@@ -199,7 +199,7 @@ TEST(ClingWrap, simpleTestQuery)
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),90)"));
 
   query1->assign(false);
-  auto query2 = cw->getExternal("query", {2}, true);
+  auto query2 = cw->getExternal("query", {2}, "query", {2,3,10}, true);
 
   input3->assign(true);
   cw->solve();
@@ -216,7 +216,7 @@ TEST(ClingWrap, simpleTestQuery)
 
   node1->assign(false);
   query2->assign(false);
-  auto query3 = cw->getExternal("query", {3}, true);
+  auto query3 = cw->getExternal("query", {3}, "query", {3,3,10}, true);
   cw->solve();
 //  cw->printLastModel();
 
@@ -261,7 +261,7 @@ TEST(ClingWrap, threeSystems)
   auto transfer1_2 = cw->getExternal("transfer", {"system2", "system1", 1, 2}, true);
   auto transfer2_3 = cw->getExternal("transfer", {"system3", "system2", 1, 2}, true);
 
-  auto query1 = cw->getExternal("query", {1}, true);
+  auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
 //  cw->printLastModel();
@@ -312,7 +312,7 @@ TEST(ClingWrap, informationTranslation)
   cw->ground("coords2Wgs84", {});
 
 
-  auto query1 = cw->getExternal("query", {1}, true);
+  auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
 // cw->printLastModel();
@@ -432,7 +432,7 @@ TEST(ClingWrap, ego2allo)
   cw->add("allo2ego", {}, "iroCost(system1,allo2ego,1).");
   cw->ground("allo2ego", {});
 
-  auto query1 = cw->getExternal("query", {1}, true);
+  auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
 //   cw->printLastModel();
@@ -502,7 +502,7 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   auto transfer3_5 = cw->getExternal("transfer", {"system3", "system5", 4000, 5}, true);
   auto transfer5_5 = cw->getExternal("transfer", {"system4", "system5", 4000, 5}, true);
 
-  auto query1 = cw->getExternal("query", {1}, true);
+  auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
 //  cw->printLastModel();
@@ -587,7 +587,7 @@ TEST(ClingWrap, simpleChainTest)
   cw->add("node3", {}, "metadataNode(accuracy,system1,node3,min,1,2).");
   cw->ground("node3", {});
 
-  auto query1 = cw->getExternal("query", {1}, true);
+  auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
 //  cw->printLastModel();

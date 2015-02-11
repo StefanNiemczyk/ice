@@ -18,6 +18,9 @@ struct ModelGenerationResult
   unsigned long long ontologyToASPTime;
   unsigned long long aspGroundingTime;
   unsigned long long aspSolvingTime;
+  unsigned long long aspSatTime;
+  unsigned long long aspUnsatTime;
+  long modelCount;
   bool successful;
 
   void print()
@@ -29,6 +32,9 @@ struct ModelGenerationResult
     std::cout << "Ontology 2 ASP\t\t" << ontologyToASPTime << " ms" << std::endl;
     std::cout << "ASP grounding\t\t" << aspGroundingTime << " ms" << std::endl;
     std::cout << "ASP Solving\t\t\t" << aspSolvingTime << " ms" << std::endl;
+    std::cout << "ASP Sat time\t\t" << aspSatTime << " ms" << std::endl;
+    std::cout << "ASP unsat time\t\t" << aspUnsatTime << " ms" << std::endl;
+    std::cout << "ASP model count\t\t" << modelCount << std::endl;
   }
 };
 
@@ -119,7 +125,8 @@ public:
   }
 
   ModelGenerationSeriesResult testSeries(std::string p_ontPath, std::vector<std::string>* p_requiredModelElements,
-                                         int p_count)
+                                         int p_count, bool warmUp, int maxHopCount = 3, int maxStepCount = 10,
+                                         std::function<void(supplementary::ClingWrapper *asp)> lambda = nullptr)
   {
     ModelGenerationSeriesResult result;
     result.numberTotal = p_count;
@@ -137,26 +144,28 @@ public:
     VarianceOnline totalTimeVar, ontologyReadTimeVar, ontologyReasonerTimeVar, ontologyToASPTimeVar,
                    aspGroundingTimeVar, aspSolvingTimeVar;
 
-    std::cout << "Starting warm up " << std::flush;
-
-    for (int i = 1; i < 101; ++i)
+    if (warmUp)
     {
-      this->test(p_ontPath, p_requiredModelElements, true);
-
-      if (i % 10 == 0)
+      std::cout << "Starting warm up " << std::flush;
+      for (int i = 1; i < 101; ++i)
       {
-        std::cout << ".";
-        std::cout << std::flush;
+        this->test(p_ontPath, p_requiredModelElements, true, maxHopCount, maxStepCount);
+
+        if (i % 10 == 0)
+        {
+          std::cout << ".";
+          std::cout << std::flush;
+        }
       }
+      std::cout << " done." << std::endl;
     }
-    std::cout << " done." << std::endl;
 
     for (int i = 0; i < p_count; ++i)
     {
       std::cout << "Starting run " << (i + 1) << " ... ";
       start = std::chrono::system_clock::now();
 
-      auto r = this->test(p_ontPath, p_requiredModelElements, false);
+      auto r = this->test(p_ontPath, p_requiredModelElements, false, maxHopCount, maxStepCount, lambda);
 
       if (r.successful)
         ++result.numberSuccessful;
@@ -239,8 +248,9 @@ public:
     return result;
   }
 
-  ModelGenerationResult test(std::string p_ontPath, std::vector<std::string>* p_requiredModelElements, bool warmUp =
-                                 false)
+  ModelGenerationResult test(std::string p_ontPath, std::vector<std::string>* p_requiredModelElements,
+                             bool warmUp, int maxHopCount = 3, int maxStepCount = 10,
+                             std::function<void(supplementary::ClingWrapper *asp)> lambda = nullptr)
   {
     ModelGenerationResult result;
     std::vector<std::string> entities;
@@ -414,12 +424,15 @@ public:
       return result;
     }
 
+    if (lambda != nullptr)
+      lambda(&asp);
+
     // Grounding
 //    std::cout << "ASP ground call" << std::endl;
     startAsp = std::chrono::system_clock::now();
     asp.ground(programPart, {});
 
-    auto lastQuery = asp.getExternal("query", {1}, true);
+    auto lastQuery = asp.getExternal("query", {1}, "query", {1, maxHopCount, maxStepCount}, true);
     asp.ground("query", {1});
 
     // Solving
@@ -441,10 +454,14 @@ public:
     result.aspSolvingTime = asp.getSolvingTime();
     result.aspGroundingTime = std::chrono::duration_cast<std::chrono::milliseconds>(endAsp - startAsp).count()
         - result.aspSolvingTime;
+    result.aspSatTime = asp.getSatTime();
+    result.aspUnsatTime = asp.getUnsatTime();
+    result.modelCount = asp.getModelCount();
 
     if (solveResult == Gringo::SolveResult::SAT)
     {
       asp.printLastModel(false);
+      std::cout << asp.getSymbolTableSize() << std::endl;
 
       for (auto toCheck : *p_requiredModelElements)
       {
