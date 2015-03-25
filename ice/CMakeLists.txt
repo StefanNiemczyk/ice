@@ -20,7 +20,7 @@ find_package(TinyXML REQUIRED)
 ## Use c++ 11x std
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
-  add_definitions(-DWITH_THREADS=0)
+add_definitions(-DWITH_THREADS=1)
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)

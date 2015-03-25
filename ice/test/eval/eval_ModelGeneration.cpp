@@ -178,7 +178,7 @@ using namespace std;
 
 TEST(EvalModelGeneration, chainTest)
 {
-//  return;
+  return;
 
   std::string path = ros::package::getPath("ice");
   std::vector<std::string> inputs;
@@ -195,15 +195,15 @@ TEST(EvalModelGeneration, chainTest)
 
   ofstream file;
 
-  int chainSizeMin = 1;
-  int chainSizeMax = 10;
+  int chainSizeMin = 8;
+  int chainSizeMax = 8;
   int chainSizeStep = 1;
 
   int nodesMin = 10;
   int nodesMax = 10;
   int nodesStep = 1;
 
-  int runs = 1;
+  int runs = 10;
 
   bool tree = false;
 
@@ -221,6 +221,17 @@ TEST(EvalModelGeneration, chainTest)
   {
     for (int nodes = nodesMin; nodes <= nodesMax; nodes += nodesStep)
     {
+      inputs.clear();
+      inputsMin.clear();
+      inputsMax.clear();
+      outputs.clear();
+      outputsMin.clear();
+      outputsMax.clear();
+      metadatas.clear();
+      metadataValues.clear();
+      metadataValues2.clear();
+      metadataGroundings.clear();
+
       std::cout << std::endl;
       std::cout << "---------------------------------------------------------------------------------------------------"
           << std::endl;
@@ -311,10 +322,10 @@ TEST(EvalModelGeneration, chainTest)
             metadataValues.push_back(5);
             metadataValues2.push_back(5);
             metadataGroundings.push_back("NodeDelayFixASPGrounding");
-            metadatas.push_back("Cost");
-            metadataValues.push_back(1);
-            metadataValues2.push_back(1);
-            metadataGroundings.push_back("NodeCostASPGrounding");
+//            metadatas.push_back("Cost");
+//            metadataValues.push_back(1);
+//            metadataValues2.push_back(1);
+//            metadataGroundings.push_back("NodeCostASPGrounding");
             metadatas.push_back("Accuracy");
             metadataValues.push_back(nodesMax - j);
             metadataValues2.push_back(nodesMax - j);
@@ -332,10 +343,10 @@ TEST(EvalModelGeneration, chainTest)
             metadataValues.push_back(0);
             metadataValues2.push_back(0);
             metadataGroundings.push_back("NodeDelayASPGrounding");
-            metadatas.push_back("Cost");
-            metadataValues.push_back(1);
-            metadataValues2.push_back(1);
-            metadataGroundings.push_back("NodeCostASPGrounding");
+//            metadatas.push_back("Cost");
+//            metadataValues.push_back(1);
+//            metadataValues2.push_back(1);
+//            metadataGroundings.push_back("NodeCostASPGrounding");
             metadatas.push_back("Accuracy");
             metadataValues.push_back(nodesMax - j);
             metadataValues2.push_back(0);
@@ -386,14 +397,18 @@ TEST(EvalModelGeneration, chainTest)
       ss << "node(1,evalSystem,evalNode0_" << chainSize - 1 << "Ind,evalEntity,none)";
       toCheck.push_back(ss.str());
 
-      ss.str("");
-      ss << "sumCost(1," << chainSize << ")";
-      toCheck.push_back(ss.str());
+//      ss.str("");
+//      ss << "sumCost(1," << chainSize << ")";
+//      toCheck.push_back(ss.str());
 
-      auto result = mg.testSeries(fileName, &toCheck, runs, true, 3, 10,
+      auto result = mg.testSeries(fileName, &toCheck, runs, true, 3, 20,
           [] (supplementary::ClingWrapper *asp){
-            asp->setPredefConfiguration(supplementary::PredefinedConfigurations::jumpy);
-//            asp->setOptStrategie(2);
+//            asp->setParallelMode(4);
+//        asp->setSaveProgress(0);
+//            asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
+//            asp->setOptStrategie(4);
+        //Berkmin|Vmtf|Vsids|Domain|Unit|None
+//              asp->setHeuristic("Domain");
           });
 
       result.print();
@@ -426,7 +441,7 @@ TEST(EvalModelGeneration, chainTest)
 
 TEST(EvalModelGeneration, representationTest)
 {
-  return;
+//  return;
 
   std::string path = ros::package::getPath("ice");
   std::vector<std::string> inputs;
@@ -450,7 +465,7 @@ TEST(EvalModelGeneration, representationTest)
   int representationSizeMax = 9;
   int representationSizeStep = 1;
 
-  int runs = 100;
+  int runs = 10;
 
   bool tree = false;
 
@@ -465,6 +480,17 @@ TEST(EvalModelGeneration, representationTest)
 
   for (int reps = representationSizeMin; reps <= representationSizeMax; reps += representationSizeStep)
   {
+    inputs.clear();
+    inputsMin.clear();
+    inputsMax.clear();
+    outputs.clear();
+    outputsMin.clear();
+    outputsMax.clear();
+    metadatas.clear();
+    metadataValues.clear();
+    metadataValues2.clear();
+    metadataGroundings.clear();
+
     std::cout << std::endl;
     std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
     std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
@@ -526,25 +552,25 @@ TEST(EvalModelGeneration, representationTest)
     metadataValues2.clear();
     metadataGroundings.clear();
 
-//    std::string node = "EvalNodeSource";
-//
-//    oi.addSourceNodeClass(node, outputs, outputsMin, outputsMax);
-//
+    std::string node = "EvalNodeSource";
+
+    oi.addSourceNodeClass(node, outputs, outputsMin, outputsMax);
+
 //    metadatas.push_back("Delay");
 //    metadataValues.push_back(5);
 //    metadataValues2.push_back(5);
 //    metadataGroundings.push_back("NodeDelayFixASPGrounding");
-//    metadatas.push_back("Cost");
-//    metadataValues.push_back(1);
-//    metadataValues2.push_back(1);
-//    metadataGroundings.push_back("NodeCostASPGrounding");
+    metadatas.push_back("Cost");
+    metadataValues.push_back(1);
+    metadataValues2.push_back(1);
+    metadataGroundings.push_back("NodeCostASPGrounding");
 //    metadatas.push_back("Accuracy");
 //    metadataValues.push_back(10);
 //    metadataValues2.push_back(10);
 //    metadataGroundings.push_back("NodeAccuracyFixASPGrounding");
-//
-//    oi.addNodeIndividual(node + "Ind", node, system, entity, "", metadatas, metadataValues, metadataValues2,
-//                         metadataGroundings);
+
+    oi.addNodeIndividual(node + "Ind", node, system, entity, "", metadatas, metadataValues, metadataValues2,
+                         metadataGroundings);
 
     for (int i = 0; i < reps; ++i)
     {
@@ -586,7 +612,7 @@ TEST(EvalModelGeneration, representationTest)
                            outputs, outputsMin, outputsMax);
 
 //        metadatas.push_back("Delay");
-//        metadataValues.push_back(0);
+//        metadataValues.push_back(i);
 //        metadataValues2.push_back(0);
 //        metadataGroundings.push_back("NodeDelayASPGrounding");
         metadatas.push_back("Cost");
@@ -640,13 +666,14 @@ TEST(EvalModelGeneration, representationTest)
     toCheck.push_back(ss.str());
 
     ss.str("");
-    ss << "sumCost(1,1)";
+    ss << "sumCost(1,2)";
     toCheck.push_back(ss.str());
 
     auto result = mg.testSeries(fileName, &toCheck, runs, true, 3, reps+1,
         [] (supplementary::ClingWrapper *asp){
-      asp->add("base",{},"stream(1,evalSystem,evalNodeSourceInd,evalSystem,information(evalEntity,evalScope,evalRepresentation0,none),1).");
-      asp->setPredefConfiguration(supplementary::PredefinedConfigurations::jumpy);
+//        asp->setSaveProgress(200);
+//      asp->add("base",{},"stream(1,evalSystem,evalNodeSourceInd,evalSystem,information(evalEntity,evalScope,evalRepresentation0,none)).");
+//      asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
     });
 
     result.print();
@@ -697,8 +724,8 @@ TEST(EvalModelGeneration, systemsStarMashTest)
 
   ofstream file;
 
-  int systemSizeMin = 200;
-  int systemSizeMax = 200;
+  int systemSizeMin = 50;
+  int systemSizeMax = 50;
   int systemSizeStep = 10;
 
   int runs = 40;
@@ -716,6 +743,17 @@ TEST(EvalModelGeneration, systemsStarMashTest)
 
   for (int systems = systemSizeMin; systems <= systemSizeMax; systems += systemSizeStep)
   {
+    inputs.clear();
+    inputsMin.clear();
+    inputsMax.clear();
+    outputs.clear();
+    outputsMin.clear();
+    outputsMax.clear();
+    metadatas.clear();
+    metadataValues.clear();
+    metadataValues2.clear();
+    metadataGroundings.clear();
+
     std::cout << std::endl;
     std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
     std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
@@ -910,7 +948,7 @@ TEST(EvalModelGeneration, systemsStarMashTest)
         asp->add("base",{},ss.str());
       }
 
-      asp->setPredefConfiguration(supplementary::PredefinedConfigurations::jumpy);
+//      asp->setPredefConfiguration(supplementary::PredefinedConfigurations::jumpy);
 //      asp->setOptStrategie(3);
     });
 
@@ -942,7 +980,7 @@ TEST(EvalModelGeneration, systemsStarMashTest)
 
 TEST(EvalModelGeneration, systemsFullMashTest)
 {
-//  return;
+  return;
 
   std::string path = ros::package::getPath("ice");
   std::vector<std::string> inputs;
@@ -963,10 +1001,10 @@ TEST(EvalModelGeneration, systemsFullMashTest)
   ofstream file;
 
   int systemSizeMin = 3;
-  int systemSizeMax = 5;
+  int systemSizeMax = 10;
   int systemSizeStep = 1;
 
-  int runs = 5;
+  int runs = 1;
 
   bool tree = false;
 
@@ -981,6 +1019,17 @@ TEST(EvalModelGeneration, systemsFullMashTest)
 
   for (int systems = systemSizeMin; systems <= systemSizeMax; systems += systemSizeStep)
   {
+    inputs.clear();
+    inputsMin.clear();
+    inputsMax.clear();
+    outputs.clear();
+    outputsMin.clear();
+    outputsMax.clear();
+    metadatas.clear();
+    metadataValues.clear();
+    metadataValues2.clear();
+    metadataGroundings.clear();
+
     std::cout << std::endl;
     std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
     std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
@@ -1052,6 +1101,13 @@ TEST(EvalModelGeneration, systemsFullMashTest)
 
     oi.addNamedStream(stream, scope, "ReqRepresentation");
 
+    inputs.clear();
+    inputsMin.clear();
+    inputsMax.clear();
+    outputs.clear();
+    outputsMin.clear();
+    outputsMax.clear();
+
     inputs.push_back("EvalSourceStream");
     inputsMin.push_back(2);
     inputsMax.push_back(2);
@@ -1066,12 +1122,6 @@ TEST(EvalModelGeneration, systemsFullMashTest)
       ss.str("");
       ss << "EvalNode" << i;
       node = ss.str();
-      inputs.clear();
-      inputsMin.clear();
-      inputsMax.clear();
-      outputs.clear();
-      outputsMin.clear();
-      outputsMax.clear();
       metadatas.clear();
       metadataValues.clear();
       metadataValues2.clear();
@@ -1177,7 +1227,7 @@ TEST(EvalModelGeneration, systemsFullMashTest)
           if (i==j)
             continue;
         ss.str("");
-        ss << "transfer(evalSystem" << j << ",evalSystem" << i << "," << 2 << "," << i << ").";
+        ss << "transfer(evalSystem" << j << ",evalSystem" << i << "," << 2 << "," << 2 << ").";
         asp->add("base",{},ss.str());
 
         ss.str("");
@@ -1186,7 +1236,7 @@ TEST(EvalModelGeneration, systemsFullMashTest)
         }
       }
 
-      asp->setPredefConfiguration(supplementary::PredefinedConfigurations::jumpy);
+//      asp->setPredefConfiguration(supplementary::PredefinedConfigurations::jumpy);
 //      asp->setOptStrategie(3);
     });
 

@@ -461,6 +461,10 @@ public:
     if (solveResult == Gringo::SolveResult::SAT)
     {
       asp.printLastModel(false);
+      ofstream file;
+      file.open("/tmp/tut.txt");
+      file << asp.toStringLastModel(true);
+      file.close();
       std::cout << asp.getSymbolTableSize() << std::endl;
 
       for (auto toCheck : *p_requiredModelElements)
@@ -474,6 +478,10 @@ public:
           result.successful = false;
         }
       }
+    }
+    else
+    {
+      result.successful = false;
     }
 
     externals.clear();

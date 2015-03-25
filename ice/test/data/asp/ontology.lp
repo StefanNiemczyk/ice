@@ -4,6 +4,7 @@ scope(position).
 
 representation(relCoords).
 representation(coords).
+representation(coords2D).
 representation(wgs84).
 
 representation(floatRep).
@@ -35,6 +36,9 @@ hasDimension(relCoords,z,1,1).
 hasDimension(coords,x,1,1).
 hasDimension(coords,y,1,1).
 hasDimension(coords,z,1,1).
+
+hasDimension(coords2D,x,1,1).
+hasDimension(coords2D,y,1,1).
 
 hasDimension(wgs84,lat,1,1).
 hasDimension(wgs84,lon,1,1).

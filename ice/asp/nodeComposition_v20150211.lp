@@ -36,31 +36,30 @@ metadata(delay,minimize).
 %%%
 
 % cycle detection
-%after(NODE1,NODE2) :- connectToNode(k,SYSTEM,NODE2,_,_,NODE1,SOURCE,_,_).
-%after(NODE1,NODE2) :- connectToMap(k,SYSTEM,NODE2,ENTITY_TYPE,ENTITY2,NODE1,SOURCE,_,STEP).
-%after(NODE1,NODE3) :- after(NODE1,NODE2), after(NODE2,NODE3).
-%:- after(NODE,NODE).
+after(NODE1,NODE2) :- connectToNode(k,SYSTEM,NODE2,_,_,NODE1,SOURCE,_,_).
+after(NODE1,NODE2) :- connectToMap(k,SYSTEM,NODE2,ENTITY_TYPE,ENTITY2,NODE1,SOURCE,_,STEP).
+after(NODE1,NODE3) :- after(NODE1,NODE2), after(NODE2,NODE3).
+:- after(NODE,NODE).
 
 
 
 %% creating a node
-tnode(k,SYSTEM,NODE,ENTITY,none) :- 
+0 { node(k,SYSTEM,NODE,ENTITY,none) } 1 :- 
 	sourceNode(SYSTEM,NODE,ENTITY), 
 	entity(ENTITY,_), 
 	query(k).
-tnode(k,SYSTEM,NODE,ENTITY,none) :- 
+0 { node(k,SYSTEM,NODE,ENTITY,none) } 1 :- 
 	nodeTemplate(SYSTEM,NODE,ENTITY_TYPE), 
 	entity(ENTITY,ENTITY_TYPE), 
-	query(k),
-	stream(k,SYSTEM,_,_,information(ENTITY,SCOPE2,REP2,none),_) : input(SYSTEM,NODE,SCOPE2,REP2,MIN,_).
-tnode(k,SYSTEM,NODE,ENTITY,none) :- 
+	query(k).
+0 { node(k,SYSTEM,NODE,ENTITY,none) } 1 :- 
 	nodeTemplate(SYSTEM,NODE,any), 
 	entity(ENTITY,ENTITY_TYPE), 
 	hasScope(ENTITY_TYPE,SCOPE), 
-	input(SYSTEM,NODE,SCOPE,_,_,_,_),
+	input(SYSTEM,NODE,SCOPE,_,_,_,_), 
 	query(k).
 
-tnode(k,SYSTEM,IRO,ENTITY,ENTITY2) :- 
+0 { node(k,SYSTEM,IRO,ENTITY,ENTITY2) } 1 :- 
 	iro(SYSTEM,IRO,any,any), 
 	entity(ENTITY,ENTITY_TYPE), 
 	hasScope(ENTITY_TYPE,SCOPE), 
@@ -69,7 +68,7 @@ tnode(k,SYSTEM,IRO,ENTITY,ENTITY2) :-
 	hasScope(ENTITY_TYPE2,SCOPE2), 
 	input2(SYSTEM,IRO,SCOPE2,_,_,_,_),
 	query(k).
-tnode(k,SYSTEM,IRO,ENTITY,none) :- 
+0 { node(k,SYSTEM,IRO,ENTITY,none) } 1 :- 
 	iro(SYSTEM,IRO,any,none), 
 	entity(ENTITY,ENTITY_TYPE), 
 	hasScope(ENTITY_TYPE,SCOPE), 
@@ -130,22 +129,8 @@ MIN { connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,
 
 
 % create output
-nodeCount(k,SYSTEM,IRO, MINV+MINV2, MAXV+MAXV2) :- 
-	sourceNode(SYSTEM,IRO,_), 
-	MINV = #sum{MIN,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,MIN,_)}, 
-	MAXV = #sum{MAX,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,_,MAX)}, 
-	MINV2 = #sum{MIN,SCOPE,REP,ENT2 : input2(SYSTEM,IRO,SCOPE,REP,ENT2,MIN,_)}, 
-	MAXV2 = #sum{MAX,SCOPE,REP,ENT2 : input2(SYSTEM,IRO,SCOPE,REP,ENT2,_,MAX)}.
-
-nodeCount(k,SYSTEM,IRO, MINV+MINV2, MAXV+MAXV2) :- 
-	nodeTemplate(SYSTEM,IRO,_), 
-	MINV = #sum{MIN,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,MIN,_)}, 
-	MAXV = #sum{MAX,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,_,MAX)}, 
-	MINV2 = #sum{MIN,SCOPE,REP,ENT2 : input2(SYSTEM,IRO,SCOPE,REP,ENT2,MIN,_)}, 
-	MAXV2 = #sum{MAX,SCOPE,REP,ENT2 : input2(SYSTEM,IRO,SCOPE,REP,ENT2,_,MAX)}.
-
-nodeCount(k,SYSTEM,IRO, MINV+MINV2, MAXV+MAXV2) :- 
-	iro(SYSTEM,IRO,_,_), 
+nodeCount(node(k,SYSTEM,IRO,ENTITY,ENTITY2), MINV+MINV2, MAXV+MAXV2) :- 
+	node(k,SYSTEM,IRO,ENTITY,ENTITY2), 
 	MINV = #sum{MIN,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,MIN,_)}, 
 	MAXV = #sum{MAX,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,_,MAX)}, 
 	MINV2 = #sum{MIN,SCOPE,REP,ENT2 : input2(SYSTEM,IRO,SCOPE,REP,ENT2,MIN,_)}, 
@@ -157,7 +142,7 @@ nodeMeta(node(k,SYSTEM,IRO,ENTITY,ENTITY2), STEP_MAX, COUNT) :-
 	COUNT = #count{PROVIDER,SOURCE,INFO,STEP2 : connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)), 
 		PROVIDER != IRO, 
 		STEP2 < STEP_MAX+1},
-	nodeCount(k,SYSTEM,IRO,MIN,MAX),
+	nodeCount(node(k,SYSTEM,IRO,ENTITY,ENTITY2), MIN, MAX),
 	COUNT > MIN-1,
 	COUNT < MAX+1,
 	STEP_MAX != #inf.
@@ -168,7 +153,7 @@ nodeMeta(node(k,SYSTEM,IRO,ENTITY,ENTITY2), 0, 0) :-
 	COUNT = #count{PROVIDER,SOURCE,INFO,STEP2 : connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)), 
 		PROVIDER != IRO, 
 		STEP2 < STEP_MAX+1},
-	nodeCount(k,SYSTEM,IRO,MIN,MAX),
+	nodeCount(node(k,SYSTEM,IRO,ENTITY,ENTITY2), MIN, MAX),
 	COUNT > MIN-1,
 	COUNT < MAX+1,
 	STEP_MAX == #inf.
@@ -322,7 +307,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	metadataNode(METADATA,SYSTEM,IRO,max,FIX_VALUE,MOD_VALUE),
 	VALUE = #max{D,STEP2,PROVIDER,SOURCE,INFO : 
 		connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)),
-		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2),D),
+		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2),D), 
 		IRO != PROVIDER, 
 		STEP2 < STEP}, 
 	nodeMeta(node(k,SYSTEM,IRO,ENTITY,ENTITY2), STEP-1, COUNT),
@@ -385,17 +370,17 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 %	transfer(SYSTEM_1,SYSTEM_2,TRANSFER_DELAY_1,TRANSFER_COST_1),
 %	transfer(SYSTEM_2,SYSTEM_3,TRANSFER_DELAY_2,TRANSFER_COST_2).
 
-requiredInformation(k,SYSTEM,INFO) :- requiredStream(SYSTEM,INFO).
-requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,ENTITY2,MIN,MAX), ENTITY2 != none, ENTITY2 != any.
-requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,none)) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,none,MIN,MAX).
-requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,any,MIN,MAX).
-requiredInformation(k,SYSTEM,information(ENTITY2,SCOPE,REP,ENTITY)) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input2(SYSTEM,NODE,SCOPE,REP,ENTITY,MIN,MAX), ENTITY2 != none, ENTITY2 != any.
-requiredInformation(k,SYSTEM,information(ENTITY2,SCOPE,REP,none)) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input2(SYSTEM,NODE,SCOPE,REP,none,MIN,MAX).
-requiredInformation(k,SYSTEM,information(ENTITY2,SCOPE,REP,ENTITY)) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input2(SYSTEM,NODE,SCOPE,REP,any,MIN,MAX).
-requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), entity(ENTITY,ENTITY_TYPE), input(SYSTEM,NODE,SCOPE,REP,_,MIN,MAX).
+%requiredInformation(k,SYSTEM,INFO) :- requiredStream(SYSTEM,INFO).
+%requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,ENTITY2,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,none)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,none,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,any,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY2,SCOPE,REP,ENTITY)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input2(SYSTEM,NODE,SCOPE,REP,ENTITY,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY2,SCOPE,REP,none)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,none,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY2,SCOPE,REP,ENTITY)) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,any,MIN,MAX).
+%requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), entity(ENTITY,ENTITY_TYPE), input(SYSTEM,NODE,SCOPE,REP,_,MIN,MAX).
 
 
-:- streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE1,PROVIDER,SOURCE,INFO,_),_,_,_), streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE2,PROVIDER,SOURCE,INFO,_),_,_,_), SYSTEM_SOURCE1 != SYSTEM_SOURCE2.
+%:- streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE1,PROVIDER,SOURCE,INFO,_),_,_,_), streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE2,PROVIDER,SOURCE,INFO,_),_,_,_), SYSTEM_SOURCE1 != SYSTEM_SOURCE2.
 
 %% transfer a stream between systems
 %*
@@ -407,30 +392,30 @@ requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- mapNode(k
 	system(SYSTEM_TARGET),
 	stream(k,_,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENTITY2),STEP),
 	SYSTEM_TARGET != SOURCE.
-*%
+
 
 0 { streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,HOPS+1) } 1 :- 
 	transfer(SYSTEM_SOURCE,SYSTEM_TARGET,TRANSFER_DELAY,TRANSFER_COST),
 	streamTransfer(k,SYSTEM_SOURCE,stream(k,SYSTEM_TRANSFER_SOURCE,PROVIDER,SOURCE,INFO,STEP-1),_,_,HOPS),
 	SYSTEM_TRANSFER_SOURCE != SYSTEM_TARGET,
-	SYSTEM_TRANSFER_SOURCE != SYSTEM_SOURCE,
+	%SYSTEM_TRANSFER_SOURCE != SYSTEM_SOURCE,
 	%requiredInformation(k,SYSTEM_TARGET,INFO),
 	%stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),
-	%not stream(k,SYSTEM_SOURCE2,PROVIDER,SOURCE,INFO,_),
-	%SYSTEM_SOURCE != SYSTEM_SOURCE2,
-	%system(SYSTEM_SOURCE2),
+	not stream(k,SYSTEM_SOURCE2,PROVIDER,SOURCE,INFO,_),
+	SYSTEM_SOURCE != SYSTEM_SOURCE2,
+	system(SYSTEM_SOURCE2),
 	HOPS < maxHopCount,
 	STEP < maxStepCount,
 	SYSTEM_TARGET != SOURCE.
 
 0 { streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SYSTEM_SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,1) } 1 :- 
 	transfer(SYSTEM_SOURCE,SYSTEM_TARGET,TRANSFER_DELAY,TRANSFER_COST),
-	%requiredInformation(k,SYSTEM_TARGET,INFO),
+	requiredInformation(k,SYSTEM_TARGET,INFO),
 	stream(k,SYSTEM_SOURCE,PROVIDER,SYSTEM_SOURCE,INFO,STEP), 
 	maxHopCount > 0,
 	STEP < maxStepCount,
 	SYSTEM_TARGET != SYSTEM_SOURCE.
-
+*%
 stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP+1) :- 
 	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,_).
 
@@ -593,8 +578,7 @@ metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),FIX
 %%%
 
 %% streams
-%pStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP) :- stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP), requiredStream(SYSTEM,INFO), query(k).
-%0 { selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP) : stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP) } 1 :- requiredStream(SYSTEM,INFO), query(k).
+0 { selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP) : stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP) } 1 :- requiredStream(SYSTEM,INFO), query(k).
 :~ requiredStream(SYSTEM,INFO), not selectedStream(k,SYSTEM,_,_,INFO,_), query(k). [1@5,requiredStream]
 
 %#minimize { 1@5,SYSTEM,INFO :  requiredStream(SYSTEM,INFO), not selectedStream(k,SYSTEM,_,_,INFO,_), query(k) }.
@@ -649,194 +633,14 @@ metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),FIX
 %%% QoS parameters of selected streams and maps are optimized
 %%%
 
-% stream QoS
-%#hide -equalNode/4.
-
-heuristic(k,SYSTEM,NODE,MAXIMIZE-MINIMIZE) :-
-	sourceNode(SYSTEM,NODE,_),
-	MINIMIZE = #sum { SUM,METADATA : 
-		metadata(METADATA,minimize),
-		metadataNode(METADATA,SYSTEM,NODE,TYPE,FIX_VALUE,MOD_VALUE),
-		nodeCount(k,SYSTEM,NODE,MIN,MAX),
-		SUM = FIX_VALUE+(MAX-MIN+1)*MOD_VALUE
-	},
-	MAXIMIZE = #sum { SUM,METADATA : 
-		metadata(METADATA,maximize), 
-		metadataNode(METADATA,SYSTEM,NODE,TYPE,FIX_VALUE,MOD_VALUE),
-		nodeCount(k,SYSTEM,NODE,MIN,MAX),
-		SUM = FIX_VALUE+(MAX-MIN+1)*MOD_VALUE	
-	}.
-
-heuristic(k,SYSTEM,NODE,MAXIMIZE-MINIMIZE) :-
-	nodeTemplate(SYSTEM,NODE,_),
-	MINIMIZE = #sum { SUM,METADATA : 
-		metadata(METADATA,minimize),
-		metadataNode(METADATA,SYSTEM,NODE,TYPE,FIX_VALUE,MOD_VALUE),
-		nodeCount(k,SYSTEM,NODE,MIN,MAX),
-		SUM = FIX_VALUE+(MAX-MIN+1)*MOD_VALUE
-	},
-	MAXIMIZE = #sum { SUM,METADATA : 
-		metadata(METADATA,maximize),
-		metadataNode(METADATA,SYSTEM,NODE,TYPE,FIX_VALUE,MOD_VALUE),
-		nodeCount(k,SYSTEM,NODE,MIN,MAX),
-		SUM = FIX_VALUE+(MAX-MIN+1)*MOD_VALUE
-	}.
-
-heuristic(k,SYSTEM,NODE,MAXIMIZE-MINIMIZE) :-
-	iro(SYSTEM,NODE,_,_),
-	MINIMIZE = #sum { SUM,METADATA : 
-		metadata(METADATA,minimize),
-		metadataNode(METADATA,SYSTEM,NODE,TYPE,FIX_VALUE,MOD_VALUE),
-		nodeCount(k,SYSTEM,NODE,MIN,MAX),
-		SUM = FIX_VALUE+(MAX-MIN+1)*MOD_VALUE
-	},
-	MAXIMIZE = #sum { SUM,METADATA : 
-		metadata(METADATA,maximize),
-		metadataNode(METADATA,SYSTEM,NODE,TYPE,FIX_VALUE,MOD_VALUE),
-		nodeCount(k,SYSTEM,NODE,MIN,MAX),
-		SUM = FIX_VALUE+(MAX-MIN+1)*MOD_VALUE
-	}.
-
-
-%#maximize{C@1,SYSTEM,NODE,ENTITY,ENITY2 : node(k,SYSTEM,NODE,ENTITY,ENITY2), heuristic(k,SYSTEM,NODE,C), query(k)}.
-
-%#show _heuristic/4.
-%#show _heuristic/3.
-%#show node/5.
-%step(k,1..10).
-%{ node(k,SYSTEM,NODE,ENTITY,ENTITY2) } :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2).
-%metaValue(0..1000).
-tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),C) :- 
-	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), 
-	heuristic(k,SYSTEM,NODE,C),
-	ENTITY2 != none,
-	ENTITY2 != any,
-	output(SYSTEM,NODE,SCOPE,REP,ENTITY2).
-
-tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,none),C) :- 
-	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),
-	heuristic(k,SYSTEM,NODE,C),
-	output(SYSTEM,NODE,SCOPE,REP,none).
-
-tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),C) :- 
-	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), 
-	heuristic(k,SYSTEM,NODE,C),
-	output(SYSTEM,NODE,SCOPE,REP,any).
-
-0 { selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP) : stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP) } 1 :- requiredStream(SYSTEM,INFO), query(k).	
-
-0 { use(k,SYSTEM,NODE,ENTITY,ENTITY2,0) : tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),C) } 1 :- requiredStream(SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)), query(k).
-
-tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),MIN,MAX) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,ENTITY2,MIN,MAX), ENTITY2 != none, ENTITY2 != any.
-tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,none),MIN,MAX) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,none,MIN,MAX).
-tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),MIN,MAX) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,any,MIN,MAX).
-tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY2,SCOPE,REP,ENTITY),MIN,MAX) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input2(SYSTEM,NODE,SCOPE,REP,ENTITY,MIN,MAX), ENTITY2 != none, ENTITY2 != any.
-tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY2,SCOPE,REP,none),MIN,MAX) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input2(SYSTEM,NODE,SCOPE,REP,none,MIN,MAX).
-tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY2,SCOPE,REP,ENTITY),MIN,MAX) :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), input2(SYSTEM,NODE,SCOPE,REP,any,MIN,MAX).
-
-
-
-%after(NODE1,NODE2) :- connectToNode(k,SYSTEM,NODE2,_,_,NODE1,SOURCE,_,_).
-%after(NODE1,NODE2) :- connectToMap(k,SYSTEM,NODE2,ENTITY_TYPE,ENTITY2,NODE1,SOURCE,_,STEP).
-%after(NODE1,NODE3) :- after(NODE1,NODE2), after(NODE2,NODE3).
-%:- after(NODE,NODE).
-%*
-iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP3,S) :- iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP2,S), iroChain(ENTITY,SCOPE,ENTITY2,REP2,REP3,S+1). 
-
-iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP2,S) :-
-	before(tnode(k,SYSTEM,NODE2,ENTITY,ENTITY2), use(k,SYSTEM,NODE,ENTITY,ENTITY2,S)),
-	iro(SYSTEM,NODE,_,_),
-	iro(SYSTEM,NODE,_,_),
-	tstream(k,SYSTEM,tnode(k,SYSTEM,NODE2,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP2,ENTITY2),_),
-	tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP1,ENTITY2),_).
-
-:- iroChain(ENTITY,SCOPE,ENTITY2,REP,REP).
-*%
-use(k,SYSTEM,NODE2,ENTITY3,ENTITY4,S+1) :- before(tnode(k,SYSTEM,NODE2,ENTITY3,ENTITY4), use(k,SYSTEM,NODE,ENTITY,ENTITY2,S)).
-
-MIN { before(tnode(k,SYSTEM,NODE2,ENTITY3,ENTITY4), use(k,SYSTEM,NODE,ENTITY,ENTITY2,S)) : tstream(k,SYSTEM,tnode(k,SYSTEM,NODE2,ENTITY3,ENTITY4),INFO,C), not before(use(k,SYSTEM,NODE,ENTITY,ENTITY2,S), tnode(k,SYSTEM,NODE2,ENTITY3,ENTITY4)) } MAX :- use(k,SYSTEM,NODE,ENTITY,ENTITY2,S), S < maxStepCount, tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,MIN,MAX), query(k).
-
-%MIN { use(k,SYSTEM,NODE2,ENTITY3,ENTITY4) : tstream(k,SYSTEM,tnode(k,SYSTEM,NODE2,ENTITY3,ENTITY4),information(ENTITY,SCOPE,REP,ENTITY2),C) } MAX :- use(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,ENTITY2,MIN,MAX), ENTITY2 != none, ENTITY2 != any, query(k).
-%MIN { use(k,SYSTEM,NODE2,ENTITY3,ENTITY4) : tstream(k,SYSTEM,tnode(k,SYSTEM,NODE2,ENTITY3,ENTITY4),information(ENTITY,SCOPE,REP,none),C) } MAX :- use(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,none,MIN,MAX), query(k).
-%MIN { use(k,SYSTEM,NODE2,ENTITY3,ENTITY4) : tstream(k,SYSTEM,tnode(k,SYSTEM,NODE2,ENTITY3,ENTITY4),information(ENTITY,SCOPE,REP,ENTITY2),C) } MAX :- use(k,SYSTEM,NODE,ENTITY,ENTITY2), input(SYSTEM,NODE,SCOPE,REP,any,MIN,MAX), query(k).
-
-%MIN { use(k,SYSTEM,NODE2,ENTITY,ENTITY2) : tstream(k,SYSTEM,NODE2,information(ENTITY2,SCOPE,REP,ENTITY),C), tnode(k,SYSTEM,NODE2,ENTITY2,ENTITY) } MAX :- use(k,SYSTEM,NODE,ENTITY,ENTITY2), input2(SYSTEM,NODE,SCOPE,REP,ENTITY2,MIN,MAX), ENTITY2 != none, ENTITY2 != any, query(k).
-%MIN { use(k,SYSTEM,NODE2,ENTITY,ENTITY3) : tstream(k,SYSTEM,NODE2,information(ENTITY2,SCOPE,REP,none),C), tnode(k,SYSTEM,NODE2,ENTITY2,ENTITY3) } MAX :- use(k,SYSTEM,NODE,ENTITY,ENTITY2), input2(SYSTEM,NODE,SCOPE,REP,none,MIN,MAX), query(k).
-%MIN { use(k,SYSTEM,NODE2,ENTITY,ENTITY2) : tstream(k,SYSTEM,NODE2,information(ENTITY2,SCOPE,REP,ENTITY),C), tnode(k,SYSTEM,NODE2,ENTITY2,ENTITY) } MAX :- use(k,SYSTEM,NODE,ENTITY,ENTITY2), input2(SYSTEM,NODE,SCOPE,REP,any,MIN,MAX), query(k).
-
-%_heuristic(use(k,SYSTEM,NODE,ENTITY,ENTITY2),factor,C) :- tstream(k,SYSTEM,NODE,information(ENTITY,SCOPE,REP,ENTITY2),C).
-
-node(k,SYSTEM,NODE,ENTITY,ENTITY2) :- 
-	%tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),
-	use(k,SYSTEM,NODE,ENTITY,ENTITY2,S),
-	query(k),
-	%sourceNode(SYSTEM,NODE,ENTITY),
-	%stream(k,SYSTEM,_,_,information(ENTITY,SCOPE,REP,none),_) : input(SYSTEM,NODE,SCOPE,REP,none,MIN,MAX).
-	stream(k,SYSTEM,_,_,INFO,_) : tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,MIN,MAX).
-
-:- use(k,SYSTEM,NODE,ENTITY,ENTITY2,S), not node(k,SYSTEM,NODE,ENTITY,ENTITY2).
-
-%#minimize{ C@6,SYSTEM,NODE,ENTITY,ENTITY2 : use(k,SYSTEM,NODE,ENTITY,ENTITY2), heuristic(k,SYSTEM,NODE,C) }.
-
-
-% see raveling salespersons problem for details
-%order(X,C1,C2) :- outcost(X,(C1;C2)), C1 < C2, C <= C1 : outcost(X,C), C < C2.
-order(k,SYSTEM,INFO,C1,C2) :- tstream(k,SYSTEM,_,INFO,(C1;C2)), C1 < C2, C <= C1 : tstream(k,SYSTEM,_,INFO,C), C < C2.
-
-%penalty(X,C1,C2-C1) :- order(X,C1,C2), cycle(X,Y), cost(X,Y,C2).
-penalty(k,SYSTEM,INFO,C2,C2-C1) :- order(k,SYSTEM,INFO,C1,C2), use(k,SYSTEM,NODE,ENTITY,ENTITY2,S), tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,C1).
-
-%penalty(X,C1,C2-C1) :- order(X,C1,C2), penalty(X,C2,_).
-penalty(k,SYSTEM,INFO,C2,C2-C1) :- order(k,SYSTEM,INFO,C1,C2), penalty(k,SYSTEM,INFO,C1,_).
-
-#minimize { D@2,SYSTEM,INFO,C : penalty(k,SYSTEM,INFO,C,D) }.
-
-
-%*
-_heuristic(connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,none),STEP)),true,C,0) :-
-	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), 
-	tstream(k,SYSTEM,NODE,INFO,C),
-	stream(k,SYSTEM,PROVIDER,information(ENTITY,SCOPE,REP,none),STEP).
-*%
-
-%#maximize{ C@1,SYSTEM,PROVIDER,SOURCE,INFO,STEP,NODE_TERM,NODE : connectToNode(NODE_TERM, stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP)), tstream(k,SOURCE,NODE,INFO,C) }.
-
-%{ node(k,SYSTEM,NODE,ENTITY,none) : pnode(k,SYSTEM,NODE,ENTITY,none) } :- step(k,S).
-
-%_h(node(k,SYSTEM,NODE,ENTITY,none),init,C) :- 
-%	heuristic(k,SYSTEM,NODE,C),
-%	sourceNode(SYSTEM,NODE,ENTITY), 
-%	entity(ENTITY,_), 
-%	query(k).
-%*
-_heuristic(node(k,SYSTEM,NODE,ENTITY,none),factor,C) :- 
-	heuristic(k,SYSTEM,NODE,C),
-	pnode(k,SYSTEM,NODE,ENTITY,none),
-	query(k).
-
-_heuristic(node(k,SYSTEM,NODE,ENTITY,none),init,C,1) :- 
-	heuristic(k,SYSTEM,NODE,C),
-	pnode(k,SYSTEM,NODE,ENTITY,none),
-	sourceNode(SYSTEM,NODE,ENTITY), 
-	query(k).
-
-_heuristic(node(k,SYSTEM,NODE,ENTITY,none),factor,C,0) :- 
-	heuristic(k,SYSTEM,NODE,C),
-	pnode(k,SYSTEM,NODE,ENTITY,none),
-	nodeTemplate(SYSTEM,NODE,_), 
-	query(k).
-	%stream(k,SYSTEM,_,_,information(ENTITY,SCOPE2,REP2,none),_) : input(SYSTEM,NODE,SCOPE2,REP2,MIN,_).
-*%
-%_heuristic(connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP)),factor,STEP) :- node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP).
-
 %sumMetadataStream(k,METADATA,SUM) :- 
 %	metadata(METADATA,_), 
 %	SUM = #sum{VALUE,INFO,SYSTEM,PROVIDER,SOURCE,STEP : selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP), metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),VALUE)}, 
 %	query(k).
 
-%#minimize {SUM@3,METADATA : metadata(METADATA,minimize), sumMetadataStream(k,METADATA,SUM), query(k) }.
-%#maximize {SUM@3,METADATA : metadata(METADATA,maximize), sumMetadataStream(k,METADATA,SUM), query(k) }.
+%#minimize {sum@3,METADATA : metadata(METADATA,_), sumMetadataStream(k,METADATA,SUM), query(k) }.
 
+% stream QoS
 #minimize { VALUE@priorityDelay,INFO,SYSTEM,PROVIDER,SOURCE,STEP : selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP), metadataStream(k,delay,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),VALUE), query(k) }.
 #maximize { VALUE@priorityAccuracy,INFO,SYSTEM,PROVIDER,SOURCE,STEP : selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP), metadataStream(k,accuracy,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),VALUE), query(k) }.
 
@@ -847,13 +651,11 @@ _heuristic(node(k,SYSTEM,NODE,ENTITY,none),factor,C,0) :-
 		metadataMap(k,accuracy,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),VALUE), query(k) }.
 
 % transfer cost
-%sumTransfer(k,SUM) :- SUM = #sum{ TRANSFER_COST,SYSTEM,STREAM : streamTransfer(k,SYSTEM,STREAM,_,TRANSFER_COST,_), query(k) }.
-%#minimize { SUM@priorityTransferCost : sumTransfer(k,SUM), query(k) }.
 #minimize { TRANSFER_COST@priorityTransferCost,SYSTEM,STREAM : streamTransfer(k,SYSTEM,STREAM,_,TRANSFER_COST,_), query(k) }.
 
 % cost
 sumCost(k,SUM_NODES) :- 
-	SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), nodeCost(SYSTEM,NODE,COST)}, 	
+	SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), nodeCost(SYSTEM,NODE,COST)}, 
 	%SUM_TRANSLATIONS = #sum{COST,SYSTEM,IRO,ENTITY,SCOPE : informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE), iroCost(SYSTEM,IRO,COST)},
 	%SUM_EXTRACTIONS = #count{SYSTEM,PROVIDER,SOURCE,SCOPE,REP1,INFO :  informationExtrection(k,SYSTEM,PROVIDER,SOURCE,SCOPE,REP1,INFO)}, 
 	query(k).
