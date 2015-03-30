@@ -20,7 +20,7 @@ struct ModelGenerationResult
   unsigned long long aspSolvingTime;
   unsigned long long aspSatTime;
   unsigned long long aspUnsatTime;
-  long modelCount;
+  long aspModelCount;
   bool successful;
 
   void print()
@@ -34,7 +34,7 @@ struct ModelGenerationResult
     std::cout << "ASP Solving\t\t\t" << aspSolvingTime << " ms" << std::endl;
     std::cout << "ASP Sat time\t\t" << aspSatTime << " ms" << std::endl;
     std::cout << "ASP unsat time\t\t" << aspUnsatTime << " ms" << std::endl;
-    std::cout << "ASP model count\t\t" << modelCount << std::endl;
+    std::cout << "ASP model count\t\t" << aspModelCount << std::endl;
   }
 };
 
@@ -52,22 +52,31 @@ struct ModelGenerationSeriesResult
   double ontologyToASPTimeVar;
   double aspGroundingTimeVar;
   double aspSolvingTimeVar;
+  double aspSatTimeVar;
+  double aspUnsatTimeVar;
+  double aspModelCountVar;
 
   void print()
   {
     printf("Result              %5d / %5d successful runs\n", numberSuccessful, numberTotal);
     printf("Total                  %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.totalTime,
            totalTimeVar, best.totalTime, worst.totalTime);
-    printf("Ontology read          %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.ontologyReadTime,
+    printf("Ontology Read          %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.ontologyReadTime,
            ontologyReadTimeVar, best.ontologyReadTime, worst.ontologyReadTime);
-    printf("Ontology reasoning     %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n",
+    printf("Ontology Reasoning     %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n",
            avg.ontologyReasonerTime, ontologyReasonerTimeVar, best.ontologyReasonerTime, worst.ontologyReasonerTime);
     printf("Ontology 2 ASP         %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.ontologyToASPTime,
            ontologyToASPTimeVar, best.ontologyToASPTime, worst.ontologyToASPTime);
-    printf("ASP grounding          %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.aspGroundingTime,
+    printf("ASP Grounding          %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.aspGroundingTime,
            aspGroundingTimeVar, best.aspGroundingTime, worst.aspGroundingTime);
     printf("ASP Solving            %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.aspSolvingTime,
            aspSolvingTimeVar, best.aspSolvingTime, worst.aspSolvingTime);
+    printf("ASP Sat Time           %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.aspSatTime,
+           aspSatTimeVar, best.aspSatTime, worst.aspSatTime);
+    printf("ASP Unsat Time         %10llu ms (%10.3f var), %10llu ms (best), %10llu ms (worst)\n", avg.aspUnsatTime,
+           aspUnsatTimeVar, best.aspUnsatTime, worst.aspUnsatTime);
+    printf("ASP Model Count        %10lu    (%10.3f var), %10lu    (best), %10lu    (worst)\n", avg.aspModelCount,
+           aspModelCountVar, best.aspModelCount, worst.aspModelCount);
   }
 };
 
@@ -142,7 +151,7 @@ public:
     result.aspSolvingTimeVar = 0;
 
     VarianceOnline totalTimeVar, ontologyReadTimeVar, ontologyReasonerTimeVar, ontologyToASPTimeVar,
-                   aspGroundingTimeVar, aspSolvingTimeVar;
+                   aspGroundingTimeVar, aspSolvingTimeVar, aspSatTimeVar, aspUnsatTimeVar, aspModelCountVar;
 
     if (warmUp)
     {
@@ -178,6 +187,9 @@ public:
       ontologyToASPTimeVar.add(r.ontologyToASPTime);
       aspGroundingTimeVar.add(r.aspGroundingTime);
       aspSolvingTimeVar.add(r.aspSolvingTime);
+      aspSatTimeVar.add(r.aspSatTime);
+      aspUnsatTimeVar.add(r.aspUnsatTime);
+      aspModelCountVar.add(r.aspModelCount);
 
       if (i == 0)
       {
@@ -193,6 +205,9 @@ public:
         result.avg.ontologyToASPTime += r.ontologyToASPTime;
         result.avg.aspGroundingTime += r.aspGroundingTime;
         result.avg.aspSolvingTime += r.aspSolvingTime;
+        result.avg.aspSatTime += r.aspSatTime;
+        result.avg.aspUnsatTime += r.aspUnsatTime;
+        result.avg.aspModelCount += r.aspModelCount;
 
         if (r.totalTime < result.best.totalTime)
           result.best.totalTime = r.totalTime;
@@ -223,6 +238,21 @@ public:
           result.best.aspSolvingTime = r.aspSolvingTime;
         else if (r.aspSolvingTime > result.worst.aspSolvingTime)
           result.worst.aspSolvingTime = r.aspSolvingTime;
+
+        if (r.aspSatTime < result.best.aspSatTime)
+          result.best.aspSatTime = r.aspSatTime;
+        else if (r.aspSatTime > result.worst.aspSatTime)
+          result.worst.aspSatTime = r.aspSatTime;
+
+        if (r.aspUnsatTime < result.best.aspUnsatTime)
+          result.best.aspUnsatTime = r.aspUnsatTime;
+        else if (r.aspUnsatTime > result.worst.aspUnsatTime)
+          result.worst.aspUnsatTime = r.aspUnsatTime;
+
+        if (r.aspModelCount < result.best.aspModelCount)
+          result.best.aspModelCount = r.aspModelCount;
+        else if (r.aspModelCount > result.worst.aspModelCount)
+          result.worst.aspModelCount = r.aspModelCount;
       }
 
       end = std::chrono::system_clock::now();
@@ -237,6 +267,9 @@ public:
     result.ontologyToASPTimeVar = ontologyToASPTimeVar.getVariance();
     result.aspGroundingTimeVar = aspGroundingTimeVar.getVariance();
     result.aspSolvingTimeVar = aspSolvingTimeVar.getVariance();
+    result.aspSatTimeVar = aspSatTimeVar.getVariance();
+    result.aspUnsatTimeVar = aspUnsatTimeVar.getVariance();
+    result.aspModelCountVar = aspModelCountVar.getVariance();
 
     result.avg.totalTime /= p_count;
     result.avg.ontologyReadTime /= p_count;
@@ -244,6 +277,9 @@ public:
     result.avg.ontologyToASPTime /= p_count;
     result.avg.aspGroundingTime /= p_count;
     result.avg.aspSolvingTime /= p_count;
+    result.avg.aspSatTime /= p_count;
+    result.avg.aspUnsatTime /= p_count;
+    result.avg.aspModelCount /= p_count;
 
     return result;
   }
@@ -261,7 +297,10 @@ public:
 
     // Initializing ASP
     supplementary::ClingWrapper asp;
-    asp.addKnowledgeFile(path + "/asp/nodeComposition.lp");
+//    asp.addKnowledgeFile(path + "/asp/nodeComposition.lp");
+    asp.addKnowledgeFile(path + "/asp/informationProcessing/processing.lp");
+    asp.addKnowledgeFile(path + "/asp/informationProcessing/searchBottomUp.lp");
+    asp.addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
     asp.init();
 
     // Initializing OwlAPI
@@ -456,7 +495,7 @@ public:
         - result.aspSolvingTime;
     result.aspSatTime = asp.getSatTime();
     result.aspUnsatTime = asp.getUnsatTime();
-    result.modelCount = asp.getModelCount();
+    result.aspModelCount = asp.getModelCount();
 
     if (solveResult == Gringo::SolveResult::SAT)
     {

@@ -243,12 +243,12 @@ target_link_libraries(ice_node
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test 
-  test/eval/eval_ModelGeneration.cpp
-  test/eval/ModelGeneration.cpp
+ # test/eval/eval_ModelGeneration.cpp
+ # test/eval/ModelGeneration.cpp
  
  # test/etc/TestTime.cpp
  # test/etc/EngineStuff.cpp
- # test/test_ASPComposition.cpp
+  test/test_ASPComposition.cpp
  # test/test_JNI.cpp
  # test/test_ASPCoordinator.cpp
  # test/test_RingBuffer.cpp

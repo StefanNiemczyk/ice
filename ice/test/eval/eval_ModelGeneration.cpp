@@ -178,7 +178,7 @@ using namespace std;
 
 TEST(EvalModelGeneration, chainTest)
 {
-  return;
+//  return;
 
   std::string path = ros::package::getPath("ice");
   std::vector<std::string> inputs;
@@ -196,14 +196,14 @@ TEST(EvalModelGeneration, chainTest)
   ofstream file;
 
   int chainSizeMin = 8;
-  int chainSizeMax = 8;
+  int chainSizeMax = 20;
   int chainSizeStep = 1;
 
   int nodesMin = 10;
   int nodesMax = 10;
   int nodesStep = 1;
 
-  int runs = 10;
+  int runs = 5;
 
   bool tree = false;
 
@@ -401,7 +401,7 @@ TEST(EvalModelGeneration, chainTest)
 //      ss << "sumCost(1," << chainSize << ")";
 //      toCheck.push_back(ss.str());
 
-      auto result = mg.testSeries(fileName, &toCheck, runs, true, 3, 20,
+      auto result = mg.testSeries(fileName, &toCheck, runs, true, 3, 21,
           [] (supplementary::ClingWrapper *asp){
 //            asp->setParallelMode(4);
 //        asp->setSaveProgress(0);
@@ -430,6 +430,12 @@ TEST(EvalModelGeneration, chainTest)
           << "\t" << result.worst.aspGroundingTime << "\t";
       file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime
           << "\t" << result.worst.aspSolvingTime << std::endl;
+      file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime
+          << "\t" << result.worst.aspSatTime << std::endl;
+      file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
+          << "\t" << result.worst.aspUnsatTime << std::endl;
+      file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspSatTime
+          << "\t" << result.worst.aspModelCount << std::endl;
 
       // gnuplot -persist -e "set hidden3d; set dgrid3d 20,20 qnorm 2; splot './results1-10_1-10.txt' using 1:2:5 with lines"
       file.flush();
@@ -694,6 +700,12 @@ TEST(EvalModelGeneration, representationTest)
         << "\t" << result.worst.aspGroundingTime << "\t";
     file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
         << result.worst.aspSolvingTime << std::endl;
+    file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime
+        << "\t" << result.worst.aspSatTime << std::endl;
+    file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
+        << "\t" << result.worst.aspUnsatTime << std::endl;
+    file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspSatTime
+        << "\t" << result.worst.aspModelCount << std::endl;
 
     // gnuplot -persist -e "plot './results3-10.txt' using 1:4 with lines"
     file.flush();
@@ -970,6 +982,12 @@ TEST(EvalModelGeneration, systemsStarMashTest)
         << "\t" << result.worst.aspGroundingTime << "\t";
     file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
         << result.worst.aspSolvingTime << std::endl;
+    file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime
+        << "\t" << result.worst.aspSatTime << std::endl;
+    file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
+        << "\t" << result.worst.aspUnsatTime << std::endl;
+    file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspSatTime
+        << "\t" << result.worst.aspModelCount << std::endl;
 
     // gnuplot -persist -e "plot './results_systems50-500.txt' u 1:4 w l t 'sum', './results_systems50-500.txt' u 1:20 w l t 'grounding', './results_systems50-500.txt' u 1:(\$20 + \$24) w l t 'solving'"
     file.flush();
@@ -1258,6 +1276,12 @@ TEST(EvalModelGeneration, systemsFullMashTest)
         << "\t" << result.worst.aspGroundingTime << "\t";
     file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
         << result.worst.aspSolvingTime << std::endl;
+    file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime
+        << "\t" << result.worst.aspSatTime << std::endl;
+    file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
+        << "\t" << result.worst.aspUnsatTime << std::endl;
+    file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspSatTime
+        << "\t" << result.worst.aspModelCount << std::endl;
 
     // gnuplot -persist -e "plot './results_systems50-500.txt' u 1:4 w l t 'sum', './results_systems50-500.txt' u 1:20 w l t 'grounding', './results_systems50-500.txt' u 1:(\$20 + \$24) w l t 'solving'"
     file.flush();

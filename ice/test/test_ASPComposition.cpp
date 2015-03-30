@@ -13,7 +13,9 @@ using namespace std;
 TEST(ClingWrap, simpleTest)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
-  cw->addKnowledgeFile("../asp/nodeComposition.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
   cw->init();
 
   // ontology
@@ -121,7 +123,9 @@ TEST(ClingWrap, simpleTest)
 TEST(ClingWrap, simpleTestQuery)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
-  cw->addKnowledgeFile("../asp/nodeComposition.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
   cw->init();
 
   // ontology
@@ -231,6 +235,7 @@ TEST(ClingWrap, simpleTestQuery)
   EXPECT_EQ(true, cw->query("sumCost(3,8)"));
 }
 
+/*
 TEST(ClingWrap, threeSystems)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
@@ -270,12 +275,15 @@ TEST(ClingWrap, threeSystems)
   EXPECT_EQ(true, cw->query("streamTransfer(1,system3,stream(1,system2,in1,system1,information(entity1,scope1,rep1,none),2),1,2,2)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system3,in1,system1,information(entity1,scope1,rep1,none),3),2)"));
 }
+*/
 
 TEST(ClingWrap, informationTranslation)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("data/asp/ontology.lp");
-  cw->addKnowledgeFile("../asp/nodeComposition.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
   cw->init();
 
   // entities
@@ -308,7 +316,7 @@ TEST(ClingWrap, informationTranslation)
   cw->add("coords2Wgs84", {}, "output(system1,coords2Wgs84,position,wgs84,none).");
   cw->add("coords2Wgs84", {}, "metadataNode(delay,system1,coords2Wgs84,max,1,0).");
   cw->add("coords2Wgs84", {}, "metadataNode(accuracy,system1,coords2Wgs84,avg,1,0).");
-  cw->add("coords2Wgs84", {}, "iroCost(system1,coords2Wgs84,1).");
+  cw->add("coords2Wgs84", {}, "nodeCost(system1,coords2Wgs84,1).");
   cw->ground("coords2Wgs84", {});
 
 
@@ -390,7 +398,9 @@ TEST(ClingWrap, ego2allo)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("data/asp/ontology.lp");
-  cw->addKnowledgeFile("../asp/nodeComposition.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
   cw->init();
 
   // entities
@@ -446,7 +456,9 @@ TEST(ClingWrap, ego2allo)
 TEST(ClingWrap, requiredStreamsByEntityType)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
-  cw->addKnowledgeFile("../asp/nodeComposition.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
   cw->init();
 
   // entities
@@ -518,7 +530,9 @@ TEST(ClingWrap, requiredStreamsByEntityType)
 TEST(ClingWrap, simpleChainTest)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
-  cw->addKnowledgeFile("../asp/nodeComposition.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
   cw->init();
 
   // ontology
@@ -590,7 +604,7 @@ TEST(ClingWrap, simpleChainTest)
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
-  cw->printLastModel();
+//  cw->printLastModel();
 
   EXPECT_EQ(true, cw->query("node(1,system1,in1,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node1,entity1,none)"));
