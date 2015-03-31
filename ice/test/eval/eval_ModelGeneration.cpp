@@ -195,15 +195,15 @@ TEST(EvalModelGeneration, chainTest)
 
   ofstream file;
 
-  int chainSizeMin = 8;
-  int chainSizeMax = 20;
+  int chainSizeMin = 1;
+  int chainSizeMax = 100;
   int chainSizeStep = 1;
 
   int nodesMin = 10;
   int nodesMax = 10;
   int nodesStep = 1;
 
-  int runs = 5;
+  int runs = 1;
 
   bool tree = false;
 
@@ -374,18 +374,18 @@ TEST(EvalModelGeneration, chainTest)
 
       std::vector<std::string> toCheck;
 
-      ss.str("");
-      ss << "metadataStream(1,accuracy,stream(1,evalSystem,evalNode0_" << chainSize - 1
-          << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
-          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
-          << chainSize * nodesMax << ")";
-      toCheck.push_back(ss.str());
-
-      ss.str("");
-      ss << "metadataStream(1,delay,stream(1,evalSystem,evalNode0_" << chainSize - 1
-          << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
-          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),5)";
-      toCheck.push_back(ss.str());
+//      ss.str("");
+//      ss << "metadataStream(1,accuracy,stream(1,evalSystem,evalNode0_" << chainSize - 1
+//          << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
+//          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
+//          << chainSize * nodesMax << ")";
+//      toCheck.push_back(ss.str());
+//
+//      ss.str("");
+//      ss << "metadataStream(1,delay,stream(1,evalSystem,evalNode0_" << chainSize - 1
+//          << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
+//          << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),5)";
+//      toCheck.push_back(ss.str());
 
       ss.str("");
       ss << "selectedStream(1,evalSystem,evalNode0_" << chainSize - 1
@@ -401,7 +401,7 @@ TEST(EvalModelGeneration, chainTest)
 //      ss << "sumCost(1," << chainSize << ")";
 //      toCheck.push_back(ss.str());
 
-      auto result = mg.testSeries(fileName, &toCheck, runs, true, 3, 21,
+      auto result = mg.testSeries(fileName, &toCheck, runs, false, 3, chainSize,
           [] (supplementary::ClingWrapper *asp){
 //            asp->setParallelMode(4);
 //        asp->setSaveProgress(0);
@@ -447,7 +447,7 @@ TEST(EvalModelGeneration, chainTest)
 
 TEST(EvalModelGeneration, representationTest)
 {
-//  return;
+  return;
 
   std::string path = ros::package::getPath("ice");
   std::vector<std::string> inputs;
@@ -467,11 +467,11 @@ TEST(EvalModelGeneration, representationTest)
 
   ofstream file;
 
-  int representationSizeMin = 9;
+  int representationSizeMin = 1;
   int representationSizeMax = 9;
   int representationSizeStep = 1;
 
-  int runs = 10;
+  int runs = 1;
 
   bool tree = false;
 
@@ -566,10 +566,10 @@ TEST(EvalModelGeneration, representationTest)
 //    metadataValues.push_back(5);
 //    metadataValues2.push_back(5);
 //    metadataGroundings.push_back("NodeDelayFixASPGrounding");
-    metadatas.push_back("Cost");
-    metadataValues.push_back(1);
-    metadataValues2.push_back(1);
-    metadataGroundings.push_back("NodeCostASPGrounding");
+//    metadatas.push_back("Cost");
+//    metadataValues.push_back(1);
+//    metadataValues2.push_back(1);
+//    metadataGroundings.push_back("NodeCostASPGrounding");
 //    metadatas.push_back("Accuracy");
 //    metadataValues.push_back(10);
 //    metadataValues2.push_back(10);
@@ -621,10 +621,10 @@ TEST(EvalModelGeneration, representationTest)
 //        metadataValues.push_back(i);
 //        metadataValues2.push_back(0);
 //        metadataGroundings.push_back("NodeDelayASPGrounding");
-        metadatas.push_back("Cost");
-        metadataValues.push_back(i+1);
-        metadataValues2.push_back(0);
-        metadataGroundings.push_back("NodeCostASPGrounding");
+//        metadatas.push_back("Cost");
+//        metadataValues.push_back(i+1);
+//        metadataValues2.push_back(0);
+//        metadataGroundings.push_back("NodeCostASPGrounding");
 //        metadatas.push_back("Accuracy");
 //        metadataValues.push_back(0);
 //        metadataValues2.push_back(0);
@@ -677,6 +677,7 @@ TEST(EvalModelGeneration, representationTest)
 
     auto result = mg.testSeries(fileName, &toCheck, runs, true, 3, reps+1,
         [] (supplementary::ClingWrapper *asp){
+//      asp->setModelCount(0);
 //        asp->setSaveProgress(200);
 //      asp->add("base",{},"stream(1,evalSystem,evalNodeSourceInd,evalSystem,information(evalEntity,evalScope,evalRepresentation0,none)).");
 //      asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);

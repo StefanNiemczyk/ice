@@ -300,7 +300,8 @@ public:
 //    asp.addKnowledgeFile(path + "/asp/nodeComposition.lp");
     asp.addKnowledgeFile(path + "/asp/informationProcessing/processing.lp");
     asp.addKnowledgeFile(path + "/asp/informationProcessing/searchBottomUp.lp");
-    asp.addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
+//    asp.addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
+    asp.addKnowledgeFile(path + "/asp/informationProcessing/localOptimization.lp");
     asp.init();
 
     // Initializing OwlAPI
