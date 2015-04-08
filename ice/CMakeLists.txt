@@ -245,6 +245,7 @@ target_link_libraries(ice_node
 catkin_add_gtest(${PROJECT_NAME}-test 
   test/eval/eval_ModelGeneration.cpp
   test/eval/ModelGeneration.cpp
+  test/eval/EvalScenarios.cpp
  
  # test/etc/TestTime.cpp
  # test/etc/EngineStuff.cpp

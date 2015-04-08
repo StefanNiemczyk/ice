@@ -8,19 +8,19 @@
 #program query(k,maxHopCount,maxStepCount).
 
 % select a theoretical stream for each required stream
-0 { before(tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),tnode(k,SYSTEM,none,none,none),INFO,-1) : tstream(k,SYSTEM,tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO,C) } 1 :- 
+0 { before(tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),tnode(k,SYSTEM,none,none,none),INFO,0) : tstream(k,SYSTEM,tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO) } 1 :- 
 	requiredStream(SYSTEM,INFO), 
 	query(k).
 
 % select a theoretical map for each required map
-1 { before(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),tnode(k,SYSTEM,none,none,none),SCOPE,REP,-1) : tmap(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),ENTITY_TYPE,SCOPE,REP,ENTITY2,C) } 1 :- 
+1 { before(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),tnode(k,SYSTEM,none,none,none),SCOPE,REP,0) : tmap(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),ENTITY_TYPE,SCOPE,REP,ENTITY2) } 1 :- 
 	requiredMap(SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2), 
 	query(k).
 
 
-% flagging nodes during search, identifies thats a node will be before another node in the resulting processing graph
+% flagging nodes during search, identifies that a node will be before another node in the resulting processing graph
 MIN { before(TNODE,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,S) : 
-		tstream(k,SYSTEM,TNODE,INFO,C), 
+		tstream(k,SYSTEM,TNODE,INFO), 
 		not before(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),TNODE,_),
 		TNODE != tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)} MAX :- 
 	flagged(k,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),S), 
@@ -29,7 +29,7 @@ MIN { before(TNODE,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,S) :
 	query(k).
 
 MIN { before(TNODE,tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),S) : 
-		tstream(k,SYSTEM,TNODE,information(ENTITY,SCOPE,REP,ENTITY2),C), 
+		tstream(k,SYSTEM,TNODE,information(ENTITY,SCOPE,REP,ENTITY2)), 
 		entity(ENTITY,ENTITY_TYPE),
 		not before(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),TNODE,_) } MAX :- 
 	flagged(k,tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),S), 
@@ -75,11 +75,12 @@ streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,NODE2,SYSTEM_SOURCE,INFO,S
    not mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2).
 
 
+%:- before(tnode(k,SYSTEM,NODE2,ENTITY,ENTITY2), tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),_,S), iro(SYSTEM,NODE,_,_), iro(SYSTEM,NODE2,_,_).
 %*
-iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP3,S) :- iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP2,S), iroChain(ENTITY,SCOPE,ENTITY2,REP2,REP3,S+1). 
+iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP3) :- iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP2), iroChain(ENTITY,SCOPE,ENTITY2,REP2,REP3). 
 
-iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP2,S) :-
-	before(tnode(k,SYSTEM,NODE2,ENTITY,ENTITY2), tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),_,S),
+iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP2) :-
+	before(tnode(k,SYSTEM,NODE2,ENTITY,ENTITY2), tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),_,_),
 	iro(SYSTEM,NODE,_,_),
 	stream(k,SYSTEM,_,_,information(ENTITY,SCOPE,REP2,ENTITY2),STEP+1),
 	stream(k,SYSTEM,_,_,information(ENTITY,SCOPE,REP1,ENTITY2),STEP),

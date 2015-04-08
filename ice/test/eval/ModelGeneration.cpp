@@ -134,7 +134,8 @@ public:
   }
 
   ModelGenerationSeriesResult testSeries(std::string p_ontPath, std::vector<std::string>* p_requiredModelElements,
-                                         int p_count, bool warmUp, int maxHopCount = 3, int maxStepCount = 10,
+                                         int p_count, bool warmUp, bool global, bool verbose, int maxHopCount = 3,
+                                         int maxStepCount = 10,
                                          std::function<void(supplementary::ClingWrapper *asp)> lambda = nullptr)
   {
     ModelGenerationSeriesResult result;
@@ -158,7 +159,7 @@ public:
       std::cout << "Starting warm up " << std::flush;
       for (int i = 1; i < 101; ++i)
       {
-        this->test(p_ontPath, p_requiredModelElements, true, maxHopCount, maxStepCount);
+        this->test(p_ontPath, p_requiredModelElements, true, global, false, maxHopCount, maxStepCount);
 
         if (i % 10 == 0)
         {
@@ -174,7 +175,7 @@ public:
       std::cout << "Starting run " << (i + 1) << " ... ";
       start = std::chrono::system_clock::now();
 
-      auto r = this->test(p_ontPath, p_requiredModelElements, false, maxHopCount, maxStepCount, lambda);
+      auto r = this->test(p_ontPath, p_requiredModelElements, false, global, verbose, maxHopCount, maxStepCount, lambda);
 
       if (r.successful)
         ++result.numberSuccessful;
@@ -285,7 +286,7 @@ public:
   }
 
   ModelGenerationResult test(std::string p_ontPath, std::vector<std::string>* p_requiredModelElements,
-                             bool warmUp, int maxHopCount = 3, int maxStepCount = 10,
+                             bool warmUp, bool global, bool verbose, int maxHopCount = 3, int maxStepCount = 10,
                              std::function<void(supplementary::ClingWrapper *asp)> lambda = nullptr)
   {
     ModelGenerationResult result;
@@ -300,8 +301,10 @@ public:
 //    asp.addKnowledgeFile(path + "/asp/nodeComposition.lp");
     asp.addKnowledgeFile(path + "/asp/informationProcessing/processing.lp");
     asp.addKnowledgeFile(path + "/asp/informationProcessing/searchBottomUp.lp");
-//    asp.addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
-    asp.addKnowledgeFile(path + "/asp/informationProcessing/localOptimization.lp");
+    if (global)
+      asp.addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
+    else
+      asp.addKnowledgeFile(path + "/asp/informationProcessing/localOptimization.lp");
     asp.init();
 
     // Initializing OwlAPI
@@ -500,12 +503,16 @@ public:
 
     if (solveResult == Gringo::SolveResult::SAT)
     {
-      asp.printLastModel(false);
-      ofstream file;
-      file.open("/tmp/tut.txt");
-      file << asp.toStringLastModel(true);
-      file.close();
-      std::cout << asp.getSymbolTableSize() << std::endl;
+      if (verbose)
+      {
+        asp.printLastModel(false);
+        ofstream file;
+        file.open("/tmp/tut.txt");
+        file << asp.toStringLastModel(true);
+        file.close();
+      }
+
+      bool first = true;
 
       for (auto toCheck : *p_requiredModelElements)
       {
@@ -513,6 +520,12 @@ public:
         std::string name = *value.name();
         if (false == asp.query(name, value.args()))
         {
+          if (first)
+          {
+            std::cout << std::endl << asp.toStringLastModel(false);
+            first = false;
+          }
+
           value.print(std::cout);
           std::cout << std::endl;
           result.successful = false;
@@ -526,7 +539,8 @@ public:
 
     externals.clear();
 
-    result.print();
+    if (verbose)
+      result.print();
 
     return result;
   }

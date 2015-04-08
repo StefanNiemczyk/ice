@@ -7,18 +7,6 @@
 %%%%--------------------------------------------------------------------------------------
 #program query(k,maxHopCount,maxStepCount).
 
-heuristic(k,SYSTEM,NODE,0) :-
-	sourceNode(SYSTEM,NODE,_).
-
-heuristic(k,SYSTEM,NODE,0) :-
-	nodeTemplate(SYSTEM,NODE,_).
-
-heuristic(k,SYSTEM,NODE,0) :-
-	iro(SYSTEM,NODE,_,_).
-
-heuristic(k,SYSTEM,NODE,0) :-
-	mapNodeTemplate(SYSTEM,NODE,_).
-
 % computing stream QoS metadata 
 %fix
 metadataStream(k,stream(METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP),FIX_VALUE) :- 

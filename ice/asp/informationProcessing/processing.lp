@@ -14,7 +14,8 @@
 
 %--------------------------------------------------------------------------------------
 #program base.
-%#show node/4.
+%#show node/5.
+%#show before/4.
 %#show stream/5.
 %#show connectToNode/6.
 %#show streamTransfer/7.
@@ -51,7 +52,7 @@ tnode(k,SYSTEM,NODE,ENTITY,none) :-
 	hasScope(ENTITY_TYPE,SCOPE), 
 	input(SYSTEM,NODE,SCOPE,_,_,_,_),
 	query(k).
-
+ 
 tnode(k,SYSTEM,IRO,ENTITY,ENTITY2) :- 
 	iro(SYSTEM,IRO,any,any), 
 	entity(ENTITY,ENTITY_TYPE), 
@@ -70,21 +71,21 @@ tnode(k,SYSTEM,IRO,ENTITY,none) :-
 
 
 % computing theoretical streams created by nodes
-tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),C) :- 
+tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2)) :- 
 	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), 
-	heuristic(k,SYSTEM,NODE,C),
+%	heuristic(k,SYSTEM,NODE,C),
 	ENTITY2 != none,
 	ENTITY2 != any,
 	output(SYSTEM,NODE,SCOPE,REP,ENTITY2).
 
-tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,none),C) :- 
+tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,none)) :- 
 	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),
-	heuristic(k,SYSTEM,NODE,C),
+%	heuristic(k,SYSTEM,NODE,C),
 	output(SYSTEM,NODE,SCOPE,REP,none).
 
-tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),C) :- 
+tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2)) :- 
 	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), 
-	heuristic(k,SYSTEM,NODE,C),
+%	heuristic(k,SYSTEM,NODE,C),
 	output(SYSTEM,NODE,SCOPE,REP,any).
 
 
@@ -144,25 +145,27 @@ MIN { connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER
 % computing meta inforamtion of a node
 nodeMeta(node(k,SYSTEM,IRO,ENTITY,ENTITY2), STEP_MAX, COUNT) :- 
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2),
+	nodeCount(k,SYSTEM,IRO,MIN,MAX),
+	MIN != MAX,
 	STEP_MAX = #max{STEP : connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,_,_,_,_,STEP))},
 	COUNT = #count{PROVIDER,SOURCE,INFO,STEP2 : connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)), 
 		PROVIDER != IRO, 
 		STEP2 < STEP_MAX+1},
-	nodeCount(k,SYSTEM,IRO,MIN,MAX),
 	COUNT > MIN-1,
 	COUNT < MAX+1,
 	STEP_MAX != #inf.
 
-nodeMeta(node(k,SYSTEM,IRO,ENTITY,ENTITY2), 0, 0) :- 
+nodeMeta(node(k,SYSTEM,IRO,ENTITY,ENTITY2), STEP_MAX, COUNT) :- 
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2),
 	STEP_MAX = #max{STEP : connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,_,_,_,_,STEP))},
-	COUNT = #count{PROVIDER,SOURCE,INFO,STEP2 : connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)), 
-		PROVIDER != IRO, 
-		STEP2 < STEP_MAX+1},
-	nodeCount(k,SYSTEM,IRO,MIN,MAX),
-	COUNT > MIN-1,
-	COUNT < MAX+1,
-	STEP_MAX == #inf.
+	nodeCount(k,SYSTEM,IRO,COUNT,COUNT),
+	COUNT > 0;
+	STEP_MAX != #inf.
+
+nodeMeta(node(k,SYSTEM,IRO,ENTITY,ENTITY2), 0, 0) :- 
+	node(k,SYSTEM,IRO,ENTITY,ENTITY2),
+	not connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), _),
+	nodeCount(k,SYSTEM,IRO,0,MAX).
 
 % create output of nodes
 stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP_MAX+1) :- 
@@ -202,14 +205,14 @@ requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :-
 
 
 %% transfer a stream between systems
-tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM_SOURCE,TNODE,INFO,C)) :-
+tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM_SOURCE,TNODE,INFO)) :-
 	requiredInformation(k,SYSTEM_TARGET,INFO),
 	transfer(SYSTEM_SOURCE,SYSTEM_TARGET,_,_),
-	tstream(k,SYSTEM_SOURCE,TNODE,INFO,C),
+	tstream(k,SYSTEM_SOURCE,TNODE,INFO),
 	SYSTEM_TARGET != SYSTEM_SOURCE.
 
-tstream(k,SYSTEM_TARGET,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),C) :- 
-	tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),C)).
+tstream(k,SYSTEM_TARGET,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2)) :- 
+	tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2))).
 	
 stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP+1) :- 
 	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,_).
@@ -225,9 +228,8 @@ tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,none) :-
 	query(k).
 
 % computing theoretical maps
-tmap(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),ENTITY_TYPE,SCOPE,REP,ENTITY2,C) :- 
+tmap(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),ENTITY_TYPE,SCOPE,REP,ENTITY2) :- 
 	tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 
-	heuristic(k,SYSTEM,NODE,C),
 	outputMap(SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2).
 
 % computing theoretical inputs for maps
@@ -258,19 +260,21 @@ mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), STEP_MAX, COUNT) :-
 		PROVIDER != NODE, 
 		STEP2 < STEP_MAX+1},
 	mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), MIN, MAX),
+	MIN != MAX,
 	COUNT > MIN-1,
 	COUNT < MAX+1,
+	STEP_MAX != #inf.
+
+mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), STEP_MAX, COUNT) :- 
+	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),
+	STEP_MAX = #max{STEP : connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), stream(k,_,_,_,_,STEP))},
+	mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), COUNT, COUNT),
 	STEP_MAX != #inf.
 
 mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 0, 0) :- 
 	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),
 	STEP_MAX = #max{STEP : connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), stream(k,_,_,_,_,STEP))},
-	COUNT = #count{PROVIDER,SOURCE,INFO,STEP2 : connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)), 
-		PROVIDER != NODE, 
-		STEP2 < STEP_MAX+1},
-	mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), MIN, MAX),
-	COUNT > MIN-1,
-	COUNT < MAX+1,
+	mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 0, MAX),
 	STEP_MAX == #inf.
 
 
