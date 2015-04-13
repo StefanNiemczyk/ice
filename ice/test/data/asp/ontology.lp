@@ -13,6 +13,8 @@ valueScope(x).
 valueScope(y).
 valueScope(z).
 
+valueScopeDefault(z,0).
+
 valueScope(lat).
 valueScope(lon).
 valueScope(alt).
@@ -25,9 +27,10 @@ hasScope(robot,position).
 
 hasRepresentation(position,relCoords).
 hasRepresentation(position,coords).
+hasRepresentation(position,coords2D).
 hasRepresentation(position,wgs84).
 
-hasDimension(relCoords,position,coords,1,1).
+hasRelatedDimension(relCoords,position,coords,1,1).
 
 hasDimension(relCoords,x,1,1).
 hasDimension(relCoords,y,1,1).
@@ -55,3 +58,37 @@ hasRepresentation(alt,floatRep).
 hasUnit(lat,degree).
 hasUnit(lon,degree).
 hasUnit(alt,meter).
+
+
+
+
+% velocity scope
+scope(velocity).
+
+representation(vel1).
+representation(vel2).
+
+hasRepresentation(velocity,vel1).
+hasRepresentation(velocity,vel2).
+
+scope(movement).
+
+representation(mov1).
+representation(mov2).
+
+hasRepresentation(movement,mov1).
+hasRepresentation(movement,mov2).
+
+hasDimension(mov1,position,coords,1,1).
+hasDimension(mov1,velocity,vel1,1,1).
+
+hasDimension(mov2,position,coords,1,1).
+hasDimension(mov2,velocity,vel2,1,1).
+
+
+
+
+
+
+
+
