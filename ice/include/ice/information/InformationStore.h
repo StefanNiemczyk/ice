@@ -243,8 +243,6 @@ private:
   std::vector<std::shared_ptr<BaseInformationStream>> streams; /**< The information steams */
   std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute events asynchronously */
   std::shared_ptr<StreamFactory> streamFactory; /**< Stream factory to create streams */
-//  std::map<std::string, std::shared_ptr<BaseInformationStream>> streamMap; /**< Map of stream name -> information stream */
-//  std::map<std::string, std::shared_ptr<InformationStreamTemplate>> streamTemplates; /**< Map of stream name -> information stream */
   std::mutex _mtx; /**< Mutex */
   el::Logger* _log; /**< Logger */
 };

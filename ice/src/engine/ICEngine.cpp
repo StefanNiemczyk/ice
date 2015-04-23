@@ -28,9 +28,9 @@ ICEngine::~ICEngine()
 {
 //  this->coordinator->cleanUp();
 //  this->communication->cleanUp();
-//  this->eventHandler;
-//  this->informationStore;
-//  this->nodeStore ;
+  this->eventHandler;
+  this->informationStore;
+  this->nodeStore;
 //  this->modelComperator;
 }
 
@@ -44,16 +44,16 @@ void ICEngine::init()
   if (this->initialized)
     return;
 
-  this->communication = std::make_shared<RosCommunication>(this->shared_from_this());
+//  this->communication = std::make_shared<RosCommunication>(this->shared_from_this());
   this->eventHandler = std::make_shared<EventHandler>(this->shared_from_this());
   this->informationStore = std::make_shared<InformationStore>(this->shared_from_this());
   this->nodeStore = std::make_shared<NodeStore>(this->shared_from_this());
-  this->modelComperator = std::make_shared<ModelComperator>();
-  this->coordinator = std::make_shared<Coordinator>(this->shared_from_this());
+//  this->modelComperator = std::make_shared<ModelComperator>();
+//  this->coordinator = std::make_shared<Coordinator>(this->shared_from_this());
 
   // Initialize components
-  this->coordinator->init();
-  this->communication->init();
+//  this->coordinator->init();
+//  this->communication->init();
 
   this->initialized = true;
 }
@@ -93,11 +93,10 @@ std::shared_ptr<Coordinator> ICEngine::getCoordinator()
   return this->coordinator;
 }
 
-
 std::shared_ptr<StreamFactory> ICEngine::getStreamFactory()
-    {
+{
   return this->streamFactory;
-    }
+}
 
 bool ICEngine::readFromFile(const std::string fileName)
 {

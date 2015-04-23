@@ -100,8 +100,9 @@ public:
 
   int init()
   {
-    if (this->inputs.empty() || this->outputs.empty())
+    if (this->inputs.empty() || this->outputs.empty()){
       return 1;
+    }
 
     this->inputStream = std::static_pointer_cast<ice::InformationStream<ice::Position>>(this->inputs[0]);
     this->outputStream = std::static_pointer_cast<ice::InformationStream<ice::Position>>(this->outputs[0]);

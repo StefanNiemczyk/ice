@@ -24,17 +24,31 @@ ASPCoordinator::ASPCoordinator(std::weak_ptr<ICEngine> engine, std::string const
   this->nodeStore = en->getNodeStore();
   this->informationStore = en->getInformationStore();
 
+  this->maxChainLength = 10;
   this->engine = engine;
   this->queryIndex = 0;
   this->groundingDirty = true;
   this->self = this->getEngineStateByIRI(ownName);
+  this->globalOptimization = true;
 
+}
+
+void ASPCoordinator::init()
+{
   std::string path = ros::package::getPath("ice");
   _log->debug("Default ontology path %v", path.c_str());
 
   // Initializing ASP
   this->asp = std::make_shared<supplementary::ClingWrapper>();
-  this->asp->addKnowledgeFile(path + "/asp/nodeComposition.lp");
+  this->asp->addKnowledgeFile("../asp/informationProcessing/processing.lp");
+  this->asp->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+
+  if (this->globalOptimization)
+    this->asp->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  else
+    this->asp->addKnowledgeFile("../asp/informationProcessing/localOptimization.lp");
+
+  this->asp->setNoWarnings(true);
   this->asp->init();
 
   // Initializing OwlAPI
@@ -79,33 +93,30 @@ void ASPCoordinator::optimizeInformationFlow()
       this->lastQuery->assign(false);
       this->lastQuery->release();
     }
-
-    this->lastQuery = this->asp->getExternal("query", {++this->queryIndex}, true);
-    this->asp->ground("query", {this->queryIndex});
+    ++this->queryIndex;
+    this->lastQuery = this->asp->getExternal("query", {this->queryIndex}, "query", {this->queryIndex,3,this->maxChainLength}, true);
   }
 
   // Solving
   auto solveResult = this->asp->solve();
-	//FIXME: implement loggable interface?
-  //_log->info("Solving finished: %v", solveResult);
+  _log->info("Solving finished: %v", (Gringo::SolveResult::SAT == solveResult) ? "SAT" : "UNSAT");
 
   if (solveResult == Gringo::SolveResult::SAT)
   {
-    //_log->verbose(1, "Resulting Model \n%v", this->asp->printLastModel());
-    this->asp->printLastModel();
+    _log->info("Resulting Model %v", this->asp->toStringLastModel());
     bool valid = true;
     std::vector<std::shared_ptr<Node>> nodes;
 
-    // node(1,testSystem,testSourceNodeInd,testEntity1)
+    // node(1,testSystem,testSourceNodeInd,testEntity1,none)
     std::vector<Gringo::Value> values;
     values.push_back(this->queryIndex);
     values.push_back(std::string(this->self->getSystemIriShort()));
     values.push_back("?");
     values.push_back("?");
     values.push_back("?");
-    auto nodeQuery = std::make_shared<Gringo::Value>("node", values);
 
-    auto queryResult = this->asp->queryAllTrue(nodeQuery);
+    Gringo::Value nodeQuery("node", values);
+    auto queryResult = this->asp->queryAllTrue(&nodeQuery);
 
     for (auto nodeValue : *queryResult)
     {
@@ -146,20 +157,30 @@ void ASPCoordinator::optimizeInformationFlow()
         valid = false;
         break;
       }
-//      connect(1,testSystem,testComputationalNodeInd,testSourceNodeInd,testSystem,
-//        information(testEntity1,testScope1,testRepresentation1,none))
+
+      // connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP))
+      std::vector<Gringo::Value> nodeValues;
+      nodeValues.push_back(this->queryIndex);
+      nodeValues.push_back(std::string(this->self->getSystemIriShort()));
+      nodeValues.push_back(Gringo::Value(aspNode->name));
+      nodeValues.push_back(Gringo::Value(nodeEntity));
+      nodeValues.push_back(Gringo::Value(nodeEntity2));
+
+      std::vector<Gringo::Value> streamValues;
+      streamValues.push_back(this->queryIndex);
+      streamValues.push_back(std::string(this->self->getSystemIriShort()));
+      streamValues.push_back("?");
+      streamValues.push_back("?");
+      streamValues.push_back("?");
+      streamValues.push_back("?");
+
+
       std::vector<Gringo::Value> values;
-      values.push_back(this->queryIndex);
-      values.push_back(std::string(this->self->getSystemIriShort()));
-      values.push_back(Gringo::Value(aspNode->name));
-      values.push_back(Gringo::Value(nodeEntity));
-      values.push_back(Gringo::Value(nodeEntity2));
-      values.push_back("?");
-      values.push_back("?");
-      values.push_back("?");
-      values.push_back("?");
-      auto connectQuery = std::make_shared<Gringo::Value>("connectToNode", values);
-      auto connectResult = this->asp->queryAllTrue(connectQuery);
+      values.push_back(Gringo::Value("node", nodeValues));
+      values.push_back(Gringo::Value("stream", streamValues));
+
+      Gringo::Value connectQuery("connectToNode", values);
+      auto connectResult = this->asp->queryAllTrue(&connectQuery);
 
       if (false == connectResult)
       {
@@ -174,10 +195,12 @@ void ASPCoordinator::optimizeInformationFlow()
         {
           _log->debug("Look up connected stream for node '%v'", nodeName.c_str());
 
-          auto lastProcessing = *connect.args()[5].name();
-          auto sourceSystem = *connect.args()[6].name();
-          auto info = connect.args()[7];
-          auto step = connect.args()[8];
+          auto streamValue = connect.args()[1];
+
+          auto lastProcessing = *streamValue.args()[2].name();
+          auto sourceSystem = *streamValue.args()[3].name();
+          auto info = streamValue.args()[4];
+          auto step = streamValue.args()[5];
           auto stream = this->getStream(info, lastProcessing, sourceSystem, step);
 
           if (false == stream)
@@ -201,8 +224,9 @@ void ASPCoordinator::optimizeInformationFlow()
       values.push_back(std::string(this->self->getSystemIriShort()));
       values.push_back("?");
       values.push_back("?");
-      auto streamQuery = std::make_shared<Gringo::Value>("stream", values);
-      auto streamResult = this->asp->queryAllTrue(streamQuery);
+
+      Gringo::Value streamQuery("stream", values);
+      auto streamResult = this->asp->queryAllTrue(&streamQuery);
 
       for (auto output : *streamResult)
       {
@@ -233,8 +257,6 @@ void ASPCoordinator::optimizeInformationFlow()
       nodes.push_back(node);
     }
 
-    // TODO interpret IRO
-    // TODO interpret information extraction
     // TODO interpret map
     // TODO selected stream
 
@@ -300,7 +322,6 @@ void ASPCoordinator::readInfoStructureFromOntology()
 
     if (std::find(this->entities.begin(), this->entities.end(), item) == this->entities.end())
     {
-//      std::cout << item << std::endl;
       this->entities.push_back(item);
       this->asp->add(programPart, {}, item);
     }
@@ -353,34 +374,48 @@ void ASPCoordinator::readSystemsFromOntology()
       const char* typeStr = types->at(i);
       ASPElementType type;
 
-      if (typeStr == "COMPUTATION_NODE")
+      if (typeStr == nullptr || name == nullptr || elementStr == nullptr)
+      {
+        _log->error("Empty string for element '%v': '%v' (elementStr), '%v' (typeStr), element will be skipped",
+                    name == nullptr ? "null" : name, elementStr == nullptr ? "null" : elementStr, typeStr == nullptr ? "null" : typeStr);
+
+        delete name;
+        delete elementStr;
+        delete aspStr;
+        delete cppStr;
+        delete typeStr;
+
+        continue;
+      }
+
+      if (std::strcmp(typeStr, "COMPUTATION_NODE") == 0)
       {
         type = ASPElementType::ASP_COMPUTATION_NODE;
       }
-      else if (typeStr == "SOURCE_NODE")
+      else if (std::strcmp(typeStr, "SOURCE_NODE") == 0)
       {
         type = ASPElementType::ASP_SOURCE_NODE;
       }
-      else if (typeStr == "REQUIRED_STREAM")
+      else if (std::strcmp(typeStr, "REQUIRED_STREAM") == 0)
       {
         type = ASPElementType::ASP_REQUIRED_STREAM;
       }
-      else if (typeStr == "MAP_NODE")
+      else if (std::strcmp(typeStr, "MAP_NODE") == 0)
       {
         type = ASPElementType::ASP_MAP_NODE;
       }
-      else if (typeStr == "IRO_NODE")
+      else if (std::strcmp(typeStr, "IRO_NODE") == 0)
       {
         type = ASPElementType::ASP_IRO_NODE;
       }
-      else if (typeStr == "REQUIRED_MAP")
+      else if (std::strcmp(typeStr, "REQUIRED_MAP") == 0)
       {
         type = ASPElementType::ASP_REQUIRED_MAP;
       }
       else
       {
-        _log->error("Unknown asp element type '%v', element will be skipped",
-                    types->at(i));
+        _log->error("Unknown asp element type '%v' for element '%v', element will be skipped",
+                    typeStr, name);
 
         delete name;
         delete elementStr;
@@ -395,7 +430,7 @@ void ASPCoordinator::readSystemsFromOntology()
 
       if (!node)
       {
-        _log->debug("ASP element '%v' not found, creating new element",
+        _log->info("ASP element '%v' not found, creating new element",
                     std::string(name).c_str());
         auto element = std::make_shared<ASPElement>();
         element->aspString = aspStr;
@@ -410,8 +445,7 @@ void ASPCoordinator::readSystemsFromOntology()
           element->config = this->readConfiguration(std::string(index + 1, std::strlen(cppStr)));
         }
 
-        auto value = this->splitASPExternalString(elementStr);
-//              std::cout << value << std::endl;
+        auto value = supplementary::ClingWrapper::stringToValue(elementStr);
         element->external = this->asp->getExternal(*value.name(), value.args());
 
         switch (type)
@@ -423,7 +457,8 @@ void ASPCoordinator::readSystemsFromOntology()
             if (false == this->nodeStore->existNodeCreator(element->className))
             {
               _log->warn("Missing creator for node '%v' of type '%v', cpp grounding '%v', asp external set to false",
-                            element->name.c_str(), ASPElementTypeNames[type].c_str(), element->className.c_str());
+                         element->name.c_str(), ASPElementTypeNames[type].c_str(),
+                         element->className == "" ? "NULL" : element->className.c_str());
               element->external->assign(false);
             }
             else
@@ -437,7 +472,6 @@ void ASPCoordinator::readSystemsFromOntology()
         }
 
         this->asp->add(name, {}, aspStr);
-        std::cout << aspStr << std::endl;
         this->asp->ground(name, {});
 
         system->addASPElement(element);
@@ -470,70 +504,6 @@ std::shared_ptr<supplementary::ClingWrapper> ASPCoordinator::getClingWrapper()
   return this->asp;
 }
 
-Gringo::Value ASPCoordinator::splitASPExternalString(std::string p_aspString)
-{
-  if (p_aspString == "")
-    return Gringo::Value();
-
-  std::vector<Gringo::Value> vec;
-
-  int start = p_aspString.find("(");
-  int end = p_aspString.find_last_of(")");
-
-  if (start == std::string::npos || end == std::string::npos || start > end)
-  {
-    return Gringo::Value(p_aspString);
-  }
-
-  std::string name = p_aspString.substr(0, start);
-  std::string values = p_aspString.substr(start + 1, end - start - 1);
-
-  istringstream f(values);
-  std::string s;
-
-  while (values != "")
-  {
-//    std::cout << values << std::endl;
-    int index1 = values.find("(");
-    int index2 = values.find(",");
-
-    if (index2 == 0) {
-      values = values.substr(1, values.size());
-      continue;
-    }
-
-    if (index2 != std::string::npos && index1 == std::string::npos)
-    {
-      vec.push_back(Gringo::Value(values.substr(0, index2)));
-      values = values.substr(index2 + 1, values.size());
-    }
-    else if (index2 == std::string::npos && index1 != std::string::npos)
-    {
-      index1 = values.find_last_of(")") + 1;
-      vec.push_back(this->splitASPExternalString(values.substr(0, index1)));
-      values = values.substr(index1, values.size());
-    }
-    else if (index2 == std::string::npos && index1 == std::string::npos)
-    {
-      vec.push_back(Gringo::Value(values));
-      values = "";
-    }
-    else if (index2 < index1)
-    {
-      vec.push_back(Gringo::Value(values.substr(0, index2)));
-      values = values.substr(index2 + 1, values.size());
-    }
-    else
-    {
-      index1 = values.find_last_of(")") + 1;
-      vec.push_back(this->splitASPExternalString(values.substr(0, index1)));
-      values = values.substr(index1, values.size());
-    }
-  }
-
-  return Gringo::Value(name, vec);
-}
-
 std::shared_ptr<EngineState> ASPCoordinator::getEngineStateByIRI(std::string p_iri)
 {
   for (auto system : this->systems)
@@ -554,6 +524,7 @@ std::map<std::string, std::string> ASPCoordinator::readConfiguration(std::string
   std::map<std::string, std::string> configuration;
   std::stringstream ss(config);
   std::string item;
+
   while (std::getline(ss, item, ';'))
   {
     int index = item.find("=");
@@ -572,6 +543,7 @@ std::map<std::string, std::string> ASPCoordinator::readConfiguration(std::string
 void ASPCoordinator::readMetadata(std::map<std::string, int>* metadata, const std::string provider,
                                   const std::string sourceSystem, Gringo::Value information, Gringo::Value step)
 {
+  // TODO read metadata from ontology
   this->readMetadata("delay", metadata, provider, sourceSystem, information, step);
   this->readMetadata("accuracy", metadata, provider, sourceSystem, information, step);
 }
@@ -579,49 +551,51 @@ void ASPCoordinator::readMetadata(std::map<std::string, int>* metadata, const st
 void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *metadata, std::string const provider,
                                   std::string const sourceSystem, Gringo::Value information, Gringo::Value step)
 {
-  // metadataStream(1,metadata,testSystem,testComputationalNodeInd,testSystem,information(testEntity1,testScope1,testRepresentation2,none),2)
+  // metadataStream(1,accuracy,stream(1,testSystem,testComputationalNodeInd,testSystem,information(testEntity1,testScope1,testRepresentation2,none),2),5)
+
   std::vector<Gringo::Value> values;
   values.push_back(this->queryIndex);
   values.push_back(Gringo::Value(name));
-  values.push_back(std::string(this->self->getSystemIriShort()));
-  values.push_back(Gringo::Value(provider));
-  values.push_back(Gringo::Value(sourceSystem));
-  values.push_back(information);
-  values.push_back(step);
+
+  std::vector<Gringo::Value> valuesStream;
+  valuesStream.push_back(this->queryIndex);
+  valuesStream.push_back(std::string(this->self->getSystemIriShort()));
+  valuesStream.push_back(Gringo::Value(provider));
+  valuesStream.push_back(Gringo::Value(sourceSystem));
+  valuesStream.push_back(information);
+  valuesStream.push_back(step);
+
+  values.push_back(Gringo::Value("stream",valuesStream));
   values.push_back("?");
 
-  auto delayQuery = std::make_shared<Gringo::Value>("metadataStream", values);
-  auto delayResult = this->asp->queryAllTrue(delayQuery);
+  Gringo::Value query("metadataStream", values);
+  auto result = this->asp->queryAllTrue(&query);
 
-  if (delayResult->size() != 1)
+  if (result->size() != 1)
   {
     std::stringstream o;
     o << information;
-    _log->warn("Wrong size '%v' for metadata '%v' of stream '%v', '%v', '%v'", delayResult->size(),
-                  name.c_str(), o.str().c_str(), provider.c_str(), sourceSystem.c_str());
+    _log->warn("Wrong size '%v' for metadata '%v' of stream '%v', '%v', '%v'", result->size(), name.c_str(),
+               o.str().c_str(), provider.c_str(), sourceSystem.c_str());
     return;
   }
 
-  auto delayValue = delayResult->at(0);
-
-  Gringo::Value value = delayValue.args()[7];
+  Gringo::Value value = result->at(0).args()[3];
 
   if (value.type() != Gringo::Value::Type::NUM)
   {
     std::stringstream o, o2;
     o << information;
     o2 << value;
-    _log->warn("Wrong type '%v' of '%v' for metadata '%v' of stream '%v', '%v', '%v'",
-                  value.type(), o2.str().c_str(), name.c_str(), o.str().c_str(), provider.c_str(),
-                  sourceSystem.c_str());
+    _log->warn("Wrong type '%v' of '%v' for metadata '%v' of stream '%v', '%v', '%v'", value.type(), o2.str().c_str(),
+               name.c_str(), o.str().c_str(), provider.c_str(), sourceSystem.c_str());
     return;
   }
 
   std::stringstream o;
      o << information;
-  _log->warn("Metadata '%v' of stream '%v', '%v', '%v' has value '%v'",
-                    name.c_str(), o.str().c_str(), provider.c_str(),
-                    sourceSystem.c_str(), value.num());
+  _log->debug("Metadata '%v' of stream '%v', '%v', '%v' has value '%v'", name.c_str(), o.str().c_str(), provider.c_str(),
+             sourceSystem.c_str(), value.num());
 
   (*metadata)[name] = value.num();
 }
@@ -661,7 +635,7 @@ std::shared_ptr<BaseInformationStream> ASPCoordinator::getStream(Gringo::Value i
 
     std::string dataType = this->dataTypeForRepresentation(*info.args()[2].name());
     std::string name = *info.args()[0].name() + "-" + lastProcessing + "-" + sourceSystem;
-    stream = this->informationStore->registerBaseStream(dataType, infoSpec, name, 100, metadata, lastProcessing,
+    stream = this->informationStore->registerBaseStream(dataType, infoSpec, name, 10, metadata, lastProcessing,
                                                         sourceSystem);
   }
 

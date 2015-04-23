@@ -18,6 +18,7 @@ TEST(ASPCoordinator, create)
   std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory);
   engine->init();
   ice::ASPCoordinator coordinator(engine, "http://vs.uni-kassel.de/IceTest#TestSystem");
+  coordinator.init();
 
   bool result = coordinator.getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
 
@@ -43,7 +44,7 @@ TEST(ASPCoordinator, create)
 
   stream1->add(std::move(position1));
 
-  std::this_thread::sleep_for(std::chrono::milliseconds {2000});
+  std::this_thread::sleep_for(std::chrono::milliseconds {10});
 
   auto position2 = stream2->getLast();
 

@@ -839,7 +839,7 @@ std::unique_ptr<std::vector<std::vector<const char*>*>>OntologyInterface::readNo
   {
     jobjectArray arr = (jobjectArray) env->GetObjectArrayElement(result, i);
     int size2 = env->GetArrayLength(arr);
-    std::vector<const char*>* vec2 = new std::vector<const char*>(size2);
+    std::vector<const char*>* vec2 = new std::vector<const char*>();
 
     for (int j = 0; j < size2; ++j)
     {

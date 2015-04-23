@@ -192,17 +192,17 @@ TEST(JNITest, addRequiredStream)
 
     ASSERT_EQ(returnValues->size(), 5);
 
-    ASSERT_EQ(returnValues->at(0).size(), 1);
-    ASSERT_EQ(returnValues->at(1).size(), 1);
-    ASSERT_EQ(returnValues->at(2).size(), 1);
-    ASSERT_EQ(returnValues->at(3).size(), 1);
-    ASSERT_EQ(returnValues->at(4).size(), 1);
+    ASSERT_EQ(returnValues->at(0)->size(), 1);
+    ASSERT_EQ(returnValues->at(1)->size(), 1);
+    ASSERT_EQ(returnValues->at(2)->size(), 1);
+    ASSERT_EQ(returnValues->at(3)->size(), 1);
+    ASSERT_EQ(returnValues->at(4)->size(), 1);
 
-    EXPECT_EQ("REQUIRED_STREAM", returnValues->at(0).at(0));
-    EXPECT_EQ("testReqStream", returnValues->at(1).at(0));
-    EXPECT_EQ("requiredStream(testSystem,information(testEntity,position,coordinatePositionRep,none)).\n", returnValues->at(2).at(0));
+    EXPECT_EQ("REQUIRED_STREAM", std::string(returnValues->at(0)->at(0)));
+    EXPECT_EQ("testReqStream", std::string(returnValues->at(1)->at(0)));
+    EXPECT_EQ("requiredStream(testSystem,information(testEntity,position,coordinatePositionRep,none)).\n", std::string(returnValues->at(2)->at(0)));
 
-    EXPECT_TRUE(returnValues->at(4).at(0) == "");
+    EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
 
 TEST(JNITest, addSourceNode)
@@ -267,23 +267,24 @@ TEST(JNITest, addSourceNode)
 
   ASSERT_EQ(returnValues->size(), 5);
 
-  ASSERT_EQ(returnValues->at(0).size(), 1);
-  ASSERT_EQ(returnValues->at(1).size(), 1);
-  ASSERT_EQ(returnValues->at(2).size(), 1);
-  ASSERT_EQ(returnValues->at(3).size(), 1);
-  ASSERT_EQ(returnValues->at(4).size(), 1);
+  ASSERT_EQ(returnValues->at(0)->size(), 1);
+  ASSERT_EQ(returnValues->at(1)->size(), 1);
+  ASSERT_EQ(returnValues->at(2)->size(), 1);
+  ASSERT_EQ(returnValues->at(3)->size(), 1);
+  ASSERT_EQ(returnValues->at(4)->size(), 1);
 
-  EXPECT_EQ("SOURCE_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("testSourceNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("sourceNode(testSystem,testSourceNodeInd,testEntity).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("SOURCE_NODE", std::string(returnValues->at(0)->at(0)));
+  EXPECT_EQ("testSourceNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("sourceNode(testSystem,testSourceNodeInd,testEntity).\n", std::string(returnValues->at(2)->at(0)));
 
-  EXPECT_TRUE(returnValues->at(3).at(0).find("#external sourceNode(testSystem,testSourceNodeInd,testEntity).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("nodeCost(testSystem,testSourceNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(delay,testSystem,testSourceNodeInd,fix,5,5).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(accuracy,testSystem,testSourceNodeInd,fix,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("output(testSystem,testSourceNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
+  std::string toTest = std::string(returnValues->at(3)->at(0));
+  EXPECT_TRUE(toTest.find("#external sourceNode(testSystem,testSourceNodeInd,testEntity).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("nodeCost(testSystem,testSourceNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataNode(delay,testSystem,testSourceNodeInd,fix,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataNode(accuracy,testSystem,testSourceNodeInd,fix,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(testSystem,testSourceNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
 
-  EXPECT_TRUE(returnValues->at(4).at(0) == "");
+  EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
 
 TEST(JNITest, addComputationNode)
@@ -346,25 +347,27 @@ TEST(JNITest, addComputationNode)
 
   ASSERT_EQ(returnValues->size(), 5);
 
-  ASSERT_EQ(returnValues->at(0).size(), 1);
-  ASSERT_EQ(returnValues->at(1).size(), 1);
-  ASSERT_EQ(returnValues->at(2).size(), 1);
-  ASSERT_EQ(returnValues->at(3).size(), 1);
-  ASSERT_EQ(returnValues->at(4).size(), 1);
+  ASSERT_EQ(returnValues->at(0)->size(), 1);
+  ASSERT_EQ(returnValues->at(1)->size(), 1);
+  ASSERT_EQ(returnValues->at(2)->size(), 1);
+  ASSERT_EQ(returnValues->at(3)->size(), 1);
+  ASSERT_EQ(returnValues->at(4)->size(), 1);
 
-  EXPECT_EQ("COMPUTATION_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("testNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("nodeTemplate(testSystem,testNodeInd,any).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("COMPUTATION_NODE", std::string(returnValues->at(0)->at(0)));
+  EXPECT_EQ("testNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("nodeTemplate(testSystem,testNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
 
-  EXPECT_TRUE(returnValues->at(3).at(0).find("#external nodeTemplate(testSystem,testNodeInd,any).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("input(testSystem,testNodeInd,position,coordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(delay,testSystem,testNodeInd,max,5,5).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("nodeCost(testSystem,testNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(accuracy,testSystem,testNodeInd,max,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
 
-  EXPECT_TRUE(returnValues->at(4).at(0) == "");
+  std::string toTest = std::string(returnValues->at(3)->at(0));
+  EXPECT_TRUE(toTest.find("#external nodeTemplate(testSystem,testNodeInd,any).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(testSystem,testNodeInd,position,coordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataNode(delay,testSystem,testNodeInd,max,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("nodeCost(testSystem,testNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataNode(accuracy,testSystem,testNodeInd,max,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
+
+  EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
 
 
@@ -435,25 +438,26 @@ TEST(JNITest, addIroNode)
 
   ASSERT_EQ(returnValues->size(), 5);
 
-  ASSERT_EQ(returnValues->at(0).size(), 1);
-  ASSERT_EQ(returnValues->at(1).size(), 1);
-  ASSERT_EQ(returnValues->at(2).size(), 1);
-  ASSERT_EQ(returnValues->at(3).size(), 1);
-  ASSERT_EQ(returnValues->at(4).size(), 1);
+  ASSERT_EQ(returnValues->at(0)->size(), 1);
+  ASSERT_EQ(returnValues->at(1)->size(), 1);
+  ASSERT_EQ(returnValues->at(2)->size(), 1);
+  ASSERT_EQ(returnValues->at(3)->size(), 1);
+  ASSERT_EQ(returnValues->at(4)->size(), 1);
 
-  EXPECT_EQ("IRO_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("testNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("iro(testSystem,testNodeInd,any,none).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("IRO_NODE", std::string(returnValues->at(0)->at(0)));
+  EXPECT_EQ("testNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("iro(testSystem,testNodeInd,any,none).\n", std::string(returnValues->at(2)->at(0)));
 
-  EXPECT_TRUE(returnValues->at(3).at(0).find("#external iro(testSystem,testNodeInd,any,none).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("input(testSystem,testNodeInd,position,coordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("input2(testSystem,testNodeInd,position,coordinatePositionRep,none,1,1).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(delay,testSystem,testNodeInd,max,5,5).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("nodeCost(testSystem,testNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(accuracy,testSystem,testNodeInd,max,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
+  std::string toTest = std::string(returnValues->at(3)->at(0));
+  EXPECT_TRUE(toTest.find("#external iro(testSystem,testNodeInd,any,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(testSystem,testNodeInd,position,coordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input2(testSystem,testNodeInd,position,coordinatePositionRep,none,1,1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataNode(delay,testSystem,testNodeInd,max,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("nodeCost(testSystem,testNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataNode(accuracy,testSystem,testNodeInd,max,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
 
-  EXPECT_TRUE(returnValues->at(4).at(0) == "");
+  EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
 
 TEST(JNITest, addNodeToSystem)
@@ -521,22 +525,23 @@ TEST(JNITest, addNodeToSystem)
 
   ASSERT_EQ(returnValues->size(), 5);
 
-  ASSERT_EQ(returnValues->at(0).size(), 1);
-  ASSERT_EQ(returnValues->at(1).size(), 1);
-  ASSERT_EQ(returnValues->at(2).size(), 1);
-  ASSERT_EQ(returnValues->at(3).size(), 1);
-  ASSERT_EQ(returnValues->at(4).size(), 1);
+  ASSERT_EQ(returnValues->at(0)->size(), 1);
+  ASSERT_EQ(returnValues->at(1)->size(), 1);
+  ASSERT_EQ(returnValues->at(2)->size(), 1);
+  ASSERT_EQ(returnValues->at(3)->size(), 1);
+  ASSERT_EQ(returnValues->at(4)->size(), 1);
 
-  EXPECT_EQ("SOURCE_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("testSourceNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("sourceNode(testSystem2,testSourceNodeInd,testEntity).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("SOURCE_NODE", std::string(returnValues->at(0)->at(0)));
+  EXPECT_EQ("testSourceNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("sourceNode(testSystem2,testSourceNodeInd,testEntity).\n", std::string(returnValues->at(2)->at(0)));
 
-  EXPECT_TRUE(returnValues->at(3).at(0).find("#external sourceNode(testSystem2,testSourceNodeInd,testEntity).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("nodeCost(testSystem2,testSourceNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(delay,testSystem2,testSourceNodeInd,fix,5,5).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(accuracy,testSystem2,testSourceNodeInd,fix,-1,-1).") != std::string::npos);
+  std::string toTest = std::string(returnValues->at(3)->at(0));
+  EXPECT_TRUE(toTest.find("#external sourceNode(testSystem2,testSourceNodeInd,testEntity).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("nodeCost(testSystem2,testSourceNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataNode(delay,testSystem2,testSourceNodeInd,fix,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataNode(accuracy,testSystem2,testSourceNodeInd,fix,-1,-1).") != std::string::npos);
 
-  EXPECT_TRUE(returnValues->at(4).at(0) == "");
+  EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
 
 
@@ -619,25 +624,26 @@ TEST(JNITest, save)
 
   ASSERT_EQ(returnValues->size(), 5);
 
-  ASSERT_EQ(1, returnValues->at(0).size());
-  ASSERT_EQ(1, returnValues->at(1).size());
-  ASSERT_EQ(1, returnValues->at(2).size());
-  ASSERT_EQ(1, returnValues->at(3).size());
-  ASSERT_EQ(1, returnValues->at(4).size());
+  ASSERT_EQ(1, returnValues->at(0)->size());
+  ASSERT_EQ(1, returnValues->at(1)->size());
+  ASSERT_EQ(1, returnValues->at(2)->size());
+  ASSERT_EQ(1, returnValues->at(3)->size());
+  ASSERT_EQ(1, returnValues->at(4)->size());
 
-  EXPECT_EQ("COMPUTATION_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("testNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("nodeTemplate(testSystem,testNodeInd,any).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("COMPUTATION_NODE", std::string(returnValues->at(0)->at(0)));
+  EXPECT_EQ("testNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("nodeTemplate(testSystem,testNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
 
-  EXPECT_TRUE(returnValues->at(3).at(0).find("#external nodeTemplate(testSystem,testNodeInd,any).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("input(testSystem,testNodeInd,position,coordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(delay,testSystem,testNodeInd,max,5,5).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("nodeCost(testSystem,testNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("metadataNode(accuracy,testSystem,testNodeInd,max,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(returnValues->at(3).at(0).find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
+  std::string toTest = std::string(returnValues->at(3)->at(0));
+  EXPECT_TRUE(toTest.find("#external nodeTemplate(testSystem,testNodeInd,any).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(testSystem,testNodeInd,position,coordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataNode(delay,testSystem,testNodeInd,max,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("nodeCost(testSystem,testNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataNode(accuracy,testSystem,testNodeInd,max,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(testSystem,testNodeInd,position,coordinatePositionRep,none).") != std::string::npos);
 
-  EXPECT_TRUE(returnValues->at(4).at(0) == "");
+  EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
 
 

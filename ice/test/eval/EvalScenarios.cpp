@@ -735,8 +735,8 @@ public:
 
           } else {
               metadatas.push_back("Delay");
-              metadataValues.push_back((i < 3 ? i : 3));
-              metadataValues2.push_back((i < 3 ? i : 3));
+              metadataValues.push_back(i);//(i < 3 ? i+2 : 5));
+              metadataValues2.push_back(i);//(i < 3 ? i+2 : 5));
               metadataGroundings.push_back("NodeDelayFixASPGrounding");
               metadatas.push_back("Cost");
               metadataValues.push_back(1);

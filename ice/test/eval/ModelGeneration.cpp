@@ -116,6 +116,11 @@ public:
     return M2 / (n - 1);
   }
 
+  double getMean()
+  {
+    return this->mean;
+  }
+
 private:
   int n = 0;
   double mean = 0;
@@ -298,13 +303,13 @@ public:
 
     // Initializing ASP
     supplementary::ClingWrapper asp;
-//    asp.addKnowledgeFile(path + "/asp/nodeComposition.lp");
     asp.addKnowledgeFile(path + "/asp/informationProcessing/processing.lp");
     asp.addKnowledgeFile(path + "/asp/informationProcessing/searchBottomUp.lp");
     if (global)
       asp.addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
     else
       asp.addKnowledgeFile(path + "/asp/informationProcessing/localOptimization.lp");
+    asp.setNoWarnings(true);
     asp.init();
 
     // Initializing OwlAPI

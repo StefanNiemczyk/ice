@@ -13,7 +13,7 @@
 	query(k).
 
 % select a theoretical map for each required map
-1 { before(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),tnode(k,SYSTEM,none,none,none),SCOPE,REP,0) : tmap(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),ENTITY_TYPE,SCOPE,REP,ENTITY2) } 1 :- 
+0 { before(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),tnode(k,SYSTEM,none,none,none),SCOPE,REP,0) : tmap(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),ENTITY_TYPE,SCOPE,REP,ENTITY2) } 1 :- 
 	requiredMap(SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2), 
 	query(k).
 

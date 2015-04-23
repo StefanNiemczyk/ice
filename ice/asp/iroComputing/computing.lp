@@ -7,9 +7,6 @@ simpleIro(NODE,SCOPE,REP1,REP2) :-
 	INPUTS = 1,
 	OUTPUTS = 1.
 
-
-
-
 hasRelatedEntity(REP) :-
 	representation(REP),
 	hasRelatedDimension(REP,_,_,_,_).
