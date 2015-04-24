@@ -30,7 +30,6 @@ RosCommunication::RosCommunication(std::weak_ptr<ICEngine> engine) :
 
 RosCommunication::~RosCommunication()
 {
-  this->worker.join();
 }
 
 void RosCommunication::init()
@@ -63,8 +62,11 @@ void RosCommunication::init()
 void RosCommunication::cleanUp()
 {
   Communication::cleanUp();
+  if (this->running == false)
+    return;
 
   this->running = false;
+  this->worker.join();
 }
 
 void RosCommunication::sendHeartbeat()
@@ -387,6 +389,12 @@ std::shared_ptr<InformationReceiver> RosCommunication::createReceiver(std::share
 
 void RosCommunication::sendCommand(const identifier receiverId, const RosCoordinationCommand command) const
 {
+  if (this->running == false)
+  {
+    this->_log->warn("Communication not initialized, message will not be send '%v'", RosCoordinationCommandString[command]);
+    return;
+  }
+
   ice_msgs::ICECoordination coordinationMsg;
   coordinationMsg.header.senderId.id.resize(16);
   std::copy(this->engineId.begin(), this->engineId.end(), coordinationMsg.header.senderId.id.begin());

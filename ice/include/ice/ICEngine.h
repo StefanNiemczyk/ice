@@ -31,6 +31,8 @@
 #include "ice/information/InformationStore.h"
 #include "ice/information/InformationType.h"
 #include "ice/information/StreamFactory.h"
+#include "ice/model/ProcessingModelGenerator.h"
+#include "ice/ontology/OntologyInterface.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/processing/Node.h"
 #include "ice/processing/NodeStore.h"
@@ -55,10 +57,10 @@ public:
    *
    * \param timeFactory The time factory to create time stamps.
    * \param streamFActory Factory to create information stream objects.
-   * \param id The unique universal identifier of this engine.
+   * \param iri The iri of this engine.
    * \param config The configuration object.
    */
-  ICEngine(std::shared_ptr<TimeFactory> timeFactory, std::shared_ptr<StreamFactory> streamFactory, std::string id = "",
+  ICEngine(std::shared_ptr<TimeFactory> timeFactory, std::shared_ptr<StreamFactory> streamFactory, std::string iri,
            std::shared_ptr<Configuration> config = std::make_shared<Configuration>());
 
   /*!
@@ -132,6 +134,20 @@ public:
   std::shared_ptr<StreamFactory> getStreamFactory();
 
   /*!
+   * \brief Returns the ontology interface.
+   *
+   * Returns the ontology interface.
+   */
+  std::shared_ptr<OntologyInterface> getOntologyInterface();
+
+  /*!
+   * \brief Returns the processing model generator.
+   *
+   * Returns the processing model generator.
+   */
+  std::shared_ptr<ProcessingModelGenerator> getProcessingModelGenerator();
+
+  /*!
    * \brief Reads a xml file and adds specified elements to the engine. Returns
    * true if successful, false otherwise.
    *
@@ -171,11 +187,14 @@ public:
    */
   identifier getId() const;
 
+  std::string getIri() const;
+
 private:
   int readXMLInformation(XMLInformation* information, const std::string namePrefix);
 
 private:
   identifier id; /**< The identifier of this engine */
+  const std::string iri; /**< The iri of this engine */
   bool initialized; /**< True if the engine is initialized, else false */
   std::shared_ptr<TimeFactory> timeFactory; /**< time factory to create time stamps */
   std::shared_ptr<Configuration> config; /**< The configuration object */
@@ -186,6 +205,8 @@ private:
   std::shared_ptr<Coordinator> coordinator; /**< Coordinator object which coordinates the cooperation */
   std::shared_ptr<StreamFactory> streamFactory; /**< Factory to create InformationStream objects */
   std::shared_ptr<ModelComperator> modelComperator; /**< Comparator to find similarities in different information model */
+  std::shared_ptr<OntologyInterface> ontologyInterface; /*< Interface to access the ontology */
+  std::shared_ptr<ProcessingModelGenerator> modelGenerator; /*< Processing model generator */
   std::mutex mtx_; /**< Mutex */
 };
 

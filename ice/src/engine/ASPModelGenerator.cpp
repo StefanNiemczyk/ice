@@ -5,63 +5,71 @@
  *      Author: sni
  */
 
-#include "ice/coordination/ASPCoordinator.h"
+#include "ice/model/aspModel/ASPModelGenerator.h"
 
 #include "ice/ICEngine.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/information/InformationStore.h"
+#include "ice/coordination/Coordinator.h"
+#include "ice/coordination/EngineState.h"
+#include "ice/model/aspModel/ASPSystem.h"
 #include "ice/processing/NodeStore.h"
+#include "ice/ontology/OntologyInterface.h"
 
 namespace ice
 {
 
-ASPCoordinator::ASPCoordinator(std::weak_ptr<ICEngine> engine, std::string const ownName)
+ASPModelGenerator::ASPModelGenerator(std::weak_ptr<ICEngine> engine) : ProcessingModelGenerator(engine)
 {
-  this->_log = el::Loggers::getLogger("ASPCoordinator");
+  this->_log = el::Loggers::getLogger("ASPModelGenerator");
   _log->verbose(1, "Constructor called");
-
-  auto en = engine.lock();
-  this->nodeStore = en->getNodeStore();
-  this->informationStore = en->getInformationStore();
 
   this->maxChainLength = 10;
   this->engine = engine;
   this->queryIndex = 0;
   this->groundingDirty = true;
-  this->self = this->getEngineStateByIRI(ownName);
   this->globalOptimization = true;
-
 }
 
-void ASPCoordinator::init()
+void ASPModelGenerator::init()
 {
   std::string path = ros::package::getPath("ice");
   _log->debug("Default ontology path %v", path.c_str());
 
+  auto en = engine.lock();
+  this->nodeStore = en->getNodeStore();
+  this->informationStore = en->getInformationStore();
+  this->ontology = en->getOntologyInterface();
+  this->coordinator = en->getCoordinator();
+  this->self = this->getASPSystemByIRI(en->getIri());
+
   // Initializing ASP
   this->asp = std::make_shared<supplementary::ClingWrapper>();
-  this->asp->addKnowledgeFile("../asp/informationProcessing/processing.lp");
-  this->asp->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+  this->asp->addKnowledgeFile(path + "/asp/informationProcessing/processing.lp");
+  this->asp->addKnowledgeFile(path + "/asp/informationProcessing/searchBottomUp.lp");
 
   if (this->globalOptimization)
-    this->asp->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+    this->asp->addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
   else
-    this->asp->addKnowledgeFile("../asp/informationProcessing/localOptimization.lp");
+    this->asp->addKnowledgeFile(path + "/asp/informationProcessing/localOptimization.lp");
 
   this->asp->setNoWarnings(true);
   this->asp->init();
-
-  // Initializing OwlAPI
-  this->ontology = std::make_shared<OntologyInterface>(path + "/java/lib/");
-  this->ontology->addIRIMapper(path + "/ontology/");
 }
 
-ASPCoordinator::~ASPCoordinator()
+void ASPModelGenerator::cleanUp()
+{
+  this->nodeStore.reset();
+  this->informationStore.reset();
+  this->ontology.reset();
+}
+
+ASPModelGenerator::~ASPModelGenerator()
 {
   // nothing to do here
 }
 
-void ASPCoordinator::optimizeInformationFlow()
+void ASPModelGenerator::createProcessingModel()
 {
   _log->verbose(1, "Start optimizing");
 
@@ -110,7 +118,7 @@ void ASPCoordinator::optimizeInformationFlow()
     // node(1,testSystem,testSourceNodeInd,testEntity1,none)
     std::vector<Gringo::Value> values;
     values.push_back(this->queryIndex);
-    values.push_back(std::string(this->self->getSystemIriShort()));
+    values.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
     values.push_back("?");
     values.push_back("?");
     values.push_back("?");
@@ -161,14 +169,14 @@ void ASPCoordinator::optimizeInformationFlow()
       // connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP))
       std::vector<Gringo::Value> nodeValues;
       nodeValues.push_back(this->queryIndex);
-      nodeValues.push_back(std::string(this->self->getSystemIriShort()));
+      nodeValues.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
       nodeValues.push_back(Gringo::Value(aspNode->name));
       nodeValues.push_back(Gringo::Value(nodeEntity));
       nodeValues.push_back(Gringo::Value(nodeEntity2));
 
       std::vector<Gringo::Value> streamValues;
       streamValues.push_back(this->queryIndex);
-      streamValues.push_back(std::string(this->self->getSystemIriShort()));
+      streamValues.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
       streamValues.push_back("?");
       streamValues.push_back("?");
       streamValues.push_back("?");
@@ -219,9 +227,9 @@ void ASPCoordinator::optimizeInformationFlow()
       // stream(1,testSystem,testSourceNodeInd,testSystem,information(testEntity1,testScope1,testRepresentation1,none),step)
       values.clear();
       values.push_back(this->queryIndex);
-      values.push_back(std::string(this->self->getSystemIriShort()));
+      values.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
       values.push_back(Gringo::Value(aspNode->name));
-      values.push_back(std::string(this->self->getSystemIriShort()));
+      values.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
       values.push_back("?");
       values.push_back("?");
 
@@ -284,7 +292,7 @@ void ASPCoordinator::optimizeInformationFlow()
   _log->verbose(1, "End optimizing");
 }
 
-void ASPCoordinator::readInfoStructureFromOntology()
+void ASPModelGenerator::readInfoStructureFromOntology()
 {
   _log->verbose(1, "Read information structure from ontology");
 
@@ -332,7 +340,7 @@ void ASPCoordinator::readInfoStructureFromOntology()
   this->groundingDirty = true;
 }
 
-void ASPCoordinator::readSystemsFromOntology()
+void ASPModelGenerator::readSystemsFromOntology()
 {
   _log->verbose(1, "Read systems from ontology");
 
@@ -350,12 +358,12 @@ void ASPCoordinator::readSystemsFromOntology()
     return;
   }
 
-  std::shared_ptr<EngineState> system;
+  std::shared_ptr<ASPSystem> system;
 
   for (auto ontSystem : *ontSystems)
   {
     _log->debug("Checking system " + std::string(ontSystem));
-    system = this->getEngineStateByIRI(ontSystem);
+    system = this->getASPSystemByIRI(ontSystem);
 
     auto nodes = this->ontology->readNodesAndIROsAsASP(ontSystem);
 
@@ -494,32 +502,33 @@ void ASPCoordinator::readSystemsFromOntology()
   }
 }
 
-std::shared_ptr<OntologyInterface> ASPCoordinator::getOntologyInterface()
+std::shared_ptr<OntologyInterface> ASPModelGenerator::getOntologyInterface()
 {
   return this->ontology;
 }
 
-std::shared_ptr<supplementary::ClingWrapper> ASPCoordinator::getClingWrapper()
+std::shared_ptr<supplementary::ClingWrapper> ASPModelGenerator::getClingWrapper()
 {
   return this->asp;
 }
 
-std::shared_ptr<EngineState> ASPCoordinator::getEngineStateByIRI(std::string p_iri)
+std::shared_ptr<ASPSystem> ASPModelGenerator::getASPSystemByIRI(std::string p_iri)
 {
   for (auto system : this->systems)
   {
-    if (system->getSystemIri() == p_iri)
+    if (system->getEngineState()->getSystemIri() == p_iri)
       return system;
   }
 
-  _log->info("New system found %v", p_iri.c_str());
-  std::shared_ptr<EngineState> system = std::make_shared<EngineState>(p_iri, this->engine);
+  _log->info("New asp system found %v", p_iri.c_str());
+
+  std::shared_ptr<ASPSystem> system = std::make_shared<ASPSystem>(this->engine, this->coordinator->getEngineState(p_iri));
   this->systems.push_back(system);
 
   return system;
 }
 
-std::map<std::string, std::string> ASPCoordinator::readConfiguration(std::string const config)
+std::map<std::string, std::string> ASPModelGenerator::readConfiguration(std::string const config)
 {
   std::map<std::string, std::string> configuration;
   std::stringstream ss(config);
@@ -540,7 +549,7 @@ std::map<std::string, std::string> ASPCoordinator::readConfiguration(std::string
   return configuration;
 }
 
-void ASPCoordinator::readMetadata(std::map<std::string, int>* metadata, const std::string provider,
+void ASPModelGenerator::readMetadata(std::map<std::string, int>* metadata, const std::string provider,
                                   const std::string sourceSystem, Gringo::Value information, Gringo::Value step)
 {
   // TODO read metadata from ontology
@@ -548,7 +557,7 @@ void ASPCoordinator::readMetadata(std::map<std::string, int>* metadata, const st
   this->readMetadata("accuracy", metadata, provider, sourceSystem, information, step);
 }
 
-void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *metadata, std::string const provider,
+void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int> *metadata, std::string const provider,
                                   std::string const sourceSystem, Gringo::Value information, Gringo::Value step)
 {
   // metadataStream(1,accuracy,stream(1,testSystem,testComputationalNodeInd,testSystem,information(testEntity1,testScope1,testRepresentation2,none),2),5)
@@ -559,7 +568,7 @@ void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *
 
   std::vector<Gringo::Value> valuesStream;
   valuesStream.push_back(this->queryIndex);
-  valuesStream.push_back(std::string(this->self->getSystemIriShort()));
+  valuesStream.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
   valuesStream.push_back(Gringo::Value(provider));
   valuesStream.push_back(Gringo::Value(sourceSystem));
   valuesStream.push_back(information);
@@ -600,13 +609,13 @@ void ASPCoordinator::readMetadata(std::string name, std::map<std::string, int> *
   (*metadata)[name] = value.num();
 }
 
-std::string ASPCoordinator::dataTypeForRepresentation(std::string representation)
+std::string ASPModelGenerator::dataTypeForRepresentation(std::string representation)
 {
   // TODO
   return representation;
 }
 
-std::shared_ptr<BaseInformationStream> ASPCoordinator::getStream(Gringo::Value info, std::string lastProcessing,
+std::shared_ptr<BaseInformationStream> ASPModelGenerator::getStream(Gringo::Value info, std::string lastProcessing,
                                                                  std::string sourceSystem, Gringo::Value step)
 {
   auto entity = *info.args()[0].name();

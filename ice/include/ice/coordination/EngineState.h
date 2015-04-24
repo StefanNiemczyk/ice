@@ -47,44 +47,6 @@ struct EngineConnection
   int delay;
 };
 
-//* ASPNodeState
-/**
- * Enum of states an ASP node.
- *
- */
-enum ASPElementState
-{
-  NEW_ELEMENT, ADDED_TO_ASP
-};
-
-//* ASPNodeType
-/**
- * Enum of ASP node types
- *
- */
-enum ASPElementType
-{
-  ASP_COMPUTATION_NODE, ASP_SOURCE_NODE, ASP_IRO_NODE, ASP_MAP_NODE, ASP_REQUIRED_STREAM, ASP_REQUIRED_MAP
-};
-const std::string ASPElementTypeNames[] {"ASP_COMPUTATION_NODE", "ASP_SOURCE_NODE", "ASP_IRO_NODE", "ASP_MAP_NODE",
-                                         "ASP_REQUIRED_STREAM", "ASP_REQUIRED_MAP"};
-
-//* ASPNode
-/**
- * This struct contains the asp informations of a node.
- *
- */
-struct ASPElement
-{
-  std::shared_ptr<supplementary::External> external;
-  std::string aspString;
-  std::string name;
-  std::string className;
-  std::map<std::string, std::string> config;
-  ASPElementState state;
-  ASPElementType type;
-};
-
 //* CooperationState
 /**
  * Enum of states of cooperation between two engines.
@@ -317,11 +279,6 @@ public:
    */
   void resetRetryCounter();
 
-  std::shared_ptr<ASPElement> getASPElementByName(ASPElementType type, std::string const name);
-  std::shared_ptr<ASPElement> getASPElementByName(std::string const name);
-
-  void addASPElement(std::shared_ptr<ASPElement> node);
-
   std::vector<std::shared_ptr<EngineConnection>> getConnections();
 
 private:
@@ -329,10 +286,6 @@ private:
   const std::string systemIri; /**< The iri of this system */
   CooperationState cooperationState; /**< State of the cooperation between this engine and the main engine */
   std::weak_ptr<ICEngine> engine; /**< The main engine */
-  std::vector<std::shared_ptr<ASPElement>> aspNodes; /**< Vector of asp nodes */
-  std::vector<std::shared_ptr<ASPElement>> aspSourceNodes; /**< Vector of asp source nodes */
-  std::vector<std::shared_ptr<ASPElement>> aspIro; /**< Vector of asp nodes */
-  std::vector<std::shared_ptr<ASPElement>> aspRequiredStreams; /**< Vector of asp nodes */
   std::shared_ptr<InformationModel> informationModel; /**< The information model of this engine */
   time timeLastActivity; /**< Time stamp of the last activity of this engine */
   time timeLastStateUpdate; /**< Time stamp of the last cooperation state update */

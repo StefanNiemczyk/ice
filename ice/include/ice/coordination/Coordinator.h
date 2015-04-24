@@ -83,6 +83,8 @@ public:
    */
   std::shared_ptr<EngineState> getEngineState(identifier engineId);
 
+  std::shared_ptr<EngineState> getEngineState(std::string p_iri);
+
   /*!
    * \brief This method should be called if a heartbeat from another engine is received.
    *
@@ -212,7 +214,7 @@ private:
 
 private:
   bool running; /**< True if the communication is running, else false */
-  std::thread worker; /**< Thread which sends the heartbeat and cyclic tests the engine states */
+  std::thread worker; /**< Thread which sends the heart beat and cyclic tests the engine states */
   std::weak_ptr<ICEngine> engine; /**< Weak pointer to the engine */
   std::shared_ptr<TimeFactory> timeFactory; /**< Time factory to create and compare time stamps */
   std::shared_ptr<Configuration> config; /**< Configuration object */

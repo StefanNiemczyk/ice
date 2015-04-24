@@ -41,6 +41,10 @@ enum RosCoordinationCommand
   COOPERATION_STOPPED //< Command that the cooperation has stopped
 };
 
+static const char* RosCoordinationCommandString[7] = {"REQUEST_INFORMATION_MODEL", "COOPERATION_ACCEPT",
+                                                      "COOPERATION_REFUSE",
+                                                       "NEGOTIATION_FINISHED", "NEGOTIATION_RETRY", "STOP_COOPERATION", "COOPERATION_STOPPED"};
+
 class RosCommunication : public Communication
 {
 public:

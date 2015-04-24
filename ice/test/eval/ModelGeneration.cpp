@@ -5,7 +5,8 @@
 
 #include "ice/TypeDefs.h"
 #include "ice/coordination/EngineState.h"
-#include "ice/coordination/OntologyInterface.h"
+#include "ice/ontology/OntologyInterface.h"
+#include "ice/model/aspModel/ASPSystem.h"
 
 #include "ClingWrapper.h"
 #include "External.h"

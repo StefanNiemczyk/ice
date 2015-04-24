@@ -1,31 +1,31 @@
 #include <gtest/gtest.h>
 
 #include "ice/ICEngine.h"
-#include "ice/coordination/ASPCoordinator.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/information/InformationStore.h"
+#include "ice/model/aspModel/ASPModelGenerator.h"
 
 #include "etc/EngineStuff.cpp"
 #include "etc/TestTime.cpp"
 
-TEST(ASPCoordinator, create)
+TEST(ASPModelGenerator, create)
 {
   ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
   ice::Node::registerNodeCreator("TestComputationalNodeGrounding", &SmothingNode::createNode);
 
   auto streamFactory = std::make_shared<TestFactory>();
   auto timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory);
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest#TestSystem");
   engine->init();
-  ice::ASPCoordinator coordinator(engine, "http://vs.uni-kassel.de/IceTest#TestSystem");
-  coordinator.init();
+//  ice::ASPModelGenerator coordinator(engine, );
+//  coordinator.init();
 
-  bool result = coordinator.getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
+  bool result = engine->getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
 
-  ASSERT_FALSE(coordinator.getOntologyInterface()->errorOccurred());
+  ASSERT_FALSE(engine->getOntologyInterface()->errorOccurred());
   ASSERT_TRUE(result);
 
-  coordinator.optimizeInformationFlow();
+  engine->getProcessingModelGenerator()->createProcessingModel();
   auto spec1 = ice::InformationSpecification("testEntity1", "testEntity", "testScope1", "testRepresentation1");
   auto spec2 = ice::InformationSpecification("testEntity1", "testEntity", "testScope1", "testRepresentation2");
 

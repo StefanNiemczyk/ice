@@ -35,8 +35,6 @@ Coordinator::Coordinator(std::weak_ptr<ICEngine> engine)
 Coordinator::~Coordinator()
 {
   _log->verbose(1, "Destructor called");
-  this->running = false;
-  this->worker.join();
 }
 
 void Coordinator::init()
@@ -57,23 +55,48 @@ void Coordinator::init()
 void Coordinator::cleanUp()
 {
   _log->verbose(1, "Clean up called");
-  std::lock_guard<std::mutex> guard(mtx_);
 
-  for (auto engineState : this->engineStates)
   {
-    this->stopCooperationWithEngine(engineState, true);
+    std::lock_guard<std::mutex> guard(mtx_);
+
+    if (this->running == false)
+      return;
+
+    this->running = false;
+
+    for (auto engineState : this->engineStates)
+    {
+      this->stopCooperationWithEngine(engineState, true);
+    }
+
+    this->communication.reset();
+    this->informationStore.reset();
   }
 
-  this->running = false;
-  this->communication.reset();
-  this->informationStore.reset();
-
   this->cv.notify_all();
+  this->worker.join();
+}
+
+std::shared_ptr<EngineState> Coordinator::getEngineState(std::string p_iri)
+{
+  std::lock_guard<std::mutex> guard(mtx_);
+
+  for (auto system : this->engineStates)
+  {
+    if (system->getSystemIri() == p_iri)
+      return system;
+  }
+
+  _log->info("New asp system found %v", p_iri.c_str());
+  std::shared_ptr<EngineState> system = std::make_shared<EngineState>(p_iri, this->engine);
+  this->engineStates.push_back(system);
+
+  return system;
 }
 
 std::shared_ptr<EngineState> Coordinator::getEngineState(identifier engineId)
 {
-  //std::lock_guard<std::mutex> guard(mtx_);
+  std::lock_guard<std::mutex> guard(mtx_);
 
   for (auto engineState : this->engineStates)
   {
@@ -926,7 +949,7 @@ void Coordinator::workerTask()
     {
       auto e = this->engine.lock();
       if (e)
-        _log->verbose(1, "Sending heartbeat %v, %v", counter, IDGenerator::toString(e->getId()).c_str());
+        _log->info("Sending heartbeat %v, %v", counter, std::string(e->getIri()));
     }
 
     {

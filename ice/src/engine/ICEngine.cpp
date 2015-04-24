@@ -7,31 +7,35 @@
 
 #include "ice/ICEngine.h"
 
+#include <ros/package.h>
+
+#include "ice/model/aspModel/ASPModelGenerator.h"
+
 namespace ice
 {
 
 ICEngine::ICEngine(std::shared_ptr<TimeFactory> timeFactory, std::shared_ptr<StreamFactory> streamFactory,
-                   std::string id, std::shared_ptr<Configuration> config)
+                   std::string iri, std::shared_ptr<Configuration> config) : iri(iri)
 {
   this->initialized = false;
   this->config = config;
   this->timeFactory = timeFactory;
   this->streamFactory = streamFactory;
 
-  if (id == "")
-    this->id = IDGenerator::getInstance()->getIdentifier();
-  else
-    this->id = IDGenerator::getInstance()->getIdentifier(id);
+  // TODO iri -> id
+
+  this->id = IDGenerator::getInstance()->getIdentifier();
 }
 
 ICEngine::~ICEngine()
 {
-//  this->coordinator->cleanUp();
-//  this->communication->cleanUp();
-  this->eventHandler;
-  this->informationStore;
-  this->nodeStore;
+  this->coordinator->cleanUp();
+  this->communication->cleanUp();
+//  this->eventHandler;
+//  this->informationStore;
+//  this->nodeStore;
 //  this->modelComperator;
+  this->modelGenerator->cleanUp();
 }
 
 void ICEngine::init()
@@ -44,16 +48,24 @@ void ICEngine::init()
   if (this->initialized)
     return;
 
-//  this->communication = std::make_shared<RosCommunication>(this->shared_from_this());
+  std::string path = ros::package::getPath("ice");
+
+  this->communication = std::make_shared<RosCommunication>(this->shared_from_this());
   this->eventHandler = std::make_shared<EventHandler>(this->shared_from_this());
   this->informationStore = std::make_shared<InformationStore>(this->shared_from_this());
   this->nodeStore = std::make_shared<NodeStore>(this->shared_from_this());
 //  this->modelComperator = std::make_shared<ModelComperator>();
-//  this->coordinator = std::make_shared<Coordinator>(this->shared_from_this());
+  this->coordinator = std::make_shared<Coordinator>(this->shared_from_this());
+  this->modelGenerator = std::make_shared<ASPModelGenerator>(this->shared_from_this());//TODO set method
+
+  // init ontology
+  this->ontologyInterface = std::make_shared<OntologyInterface>(path + "/java/lib/");
+  this->ontologyInterface->addIRIMapper(path + "/ontology/");
 
   // Initialize components
-//  this->coordinator->init();
-//  this->communication->init();
+  this->coordinator->init();
+  this->communication->init();
+  this->modelGenerator->init();
 
   this->initialized = true;
 }
@@ -96,6 +108,16 @@ std::shared_ptr<Coordinator> ICEngine::getCoordinator()
 std::shared_ptr<StreamFactory> ICEngine::getStreamFactory()
 {
   return this->streamFactory;
+}
+
+std::shared_ptr<OntologyInterface> ICEngine::getOntologyInterface()
+{
+  return this->ontologyInterface;
+}
+
+std::shared_ptr<ProcessingModelGenerator> ICEngine::getProcessingModelGenerator()
+{
+  return this->modelGenerator;
 }
 
 bool ICEngine::readFromFile(const std::string fileName)
@@ -321,6 +343,12 @@ bool ICEngine::readFromFiles(std::initializer_list<std::string> fileNameList)
 identifier ICEngine::getId() const
 {
   return this->id;
+}
+
+
+std::string ICEngine::getIri() const
+{
+  return this->iri;
 }
 
 int ICEngine::readXMLInformation(XMLInformation* information, const std::string namePrefix)

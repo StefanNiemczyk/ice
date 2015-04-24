@@ -5,7 +5,7 @@
  *      Author: sni
  */
 
-#include "ice/coordination/OntologyInterface.h"
+#include "ice/ontology/OntologyInterface.h"
 
 #include "easylogging++.h"
 

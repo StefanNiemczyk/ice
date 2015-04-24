@@ -4,7 +4,7 @@
 
 #include <ros/package.h>
 
-#include "ice/coordination/OntologyInterface.h"
+#include "ice/ontology/OntologyInterface.h"
 
 #include "gtest/gtest.h"
 
