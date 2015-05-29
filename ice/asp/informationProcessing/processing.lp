@@ -295,6 +295,7 @@ map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP_MAX+1) :-
 0 { selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP) : stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP) } 1 :- 
 	requiredStream(SYSTEM,INFO), query(k).	
 %:- requiredStream(SYSTEM,INFO), not selectedStream(k,SYSTEM,_,_,INFO,_), query(k).
+
 :~ requiredStream(SYSTEM,INFO), not selectedStream(k,SYSTEM,_,_,INFO,_), query(k). [1@5,requiredStream]
 %#minimize { 1@5,SYSTEM,INFO :  requiredStream(SYSTEM,INFO), not selectedStream(k,SYSTEM,_,_,INFO,_), query(k) }.
 %??? why?
@@ -320,6 +321,7 @@ map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP_MAX+1) :-
 %sumTransfer(k,SUM) :- SUM = #sum{ TRANSFER_COST,SYSTEM,STREAM : streamTransfer(k,SYSTEM,STREAM,_,TRANSFER_COST,_), query(k) }.
 %#minimize { SUM@priorityTransferCost : sumTransfer(k,SUM), query(k) }.
 #minimize { TRANSFER_COST@priorityTransferCost,SYSTEM,STREAM : streamTransfer(k,SYSTEM,STREAM,_,TRANSFER_COST,_), query(k) }.
+
 
 % cost
 sumCost(k,SUM_NODES) :- 

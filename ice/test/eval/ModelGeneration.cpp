@@ -22,6 +22,9 @@ struct ModelGenerationResult
   unsigned long long aspSatTime;
   unsigned long long aspUnsatTime;
   long aspModelCount;
+  long aspAtomCount;
+  long aspBodiesCount;
+  long aspAuxAtomCount;
   bool successful;
 
   void print()
@@ -36,6 +39,9 @@ struct ModelGenerationResult
     std::cout << "ASP Sat time\t\t" << aspSatTime << " ms" << std::endl;
     std::cout << "ASP unsat time\t\t" << aspUnsatTime << " ms" << std::endl;
     std::cout << "ASP model count\t\t" << aspModelCount << std::endl;
+    std::cout << "ASP atom count\t\t" << aspAtomCount << std::endl;
+    std::cout << "ASP bodies count\t\t" << aspBodiesCount << std::endl;
+    std::cout << "ASP aux atom count\t\t" << aspAuxAtomCount << std::endl;
   }
 };
 
@@ -56,6 +62,9 @@ struct ModelGenerationSeriesResult
   double aspSatTimeVar;
   double aspUnsatTimeVar;
   double aspModelCountVar;
+  double aspAtomCountVar;
+  double aspBodiesCountVar;
+  double aspAuxAtomCountVar;
 
   void print()
   {
@@ -78,6 +87,12 @@ struct ModelGenerationSeriesResult
            aspUnsatTimeVar, best.aspUnsatTime, worst.aspUnsatTime);
     printf("ASP Model Count        %10lu    (%10.3f var), %10lu    (best), %10lu    (worst)\n", avg.aspModelCount,
            aspModelCountVar, best.aspModelCount, worst.aspModelCount);
+    printf("ASP Atom Count         %10lu    (%10.3f var), %10lu    (best), %10lu    (worst)\n", avg.aspAtomCount,
+           aspAtomCountVar, best.aspAtomCount, worst.aspAtomCount);
+    printf("ASP Bodies Count       %10lu    (%10.3f var), %10lu    (best), %10lu    (worst)\n", avg.aspBodiesCount,
+           aspBodiesCountVar, best.aspBodiesCount, worst.aspBodiesCount);
+    printf("ASP Aux Atom Count     %10lu    (%10.3f var), %10lu    (best), %10lu    (worst)\n", avg.aspAuxAtomCount,
+           aspAuxAtomCountVar, best.aspAuxAtomCount, worst.aspAuxAtomCount);
   }
 };
 
@@ -158,7 +173,8 @@ public:
     result.aspSolvingTimeVar = 0;
 
     VarianceOnline totalTimeVar, ontologyReadTimeVar, ontologyReasonerTimeVar, ontologyToASPTimeVar,
-                   aspGroundingTimeVar, aspSolvingTimeVar, aspSatTimeVar, aspUnsatTimeVar, aspModelCountVar;
+                   aspGroundingTimeVar, aspSolvingTimeVar, aspSatTimeVar, aspUnsatTimeVar, aspModelCountVar,
+                   aspAtomCountVar, aspBodiesCountVar, aspAuxAtomCountVar;
 
     if (warmUp)
     {
@@ -197,6 +213,9 @@ public:
       aspSatTimeVar.add(r.aspSatTime);
       aspUnsatTimeVar.add(r.aspUnsatTime);
       aspModelCountVar.add(r.aspModelCount);
+      aspAtomCountVar.add(r.aspAtomCount);
+      aspBodiesCountVar.add(r.aspBodiesCount);
+      aspAuxAtomCountVar.add(r.aspAuxAtomCount);
 
       if (i == 0)
       {
@@ -215,6 +234,9 @@ public:
         result.avg.aspSatTime += r.aspSatTime;
         result.avg.aspUnsatTime += r.aspUnsatTime;
         result.avg.aspModelCount += r.aspModelCount;
+        result.avg.aspModelCount += r.aspAtomCount;
+        result.avg.aspModelCount += r.aspBodiesCount;
+        result.avg.aspModelCount += r.aspAuxAtomCount;
 
         if (r.totalTime < result.best.totalTime)
           result.best.totalTime = r.totalTime;
@@ -260,6 +282,21 @@ public:
           result.best.aspModelCount = r.aspModelCount;
         else if (r.aspModelCount > result.worst.aspModelCount)
           result.worst.aspModelCount = r.aspModelCount;
+
+        if (r.aspAtomCount < result.best.aspAtomCount)
+          result.best.aspAtomCount = r.aspAtomCount;
+        else if (r.aspAtomCount > result.worst.aspAtomCount)
+          result.worst.aspAtomCount = r.aspAtomCount;
+
+        if (r.aspBodiesCount < result.best.aspBodiesCount)
+          result.best.aspBodiesCount = r.aspBodiesCount;
+        else if (r.aspBodiesCount > result.worst.aspBodiesCount)
+          result.worst.aspBodiesCount = r.aspBodiesCount;
+
+        if (r.aspAuxAtomCount < result.best.aspAuxAtomCount)
+          result.best.aspAuxAtomCount = r.aspAuxAtomCount;
+        else if (r.aspAuxAtomCount > result.worst.aspAuxAtomCount)
+          result.worst.aspAuxAtomCount = r.aspAuxAtomCount;
       }
 
       end = std::chrono::system_clock::now();
@@ -277,6 +314,9 @@ public:
     result.aspSatTimeVar = aspSatTimeVar.getVariance();
     result.aspUnsatTimeVar = aspUnsatTimeVar.getVariance();
     result.aspModelCountVar = aspModelCountVar.getVariance();
+    result.aspAtomCountVar = aspAtomCountVar.getVariance();
+    result.aspBodiesCountVar = aspBodiesCountVar.getVariance();
+    result.aspAuxAtomCountVar = aspAuxAtomCountVar.getVariance();
 
     result.avg.totalTime /= p_count;
     result.avg.ontologyReadTime /= p_count;
@@ -287,6 +327,9 @@ public:
     result.avg.aspSatTime /= p_count;
     result.avg.aspUnsatTime /= p_count;
     result.avg.aspModelCount /= p_count;
+    result.avg.aspAtomCount /= p_count;
+    result.avg.aspBodiesCount /= p_count;
+    result.avg.aspAuxAtomCount /= p_count;
 
     return result;
   }
@@ -506,6 +549,9 @@ public:
     result.aspSatTime = asp.getSatTime();
     result.aspUnsatTime = asp.getUnsatTime();
     result.aspModelCount = asp.getModelCount();
+    result.aspModelCount = asp.getAtomCount();
+    result.aspModelCount = asp.getBodiesCount();
+    result.aspModelCount = asp.getAuxAtomsCount();
 
     if (solveResult == Gringo::SolveResult::SAT)
     {
@@ -528,7 +574,8 @@ public:
         {
           if (first)
           {
-            std::cout << std::endl << asp.toStringLastModel(false);
+            if (false == verbose)
+              std::cout << std::endl << asp.toStringLastModel(false);
             first = false;
           }
 
@@ -540,6 +587,7 @@ public:
     }
     else
     {
+      std::cout << "UNSAT" << std::endl;
       result.successful = false;
     }
 

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int iterations = 100000000;
+int iterations = 1000;
 
 class SimpleClass
 {

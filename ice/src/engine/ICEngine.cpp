@@ -23,6 +23,8 @@ ICEngine::ICEngine(std::shared_ptr<TimeFactory> timeFactory, std::shared_ptr<Str
   this->streamFactory = streamFactory;
 
   // TODO iri -> id
+  // TODO load ontology?
+  // id or iri? mapping?
 
   this->id = IDGenerator::getInstance()->getIdentifier();
 }

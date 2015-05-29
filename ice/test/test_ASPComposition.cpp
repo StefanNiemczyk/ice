@@ -107,7 +107,7 @@ TEST(ClingWrap, simpleTest)
 
   node1->assign(false);
   cw->solve();
-  cw->printLastModel();
+//  cw->printLastModel();
 
   EXPECT_EQ(false, cw->query("node(1,system1,node1,entity1,none)"));
   EXPECT_EQ(true, cw->query("node(1,system1,node2,entity1,none)"));
@@ -525,6 +525,90 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   EXPECT_EQ(true, cw->query("stream(1,system1,in3,system3,information(entity3,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("metadataMap(1,accuracy,map(1,system1,mapNode,type,scope1,rep1,none,3),102)"));
   EXPECT_EQ(true, cw->query("metadataMap(1,delay,map(1,system1,mapNode,type,scope1,rep1,none,3),4001)"));
+}
+
+
+TEST(ClingWrap, noInputTest)
+{
+  std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
+  cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->init();
+
+  // ontology
+  cw->add("base", {}, "entityType(robot).");
+  cw->add("base", {}, "scope(scope1).");
+  cw->add("base", {}, "representation(rep1).");
+  cw->add("base", {}, "hasScope(robot,scope1).");
+  cw->add("base", {}, "hasRepresentation(scope1,rep1).");
+
+
+  cw->ground("base", {});
+
+  // entities
+  cw->ground("entity", {"entity1", "robot"});
+
+  // systems
+  auto system1 = cw->getExternal("system", {"system1", 100}, true);
+
+  // inputs
+  cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
+  auto input1 = cw->getExternal("sourceNode", {"system1", "in1", "entity1"}, true);
+
+  // requireds
+  auto required = cw->getExternal("requiredStream", {"system1", Gringo::Value("information", {"entity1", "scope1",
+                                                                                              "rep1", "none"})},
+                                  "requiredStream", {"system1", Gringo::Value("information", {"entity1", "scope1",
+                                                                                              "rep1", "none"}),
+                                                     10000, -100},
+                                  true);
+
+  // add node1
+  cw->add("node1", {}, "#external nodeTemplate(system1,node1,any).");
+  auto node1 = cw->getExternal("nodeTemplate", {"system1", "node1", "any"}, "node1", {}, true);
+  cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
+  cw->add("node1", {}, "output(system1,node1,scope1,rep1,none).");
+  cw->add("node1", {}, "metadataNode(delay,system1,node1,min,1,0).");
+  cw->add("node1", {}, "nodeCost(system1,node1,1).");
+  cw->add("node1", {}, "metadataNode(accuracy,system1,node1,min,5,0).");
+  cw->ground("node1", {});
+
+  // add node2
+  cw->add("node2", {}, "#external nodeTemplate(system1,node2,any).");
+  auto node2 = cw->getExternal("nodeTemplate", {"system1", "node2", "any"}, "node2", {}, true);
+  cw->add("node2", {}, "input(system1,node2,scope1,rep1,none,1,1) :- nodeTemplate(system1,node2,any).");
+  cw->add("node2", {}, "output(system1,node2,scope1,rep1,none).");
+  cw->add("node2", {}, "metadataNode(delay,system1,node2,min,1,0).");
+  cw->add("node2", {}, "nodeCost(system1,node2,1).");
+  cw->add("node2", {}, "metadataNode(accuracy,system1,node2,min,5,0).");
+  cw->ground("node2", {});
+
+  // add node3
+  cw->add("node3", {}, "#external nodeTemplate(system1,node3,any).");
+  auto node3 = cw->getExternal("nodeTemplate", {"system1", "node3", "any"}, "node3", {}, true);
+  cw->add("node3", {}, "input(system1,node3,scope1,rep1,none,1,1) :- nodeTemplate(system1,node3,any).");
+  cw->add("node3", {}, "output(system1,node3,scope1,rep1,none).");
+  cw->add("node3", {}, "metadataNode(delay,system1,node3,min,1,0).");
+  cw->add("node3", {}, "nodeCost(system1,node3,1).");
+  cw->add("node3", {}, "metadataNode(accuracy,system1,node3,min,1,2).");
+  cw->ground("node3", {});
+
+  auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
+
+  cw->solve();
+//  cw->printLastModel();
+
+  EXPECT_EQ(true, cw->query("node(1,system1,in1,entity1,none)"));
+  EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
+  EXPECT_EQ(true, cw->query("node(1,system1,node2,entity1,none)"));
+  EXPECT_EQ(true, cw->query("node(1,system1,node3,entity1,none)"));
+  // metadataStream(1,accuracy,system1,node2,system1,information(entity1,scope1,rep1,none),2,94
+//  bool result = cw->query("metadataStream(1,accuracy,stream(1,system1,node2,system1,information(entity1,scope1,rep1,none),3),98)");
+//  result |= cw->query("metadataStream(1,accuracy,stream(1,system1,node3,system1,information(entity1,scope1,rep1,none),3),98)");
+//
+//  EXPECT_EQ(true, result);
+//  EXPECT_EQ(true, cw->query("sumCost(1,11)"));
 }
 
 TEST(ClingWrap, simpleChainTest)

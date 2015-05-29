@@ -41,6 +41,8 @@ MIN { before(TNODE,tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),information(ENTIT
 % flag node as to used
 flagged(k,TNODE,S+1) :- before(TNODE,_,_,S), query(k).
 flagged(k,TMAPNODE,S+1) :- before(TMAPNODE,_,_,_,S), query(k).
+%:- flagged(k,TNODE,S1), flagged(k,TNODE,S2), S1 != S2.
+%:- before(TNODE1,TNODE2,_,_), before(TNODE2,TNODE1,_,_).
 
 
 % each flagged node will be instanced
@@ -82,9 +84,10 @@ iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP3) :- iroChain(ENTITY,SCOPE,ENTITY2,REP1,R
 iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP2) :-
 	before(tnode(k,SYSTEM,NODE2,ENTITY,ENTITY2), tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),_,_),
 	iro(SYSTEM,NODE,_,_),
+	iro(SYSTEM,NODE2,_,_),
 	stream(k,SYSTEM,_,_,information(ENTITY,SCOPE,REP2,ENTITY2),STEP+1),
 	stream(k,SYSTEM,_,_,information(ENTITY,SCOPE,REP1,ENTITY2),STEP),
 	REP2 != REP1.
 
-:- iroChain(ENTITY,SCOPE,ENTITY2,REP,REP,S).
+:- iroChain(ENTITY,SCOPE,ENTITY2,REP,REP).
 *%

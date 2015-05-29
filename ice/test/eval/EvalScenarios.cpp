@@ -232,6 +232,7 @@ public:
         auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, chainSize,
             [this] (supplementary::ClingWrapper *asp){
           this->lambda(asp);
+          asp->setModelCount(0);
   //            asp->setParallelMode(4);
   //        asp->setSaveProgress(0);
 //              asp->setPredefConfiguration(supplementary::PredefinedConfigurations::crafty);
@@ -263,7 +264,7 @@ public:
             << "\t" << result.worst.aspSatTime;
         file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
             << "\t" << result.worst.aspUnsatTime;
-        file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspSatTime
+        file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount
             << "\t" << result.worst.aspModelCount << std::endl;
 
         // gnuplot -persist -e "set hidden3d; set dgrid3d 20,20 qnorm 2; splot './results1-10_1-10.txt' using 1:2:5 with lines"
@@ -516,7 +517,7 @@ public:
         ss << "sumCost(1,2)";
         toCheck.push_back(ss.str());
 
-        auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, reps+1,
+        auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, reps,
             [this] (supplementary::ClingWrapper *asp){
           this->lambda(asp);
           asp->setModelCount(0);
@@ -547,7 +548,7 @@ public:
             << "\t" << result.worst.aspSatTime;
         file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
             << "\t" << result.worst.aspUnsatTime;
-        file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspSatTime
+        file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount
             << "\t" << result.worst.aspModelCount << std::endl;
 
         // gnuplot -persist -e "plot './results3-10.txt' using 1:4 with lines"
@@ -568,7 +569,7 @@ public:
       system(ss.str().c_str());
   }
 
-  void systemsStarMashScenario(bool global, bool verbose, bool gnuplot, int runs, int systemSizeMin,
+  void systemsStarMashScenario(bool global, bool verbose, bool gnuplot, int runs, bool neutrality, int systemSizeMin,
                               int systemSizeMax, int systemSizeStep)
   {
     std::string path = ros::package::getPath("ice");
@@ -591,7 +592,7 @@ public:
 
       ss.str("");
       ss << this->logPath << "/systemsStarMashScenario_" << (global ? "global" : "local") << "_"
-          << systemSizeMin << "-" << systemSizeMax << ".txt";
+          << (neutrality ? "neutrality_" : "") << systemSizeMin << "-" << systemSizeMax << ".txt";
       std::string pathStr = ss.str();
       file.open(pathStr);
 
@@ -735,8 +736,14 @@ public:
 
           } else {
               metadatas.push_back("Delay");
-              metadataValues.push_back(i);//(i < 3 ? i+2 : 5));
-              metadataValues2.push_back(i);//(i < 3 ? i+2 : 5));
+              if (neutrality)
+              {
+                metadataValues.push_back(i < 3 ? i : 3);
+                metadataValues2.push_back(i < 3 ? i : 3);
+              } else {
+                metadataValues.push_back(i);
+                metadataValues2.push_back(i);
+              }
               metadataGroundings.push_back("NodeDelayFixASPGrounding");
               metadatas.push_back("Cost");
               metadataValues.push_back(1);
@@ -810,6 +817,7 @@ public:
             asp->add("base",{},ss.str());
           }
 
+          asp->setModelCount(0);
     //      asp->setPredefConfiguration(supplementary::PredefinedConfigurations::jumpy);
     //      asp->setOptStrategie(3);
         });
@@ -836,8 +844,14 @@ public:
             << "\t" << result.worst.aspSatTime;
         file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
             << "\t" << result.worst.aspUnsatTime;
-        file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspSatTime
-            << "\t" << result.worst.aspModelCount << std::endl;
+        file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount
+            << "\t" << result.worst.aspModelCount;
+        file << result.avg.aspAtomCount << "\t" << result.aspAtomCountVar << "\t" << result.best.aspAtomCount
+            << "\t" << result.worst.aspAtomCount;
+        file << result.avg.aspBodiesCount << "\t" << result.aspBodiesCountVar << "\t" << result.best.aspBodiesCount
+            << "\t" << result.worst.aspBodiesCount;
+        file << result.avg.aspAuxAtomCount << "\t" << result.aspAuxAtomCountVar << "\t" << result.best.aspAuxAtomCount
+            << "\t" << result.worst.aspAuxAtomCount << std::endl;
 
         // gnuplot -persist -e "plot './results_systems50-500.txt' u 1:4 w l t 'sum', './results_systems50-500.txt' u 1:20 w l t 'grounding', './results_systems50-500.txt' u 1:(\$20 + \$24) w l t 'solving'"
         file.flush();
@@ -1138,7 +1152,7 @@ public:
           << "\t" << result.worst.aspSatTime;
       file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
           << "\t" << result.worst.aspUnsatTime;
-      file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspSatTime
+      file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount
           << "\t" << result.worst.aspModelCount << std::endl;
 
       // gnuplot -persist -e "plot './results_systems50-500.txt' u 1:4 w l t 'sum', './results_systems50-500.txt' u 1:20 w l t 'grounding', './results_systems50-500.txt' u 1:(\$20 + \$24) w l t 'solving'"
