@@ -259,13 +259,19 @@ public:
         file << result.avg.aspGroundingTime << "\t" << result.aspGroundingTimeVar << "\t" << result.best.aspGroundingTime
             << "\t" << result.worst.aspGroundingTime << "\t";
         file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime
-            << "\t" << result.worst.aspSolvingTime;
+            << "\t" << result.worst.aspSolvingTime << "\t";
         file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime
-            << "\t" << result.worst.aspSatTime;
+            << "\t" << result.worst.aspSatTime << "\t";
         file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
-            << "\t" << result.worst.aspUnsatTime;
+            << "\t" << result.worst.aspUnsatTime << "\t";
         file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount
-            << "\t" << result.worst.aspModelCount << std::endl;
+            << "\t" << result.worst.aspModelCount << "\t";
+        file << result.avg.aspAtomCount << "\t" << result.aspAtomCountVar << "\t" << result.best.aspAtomCount
+            << "\t" << result.worst.aspAtomCount << "\t";
+        file << result.avg.aspBodiesCount << "\t" << result.aspBodiesCountVar << "\t" << result.best.aspBodiesCount
+            << "\t" << result.worst.aspBodiesCount << "\t";
+        file << result.avg.aspAuxAtomCount << "\t" << result.aspAuxAtomCountVar << "\t" << result.best.aspAuxAtomCount
+            << "\t" << result.worst.aspAuxAtomCount << std::endl;
 
         // gnuplot -persist -e "set hidden3d; set dgrid3d 20,20 qnorm 2; splot './results1-10_1-10.txt' using 1:2:5 with lines"
         file.flush();
@@ -543,13 +549,19 @@ public:
         file << result.avg.aspGroundingTime << "\t" << result.aspGroundingTimeVar << "\t" << result.best.aspGroundingTime
             << "\t" << result.worst.aspGroundingTime << "\t";
         file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
-            << result.worst.aspSolvingTime;
+            << result.worst.aspSolvingTime << "\t";
         file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime
-            << "\t" << result.worst.aspSatTime;
+            << "\t" << result.worst.aspSatTime << "\t";
         file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
-            << "\t" << result.worst.aspUnsatTime;
+            << "\t" << result.worst.aspUnsatTime << "\t";
         file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount
-            << "\t" << result.worst.aspModelCount << std::endl;
+            << "\t" << result.worst.aspModelCount << "\t";
+        file << result.avg.aspAtomCount << "\t" << result.aspAtomCountVar << "\t" << result.best.aspAtomCount
+            << "\t" << result.worst.aspAtomCount << "\t";
+        file << result.avg.aspBodiesCount << "\t" << result.aspBodiesCountVar << "\t" << result.best.aspBodiesCount
+            << "\t" << result.worst.aspBodiesCount << "\t";
+        file << result.avg.aspAuxAtomCount << "\t" << result.aspAuxAtomCountVar << "\t" << result.best.aspAuxAtomCount
+            << "\t" << result.worst.aspAuxAtomCount << std::endl;
 
         // gnuplot -persist -e "plot './results3-10.txt' using 1:4 with lines"
         file.flush();
@@ -839,17 +851,17 @@ public:
         file << result.avg.aspGroundingTime << "\t" << result.aspGroundingTimeVar << "\t" << result.best.aspGroundingTime
             << "\t" << result.worst.aspGroundingTime << "\t";
         file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
-            << result.worst.aspSolvingTime;
+            << result.worst.aspSolvingTime << "\t";
         file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime
-            << "\t" << result.worst.aspSatTime;
+            << "\t" << result.worst.aspSatTime << "\t";
         file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
-            << "\t" << result.worst.aspUnsatTime;
+            << "\t" << result.worst.aspUnsatTime << "\t";
         file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount
-            << "\t" << result.worst.aspModelCount;
+            << "\t" << result.worst.aspModelCount << "\t";
         file << result.avg.aspAtomCount << "\t" << result.aspAtomCountVar << "\t" << result.best.aspAtomCount
-            << "\t" << result.worst.aspAtomCount;
+            << "\t" << result.worst.aspAtomCount << "\t";
         file << result.avg.aspBodiesCount << "\t" << result.aspBodiesCountVar << "\t" << result.best.aspBodiesCount
-            << "\t" << result.worst.aspBodiesCount;
+            << "\t" << result.worst.aspBodiesCount << "\t";
         file << result.avg.aspAuxAtomCount << "\t" << result.aspAuxAtomCountVar << "\t" << result.best.aspAuxAtomCount
             << "\t" << result.worst.aspAuxAtomCount << std::endl;
 
@@ -1147,13 +1159,19 @@ public:
       file << result.avg.aspGroundingTime << "\t" << result.aspGroundingTimeVar << "\t" << result.best.aspGroundingTime
           << "\t" << result.worst.aspGroundingTime << "\t";
       file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
-          << result.worst.aspSolvingTime;
+          << result.worst.aspSolvingTime << "\t";
       file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime
-          << "\t" << result.worst.aspSatTime;
+          << "\t" << result.worst.aspSatTime << "\t";
       file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
-          << "\t" << result.worst.aspUnsatTime;
+          << "\t" << result.worst.aspUnsatTime << "\t";
       file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount
-          << "\t" << result.worst.aspModelCount << std::endl;
+          << "\t" << result.worst.aspModelCount << "\t";
+      file << result.avg.aspAtomCount << "\t" << result.aspAtomCountVar << "\t" << result.best.aspAtomCount
+          << "\t" << result.worst.aspAtomCount << "\t";
+      file << result.avg.aspBodiesCount << "\t" << result.aspBodiesCountVar << "\t" << result.best.aspBodiesCount
+          << "\t" << result.worst.aspBodiesCount << "\t";
+      file << result.avg.aspAuxAtomCount << "\t" << result.aspAuxAtomCountVar << "\t" << result.best.aspAuxAtomCount
+          << "\t" << result.worst.aspAuxAtomCount << std::endl;
 
       // gnuplot -persist -e "plot './results_systems50-500.txt' u 1:4 w l t 'sum', './results_systems50-500.txt' u 1:20 w l t 'grounding', './results_systems50-500.txt' u 1:(\$20 + \$24) w l t 'solving'"
       file.flush();

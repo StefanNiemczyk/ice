@@ -40,8 +40,8 @@ struct ModelGenerationResult
     std::cout << "ASP unsat time\t\t" << aspUnsatTime << " ms" << std::endl;
     std::cout << "ASP model count\t\t" << aspModelCount << std::endl;
     std::cout << "ASP atom count\t\t" << aspAtomCount << std::endl;
-    std::cout << "ASP bodies count\t\t" << aspBodiesCount << std::endl;
-    std::cout << "ASP aux atom count\t\t" << aspAuxAtomCount << std::endl;
+    std::cout << "ASP bodies count\t" << aspBodiesCount << std::endl;
+    std::cout << "ASP aux atom count\t" << aspAuxAtomCount << std::endl;
   }
 };
 
@@ -234,9 +234,9 @@ public:
         result.avg.aspSatTime += r.aspSatTime;
         result.avg.aspUnsatTime += r.aspUnsatTime;
         result.avg.aspModelCount += r.aspModelCount;
-        result.avg.aspModelCount += r.aspAtomCount;
-        result.avg.aspModelCount += r.aspBodiesCount;
-        result.avg.aspModelCount += r.aspAuxAtomCount;
+        result.avg.aspAtomCount += r.aspAtomCount;
+        result.avg.aspBodiesCount += r.aspBodiesCount;
+        result.avg.aspAuxAtomCount += r.aspAuxAtomCount;
 
         if (r.totalTime < result.best.totalTime)
           result.best.totalTime = r.totalTime;
@@ -549,9 +549,9 @@ public:
     result.aspSatTime = asp.getSatTime();
     result.aspUnsatTime = asp.getUnsatTime();
     result.aspModelCount = asp.getModelCount();
-    result.aspModelCount = asp.getAtomCount();
-    result.aspModelCount = asp.getBodiesCount();
-    result.aspModelCount = asp.getAuxAtomsCount();
+    result.aspAtomCount = asp.getAtomCount();
+    result.aspBodiesCount = asp.getBodiesCount();
+    result.aspAuxAtomCount = asp.getAuxAtomsCount();
 
     if (solveResult == Gringo::SolveResult::SAT)
     {
