@@ -1138,6 +1138,7 @@ public:
           asp->add("base",{},ss.str());
         }
 
+        asp->setModelCount(0);
 //        asp->setPredefConfiguration(supplementary::PredefinedConfigurations::trendy);
   //      asp->setOptStrategie(3);
       });
