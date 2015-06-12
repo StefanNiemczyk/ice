@@ -42,7 +42,7 @@ heuristic(k,tstream(k,SYSTEM,tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO),METADATA
 	SUM = FIX_VALUE+(MAX-MIN+1)*MOD_VALUE.
 
 
-% see raveling salespersons problem for details
+% see traveling salespersons problem for details
 %order(X,C1,C2) :- outcost(X,(C1;C2)), C1 < C2, C <= C1 : outcost(X,C), C < C2.
 order(k,SYSTEM,METADATA,INFO,C1,C2) :- 
 	metadata(METADATA,_),

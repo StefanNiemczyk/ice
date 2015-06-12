@@ -191,7 +191,7 @@ public:
         oi.addRequiredStream(reqStream, stream, system, entity, "");
 
         ss.str("");
-        ss << "/tmp/evalChain" << chainSize << "_" << nodes << ".owl";
+        ss << "/tmp/chainScenario_" << (global ? "global" : "local") << chainSize << "_" << nodes << ".owl";
         std::string fileName = ss.str();
         oi.saveOntology(fileName);
 
@@ -232,7 +232,7 @@ public:
         auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, chainSize,
             [this] (supplementary::ClingWrapper *asp){
           this->lambda(asp);
-          asp->setModelCount(0);
+//          asp->setModelCount(0);
   //            asp->setParallelMode(4);
   //        asp->setSaveProgress(0);
 //              asp->setPredefConfiguration(supplementary::PredefinedConfigurations::crafty);
@@ -489,7 +489,7 @@ public:
         oi.addRequiredStream(reqStream, stream, system, entity, "");
 
         ss.str("");
-        ss << "/tmp/evalReps" << reps << ".owl";
+        ss << "/tmp/representationScenario_" << (global ? "global" : "local") << "_" << reps << ".owl";
         std::string fileName = ss.str();
         oi.saveOntology(fileName);
 
@@ -526,10 +526,10 @@ public:
         auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, reps,
             [this] (supplementary::ClingWrapper *asp){
           this->lambda(asp);
-          asp->setModelCount(0);
+//          asp->setModelCount(0);
     //        asp->setSaveProgress(200);
     //      asp->add("base",{},"stream(1,evalSystem,evalNodeSourceInd,evalSystem,information(evalEntity,evalScope,evalRepresentation0,none)).");
-    //      asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
+//          asp->setPredefConfiguration(supplementary::PredefinedConfigurations::crafty);
         });
 
         result.print();
@@ -582,7 +582,7 @@ public:
   }
 
   void systemsStarMashScenario(bool global, bool verbose, bool gnuplot, int runs, bool neutrality, int systemSizeMin,
-                              int systemSizeMax, int systemSizeStep)
+                              int systemSizeMax, int systemSizeStep, int inputSizeMin, int inputSizeMax, int inputSizeStep)
   {
     std::string path = ros::package::getPath("ice");
       std::vector<std::string> inputs;
@@ -604,7 +604,8 @@ public:
 
       ss.str("");
       ss << this->logPath << "/systemsStarMashScenario_" << (global ? "global" : "local") << "_"
-          << (neutrality ? "neutrality_" : "") << systemSizeMin << "-" << systemSizeMax << ".txt";
+          << (neutrality ? "neutrality_" : "") << systemSizeMin << "-" << systemSizeMax
+          << "_" << inputSizeMin << "-" << inputSizeMax << ".txt";
       std::string pathStr = ss.str();
       file.open(pathStr);
 
@@ -613,96 +614,11 @@ public:
       std::string superValueScope = "SuperEvalValueScope";
       std::string superRepresentation = "SuperRepresentation";
 
-      for (int systems = systemSizeMin; systems <= systemSizeMax; systems += systemSizeStep)
+    for (int systems = systemSizeMin; systems <= systemSizeMax; systems += systemSizeStep)
+    {
+      for (int inputsCount = inputSizeMin; inputsCount <= inputSizeMax && inputsCount < systems; inputsCount +=
+          inputSizeStep)
       {
-        inputs.clear();
-        inputsMin.clear();
-        inputsMax.clear();
-        outputs.clear();
-        outputsMin.clear();
-        outputsMax.clear();
-        metadatas.clear();
-        metadataValues.clear();
-        metadataValues2.clear();
-        metadataGroundings.clear();
-
-        std::cout << std::endl;
-        std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
-        std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
-        std::cout << "Starting eval " << systems << " systems" << std::endl << std::endl;
-
-
-        ice::OntologyInterface oi(path + "/java/lib/");
-
-        oi.addIRIMapper(path + "/ontology/");
-        oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
-        oi.loadOntologies();
-
-        // add information structure
-        std::vector<std::string> scopes;
-
-
-        ss.str("");
-        ss << "EvalScope";
-        std::string scope = ss.str();
-        ss.str("");
-        ss << "EvalValueScope";
-        std::string valueScope = ss.str();
-
-        oi.addValueScope(superValueScope, valueScope);
-
-        std::vector<std::string> reps;
-        ss.str("");
-        ss << "ReqRepresentation";
-        std::string representation = ss.str();
-
-        std::vector<std::string> vec;
-        vec.push_back(valueScope);
-        oi.addRepresentation(superRepresentation, representation, vec);
-        reps.push_back(representation);
-
-        ss.str("");
-        ss << "EvalRepresentation";
-        representation = ss.str();
-
-        oi.addRepresentation(superRepresentation, representation, vec);
-        reps.push_back(representation);
-
-        oi.addEntityScope(scope, reps);
-
-        scopes.push_back(scope);
-        oi.addEntityType(entityType, scopes);
-        oi.addIndividual(entity, entityType);
-
-        // Add source stream
-        ss.str("");
-        ss << "EvalSourceStream";
-        std::string stream = ss.str();
-
-        oi.addNamedStream(stream, scope, representation);
-
-        // Add eval node
-        outputs.push_back("EvalSourceStream");
-        outputsMin.push_back(1);
-        outputsMax.push_back(1);
-
-        std::string node = "EvalNodeSource";
-        oi.addSourceNodeClass(node, outputs, outputsMin, outputsMax);
-
-        // Add req stream
-        stream = "EvalStream";
-    //    reps.clear();
-    //    reps.push_back(representation);
-    //    oi.addEntityScope(scope, reps);
-
-        oi.addNamedStream(stream, scope, "ReqRepresentation");
-
-
-        for (int i = 0; i < systems; ++i)
-        {
-          ss.str("");
-          ss << "EvalNode" << i;
-          node = ss.str();
           inputs.clear();
           inputsMin.clear();
           inputsMax.clear();
@@ -714,159 +630,250 @@ public:
           metadataValues2.clear();
           metadataGroundings.clear();
 
+          std::cout << std::endl;
+          std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
+          std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
+          std::cout << "Starting eval " << systems << " systems and " << inputsCount << " inputs" << std::endl << std::endl;
+
+
+          ice::OntologyInterface oi(path + "/java/lib/");
+
+          oi.addIRIMapper(path + "/ontology/");
+          oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+          oi.loadOntologies();
+
+          // add information structure
+          std::vector<std::string> scopes;
+
+
           ss.str("");
-          ss << "EvalSystem" << i;
-          std::string system = ss.str();
-          oi.addSystem(system);
+          ss << "EvalScope";
+          std::string scope = ss.str();
+          ss.str("");
+          ss << "EvalValueScope";
+          std::string valueScope = ss.str();
 
-          if (i == 0)
+          oi.addValueScope(superValueScope, valueScope);
+
+          std::vector<std::string> reps;
+          ss.str("");
+          ss << "ReqRepresentation";
+          std::string representation = ss.str();
+
+          std::vector<std::string> vec;
+          vec.push_back(valueScope);
+          oi.addRepresentation(superRepresentation, representation, vec);
+          reps.push_back(representation);
+
+          ss.str("");
+          ss << "EvalRepresentation";
+          representation = ss.str();
+
+          oi.addRepresentation(superRepresentation, representation, vec);
+          reps.push_back(representation);
+
+          oi.addEntityScope(scope, reps);
+
+          scopes.push_back(scope);
+          oi.addEntityType(entityType, scopes);
+          oi.addIndividual(entity, entityType);
+
+          // Add source stream
+          ss.str("");
+          ss << "EvalSourceStream";
+          std::string stream = ss.str();
+
+          oi.addNamedStream(stream, scope, representation);
+
+          // Add eval node
+          outputs.push_back("EvalSourceStream");
+          outputsMin.push_back(1);
+          outputsMax.push_back(1);
+
+          std::string node = "EvalNodeSource";
+          oi.addSourceNodeClass(node, outputs, outputsMin, outputsMax);
+
+          // Add req stream
+          stream = "EvalStream";
+      //    reps.clear();
+      //    reps.push_back(representation);
+      //    oi.addEntityScope(scope, reps);
+
+          oi.addNamedStream(stream, scope, "ReqRepresentation");
+
+
+          for (int i = 0; i < systems; ++i)
           {
-            inputs.push_back("EvalSourceStream");
-            inputsMin.push_back(2);
-            inputsMax.push_back(2);
-            outputs.push_back("EvalStream");
-            outputsMin.push_back(1);
-            outputsMax.push_back(1);
+            ss.str("");
+            ss << "EvalNode" << i;
+            node = ss.str();
+            inputs.clear();
+            inputsMin.clear();
+            inputsMax.clear();
+            outputs.clear();
+            outputsMin.clear();
+            outputsMax.clear();
+            metadatas.clear();
+            metadataValues.clear();
+            metadataValues2.clear();
+            metadataGroundings.clear();
 
-            oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
+            ss.str("");
+            ss << "EvalSystem" << i;
+            std::string system = ss.str();
+            oi.addSystem(system);
 
-            metadatas.push_back("Delay");
-            metadataValues.push_back(1);
-            metadataValues2.push_back(1);
-            metadataGroundings.push_back("NodeDelayASPGrounding");
-            metadatas.push_back("Cost");
-            metadataValues.push_back(1);
-            metadataValues2.push_back(1);
-            metadataGroundings.push_back("NodeCostASPGrounding");
-    //        metadatas.push_back("Accuracy");
-    //        metadataValues.push_back(0);
-    //        metadataValues2.push_back(0);
-    //        metadataGroundings.push_back("NodeAccuracyMaxASPGrounding");
+            if (i == 0)
+            {
+              inputs.push_back("EvalSourceStream");
+              inputsMin.push_back(inputsCount);
+              inputsMax.push_back(inputsCount);
+              outputs.push_back("EvalStream");
+              outputsMin.push_back(1);
+              outputsMax.push_back(1);
 
-            oi.addNodeIndividual(node + "Ind", node, system, "", "", metadatas, metadataValues, metadataValues2,
-                                 metadataGroundings);
+              oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
 
-          } else {
               metadatas.push_back("Delay");
-              if (neutrality)
-              {
-                metadataValues.push_back(i < 3 ? i : 3);
-                metadataValues2.push_back(i < 3 ? i : 3);
-              } else {
-                metadataValues.push_back(i);
-                metadataValues2.push_back(i);
-              }
-              metadataGroundings.push_back("NodeDelayFixASPGrounding");
+              metadataValues.push_back(1);
+              metadataValues2.push_back(1);
+              metadataGroundings.push_back("NodeDelayASPGrounding");
               metadatas.push_back("Cost");
               metadataValues.push_back(1);
               metadataValues2.push_back(1);
               metadataGroundings.push_back("NodeCostASPGrounding");
-    //          metadatas.push_back("Accuracy");
-    //          metadataValues.push_back(10);
-    //          metadataValues2.push_back(10);
-    //          metadataGroundings.push_back("NodeAccuracyFixASPGrounding");
+      //        metadatas.push_back("Accuracy");
+      //        metadataValues.push_back(0);
+      //        metadataValues2.push_back(0);
+      //        metadataGroundings.push_back("NodeAccuracyMaxASPGrounding");
 
-              oi.addNodeIndividual(node + "SourceInd", "EvalNodeSource", system, entity, "", metadatas, metadataValues, metadataValues2,
+              oi.addNodeIndividual(node + "Ind", node, system, "", "", metadatas, metadataValues, metadataValues2,
                                    metadataGroundings);
+
+            } else {
+                metadatas.push_back("Delay");
+                if (neutrality)
+                {
+                  metadataValues.push_back(i < (inputsCount+1) ? i : (inputsCount+1));
+                  metadataValues2.push_back(i < (inputsCount+1) ? i : (inputsCount+1));
+                } else {
+                  metadataValues.push_back(i);
+                  metadataValues2.push_back(i);
+                }
+                metadataGroundings.push_back("NodeDelayFixASPGrounding");
+                metadatas.push_back("Cost");
+                metadataValues.push_back(1);
+                metadataValues2.push_back(1);
+                metadataGroundings.push_back("NodeCostASPGrounding");
+      //          metadatas.push_back("Accuracy");
+      //          metadataValues.push_back(10);
+      //          metadataValues2.push_back(10);
+      //          metadataGroundings.push_back("NodeAccuracyFixASPGrounding");
+
+                oi.addNodeIndividual(node + "SourceInd", "EvalNodeSource", system, entity, "", metadatas, metadataValues, metadataValues2,
+                                     metadataGroundings);
+            }
+
+            if (i == 0)
+            {
+              ss.str("");
+              ss << "Req" << stream << i;
+              oi.addRequiredStream(ss.str(), stream, system, entity, "");
+            }
           }
 
-          if (i == 0)
-          {
-            ss.str("");
-            ss << "Req" << stream << i;
-            oi.addRequiredStream(ss.str(), stream, system, entity, "");
-          }
-        }
-
-        ss.str("");
-        ss << "/tmp/evalSystems" << systems << ".owl";
-        std::string fileName = ss.str();
-        oi.saveOntology(fileName);
-
-        ModelGeneration mg(path);
-
-        std::vector<std::string> toCheck;
-
-    //    ss.str("");
-    //    ss << "metadataStream(1,accuracy,stream(1,evalSystem0,evalNode0Ind,evalSystem0," <<
-    //        "information(evalEntity,evalScope,reqRepresentation,none),3),10)";
-    //    toCheck.push_back(ss.str());
-
-        if (global)
-        {
           ss.str("");
-          ss << "metadataStream(1,delay,stream(1,evalSystem0,evalNode0Ind,evalSystem0," <<
-              "information(evalEntity,evalScope,reqRepresentation,none),3),7)";
-          toCheck.push_back(ss.str());
-        }
+          ss << "/tmp/systemsStarMashScenario_" << (global ? "global" : "local") << "_"
+          << (neutrality ? "neutrality_" : "") << systems << "_" << inputsCount << ".owl";
+          std::string fileName = ss.str();
+          oi.saveOntology(fileName);
 
-        ss.str("");
-        ss << "stream(1,evalSystem0,evalNode1SourceInd,evalSystem1,information(evalEntity,evalScope,evalRepresentation,none),2)";
-        toCheck.push_back(ss.str());
-        ss.str("");
-        ss << "stream(1,evalSystem0,evalNode2SourceInd,evalSystem2,information(evalEntity,evalScope,evalRepresentation,none),2)";
-        toCheck.push_back(ss.str());
+          ModelGeneration mg(path);
 
-        ss.str("");
-        ss << "selectedStream(1,evalSystem0,evalNode0Ind,evalSystem0,information(evalEntity,evalScope,reqRepresentation,none),3)";
-        toCheck.push_back(ss.str());
+          std::vector<std::string> toCheck;
 
-        ss.str("");
-        ss << "sumCost(1,3)";
-        toCheck.push_back(ss.str());
+      //    ss.str("");
+      //    ss << "metadataStream(1,accuracy,stream(1,evalSystem0,evalNode0Ind,evalSystem0," <<
+      //        "information(evalEntity,evalScope,reqRepresentation,none),3),10)";
+      //    toCheck.push_back(ss.str());
 
-        auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, 10,
-            [&] (supplementary::ClingWrapper *asp){
-          this->lambda(asp);
-
-          for (int i=1; i < systems; ++i)
+          if (global)
           {
             ss.str("");
-            ss << "transfer(evalSystem" << i << ",evalSystem0," << 2 << "," << 2 << ").";
-            asp->add("base",{},ss.str());
-            ss.str("");
-            ss << "transfer(evalSystem0,evalSystem" << i << "," << 2 << "," << 2 << ").";
-            asp->add("base",{},ss.str());
+            ss << "metadataStream(1,delay,stream(1,evalSystem0,evalNode0Ind,evalSystem0," <<
+                "information(evalEntity,evalScope,reqRepresentation,none),3)," << (inputsCount + 2 + inputsCount + 1) << ")";
+            toCheck.push_back(ss.str());
           }
 
-          asp->setModelCount(0);
-    //      asp->setPredefConfiguration(supplementary::PredefinedConfigurations::jumpy);
-    //      asp->setOptStrategie(3);
-        });
+          for (int i=1; i <= inputsCount; ++i)
+          {
+            ss.str("");
+            ss << "stream(1,evalSystem0,evalNode" << i << "SourceInd,evalSystem" << i << ",information(evalEntity,evalScope,evalRepresentation,none),2)";
+            toCheck.push_back(ss.str());
+         }
 
-        result.print();
+          ss.str("");
+          ss << "selectedStream(1,evalSystem0,evalNode0Ind,evalSystem0,information(evalEntity,evalScope,reqRepresentation,none),3)";
+          toCheck.push_back(ss.str());
 
-        // print to file
-        file << systems << "\t";
-        file << result.numberTotal << "\t";
-        file << result.numberSuccessful << "\t";
-        file << result.avg.totalTime << "\t" << result.totalTimeVar << "\t" << result.best.totalTime << "\t"
-            << result.worst.totalTime << "\t";
-        file << result.avg.ontologyReadTime << "\t" << result.ontologyReadTimeVar << "\t" << result.best.ontologyReadTime
-            << "\t" << result.worst.ontologyReadTime << "\t";
-        file << result.avg.ontologyReasonerTime << "\t" << result.ontologyReasonerTimeVar << "\t"
-            << result.best.ontologyReasonerTime << "\t" << result.worst.ontologyReasonerTime << "\t";
-        file << result.avg.ontologyToASPTime << "\t" << result.ontologyToASPTimeVar << "\t" << result.best.ontologyToASPTime
-            << "\t" << result.worst.ontologyToASPTime << "\t";
-        file << result.avg.aspGroundingTime << "\t" << result.aspGroundingTimeVar << "\t" << result.best.aspGroundingTime
-            << "\t" << result.worst.aspGroundingTime << "\t";
-        file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
-            << result.worst.aspSolvingTime << "\t";
-        file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime
-            << "\t" << result.worst.aspSatTime << "\t";
-        file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
-            << "\t" << result.worst.aspUnsatTime << "\t";
-        file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount
-            << "\t" << result.worst.aspModelCount << "\t";
-        file << result.avg.aspAtomCount << "\t" << result.aspAtomCountVar << "\t" << result.best.aspAtomCount
-            << "\t" << result.worst.aspAtomCount << "\t";
-        file << result.avg.aspBodiesCount << "\t" << result.aspBodiesCountVar << "\t" << result.best.aspBodiesCount
-            << "\t" << result.worst.aspBodiesCount << "\t";
-        file << result.avg.aspAuxAtomCount << "\t" << result.aspAuxAtomCountVar << "\t" << result.best.aspAuxAtomCount
-            << "\t" << result.worst.aspAuxAtomCount << std::endl;
+          ss.str("");
+          ss << "sumCost(1," << inputsCount + 1 << ")";
+          toCheck.push_back(ss.str());
 
-        // gnuplot -persist -e "plot './results_systems50-500.txt' u 1:4 w l t 'sum', './results_systems50-500.txt' u 1:20 w l t 'grounding', './results_systems50-500.txt' u 1:(\$20 + \$24) w l t 'solving'"
-        file.flush();
+          auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, 10,
+              [&] (supplementary::ClingWrapper *asp){
+            this->lambda(asp);
+
+            for (int i=1; i < systems; ++i)
+            {
+              ss.str("");
+              ss << "transfer(evalSystem" << i << ",evalSystem0," << 2 << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "transfer(evalSystem0,evalSystem" << i << "," << 2 << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+            }
+
+       //     asp->setModelCount(0);
+//            asp->setPredefConfiguration(supplementary::PredefinedConfigurations::crafty);
+      //      asp->setOptStrategie(3);
+          });
+
+          result.print();
+
+          // print to file
+          file << systems << "\t";
+          file << inputsCount << "\t";
+          file << result.numberTotal << "\t";
+          file << result.numberSuccessful << "\t";
+          file << result.avg.totalTime << "\t" << result.totalTimeVar << "\t" << result.best.totalTime << "\t"
+              << result.worst.totalTime << "\t";
+          file << result.avg.ontologyReadTime << "\t" << result.ontologyReadTimeVar << "\t" << result.best.ontologyReadTime
+              << "\t" << result.worst.ontologyReadTime << "\t";
+          file << result.avg.ontologyReasonerTime << "\t" << result.ontologyReasonerTimeVar << "\t"
+              << result.best.ontologyReasonerTime << "\t" << result.worst.ontologyReasonerTime << "\t";
+          file << result.avg.ontologyToASPTime << "\t" << result.ontologyToASPTimeVar << "\t" << result.best.ontologyToASPTime
+              << "\t" << result.worst.ontologyToASPTime << "\t";
+          file << result.avg.aspGroundingTime << "\t" << result.aspGroundingTimeVar << "\t" << result.best.aspGroundingTime
+              << "\t" << result.worst.aspGroundingTime << "\t";
+          file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
+              << result.worst.aspSolvingTime << "\t";
+          file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime
+              << "\t" << result.worst.aspSatTime << "\t";
+          file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
+              << "\t" << result.worst.aspUnsatTime << "\t";
+          file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount
+              << "\t" << result.worst.aspModelCount << "\t";
+          file << result.avg.aspAtomCount << "\t" << result.aspAtomCountVar << "\t" << result.best.aspAtomCount
+              << "\t" << result.worst.aspAtomCount << "\t";
+          file << result.avg.aspBodiesCount << "\t" << result.aspBodiesCountVar << "\t" << result.best.aspBodiesCount
+              << "\t" << result.worst.aspBodiesCount << "\t";
+          file << result.avg.aspAuxAtomCount << "\t" << result.aspAuxAtomCountVar << "\t" << result.best.aspAuxAtomCount
+              << "\t" << result.worst.aspAuxAtomCount << std::endl;
+
+          // gnuplot -persist -e "plot './results_systems50-500.txt' u 1:4 w l t 'sum', './results_systems50-500.txt' u 1:20 w l t 'grounding', './results_systems50-500.txt' u 1:(\$20 + \$24) w l t 'solving'"
+          file.flush();
+        }
       }
 
       file.close();
@@ -874,11 +881,21 @@ public:
       if (!gnuplot)
         return;
 
+
       ss.str("");
-      ss << "gnuplot -persist -e \"set title '" << pathStr << "'; plot '"
-          << pathStr << "' u 1:4 w l t 'sum', '"
-          << pathStr << "' u 1:20 w l t 'grounding', '"
-          << pathStr << "' u 1:(\\$20 + \\$24) w l t 'solving'\"";
+      if (inputSizeMin == inputSizeMax)
+       {
+         ss <<  "gnuplot -persist -e \"set title '" << pathStr << "'; plot '"
+           << pathStr << "' u 1:5 w l t 'sum', '"
+           << pathStr << "' u 1:21 w l t 'grounding', '"
+           << pathStr << "' u 1:(\\$21 + \\$25) w l t 'solving'\"";
+       } else {
+         ss <<  "gnuplot -persist -e \"set title '" << pathStr << "'; splot '"
+           << pathStr << "' using 1:2:5 with points t 'sum', '"
+           << pathStr << "' using 1:2:21 with points t 'Grounding', '"
+           << pathStr << "' using 1:2:(\\$21+\\$25) with points t 'Grounding + Solving'\"";
+       }
+
       system(ss.str().c_str());
   }
 
@@ -1082,7 +1099,7 @@ public:
       }
 
       ss.str("");
-      ss << "/tmp/evalSystemsStarMash2" << systems << ".owl";
+      ss << "/tmp/systemsFullMashScenario_" << (global ? "global" : "local") << "_" << systems << ".owl";
       std::string fileName = ss.str();
       oi.saveOntology(fileName);
 
@@ -1138,7 +1155,7 @@ public:
           asp->add("base",{},ss.str());
         }
 
-        asp->setModelCount(0);
+//        asp->setModelCount(0);
 //        asp->setPredefConfiguration(supplementary::PredefinedConfigurations::trendy);
   //      asp->setOptStrategie(3);
       });
