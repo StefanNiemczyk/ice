@@ -178,6 +178,8 @@ public:
 
     if (warmUp)
     {
+      ice::OntologyInterface::callJniGc();
+
       std::cout << "Starting warm up " << std::flush;
       for (int i = 1; i < 101; ++i)
       {

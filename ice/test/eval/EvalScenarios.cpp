@@ -144,8 +144,8 @@ public:
               oi.addSourceNodeClass(node, outputs, outputsMin, outputsMax);
 
               metadatas.push_back("Delay");
-              metadataValues.push_back(5);
-              metadataValues2.push_back(5);
+              metadataValues.push_back(1);
+              metadataValues2.push_back(0);
               metadataGroundings.push_back("NodeDelayFixASPGrounding");
   //            metadatas.push_back("Cost");
   //            metadataValues.push_back(1);
@@ -153,7 +153,7 @@ public:
   //            metadataGroundings.push_back("NodeCostASPGrounding");
               metadatas.push_back("Accuracy");
               metadataValues.push_back(nodesMax - j);
-              metadataValues2.push_back(nodesMax - j);
+              metadataValues2.push_back(0);
               metadataGroundings.push_back("NodeAccuracyFixASPGrounding");
 
               oi.addNodeIndividual(node + "Ind", node, system, entity, "", metadatas, metadataValues, metadataValues2,
@@ -165,7 +165,7 @@ public:
               oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
 
               metadatas.push_back("Delay");
-              metadataValues.push_back(0);
+              metadataValues.push_back(1);
               metadataValues2.push_back(0);
               metadataGroundings.push_back("NodeDelayASPGrounding");
   //            metadatas.push_back("Cost");
@@ -211,7 +211,8 @@ public:
           ss.str("");
           ss << "metadataStream(1,delay,stream(1,evalSystem,evalNode0_" << chainSize - 1
               << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
-              << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),5)";
+              << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
+              << (chainSize) << ")";
           toCheck.push_back(ss.str());
         }
 
@@ -520,7 +521,7 @@ public:
         toCheck.push_back(ss.str());
 
         ss.str("");
-        ss << "sumCost(1,2)";
+        ss << "sumMetadata(1,cost,2)";
         toCheck.push_back(ss.str());
 
         auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, reps,
@@ -736,11 +737,11 @@ public:
 
               metadatas.push_back("Delay");
               metadataValues.push_back(1);
-              metadataValues2.push_back(1);
+              metadataValues2.push_back(0);
               metadataGroundings.push_back("NodeDelayASPGrounding");
               metadatas.push_back("Cost");
               metadataValues.push_back(1);
-              metadataValues2.push_back(1);
+              metadataValues2.push_back(0);
               metadataGroundings.push_back("NodeCostASPGrounding");
       //        metadatas.push_back("Accuracy");
       //        metadataValues.push_back(0);
@@ -755,15 +756,15 @@ public:
                 if (neutrality)
                 {
                   metadataValues.push_back(i < (inputsCount+1) ? i : (inputsCount+1));
-                  metadataValues2.push_back(i < (inputsCount+1) ? i : (inputsCount+1));
+                  metadataValues2.push_back(0);
                 } else {
                   metadataValues.push_back(i);
-                  metadataValues2.push_back(i);
+                  metadataValues2.push_back(0);
                 }
                 metadataGroundings.push_back("NodeDelayFixASPGrounding");
                 metadatas.push_back("Cost");
                 metadataValues.push_back(1);
-                metadataValues2.push_back(1);
+                metadataValues2.push_back(0);
                 metadataGroundings.push_back("NodeCostASPGrounding");
       //          metadatas.push_back("Accuracy");
       //          metadataValues.push_back(10);
@@ -801,7 +802,7 @@ public:
           {
             ss.str("");
             ss << "metadataStream(1,delay,stream(1,evalSystem0,evalNode0Ind,evalSystem0," <<
-                "information(evalEntity,evalScope,reqRepresentation,none),3)," << (inputsCount + 2 + inputsCount + 1) << ")";
+                "information(evalEntity,evalScope,reqRepresentation,none),3)," << (inputsCount + 2 + 1) << ")";
             toCheck.push_back(ss.str());
           }
 
@@ -817,7 +818,7 @@ public:
           toCheck.push_back(ss.str());
 
           ss.str("");
-          ss << "sumCost(1," << inputsCount + 1 << ")";
+          ss << "sumMetadata(1,cost," << inputsCount + 1 << ")";
           toCheck.push_back(ss.str());
 
           auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, 10,
@@ -827,10 +828,23 @@ public:
             for (int i=1; i < systems; ++i)
             {
               ss.str("");
-              ss << "transfer(evalSystem" << i << ",evalSystem0," << 2 << "," << 2 << ").";
+              ss << "transfer(evalSystem" << i << ",evalSystem0).";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "transfer(evalSystem0,evalSystem" << i << "," << 2 << "," << 2 << ").";
+              ss << "metadataProcessing(cost,evalSystem" << i << ",evalSystem0," << 2 << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataOutput(delay,evalSystem" << i << ",evalSystem0," << 2 << ").";
+              asp->add("base",{},ss.str());
+
+              ss.str("");
+              ss << "transfer(evalSystem0,evalSystem" << i << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataProcessing(cost,evalSystem0,evalSystem" << i << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataOutput(delay,evalSystem0,evalSystem" << i << "," << 2 << ").";
               asp->add("base",{},ss.str());
             }
 
@@ -1132,7 +1146,7 @@ public:
       toCheck.push_back(ss.str());
 
       ss.str("");
-      ss << "sumCost(1,4)";
+      ss << "sumMetadata(1,cost,4)";
       toCheck.push_back(ss.str());
 
       auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, 10,

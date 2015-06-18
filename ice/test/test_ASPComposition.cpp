@@ -56,7 +56,7 @@ TEST(ClingWrap, simpleTest)
                                   true);
 
   // add transfer
-  auto transfer = cw->getExternal("transfer", {"system2", "system1", 1, 2}, true);
+  auto transfer = cw->getExternal("transfer", {"system2", "system1"}, "transfer", {"system2", "system1", 1, 2}, true);
 
   // add node1
   cw->add("node1", {}, "#external nodeTemplate(system1,node1,any).");
@@ -64,9 +64,9 @@ TEST(ClingWrap, simpleTest)
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "input(system1,node1,scope2,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "output(system1,node1,scope3,rep1,none).");
-  cw->add("node1", {}, "metadataNode(delay,system1,node1,max,1,0).");
-  cw->add("node1", {}, "nodeCost(system1,node1,10).");
-  cw->add("node1", {}, "metadataNode(accuracy,system1,node1,max,0,0).");
+  cw->add("node1", {}, "metadataOutput(delay,system1,node1,max,1,0).");
+  cw->add("node1", {}, "metadataProcessing(cost,system1,node1,10).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node1,max,0,0).");
   cw->ground("node1", {});
 
   // add node2
@@ -75,9 +75,9 @@ TEST(ClingWrap, simpleTest)
   cw->add("node2", {}, "input(system1,node2,scope1,rep1,none,1,1) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "input(system1,node2,scope2,rep1,none,2,2) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "output(system1,node2,scope3,rep1,none).");
-  cw->add("node2", {}, "metadataNode(delay,system1,node2,max,1,0).");
-  cw->add("node2", {}, "nodeCost(system1,node2,5).");
-  cw->add("node1", {}, "metadataNode(accuracy,system1,node2,avg,0,1).");
+  cw->add("node2", {}, "metadataOutput(delay,system1,node2,max,1,0).");
+  cw->add("node2", {}, "metadataProcessing(cost,system1,node2,5).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node2,avg,0,1).");
   cw->ground("node2", {});
 
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
@@ -88,7 +88,7 @@ TEST(ClingWrap, simpleTest)
   EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
   EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,in2,system1,information(entity1,scope2,rep1,none),1))"));
-  EXPECT_EQ(true, cw->query("sumCost(1,12)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,12)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),6)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),90)"));
 
@@ -103,7 +103,7 @@ TEST(ClingWrap, simpleTest)
   EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),6)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),2)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),99)"));
-  EXPECT_EQ(true, cw->query("sumCost(1,12)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,12)"));
 
   node1->assign(false);
   cw->solve();
@@ -117,7 +117,7 @@ TEST(ClingWrap, simpleTest)
   EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),6)"));
   EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),2)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),96)"));
-  EXPECT_EQ(true, cw->query("sumCost(1,8)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,8)"));
 }
 
 TEST(ClingWrap, simpleTestQuery)
@@ -166,7 +166,7 @@ TEST(ClingWrap, simpleTestQuery)
                                   true);
 
   // add transfer
-  auto transfer = cw->getExternal("transfer", {"system2", "system1", 1, 2}, true);
+  auto transfer = cw->getExternal("transfer", {"system2", "system1"}, "transfer", {"system2", "system1", 1, 2}, true);
 
   // add node1
   cw->add("node1", {}, "#external nodeTemplate(system1,node1,any).");
@@ -174,9 +174,9 @@ TEST(ClingWrap, simpleTestQuery)
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "input(system1,node1,scope2,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "output(system1,node1,scope3,rep1,none).");
-  cw->add("node1", {}, "metadataNode(delay,system1,node1,max,1,0).");
-  cw->add("node1", {}, "nodeCost(system1,node1,10).");
-  cw->add("node1", {}, "metadataNode(accuracy,system1,node1,max,0,0).");
+  cw->add("node1", {}, "metadataOutput(delay,system1,node1,max,1,0).");
+  cw->add("node1", {}, "metadataProcessing(cost,system1,node1,10).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node1,max,0,0).");
   cw->ground("node1", {});
 
   // add node2
@@ -185,9 +185,9 @@ TEST(ClingWrap, simpleTestQuery)
   cw->add("node2", {}, "input(system1,node2,scope1,rep1,none,1,1) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "input(system1,node2,scope2,rep1,none,2,2) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "output(system1,node2,scope3,rep1,none).");
-  cw->add("node2", {}, "metadataNode(delay,system1,node2,max,1,0).");
-  cw->add("node2", {}, "nodeCost(system1,node2,5).");
-  cw->add("node1", {}, "metadataNode(accuracy,system1,node2,avg,0,1).");
+  cw->add("node2", {}, "metadataOutput(delay,system1,node2,max,1,0).");
+  cw->add("node2", {}, "metadataProcessing(cost,system1,node2,5).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node2,avg,0,1).");
   cw->ground("node2", {});
 
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
@@ -198,7 +198,7 @@ TEST(ClingWrap, simpleTestQuery)
   EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
   EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,in2,system1,information(entity1,scope2,rep1,none),1))"));
-  EXPECT_EQ(true, cw->query("sumCost(1,12)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,12)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),6)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),90)"));
 
@@ -216,7 +216,7 @@ TEST(ClingWrap, simpleTestQuery)
   EXPECT_EQ(false, cw->query("metadataStream(2,delay,stream(2,system1,node1,system1,information(entity1,scope3,rep1,none),3),6)"));
   EXPECT_EQ(true, cw->query("metadataStream(2,delay,stream(2,system1,node1,system1,information(entity1,scope3,rep1,none),3),2)"));
   EXPECT_EQ(true, cw->query("metadataStream(2,accuracy,stream(2,system1,node1,system1,information(entity1,scope3,rep1,none),3),99)"));
-  EXPECT_EQ(true, cw->query("sumCost(2,12)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(2,cost,12)"));
 
   node1->assign(false);
   query2->assign(false);
@@ -232,7 +232,7 @@ TEST(ClingWrap, simpleTestQuery)
   EXPECT_EQ(true, cw->query("metadataStream(3,delay,stream(3,system1,node2,system1,information(entity1,scope3,rep1,none),3),6)"));
   EXPECT_EQ(false, cw->query("metadataStream(3,delay,stream(3,system1,node2,system1,information(entity1,scope3,rep1,none),3),2)"));
   EXPECT_EQ(true, cw->query("metadataStream(3,accuracy,stream(3,system1,node2,system1,information(entity1,scope3,rep1,none),3),96)"));
-  EXPECT_EQ(true, cw->query("sumCost(3,8)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(3,cost,8)"));
 }
 
 /*
@@ -306,7 +306,7 @@ TEST(ClingWrap, informationTranslation)
                                   true);
 
   // add transfer
-  auto transfer1_2 = cw->getExternal("transfer", {"system2", "system1", 1, 2}, true);
+  auto transfer1_2 = cw->getExternal("transfer", {"system2", "system1"}, "transfer", {"system2", "system1", 1, 2}, true);
 
   // add translation
   cw->add("coords2Wgs84", {}, "#external iro(system1,coords2Wgs84,any,none).");
@@ -314,9 +314,9 @@ TEST(ClingWrap, informationTranslation)
   cw->add("coords2Wgs84", {},
           "input(system1,coords2Wgs84,position,coords,none,1,1) :- iro(system1,coords2Wgs84,any,none).");
   cw->add("coords2Wgs84", {}, "output(system1,coords2Wgs84,position,wgs84,none).");
-  cw->add("coords2Wgs84", {}, "metadataNode(delay,system1,coords2Wgs84,max,1,0).");
-  cw->add("coords2Wgs84", {}, "metadataNode(accuracy,system1,coords2Wgs84,avg,1,0).");
-  cw->add("coords2Wgs84", {}, "nodeCost(system1,coords2Wgs84,1).");
+  cw->add("coords2Wgs84", {}, "metadataOutput(delay,system1,coords2Wgs84,max,1,0).");
+  cw->add("coords2Wgs84", {}, "metadataOutput(accuracy,system1,coords2Wgs84,avg,1,0).");
+  cw->add("coords2Wgs84", {}, "metadataProcessing(cost,system1,coords2Wgs84,1).");
   cw->ground("coords2Wgs84", {});
 
 
@@ -365,8 +365,8 @@ TEST(ClingWrap, informationTranslation)
 //  cw->add("coords2Wgs84", {},
 //          "input(system1,coords2Wgs84,position,coords,none,1,1) :- iro(system1,coords2Wgs84,any,none).");
 //  cw->add("coords2Wgs84", {}, "output(system1,coords2Wgs84,position,wgs84,none).");
-//  cw->add("coords2Wgs84", {}, "metadataNode(delay,system1,coords2Wgs84,max,1,0).");
-//  cw->add("coords2Wgs84", {}, "metadataNode(accuracy,system1,coords2Wgs84,avg,0,1).");
+//  cw->add("coords2Wgs84", {}, "metadataOutput(delay,system1,coords2Wgs84,max,1,0).");
+//  cw->add("coords2Wgs84", {}, "metadataOutput(accuracy,system1,coords2Wgs84,avg,0,1).");
 //  cw->add("coords2Wgs84", {}, "iroCost(system1,coords2Wgs84,1).");
 //  cw->ground("coords2Wgs84", {});
 //
@@ -426,7 +426,7 @@ TEST(ClingWrap, ego2allo)
                                   true);
 
   // add transfer
-  auto transfer1_2 = cw->getExternal("transfer", {"system2", "system1", 2, 1}, true);
+  auto transfer1_2 = cw->getExternal("transfer", {"system2", "system1"}, "transfer", {"system2", "system1", 2, 1}, true);
 
   // add translation
   cw->add("allo2ego", {}, "#external iro(system1,allo2ego,any,any).");
@@ -437,8 +437,8 @@ TEST(ClingWrap, ego2allo)
   cw->add("allo2ego", {},
           "input(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).");
   cw->add("allo2ego", {}, "output(system1,allo2ego,position,egoCoords,any).");
-  cw->add("allo2ego", {}, "metadataNode(delay,system1,allo2ego,max,0,0).");
-  cw->add("allo2ego", {}, "metadataNode(accuracy,system1,allo2ego,avg,0,1).");
+  cw->add("allo2ego", {}, "metadataOutput(delay,system1,allo2ego,max,0,0).");
+  cw->add("allo2ego", {}, "metadataOutput(accuracy,system1,allo2ego,avg,0,1).");
   cw->add("allo2ego", {}, "iroCost(system1,allo2ego,1).");
   cw->ground("allo2ego", {});
 
@@ -494,7 +494,7 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   cw->add("mapNode", {}, "input(system1,mapNode,scope1,rep1,none,2,3) :- mapNodeTemplate(system1,mapNode,type).");
   cw->add("mapNode", {}, "outputMap(system1,mapNode,type,scope1,rep1,none).");
   cw->add("mapNode", {}, "metadataMap(delay,system1,mapNode,max,1,0).");
-  cw->add("mapNode", {}, "nodeCost(system1,mapNode,1).");
+  cw->add("mapNode", {}, "metadataProcessing(cost,system1,mapNode,1).");
   cw->add("mapNode", {}, "metadataMap(accuracy,system1,mapNode,avg,0,4).");
   cw->ground("mapNode", {});
 
@@ -503,16 +503,16 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   auto required = cw->getExternal("requiredMap", {"system1", "type", "scope1", "rep1", "none"}, true);
 
   // add transfer
-  auto transfer1_2 = cw->getExternal("transfer", {"system2", "system1", 4000, 2}, true);
-  auto transfer1_3 = cw->getExternal("transfer", {"system3", "system1", 4000, 3}, true);
-  auto transfer1_4 = cw->getExternal("transfer", {"system4", "system1", 4000, 4}, true);
-  auto transfer1_5 = cw->getExternal("transfer", {"system5", "system1", 4000, 5}, true);
-  auto transfer2_3 = cw->getExternal("transfer", {"system3", "system2", 4000, 5}, true);
-  auto transfer2_4 = cw->getExternal("transfer", {"system2", "system4", 4000, 5}, true);
-  auto transfer2_5 = cw->getExternal("transfer", {"system2", "system5", 4000, 5}, true);
-  auto transfer3_4 = cw->getExternal("transfer", {"system3", "system4", 4000, 5}, true);
-  auto transfer3_5 = cw->getExternal("transfer", {"system3", "system5", 4000, 5}, true);
-  auto transfer5_5 = cw->getExternal("transfer", {"system4", "system5", 4000, 5}, true);
+  auto transfer1_2 = cw->getExternal("transfer", {"system1", "system2"}, "transfer", {"system1", "system2", 4000, 2}, true);
+  auto transfer1_3 = cw->getExternal("transfer", {"system1", "system3"}, "transfer", {"system1", "system3", 4000, 3}, true);
+  auto transfer1_4 = cw->getExternal("transfer", {"system1", "system4"}, "transfer", {"system1", "system4", 4000, 4}, true);
+  auto transfer1_5 = cw->getExternal("transfer", {"system1", "system5"}, "transfer", {"system1", "system5", 4000, 5}, true);
+  auto transfer2_3 = cw->getExternal("transfer", {"system2", "system3"}, "transfer", {"system2", "system3", 4000, 5}, true);
+  auto transfer2_4 = cw->getExternal("transfer", {"system2", "system4"}, "transfer", {"system2", "system4", 4000, 5}, true);
+  auto transfer2_5 = cw->getExternal("transfer", {"system2", "system5"}, "transfer", {"system2", "system5", 4000, 5}, true);
+  auto transfer3_4 = cw->getExternal("transfer", {"system3", "system4"}, "transfer", {"system3", "system4", 4000, 5}, true);
+  auto transfer3_5 = cw->getExternal("transfer", {"system3", "system5"}, "transfer", {"system3", "system5", 4000, 5}, true);
+  auto transfer5_5 = cw->getExternal("transfer", {"system4", "system5"}, "transfer", {"system4", "system5", 4000, 5}, true);
 
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
@@ -569,9 +569,9 @@ TEST(ClingWrap, noInputTest)
   auto node1 = cw->getExternal("nodeTemplate", {"system1", "node1", "any"}, "node1", {}, true);
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "output(system1,node1,scope1,rep1,none).");
-  cw->add("node1", {}, "metadataNode(delay,system1,node1,min,1,0).");
-  cw->add("node1", {}, "nodeCost(system1,node1,1).");
-  cw->add("node1", {}, "metadataNode(accuracy,system1,node1,min,5,0).");
+  cw->add("node1", {}, "metadataOutput(delay,system1,node1,min,1,0).");
+  cw->add("node1", {}, "metadataProcessing(cost,system1,node1,1).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node1,min,5,0).");
   cw->ground("node1", {});
 
   // add node2
@@ -579,9 +579,9 @@ TEST(ClingWrap, noInputTest)
   auto node2 = cw->getExternal("nodeTemplate", {"system1", "node2", "any"}, "node2", {}, true);
   cw->add("node2", {}, "input(system1,node2,scope1,rep1,none,1,1) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "output(system1,node2,scope1,rep1,none).");
-  cw->add("node2", {}, "metadataNode(delay,system1,node2,min,1,0).");
-  cw->add("node2", {}, "nodeCost(system1,node2,1).");
-  cw->add("node2", {}, "metadataNode(accuracy,system1,node2,min,5,0).");
+  cw->add("node2", {}, "metadataOutput(delay,system1,node2,min,1,0).");
+  cw->add("node2", {}, "metadataProcessing(cost,system1,node2,1).");
+  cw->add("node2", {}, "metadataOutput(accuracy,system1,node2,min,5,0).");
   cw->ground("node2", {});
 
   // add node3
@@ -589,9 +589,9 @@ TEST(ClingWrap, noInputTest)
   auto node3 = cw->getExternal("nodeTemplate", {"system1", "node3", "any"}, "node3", {}, true);
   cw->add("node3", {}, "input(system1,node3,scope1,rep1,none,1,1) :- nodeTemplate(system1,node3,any).");
   cw->add("node3", {}, "output(system1,node3,scope1,rep1,none).");
-  cw->add("node3", {}, "metadataNode(delay,system1,node3,min,1,0).");
-  cw->add("node3", {}, "nodeCost(system1,node3,1).");
-  cw->add("node3", {}, "metadataNode(accuracy,system1,node3,min,1,2).");
+  cw->add("node3", {}, "metadataOutput(delay,system1,node3,min,1,0).");
+  cw->add("node3", {}, "metadataProcessing(cost,system1,node3,1).");
+  cw->add("node3", {}, "metadataOutput(accuracy,system1,node3,min,1,2).");
   cw->ground("node3", {});
 
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
@@ -660,9 +660,9 @@ TEST(ClingWrap, simpleChainTest)
   auto node1 = cw->getExternal("nodeTemplate", {"system1", "node1", "any"}, "node1", {}, true);
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "output(system1,node1,scope1,rep1,none).");
-  cw->add("node1", {}, "metadataNode(delay,system1,node1,min,1,0).");
-  cw->add("node1", {}, "nodeCost(system1,node1,8).");
-  cw->add("node1", {}, "metadataNode(accuracy,system1,node1,min,5,0).");
+  cw->add("node1", {}, "metadataOutput(delay,system1,node1,min,1,0).");
+  cw->add("node1", {}, "metadataProcessing(cost,system1,node1,8).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node1,min,5,0).");
   cw->ground("node1", {});
 
   // add node2
@@ -670,9 +670,9 @@ TEST(ClingWrap, simpleChainTest)
   auto node2 = cw->getExternal("nodeTemplate", {"system1", "node2", "any"}, "node2", {}, true);
   cw->add("node2", {}, "input(system1,node2,scope1,rep1,none,1,1) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "output(system1,node2,scope1,rep1,none).");
-  cw->add("node2", {}, "metadataNode(delay,system1,node2,min,1,0).");
-  cw->add("node2", {}, "nodeCost(system1,node2,5).");
-  cw->add("node2", {}, "metadataNode(accuracy,system1,node2,min,5,0).");
+  cw->add("node2", {}, "metadataOutput(delay,system1,node2,min,1,0).");
+  cw->add("node2", {}, "metadataProcessing(cost,system1,node2,5).");
+  cw->add("node2", {}, "metadataOutput(accuracy,system1,node2,min,5,0).");
   cw->ground("node2", {});
 
   // add node3
@@ -680,9 +680,9 @@ TEST(ClingWrap, simpleChainTest)
   auto node3 = cw->getExternal("nodeTemplate", {"system1", "node3", "any"}, "node3", {}, true);
   cw->add("node3", {}, "input(system1,node3,scope1,rep1,none,1,1) :- nodeTemplate(system1,node3,any).");
   cw->add("node3", {}, "output(system1,node3,scope1,rep1,none).");
-  cw->add("node3", {}, "metadataNode(delay,system1,node3,min,1,0).");
-  cw->add("node3", {}, "nodeCost(system1,node3,5).");
-  cw->add("node3", {}, "metadataNode(accuracy,system1,node3,min,1,2).");
+  cw->add("node3", {}, "metadataOutput(delay,system1,node3,min,1,0).");
+  cw->add("node3", {}, "metadataProcessing(cost,system1,node3,5).");
+  cw->add("node3", {}, "metadataOutput(accuracy,system1,node3,min,1,2).");
   cw->ground("node3", {});
 
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
@@ -699,7 +699,7 @@ TEST(ClingWrap, simpleChainTest)
   result |= cw->query("metadataStream(1,accuracy,stream(1,system1,node3,system1,information(entity1,scope1,rep1,none),3),98)");
 
   EXPECT_EQ(true, result);
-  EXPECT_EQ(true, cw->query("sumCost(1,11)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,11)"));
 }
 
 TEST(ClingWrap, nodeUsedTwiced)
@@ -760,9 +760,9 @@ TEST(ClingWrap, nodeUsedTwiced)
   auto node1 = cw->getExternal("nodeTemplate", {"system1", "node1", "any"}, "node1", {}, true);
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "output(system1,node1,scope1,rep1,none).");
-  cw->add("node1", {}, "metadataNode(delay,system1,node1,min,1,0).");
-  cw->add("node1", {}, "nodeCost(system1,node1,8).");
-  cw->add("node1", {}, "metadataNode(accuracy,system1,node1,min,5,0).");
+  cw->add("node1", {}, "metadataOutput(delay,system1,node1,min,1,0).");
+  cw->add("node1", {}, "metadataProcessing(cost,system1,node1,8).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node1,min,5,0).");
   cw->ground("node1", {});
 
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
@@ -776,7 +776,7 @@ TEST(ClingWrap, nodeUsedTwiced)
   EXPECT_EQ(true, cw->query("node(1,system1,node1,entity2,none)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope1,rep1,none),2),95)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity2,scope1,rep1,none),2),95)"));
-  EXPECT_EQ(true, cw->query("sumCost(1,18)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,18)"));
 }
 
 TEST(ClingWrap, localSimpleTest)
@@ -825,7 +825,7 @@ TEST(ClingWrap, localSimpleTest)
                                   true);
 
   // add transfer
-  auto transfer = cw->getExternal("transfer", {"system2", "system1", 1, 2}, true);
+  auto transfer = cw->getExternal("transfer", {"system2", "system1"}, "transfer", {"system2", "system1", 1, 2}, true);
 
   // add node1
   cw->add("node1", {}, "#external nodeTemplate(system1,node1,any).");
@@ -833,9 +833,9 @@ TEST(ClingWrap, localSimpleTest)
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "input(system1,node1,scope2,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "output(system1,node1,scope3,rep1,none).");
-  cw->add("node1", {}, "metadataNode(delay,system1,node1,max,1,0).");
-  cw->add("node1", {}, "nodeCost(system1,node1,10).");
-  cw->add("node1", {}, "metadataNode(accuracy,system1,node1,max,0,0).");
+  cw->add("node1", {}, "metadataOutput(delay,system1,node1,max,1,0).");
+  cw->add("node1", {}, "metadataProcessing(cost,system1,node1,10).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node1,max,0,0).");
   cw->ground("node1", {});
 
   // add node2
@@ -844,9 +844,9 @@ TEST(ClingWrap, localSimpleTest)
   cw->add("node2", {}, "input(system1,node2,scope1,rep1,none,1,1) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "input(system1,node2,scope2,rep1,none,2,2) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "output(system1,node2,scope3,rep1,none).");
-  cw->add("node2", {}, "metadataNode(delay,system1,node2,max,1,0).");
-  cw->add("node2", {}, "nodeCost(system1,node2,5).");
-  cw->add("node1", {}, "metadataNode(accuracy,system1,node2,avg,0,1).");
+  cw->add("node2", {}, "metadataOutput(delay,system1,node2,max,1,0).");
+  cw->add("node2", {}, "metadataProcessing(cost,system1,node2,5).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node2,avg,0,1).");
   cw->ground("node2", {});
 
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
@@ -857,7 +857,7 @@ TEST(ClingWrap, localSimpleTest)
   EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
   EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,in2,system1,information(entity1,scope2,rep1,none),1))"));
-  EXPECT_EQ(true, cw->query("sumCost(1,12)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,12)"));
 //  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),6)"));
 //  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),90)"));
 
@@ -872,7 +872,7 @@ TEST(ClingWrap, localSimpleTest)
 //  EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),6)"));
 //  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),2)"));
 //  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),99)"));
-  EXPECT_EQ(true, cw->query("sumCost(1,12)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,12)"));
 
   node1->assign(false);
   cw->solve();
@@ -886,7 +886,7 @@ TEST(ClingWrap, localSimpleTest)
 //  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),6)"));
 //  EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),2)"));
 //  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),96)"));
-  EXPECT_EQ(true, cw->query("sumCost(1,8)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,8)"));
 }
 
 TEST(ClingWrap, localChainTest)
@@ -938,9 +938,9 @@ TEST(ClingWrap, localChainTest)
   auto node1 = cw->getExternal("nodeTemplate", {"system1", "node1", "any"}, "node1", {}, true);
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "output(system1,node1,scope1,rep1,none).");
-  cw->add("node1", {}, "metadataNode(delay,system1,node1,min,1,0).");
-  cw->add("node1", {}, "nodeCost(system1,node1,8).");
-  cw->add("node1", {}, "metadataNode(accuracy,system1,node1,min,5,0).");
+  cw->add("node1", {}, "metadataOutput(delay,system1,node1,min,1,0).");
+  cw->add("node1", {}, "metadataProcessing(cost,system1,node1,8).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node1,min,5,0).");
   cw->ground("node1", {});
 
   // add node2
@@ -948,9 +948,9 @@ TEST(ClingWrap, localChainTest)
   auto node2 = cw->getExternal("nodeTemplate", {"system1", "node2", "any"}, "node2", {}, true);
   cw->add("node2", {}, "input(system1,node2,scope1,rep1,none,1,1) :- nodeTemplate(system1,node2,any).");
   cw->add("node2", {}, "output(system1,node2,scope1,rep1,none).");
-  cw->add("node2", {}, "metadataNode(delay,system1,node2,min,1,0).");
-  cw->add("node2", {}, "nodeCost(system1,node2,5).");
-  cw->add("node2", {}, "metadataNode(accuracy,system1,node2,min,5,0).");
+  cw->add("node2", {}, "metadataOutput(delay,system1,node2,min,1,0).");
+  cw->add("node2", {}, "metadataProcessing(cost,system1,node2,5).");
+  cw->add("node2", {}, "metadataOutput(accuracy,system1,node2,min,5,0).");
   cw->ground("node2", {});
 
   // add node3
@@ -958,9 +958,9 @@ TEST(ClingWrap, localChainTest)
   auto node3 = cw->getExternal("nodeTemplate", {"system1", "node3", "any"}, "node3", {}, true);
   cw->add("node3", {}, "input(system1,node3,scope1,rep1,none,1,1) :- nodeTemplate(system1,node3,any).");
   cw->add("node3", {}, "output(system1,node3,scope1,rep1,none).");
-  cw->add("node3", {}, "metadataNode(delay,system1,node3,min,1,0).");
-  cw->add("node3", {}, "nodeCost(system1,node3,5).");
-  cw->add("node3", {}, "metadataNode(accuracy,system1,node3,min,1,2).");
+  cw->add("node3", {}, "metadataOutput(delay,system1,node3,min,1,0).");
+  cw->add("node3", {}, "metadataProcessing(cost,system1,node3,5).");
+  cw->add("node3", {}, "metadataOutput(accuracy,system1,node3,min,1,2).");
   cw->ground("node3", {});
 
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
@@ -977,5 +977,5 @@ TEST(ClingWrap, localChainTest)
 //  result |= cw->query("metadataStream(1,accuracy,stream(1,system1,node3,system1,information(entity1,scope1,rep1,none),3),98)");
 
 //  EXPECT_EQ(true, result);
-  EXPECT_EQ(true, cw->query("sumCost(1,1)"));
+  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,1)"));
 }

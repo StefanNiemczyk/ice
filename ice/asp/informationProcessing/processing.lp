@@ -22,8 +22,9 @@
 
 
 
-metadata(accuracy,maximize).
-metadata(delay,minimize).
+metadata(information,accuracy,maximize).
+metadata(information,delay,minimize).
+metadata(processing,cost,minimize).
 
 
 %--------------------------------------------------------------------------------------
@@ -207,7 +208,7 @@ requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :-
 %% transfer a stream between systems
 tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM_SOURCE,TNODE,INFO)) :-
 	requiredInformation(k,SYSTEM_TARGET,INFO),
-	transfer(SYSTEM_SOURCE,SYSTEM_TARGET,_,_),
+	transfer(SYSTEM_SOURCE,SYSTEM_TARGET),
 	tstream(k,SYSTEM_SOURCE,TNODE,INFO),
 	SYSTEM_TARGET != SYSTEM_SOURCE.
 
@@ -215,10 +216,10 @@ tstream(k,SYSTEM_TARGET,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,S
 	tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2))).
 	
 stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP+1) :- 
-	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,_).
+	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),_).
 
-:- streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE1,PROVIDER,SOURCE,INFO,_),_,_,_), 
-   streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE2,PROVIDER,SOURCE,INFO,_),_,_,_), 
+:- streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE1,PROVIDER,SOURCE,INFO,_),_), 
+   streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE2,PROVIDER,SOURCE,INFO,_),_), 
    SYSTEM_SOURCE1 != SYSTEM_SOURCE2.
 
 
@@ -308,8 +309,15 @@ map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP_MAX+1) :-
 
 
 % checking point budget of systems
-:- system(SYSTEM,POINTS), SUM_STREAMS = #sum{COST,SYSTEM,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP : streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),_,COST,_)}, 
-		SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), nodeCost(SYSTEM,NODE,COST)}, (SUM_NODES + SUM_STREAMS) > POINTS, query(k).
+:- system(SYSTEM,POINTS), 
+   SUM_STREAMS = #sum{COST,SYSTEM,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP : 
+			streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),_), 
+			metadataProcessing(cost,SYSTEM,SYSTEM_TARGET,COST)}, 
+   SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY,ENTITY2 : 
+			node(k,SYSTEM,NODE,ENTITY,ENTITY2), 
+			metadataProcessing(cost,SYSTEM,NODE,COST)}, 
+   (SUM_NODES + SUM_STREAMS) > POINTS, 
+   query(k).
 
 
 %%%
@@ -320,16 +328,18 @@ map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP_MAX+1) :-
 % transfer cost
 %sumTransfer(k,SUM) :- SUM = #sum{ TRANSFER_COST,SYSTEM,STREAM : streamTransfer(k,SYSTEM,STREAM,_,TRANSFER_COST,_), query(k) }.
 %#minimize { SUM@priorityTransferCost : sumTransfer(k,SUM), query(k) }.
-#minimize { TRANSFER_COST@priorityTransferCost,SYSTEM,STREAM : streamTransfer(k,SYSTEM,STREAM,_,TRANSFER_COST,_), query(k) }.
+#minimize { COST@priorityTransferCost,SYSTEM,SYSTEM_TARGET,PROVIDER,SOURCE,INFO : 
+		streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,_),_), 
+		metadataProcessing(cost,SYSTEM,SYSTEM_TARGET,COST), 
+		query(k) }.
 
 
 % cost
-sumCost(k,SUM_NODES) :- 
-	SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), nodeCost(SYSTEM,NODE,COST)}, 	
-	%SUM_TRANSLATIONS = #sum{COST,SYSTEM,IRO,ENTITY,SCOPE : informationTranslation(k,SYSTEM,IRO,ENTITY,SCOPE), iroCost(SYSTEM,IRO,COST)},
-	%SUM_EXTRACTIONS = #count{SYSTEM,PROVIDER,SOURCE,SCOPE,REP1,INFO :  informationExtrection(k,SYSTEM,PROVIDER,SOURCE,SCOPE,REP1,INFO)}, 
+sumMetadata(k,METADATA,SUM) :- 
+	SUM = #sum{VALUE,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), metadataProcessing(METADATA,SYSTEM,NODE,VALUE)}, 
+	metadata(processing,METADATA,_),
 	query(k).
-#minimize { COST@priorityCost : sumCost(k,COST), query(k) }.
+#minimize { COST@priorityCost,METADATA : sumMetadata(k,METADATA,COST), query(k) }.
 %#minimize { COST@priorityCost,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), nodeCost(SYSTEM,NODE,COST), query(k) }.
 
 
@@ -341,15 +351,15 @@ entity(entity,entityType).
 
 
 %--------------------------------------------------------------------------------------
-#program sourceNode(node,system,source,entity,scope,rep,entity2,delayFix,accuracyFix,cost).
+#program sourceNode(node,system,source,entity,scope,rep,entity2,delayFix,accuracyFix,costValue).
 
 #external sourceNode(system,node,entity).
 
 output(system,node,scope,rep,none).
 
-metadataNode(accuracy,system,node,fix,accuracyFix,0).
-metadataNode(delay,system,node,fix,delayFix,0).
-nodeCost(system,node,cost).
+metadataOutput(accuracy,system,node,fix,accuracyFix,0).
+metadataOutput(delay,system,node,fix,delayFix,0).
+metadataProcessing(cost,system,node,costValue).
 
 
 %--------------------------------------------------------------------------------------
@@ -382,10 +392,16 @@ requiredMetadata(delay,system,information,delayValue).
 
 
 %--------------------------------------------------------------------------------------
-#program transfer(system1,system2,delay,cost).
+#program transfer(system1,system2,delayValue,costValue).
 
-#external transfer(system1,system2,delay,cost).
-transfer(system2,system1,delay,cost) :- transfer(system1,system2,delay,cost).
+#external transfer(system1,system2).
+transfer(system2,system1) :- transfer(system1,system2).
+
+metadataProcessing(cost,system1,system2,costValue).
+metadataOutput(delay,system1,system2,delayValue).
+
+metadataProcessing(cost,system2,system1,costValue).
+metadataOutput(delay,system2,system1,delayValue).
 
 
 

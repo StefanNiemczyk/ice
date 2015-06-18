@@ -14,6 +14,19 @@ namespace ice
 
 JavaVM *OntologyInterface::jvm = nullptr;
 
+void OntologyInterface::callJniGc()
+{
+  if (jvm != nullptr)
+  {
+    JNIEnv *env;
+    jvm->AttachCurrentThread((void**)&env, NULL);
+
+    jclass system = env->FindClass("java/lang/System");
+    jmethodID gc = env->GetStaticMethodID(system, "gc", "()V");
+    env->CallVoidMethod(system, gc);
+  }
+}
+
 OntologyInterface::OntologyInterface(std::string const p_jarPath)
 {
   this->_log = el::Loggers::getLogger("OntologyInterface");

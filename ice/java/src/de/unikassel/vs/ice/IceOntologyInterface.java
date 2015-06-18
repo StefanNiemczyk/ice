@@ -66,6 +66,7 @@ public class IceOntologyInterface {
 	private String mainIRIPrefix;
 
 	public IceOntologyInterface() {
+		// System.gc();
 		this.manager = OWLManager.createOWLOntologyManager();
 		this.dataFactory = manager.getOWLDataFactory();
 		// this.reasonerFactory = new Reasoner.ReasonerFactory();
@@ -77,7 +78,10 @@ public class IceOntologyInterface {
 		this.defaultMaxCardinality = 5;
 		this.dirty = true;
 		this.logging = true;
-		// System.gc();
+	}
+
+	public void cleanUp() {
+		System.gc();
 	}
 
 	public void addIRIMapper(final String p_path) {

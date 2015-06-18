@@ -26,6 +26,9 @@ namespace ice
 class OntologyInterface
 {
 public:
+  static void callJniGc();
+
+public:
   OntologyInterface(std::string const p_jarPath);
   virtual ~OntologyInterface();
   bool errorOccurred();

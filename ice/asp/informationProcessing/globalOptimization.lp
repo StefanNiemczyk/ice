@@ -15,17 +15,17 @@ metadataStream(k,stream(METADATA,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,
 	ENTITY2 != any,
 	output(SYSTEM,IRO,SCOPE,REP,ENTITY2), 
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,fix,FIX_VALUE,MOD_VALUE).
+	metadataOutput(METADATA,SYSTEM,IRO,fix,FIX_VALUE,MOD_VALUE).
 metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,none),STEP),FIX_VALUE) :- 
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2), 
 	output(SYSTEM,IRO,SCOPE,REP,none), 
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,none),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,fix,FIX_VALUE,MOD_VALUE).
+	metadataOutput(METADATA,SYSTEM,IRO,fix,FIX_VALUE,MOD_VALUE).
 metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP),FIX_VALUE) :- 
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2), 
 	output(SYSTEM,IRO,SCOPE,REP,any), 
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,fix,FIX_VALUE,MOD_VALUE).
+	metadataOutput(METADATA,SYSTEM,IRO,fix,FIX_VALUE,MOD_VALUE).
 
 %min
 metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP),VALUE+FIX_VALUE+MOD_VALUE*COUNT) :- 
@@ -34,7 +34,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	ENTITY2 != none,
 	ENTITY2 != any,
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,min,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,min,FIX_VALUE,MOD_VALUE),
 	VALUE = #min{D,STEP2,PROVIDER,SOURCE,INFO : 
 		connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)),
 		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2),D), 
@@ -47,7 +47,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2), 
 	output(SYSTEM,IRO,SCOPE,REP,none), 
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,none),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,min,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,min,FIX_VALUE,MOD_VALUE),
 	VALUE = #min{D,STEP2,PROVIDER,SOURCE,INFO : 
 		connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)),
 		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2),D), 
@@ -60,7 +60,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2), 
 	output(SYSTEM,IRO,SCOPE,REP,any), 
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,min,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,min,FIX_VALUE,MOD_VALUE),
 	VALUE = #min{D,STEP2,PROVIDER,SOURCE,INFO : 
 		connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)),
 		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2),D), 
@@ -77,7 +77,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	ENTITY2 != none,
 	ENTITY2 != any,
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,avg,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,avg,FIX_VALUE,MOD_VALUE),
 	VALUE = #sum{D,STEP2,PROVIDER,SOURCE,INFO : 
 		connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)),
 		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2),D), 
@@ -90,7 +90,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2), 
 	output(SYSTEM,IRO,SCOPE,REP,none), 
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,none),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,avg,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,avg,FIX_VALUE,MOD_VALUE),
 	VALUE = #sum{D,STEP2,PROVIDER,SOURCE,INFO : 
 		connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)),
 		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2),D), 
@@ -103,7 +103,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2), 
 	output(SYSTEM,IRO,SCOPE,REP,any), 
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,avg,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,avg,FIX_VALUE,MOD_VALUE),
 	VALUE = #sum{D,STEP2,PROVIDER,SOURCE,INFO : 
 		connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)),
 		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2),D), 
@@ -120,7 +120,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 %	node(k,SYSTEM,NODE,ENTITY,ENTITY2), 
 %	tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,_),
 %	stream(k,SYSTEM,NODE,SYSTEM,INFO,STEP), 
-%	metadataNode(METADATA,SYSTEM,NODE,max,FIX_VALUE,MOD_VALUE),
+%	metadataOutput(METADATA,SYSTEM,NODE,max,FIX_VALUE,MOD_VALUE),
 %	VALUE = #max{D,STEP2,PROVIDER,SOURCE,INFO2 : 
 %		connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO2,STEP2)),
 %		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO2,STEP2),D), 
@@ -136,7 +136,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	ENTITY2 != none,
 	ENTITY2 != any,
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,max,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,max,FIX_VALUE,MOD_VALUE),
 	VALUE = #max{D,STEP2,PROVIDER,SOURCE,INFO : 
 		connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)),
 		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2),D), 
@@ -149,7 +149,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2), 
 	output(SYSTEM,IRO,SCOPE,REP,none), 
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,none),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,max,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,max,FIX_VALUE,MOD_VALUE),
 	VALUE = #max{D,STEP2,PROVIDER,SOURCE,INFO : 
 		connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)),
 		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2),D),
@@ -162,7 +162,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2), 
 	output(SYSTEM,IRO,SCOPE,REP,any), 
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,max,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,max,FIX_VALUE,MOD_VALUE),
 	VALUE = #max{D,STEP2,PROVIDER,SOURCE,INFO : 
 		connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)),
 		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2),D), 
@@ -179,7 +179,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	ENTITY2 != none,
 	ENTITY2 != any,
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,TYPE,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,TYPE,FIX_VALUE,MOD_VALUE),
 	TYPE != fix,
 	nodeMeta(node(k,SYSTEM,IRO,ENTITY,ENTITY2), STEP-1, 0).
 
@@ -187,7 +187,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2), 
 	output(SYSTEM,IRO,SCOPE,REP,none), 
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,none),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,TYPE,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,TYPE,FIX_VALUE,MOD_VALUE),
 	TYPE != fix,
 	nodeMeta(node(k,SYSTEM,IRO,ENTITY,ENTITY2), STEP-1, 0).
 
@@ -195,7 +195,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2), 
 	output(SYSTEM,IRO,SCOPE,REP,any), 
 	stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2),STEP), 
-	metadataNode(METADATA,SYSTEM,IRO,TYPE,FIX_VALUE,MOD_VALUE),
+	metadataOutput(METADATA,SYSTEM,IRO,TYPE,FIX_VALUE,MOD_VALUE),
 	TYPE != fix,
 	nodeMeta(node(k,SYSTEM,IRO,ENTITY,ENTITY2), STEP-1, 0).
 
@@ -209,14 +209,14 @@ metadataStream(k,METADATA,stream(k,SYSTEM,IRO,SYSTEM,information(ENTITY,SCOPE,RE
 %% Transfer of streams
 % computing QoS metadata	
 metadataStream(k,METADATA,stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP+1),VALUE) :- 
-	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,_), 
+	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),_), 
 	metadataStream(k,METADATA,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),VALUE), 
-	METADATA != delay.	
+	not metadataOutput(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,_).	
 
-% computing delay
-metadataStream(k,delay,stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP+1),TRANSFER_DELAY+DELAY) :-
-	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),TRANSFER_DELAY,TRANSFER_COST,_), 
-	metadataStream(k,delay,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),DELAY).
+metadataStream(k,METADATA,stream(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP+1),VALUE+VALUE_PROCESSING) :-
+	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),_), 
+	metadataStream(k,delay,stream(k,SYSTEM_SOURCE,PROVIDER,SOURCE,INFO,STEP),VALUE),
+	metadataOutput(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE_PROCESSING).
 
 
 %% Computing map QoS metadata
@@ -270,41 +270,75 @@ metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),FIX
 
 
 % checking stream QoS metadata
-
 :~ requiredStream(SYSTEM,INFO), 
    selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),
    requiredMetadata(METADATA,SYSTEM,INFO,REQUIRED_VALUE), 
    metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),VALUE), 
-   metadata(METADATA,maximize),
+   metadata(information,METADATA,maximize),
    REQUIRED_VALUE < VALUE,
    query(k). [1@4,requiredStream]
 :~ requiredStream(SYSTEM,INFO), 
    selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),
    requiredMetadata(METADATA,SYSTEM,INFO,REQUIRED_VALUE), 
    metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),VALUE),
-   metadata(METADATA,minimize), 
+   metadata(information,METADATA,minimize), 
    REQUIRED_VALUE > VALUE,
    query(k). [1@4,requiredStream]
+
+:~ requiredStream(SYSTEM,INFO), 
+   selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),
+   requiredMetadata(METADATA,SYSTEM,INFO,REQUIRED_VALUE), 
+   metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),VALUE), 
+   metadata(stream,METADATA,maximize),
+   REQUIRED_VALUE < VALUE,
+   query(k). [1@4,requiredStream]
+:~ requiredStream(SYSTEM,INFO), 
+   selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),
+   requiredMetadata(METADATA,SYSTEM,INFO,REQUIRED_VALUE), 
+   metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),VALUE),
+   metadata(stream,METADATA,minimize), 
+   REQUIRED_VALUE > VALUE,
+   query(k). [1@4,requiredStream]
+
 
 
 % checking map QoS parameters
 :~ selectedMap(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2,STEP),
    requiredMetadata(METADATA,SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2,REQUIRED_VALUE), 
    metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),VALUE),
-   metadata(METADATA,maximize),
+   metadata(information,METADATA,maximize),
    REQUIRED_VALUE < VALUE,
    query(k). [1@4,requiredStream]
 :~ selectedMap(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2,STEP),
    requiredMetadata(METADATA,SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2,REQUIRED_VALUE), 
    metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),VALUE),
-   metadata(METADATA,minimize), 
+   metadata(information,METADATA,minimize), 
+   REQUIRED_VALUE > VALUE,
+   query(k). [1@4,requiredStream]
+
+:~ selectedMap(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2,STEP),
+   requiredMetadata(METADATA,SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2,REQUIRED_VALUE), 
+   metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),VALUE),
+   metadata(stream,METADATA,maximize),
+   REQUIRED_VALUE < VALUE,
+   query(k). [1@4,requiredStream]
+:~ selectedMap(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2,STEP),
+   requiredMetadata(METADATA,SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2,REQUIRED_VALUE), 
+   metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),VALUE),
+   metadata(stream,METADATA,minimize), 
    REQUIRED_VALUE > VALUE,
    query(k). [1@4,requiredStream]
 
 
 % optimizing Stream QoS metadata
-#minimize { VALUE@priorityDelay,INFO,SYSTEM,PROVIDER,SOURCE,STEP : selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP), metadataStream(k,delay,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),VALUE), query(k) }.
-#maximize { VALUE@priorityAccuracy,INFO,SYSTEM,PROVIDER,SOURCE,STEP : selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP), metadataStream(k,accuracy,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),VALUE), query(k) }.
+#minimize { VALUE@priorityDelay,INFO,SYSTEM,PROVIDER,SOURCE,STEP : 
+		selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP), 
+		metadataStream(k,delay,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),VALUE), 
+		query(k) }.
+#maximize { VALUE@priorityAccuracy,INFO,SYSTEM,PROVIDER,SOURCE,STEP : 
+		selectedStream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP), 
+		metadataStream(k,accuracy,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),VALUE), 
+		query(k) }.
 
 
 
