@@ -83,8 +83,9 @@ public:
    *
    * /param engine The main engine.
    * /param state The engine state.
+   * /param external The asp external.
    */
-  ASPSystem(std::weak_ptr<ICEngine> engine, std::shared_ptr<EngineState> state);
+  ASPSystem(std::weak_ptr<ICEngine> engine, std::shared_ptr<EngineState> state, std::shared_ptr<supplementary::External> external);
 
   /*!
    * \brief Default destructor
@@ -104,6 +105,7 @@ public:
 private:
   std::weak_ptr<ICEngine> engine; /**< The main engine */
   std::shared_ptr<EngineState> state; /**< The engine state */
+  std::shared_ptr<supplementary::External> systemExternal; /**< The external for the system */
   std::vector<std::shared_ptr<ASPElement>> aspNodes; /**< Vector of asp nodes */
   std::vector<std::shared_ptr<ASPElement>> aspSourceNodes; /**< Vector of asp source nodes */
   std::vector<std::shared_ptr<ASPElement>> aspIro; /**< Vector of asp nodes */

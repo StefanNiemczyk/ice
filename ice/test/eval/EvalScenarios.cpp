@@ -414,7 +414,7 @@ public:
 //        metadataGroundings.push_back("NodeDelayFixASPGrounding");
         metadatas.push_back("Cost");
         metadataValues.push_back(1);
-        metadataValues2.push_back(1);
+        metadataValues2.push_back(0);
         metadataGroundings.push_back("NodeCostASPGrounding");
 //        metadatas.push_back("Accuracy");
 //        metadataValues.push_back(10);
@@ -520,9 +520,9 @@ public:
         ss << "node(1,evalSystem,evalNode0_" << reps - 1 << "Ind,evalEntity,none)";
         toCheck.push_back(ss.str());
 
-        ss.str("");
-        ss << "sumMetadata(1,cost,2)";
-        toCheck.push_back(ss.str());
+//        ss.str("");
+//        ss << "sumMetadata(1,cost,2)";
+//        toCheck.push_back(ss.str());
 
         auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, reps,
             [this] (supplementary::ClingWrapper *asp){
@@ -817,9 +817,9 @@ public:
           ss << "selectedStream(1,evalSystem0,evalNode0Ind,evalSystem0,information(evalEntity,evalScope,reqRepresentation,none),3)";
           toCheck.push_back(ss.str());
 
-          ss.str("");
-          ss << "sumMetadata(1,cost," << inputsCount + 1 << ")";
-          toCheck.push_back(ss.str());
+//          ss.str("");
+//          ss << "sumMetadata(1,cost," << inputsCount + 1 << ")";
+//          toCheck.push_back(ss.str());
 
           auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, 10,
               [&] (supplementary::ClingWrapper *asp){
@@ -1145,9 +1145,9 @@ public:
       ss << "selectedStream(1,evalSystem0,evalNode0Ind,evalSystem0,information(evalEntity,evalScope,reqRepresentation,none),3)";
       toCheck.push_back(ss.str());
 
-      ss.str("");
-      ss << "sumMetadata(1,cost,4)";
-      toCheck.push_back(ss.str());
+//      ss.str("");
+//      ss << "sumMetadata(1,cost,4)";
+//      toCheck.push_back(ss.str());
 
       auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, 10,
           [&] (supplementary::ClingWrapper *asp){
@@ -1159,19 +1159,35 @@ public:
           {
             if (i==j)
               continue;
-          ss.str("");
-          ss << "transfer(evalSystem" << j << ",evalSystem" << i << "," << 2 << "," << 2 << ").";
-          asp->add("base",{},ss.str());
+
+            ss.str("");
+            ss << "transfer(evalSystem" << i << ",evalSystem" << j << ").";
+            asp->add("base",{},ss.str());
+            ss.str("");
+            ss << "metadataProcessing(cost,evalSystem" << i << ",evalSystem" << j << "," << 2 << ").";
+            asp->add("base",{},ss.str());
+            ss.str("");
+            ss << "metadataOutput(delay,evalSystem" << i << ",evalSystem" << j << "," << 2 << ").";
+            asp->add("base",{},ss.str());
+
+            ss.str("");
+            ss << "transfer(evalSystem" << j << ",evalSystem" << i << ").";
+            asp->add("base",{},ss.str());
+            ss.str("");
+            ss << "metadataProcessing(cost,evalSystem" << j << ",evalSystem" << i << "," << 2 << ").";
+            asp->add("base",{},ss.str());
+            ss.str("");
+            ss << "metadataOutput(delay,evalSystem" << j << ",evalSystem" << i << "," << 2 << ").";
+            asp->add("base",{},ss.str());
+
           }
 
-          ss.str("");
-          ss << "system(evalSystem" << i << ").";
-          asp->add("base",{},ss.str());
+//          ss.str("");
+//          ss << "system(evalSystem" << i << ").";
+//          asp->add("base",{},ss.str());
         }
 
 //        asp->setModelCount(0);
-//        asp->setPredefConfiguration(supplementary::PredefinedConfigurations::trendy);
-  //      asp->setOptStrategie(3);
       });
 
       result.print();

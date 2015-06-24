@@ -537,19 +537,6 @@ public class NodeIROVisitor extends IceVisitor {
 			default:
 				// TODO
 			}
-		} else if (p_property.equals(this.ii.hasOutputMap)) {
-			switch (this.currentType) {
-			case COMPUTATION_NODE:
-			case SOURCE_NODE:
-			case IRO_NODE:
-				pattern = "outputMap($system,$element,$scope,$representation,$checkRelatedEntity).\n";
-				break;
-			case MAP_NODE:
-				pattern = "outputMap($system,$element,$type,$scope,$representation,$checkRelatedEntity).\n";
-				break;
-			default:
-				// TODO
-			}
 		} else if (p_property.equals(this.ii.hasRelatedInput)) {
 			switch (this.currentType) {
 			case COMPUTATION_NODE:
@@ -558,6 +545,33 @@ public class NodeIROVisitor extends IceVisitor {
 			case MAP_NODE:
 				pattern = "input2($system,$element,$scope,$representation,$checkEntity," + min + "," + max + ").\n";
 				// + this.elementString;
+				break;
+			default:
+				// TODO
+			}
+		} else if (p_property.equals(this.ii.hasInputMap)) {
+			switch (this.currentType) {
+			case COMPUTATION_NODE:
+			case SOURCE_NODE:
+			case IRO_NODE:
+			case MAP_NODE:
+				pattern = "inputMap($system,$element,$type,$scope,$representation,$checkRelatedEntity," + min + ","
+						+ max + ").\n";
+				// + this.elementString;
+				break;
+			default:
+				// TODO
+			}
+		} else if (p_property.equals(this.ii.hasOutputMap)) {
+			switch (this.currentType) {
+			case COMPUTATION_NODE:
+			case SOURCE_NODE:
+			case IRO_NODE:
+				// pattern =
+				// "outputMap($system,$element,$scope,$representation,$checkRelatedEntity).\n";
+				break;
+			case MAP_NODE:
+				pattern = "outputMap($system,$element,$type,$scope,$representation,$checkRelatedEntity).\n";
 				break;
 			default:
 				// TODO
@@ -573,6 +587,9 @@ public class NodeIROVisitor extends IceVisitor {
 	public void printNodeStreamRelation(OWLClassExpression p_ce, String p_pattern) {
 		this.currentRepresentation = null;
 		this.currentScope = null;
+		OWLNamedIndividual lastCurrentEntity = this.currentEntity;
+		OWLClass lastCurrentEntityType = this.currentEntityType;
+		OWLNamedIndividual lastCurrentRelatedEntity = this.currentRelatedEntity;
 
 		if (p_ce.isAnonymous()) {
 			p_ce.accept(this);
@@ -589,6 +606,10 @@ public class NodeIROVisitor extends IceVisitor {
 		}
 
 		sb.append(this.replace(p_pattern));
+
+		this.currentEntity = lastCurrentEntity;
+		this.currentEntityType = lastCurrentEntityType;
+		this.currentRelatedEntity = lastCurrentRelatedEntity;
 	}
 
 	private String replace(String p_string) {
@@ -615,6 +636,8 @@ public class NodeIROVisitor extends IceVisitor {
 		// type
 		if (this.currentEntityType != null)
 			p_string = p_string.replace("$type", this.iRIShortName(this.currentEntityType.getIRI()));
+		else
+			p_string = p_string.replace("$type", "any");
 
 		// scope
 		if (this.currentScope != null)

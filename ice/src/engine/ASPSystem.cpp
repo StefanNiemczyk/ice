@@ -6,7 +6,9 @@
 namespace ice
 {
 
-ASPSystem::ASPSystem(std::weak_ptr<ICEngine> engine, std::shared_ptr<EngineState> state) : engine(engine), state(state)
+ASPSystem::ASPSystem(std::weak_ptr<ICEngine> engine, std::shared_ptr<EngineState> state,
+                     std::shared_ptr<supplementary::External> external) :
+    engine(engine), state(state), systemExternal(external)
 {
   this->_log = el::Loggers::getLogger("ASPSystem");
 }

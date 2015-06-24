@@ -49,6 +49,7 @@ public:
   bool addRepresentation(std::string const p_superRepresentation, std::string const p_representation,
                          std::vector<std::string> p_dimensions);
   bool addNamedStream(std::string const p_stream, std::string const p_entityScope, std::string const p_representation);
+  bool addNamedMap(std::string const p_map, std::string const p_entityType, std::string const p_entityScope, std::string const p_representation);
   bool addRequiredStream(std::string const p_namedStream, std::string const p_namedStreamClass, std::string const p_system, std::string const p_entity, std::string const p_entityRelated);
   bool addSourceNodeClass(std::string const p_node, std::vector<std::string> p_outputs,
                           std::vector<int> p_outputsMinSize, std::vector<int> p_outputsMaxSize);
@@ -61,6 +62,12 @@ public:
                        std::vector<int> p_inputsRelatedMinSize, std::vector<int> p_inputsRelatedMaxSize,
                        std::vector<std::string> p_outputs, std::vector<int> p_outputsMinSize,
                        std::vector<int> p_outputsMaxSize);
+  bool addMapNodeClass(std::string const p_node, std::vector<std::string> p_inputs, std::vector<int> p_inputsMinSize,
+                       std::vector<int> p_inputsMaxSize, std::vector<std::string> p_inputsRelated,
+                       std::vector<int> p_inputsRelatedMinSize, std::vector<int> p_inputsRelatedMaxSize,
+                       std::vector<std::string> p_inputMaps, std::vector<int> p_inputMapsMinSize,
+                       std::vector<int> p_inputMapsMaxSize, std::vector<std::string> p_outputMaps,
+                       std::vector<int> p_outputMapsMinSize, std::vector<int> p_outputMapsMaxSize);
 
   bool addOntologyIRI(std::string const p_iri);
   bool removeOntologyIRI(std::string const p_iri);
@@ -109,10 +116,12 @@ private:
   jmethodID addValueScopeMethod; /**< Method id */
   jmethodID addRepresentationMethod; /**< Method id */
   jmethodID addNamedStreamMethod; /**< Method id */
+  jmethodID addNamedMapMethod; /**< Method id */
   jmethodID addRequiredStreamMethod; /**< Method id */
   jmethodID addSourceNodeClassMethod; /**< Method id */
   jmethodID addComputationNodeClassMethod; /**< Method id */
   jmethodID addIroNodeClassMethod; /**< Method id */
+  jmethodID addMapNodeClassMethod; /**< Method id */
 
   jmethodID addOntologyIRIMethod; /**< Method id */
   jmethodID removeOntologyIRIMethod; /**< Method id */

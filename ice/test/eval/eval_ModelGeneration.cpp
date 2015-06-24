@@ -13,11 +13,11 @@ TEST(EvalModelGeneration, simpleEvalTests)
     asp->setPredefConfiguration(supplementary::PredefinedConfigurations::crafty);
   });
   //                                 global      verbose gnuplot         runs
-  scenarios2.chainScenario(          true,       false,  false,          runs,      10, 10, 1, 10, 10, 10);
 //  scenarios2.representationScenario( true,       false,  false,          runs,      9, 9, 1);
   scenarios2.systemsStarMashScenario(true,       false,  false,          runs,      true, 10, 150, 1, 1, 149, 1);
   scenarios2.systemsStarMashScenario(true,       false,  false,          runs,      false, 10, 150, 1, 1, 149, 1);
 //  scenarios2.systemsFullMashScenario(true,       false,  false,          runs,      10, 20, 1);
+  scenarios2.chainScenario(          true,       false,  false,          runs,      1, 1, 1, 10, 500, 10);
 
 
   runs = 30;

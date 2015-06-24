@@ -103,7 +103,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->addEntityTypeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addEntityType",
                                                      "(Ljava/lang/String;[Ljava/lang/String;)Z");
   this->addScopesToEntityTypeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addScopesToEntityType",
-                                                     "(Ljava/lang/String;[Ljava/lang/String;)Z");
+                                                             "(Ljava/lang/String;[Ljava/lang/String;)Z");
   this->addEntityScopeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addEntityScope",
                                                       "(Ljava/lang/String;[Ljava/lang/String;)Z");
   this->addValueScopeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addValueScope",
@@ -112,6 +112,8 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
                                                          "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Z");
   this->addNamedStreamMethod = this->env->GetMethodID(this->javaOntologyInterface, "addNamedStream",
                                                       "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+  this->addNamedMapMethod = this->env->GetMethodID(this->javaOntologyInterface, "addNamedMap",
+                                                      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
   this->addRequiredStreamMethod = this->env->GetMethodID(
       this->javaOntologyInterface, "addRequiredStream",
       "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
@@ -123,6 +125,11 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->addIroNodeClassMethod = this->env->GetMethodID(
       this->javaOntologyInterface, "addIroNodeClass",
       "(Ljava/lang/String;[Ljava/lang/String;[I[I[Ljava/lang/String;[I[I[Ljava/lang/String;[I[I)Z");
+  this->addMapNodeClassMethod =
+      this->env->GetMethodID(
+          this->javaOntologyInterface,
+          "addMapNodeClass",
+          "(Ljava/lang/String;[Ljava/lang/String;[I[I[Ljava/lang/String;[I[I[Ljava/lang/String;[I[I[Ljava/lang/String;[I[I)Z");
 
   this->addOntologyIRIMethod = this->env->GetMethodID(this->javaOntologyInterface, "addOntologyIRI",
                                                       "(Ljava/lang/String;)Z");
@@ -374,7 +381,6 @@ bool OntologyInterface::addIndividual(std::string const p_individual, std::strin
   return result;
 }
 
-
 bool OntologyInterface::addScopesToEntityType(std::string const p_entityType, std::vector<std::string> p_entityScopes)
 {
   this->checkError("addScopesToEntityType", "Error exists, method addScopesToEntityType will not be executed");
@@ -389,7 +395,8 @@ bool OntologyInterface::addScopesToEntityType(std::string const p_entityType, st
     env->SetObjectArrayElement(entityScopes, i, env->NewStringUTF(p_entityScopes[i].c_str()));
   }
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addScopesToEntityTypeMethod, entityType, entityScopes);
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addScopesToEntityTypeMethod, entityType,
+                                       entityScopes);
 
   for (int i = 0; i < size; ++i)
   {
@@ -544,6 +551,32 @@ bool OntologyInterface::addNamedStream(std::string const p_stream, std::string c
   env->DeleteLocalRef(representation);
 
   if (this->checkError("addNamedStream", "Error occurred adding a stream " + p_stream))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
+bool OntologyInterface::addNamedMap(std::string const p_map, std::string const p_entityType,
+                                    std::string const p_entityScope, std::string const p_representation)
+{
+  this->checkError("addNamedMap", "Error exists, method addNamedMap will not be executed");
+
+  jstring map = env->NewStringUTF(p_map.c_str());
+  jstring entityType = env->NewStringUTF(p_entityType.c_str());
+  jstring entityScope = env->NewStringUTF(p_entityScope.c_str());
+  jstring representation = env->NewStringUTF(p_representation.c_str());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addNamedMapMethod, map, entityType, entityScope,
+                                       representation);
+
+  env->DeleteLocalRef(map);
+  env->DeleteLocalRef(entityType);
+  env->DeleteLocalRef(entityScope);
+  env->DeleteLocalRef(representation);
+
+  if (this->checkError("addNamedMap", "Error occurred adding a stream " + p_map))
     return false;
 
   this->systemDirty = true;
@@ -759,16 +792,136 @@ bool OntologyInterface::addIroNodeClass(std::string const p_node, std::vector<st
   }
 
   env->DeleteLocalRef(node);
+
   env->DeleteLocalRef(inputs);
-  env->DeleteLocalRef(outputs);
   env->DeleteLocalRef(inputsMinSize);
   env->DeleteLocalRef(inputsMaxSize);
+
+  env->DeleteLocalRef(inputsRelated);
   env->DeleteLocalRef(inputsRelatedMinSize);
   env->DeleteLocalRef(inputsRelatedMaxSize);
+
+  env->DeleteLocalRef(outputs);
   env->DeleteLocalRef(outputsMinSize);
   env->DeleteLocalRef(outputsMaxSize);
 
   if (this->checkError("addIroNodeClass", "Error occurred at adding a node class " + p_node))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
+bool OntologyInterface::addMapNodeClass(std::string const p_node, std::vector<std::string> p_inputs,
+                                        std::vector<int> p_inputsMinSize, std::vector<int> p_inputsMaxSize,
+                                        std::vector<std::string> p_inputsRelated,
+                                        std::vector<int> p_inputsRelatedMinSize,
+                                        std::vector<int> p_inputsRelatedMaxSize, std::vector<std::string> p_inputMaps,
+                                        std::vector<int> p_inputMapsMinSize, std::vector<int> p_inputMapsMaxSize,
+                                        std::vector<std::string> p_outputMaps, std::vector<int> p_outputMapsMinSize,
+                                        std::vector<int> p_outputMapsMaxSize)
+{
+  this->checkError("addMapNodeClass", "Error exists, addMapNodeClass will not be executed");
+
+  int sizeInput = p_inputs.size();
+  int sizeInputRelated = p_inputsRelated.size();
+  int sizeInputMap = p_inputMaps.size();
+  int sizeOutputMap = p_outputMaps.size();
+
+  jstring node = env->NewStringUTF(p_node.c_str());
+  jobjectArray inputs = (jobjectArray)env->NewObjectArray(sizeInput, env->FindClass("java/lang/String"),
+                                                          env->NewStringUTF(""));
+  jobjectArray inputsRelated = (jobjectArray)env->NewObjectArray(sizeInputRelated, env->FindClass("java/lang/String"),
+                                                                 env->NewStringUTF(""));
+  jobjectArray inputMaps = (jobjectArray)env->NewObjectArray(sizeInputMap, env->FindClass("java/lang/String"),
+                                                             env->NewStringUTF(""));
+  jobjectArray outputMaps = (jobjectArray)env->NewObjectArray(sizeOutputMap, env->FindClass("java/lang/String"),
+                                                              env->NewStringUTF(""));
+
+  jintArray inputsMinSize = env->NewIntArray(sizeInput);
+  jintArray inputsMaxSize = env->NewIntArray(sizeInput);
+
+  jintArray inputsRelatedMinSize = env->NewIntArray(sizeInputRelated);
+  jintArray inputsRelatedMaxSize = env->NewIntArray(sizeInputRelated);
+
+  jintArray inputMapsMinSize = env->NewIntArray(sizeInputMap);
+  jintArray inputMapsMaxSize = env->NewIntArray(sizeInputMap);
+
+  jintArray outputMapsMinSize = env->NewIntArray(sizeOutputMap);
+  jintArray outputMapsMaxSize = env->NewIntArray(sizeOutputMap);
+
+  for (int i = 0; i < sizeInput; ++i)
+  {
+    env->SetObjectArrayElement(inputs, i, env->NewStringUTF(p_inputs[i].c_str()));
+  }
+  env->SetIntArrayRegion(inputsMinSize, 0, sizeInput, p_inputsMinSize.data());
+  env->SetIntArrayRegion(inputsMaxSize, 0, sizeInput, p_inputsMaxSize.data());
+
+  for (int i = 0; i < sizeInputRelated; ++i)
+  {
+    env->SetObjectArrayElement(inputsRelated, i, env->NewStringUTF(p_inputsRelated[i].c_str()));
+  }
+  env->SetIntArrayRegion(inputsRelatedMinSize, 0, sizeInputRelated, p_inputsRelatedMinSize.data());
+  env->SetIntArrayRegion(inputsRelatedMaxSize, 0, sizeInputRelated, p_inputsRelatedMaxSize.data());
+
+  for (int i = 0; i < sizeInputMap; ++i)
+  {
+    env->SetObjectArrayElement(inputMaps, i, env->NewStringUTF(p_inputMaps[i].c_str()));
+  }
+  env->SetIntArrayRegion(inputMapsMinSize, 0, sizeInputMap, p_inputMapsMinSize.data());
+  env->SetIntArrayRegion(inputMapsMaxSize, 0, sizeInputMap, p_inputMapsMaxSize.data());
+
+  for (int i = 0; i < sizeOutputMap; ++i)
+  {
+    env->SetObjectArrayElement(outputMaps, i, env->NewStringUTF(p_outputMaps[i].c_str()));
+  }
+  env->SetIntArrayRegion(outputMapsMinSize, 0, sizeOutputMap, p_outputMapsMinSize.data());
+  env->SetIntArrayRegion(outputMapsMaxSize, 0, sizeOutputMap, p_outputMapsMaxSize.data());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addMapNodeClassMethod, node, inputs, inputsMinSize,
+                                       inputsMaxSize, inputsRelated, inputsRelatedMinSize, inputsRelatedMaxSize,
+                                       inputMaps, inputMapsMinSize, inputMapsMaxSize, outputMaps, outputMapsMinSize,
+                                       outputMapsMaxSize);
+
+  for (int i = 0; i < sizeInput; ++i)
+  {
+    env->DeleteLocalRef(env->GetObjectArrayElement(inputs, i));
+  }
+
+  for (int i = 0; i < sizeInputRelated; ++i)
+  {
+    env->DeleteLocalRef(env->GetObjectArrayElement(inputsRelated, i));
+  }
+
+  for (int i = 0; i < sizeInputMap; ++i)
+  {
+    env->DeleteLocalRef(env->GetObjectArrayElement(inputMaps, i));
+  }
+
+  for (int i = 0; i < sizeOutputMap; ++i)
+  {
+    env->DeleteLocalRef(env->GetObjectArrayElement(outputMaps, i));
+  }
+
+  env->DeleteLocalRef(node);
+  env->DeleteLocalRef(inputs);
+  env->DeleteLocalRef(inputsMinSize);
+  env->DeleteLocalRef(inputsMaxSize);
+
+  env->DeleteLocalRef(inputsRelated);
+  env->DeleteLocalRef(inputsRelatedMinSize);
+  env->DeleteLocalRef(inputsRelatedMaxSize);
+
+  env->DeleteLocalRef(inputMaps);
+  env->DeleteLocalRef(inputMapsMinSize);
+  env->DeleteLocalRef(inputMapsMaxSize);
+
+  env->DeleteLocalRef(outputMaps);
+  env->DeleteLocalRef(outputMapsMinSize);
+  env->DeleteLocalRef(outputMapsMaxSize);
+
+  if (this->checkError("addMapNodeClass", "Error occurred at adding a node class " + p_node))
     return false;
 
   this->systemDirty = true;
@@ -831,18 +984,20 @@ const char* OntologyInterface::readInformationStructureAsASP()
   return cstr;
 }
 
-std::unique_ptr<std::vector<std::vector<const char*>*>>OntologyInterface::readNodesAndIROsAsASP(std::string const p_system)
+std::unique_ptr<std::vector<std::vector<const char*>*>> OntologyInterface::readNodesAndIROsAsASP(
+    std::string const p_system)
 {
   this->checkError("readNodesAndIROsAsASP", "Error exists, readNodesAndIROsAsASP will not be executed");
 
   jstring jstr = env->NewStringUTF(p_system.c_str());
 
-  jobjectArray result = (jobjectArray) env->CallObjectMethod(this->javaInterface, this->readNodesAndIROsAsASPMethod, jstr);
+  jobjectArray result = (jobjectArray)env->CallObjectMethod(this->javaInterface, this->readNodesAndIROsAsASPMethod,
+                                                            jstr);
 
   env->DeleteLocalRef(jstr);
 
-  if(this->checkError("readNodesAndIROsAsASP", "Error occurred at reading nodes and iros for system " + p_system))
-  return nullptr;
+  if (this->checkError("readNodesAndIROsAsASP", "Error occurred at reading nodes and iros for system " + p_system))
+    return nullptr;
 
   std::unique_ptr<std::vector<std::vector<const char*>*>> vec(new std::vector<std::vector<const char*>*>);
 
@@ -850,17 +1005,17 @@ std::unique_ptr<std::vector<std::vector<const char*>*>>OntologyInterface::readNo
 
   for (int i = 0; i < size; ++i)
   {
-    jobjectArray arr = (jobjectArray) env->GetObjectArrayElement(result, i);
+    jobjectArray arr = (jobjectArray)env->GetObjectArrayElement(result, i);
     int size2 = env->GetArrayLength(arr);
     std::vector<const char*>* vec2 = new std::vector<const char*>();
 
     for (int j = 0; j < size2; ++j)
     {
-      jstring str = (jstring) env->GetObjectArrayElement(arr, j);
-      const char* cstr = env->GetStringUTFChars(str,0);
+      jstring str = (jstring)env->GetObjectArrayElement(arr, j);
+      const char* cstr = env->GetStringUTFChars(str, 0);
       vec2->push_back(cstr);
 
-      env->ReleaseStringUTFChars(str,0);
+      env->ReleaseStringUTFChars(str, 0);
       env->DeleteLocalRef(str);
     }
 

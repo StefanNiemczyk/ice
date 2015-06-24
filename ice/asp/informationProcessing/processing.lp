@@ -309,7 +309,7 @@ map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP_MAX+1) :-
 
 
 % checking point budget of systems
-:- system(SYSTEM,POINTS), 
+:- systemPoints(SYSTEM,POINTS), 
    SUM_STREAMS = #sum{COST,SYSTEM,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP : 
 			streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),_), 
 			metadataProcessing(cost,SYSTEM,SYSTEM_TARGET,COST)}, 
@@ -335,12 +335,12 @@ map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP_MAX+1) :-
 
 
 % cost
-sumMetadata(k,METADATA,SUM) :- 
-	SUM = #sum{VALUE,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), metadataProcessing(METADATA,SYSTEM,NODE,VALUE)}, 
-	metadata(processing,METADATA,_),
-	query(k).
-#minimize { COST@priorityCost,METADATA : sumMetadata(k,METADATA,COST), query(k) }.
-%#minimize { COST@priorityCost,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), nodeCost(SYSTEM,NODE,COST), query(k) }.
+%sumMetadata(k,METADATA,SUM) :- 
+%	SUM = #sum{VALUE,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), metadataProcessing(METADATA,SYSTEM,NODE,VALUE)}, 
+%	metadata(processing,METADATA,_),
+%	query(k).
+%#minimize { COST@priorityCost,METADATA : sumMetadata(k,METADATA,COST), query(k) }.
+#minimize { COST@priorityCost,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), metadataProcessing(cost,SYSTEM,NODE,COST), query(k) }.
 
 
 
@@ -386,12 +386,6 @@ requiredMetadata(delay,system,information,delayValue).
 
 
 %--------------------------------------------------------------------------------------
-#program system(name,points).
-
-#external system(name,points).
-
-
-%--------------------------------------------------------------------------------------
 #program transfer(system1,system2,delayValue,costValue).
 
 #external transfer(system1,system2).
@@ -404,6 +398,37 @@ metadataProcessing(cost,system2,system1,costValue).
 metadataOutput(delay,system2,system1,delayValue).
 
 
+%--------------------------------------------------------------------------------------
+#program system(name,points).
+
+#external system(name,default).
+systemPoints(name,points) :- system(name,default).
+
+
+%--------------------------------------------------------------------------------------
+#program island(name).
+
+#external island(name).
+
+
+%--------------------------------------------------------------------------------------
+#program system(name,points,island).
+
+#external system(name,island).
+systemPoints(name,points) :- system(name,island).
+
+
+%--------------------------------------------------------------------------------------
+#program bridge(island1,island2,delayValue,costValue).
+
+#external bridge(island1,island2).
+bridge(island2,island1) :- bridge(island1,island2).
+
+metadataProcessing(cost,island1,island2,costValue).
+metadataOutput(delay,island1,island2,delayValue).
+
+metadataProcessing(cost,island2,island1,costValue).
+metadataOutput(delay,island2,island1,delayValue).
 
 
 

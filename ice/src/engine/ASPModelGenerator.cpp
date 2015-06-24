@@ -522,8 +522,14 @@ std::shared_ptr<ASPSystem> ASPModelGenerator::getASPSystemByIRI(std::string p_ir
 
   _log->info("New asp system found %v", p_iri.c_str());
 
-  std::shared_ptr<ASPSystem> system = std::make_shared<ASPSystem>(this->engine, this->coordinator->getEngineState(p_iri));
+  int index = p_iri.find_last_of("#");
+  std::string asp = (index != std::string::npos ? p_iri.substr(index+1, p_iri.length()) : p_iri);
+
+  auto external = this->asp->getExternal("system", {Gringo::Value(asp)}, true);
+
+  std::shared_ptr<ASPSystem> system = std::make_shared<ASPSystem>(this->engine, this->coordinator->getEngineState(p_iri), external);
   this->systems.push_back(system);
+
 
   return system;
 }

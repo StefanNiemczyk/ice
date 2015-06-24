@@ -34,6 +34,7 @@ public class IceIris {
 
 	public final OWLObjectProperty hasSystem;
 	public final OWLObjectProperty hasInput;
+	public final OWLObjectProperty hasInputMap;
 	public final OWLObjectProperty hasRelatedInput;
 	public final OWLObjectProperty hasOutput;
 	public final OWLObjectProperty hasOutputMap;
@@ -87,6 +88,7 @@ public class IceIris {
 
 		this.hasSystem = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasSystem"));
 		this.hasInput = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasInput"));
+		this.hasInputMap = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasInputMap"));
 		this.hasRelatedInput = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasRelatedInput"));
 		this.hasOutput = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasOutput"));
 		this.hasOutputMap = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasOutputMap"));
