@@ -13,8 +13,8 @@
 	query(k).
 
 % select a theoretical map for each required map
-0 { before(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),tnode(k,SYSTEM,none,none,none),SCOPE,REP,0) : tmap(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),ENTITY_TYPE,SCOPE,REP,ENTITY2) } 1 :- 
-	requiredMap(SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2), 
+0 { before(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),tnode(k,SYSTEM,none,none,none),INFO_TYPE,0) : tmap(k,SYSTEM,tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE) } 1 :- 
+	requiredMap(SYSTEM,INFO_TYPE), 
 	query(k).
 
 
@@ -28,21 +28,26 @@ MIN { before(TNODE,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,S) :
 	tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,MIN,MAX), 
 	query(k).
 
-MIN { before(TNODE,tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),S) : 
+MIN { before(TNODE,TMAP_NODE,information(ENTITY,SCOPE,REP,ENTITY2),S) : 
 		tstream(k,SYSTEM,TNODE,information(ENTITY,SCOPE,REP,ENTITY2)), 
-		entity(ENTITY,ENTITY_TYPE),
-		not before(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),TNODE,_) } MAX :- 
+		not before(TMAP_NODE,TNODE,_) } MAX :- 
+	flagged(k,MAP_NODE,S), 
+	entity(ENTITY,ENTITY_TYPE),
+	S < maxStepCount, 
+	tmapInput(TMAP_NODE,informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),MIN,MAX), 
+	query(k).
+
+MIN { before(TNODE,tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,S) : 
+		tmap(k,SYSTEM,TNODE,INFO_TYPE) } MAX :- 
 	flagged(k,tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),S), 
 	S < maxStepCount, 
-	tmapInput(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),SCOPE,REP,MIN,MAX), 
+	tmapInputMap(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,MIN,MAX), 
 	query(k).
 
 
 % flag node as to used
 flagged(k,TNODE,S+1) :- before(TNODE,_,_,S), query(k).
-flagged(k,TMAPNODE,S+1) :- before(TMAPNODE,_,_,_,S), query(k).
-%:- flagged(k,TNODE,S1), flagged(k,TNODE,S2), S1 != S2.
-%:- before(TNODE1,TNODE2,_,_), before(TNODE2,TNODE1,_,_).
+%flagged(k,TMAPNODE,S+1) :- before(TMAPNODE,_,_,S), query(k).
 
 
 % each flagged node will be instanced
@@ -68,6 +73,11 @@ streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,NODE2,SYSTEM_SOURCE,INFO,S
 	stream(k,SYSTEM_SOURCE,NODE2,SYSTEM_SOURCE,INFO,STEP),
 	transfer(SYSTEM_SOURCE,SYSTEM_TARGET).
 
+mapTransfer(k,SYSTEM_TARGET,map(k,SYSTEM_SOURCE,NODE2,SYSTEM_SOURCE,INFO_TYPE,STEP),0) :-
+	before(tmapNode(k,SYSTEM_SOURCE,NODE2,ENTITY_TYPE,ENTITY2),tmapNode(k,SYSTEM_TARGET,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,S),
+	map(k,SYSTEM_SOURCE,NODE2,SYSTEM_SOURCE,INFO_TYPE,STEP),
+	transfer(SYSTEM_SOURCE,SYSTEM_TARGET).
+
 
 % flagged nodes which are not instanced are forbidden
 :- flagged(k,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),S), 
@@ -77,17 +87,4 @@ streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,NODE2,SYSTEM_SOURCE,INFO,S
    not mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2).
 
 
-%:- before(tnode(k,SYSTEM,NODE2,ENTITY,ENTITY2), tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),_,S), iro(SYSTEM,NODE,_,_), iro(SYSTEM,NODE2,_,_).
-%*
-iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP3) :- iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP2), iroChain(ENTITY,SCOPE,ENTITY2,REP2,REP3). 
 
-iroChain(ENTITY,SCOPE,ENTITY2,REP1,REP2) :-
-	before(tnode(k,SYSTEM,NODE2,ENTITY,ENTITY2), tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),_,_),
-	iro(SYSTEM,NODE,_,_),
-	iro(SYSTEM,NODE2,_,_),
-	stream(k,SYSTEM,_,_,information(ENTITY,SCOPE,REP2,ENTITY2),STEP+1),
-	stream(k,SYSTEM,_,_,information(ENTITY,SCOPE,REP1,ENTITY2),STEP),
-	REP2 != REP1.
-
-:- iroChain(ENTITY,SCOPE,ENTITY2,REP,REP).
-*%

@@ -649,6 +649,22 @@
     
 
 
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Density -->
+
+    <owl:Class rdf:about="&Ice;Density">
+        <rdfs:subClassOf rdf:resource="&Ice;MapMetadata"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DensityASPGrounding -->
+
+    <owl:Class rdf:about="&Ice;DensityASPGrounding">
+        <rdfs:subClassOf rdf:resource="&Ice;ASPMetadataGrounding"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep -->
 
     <owl:Class rdf:about="&Ice;DoubleRep">
@@ -871,6 +887,14 @@
     <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Map -->
 
     <owl:Class rdf:about="&Ice;Map"/>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapMetadata -->
+
+    <owl:Class rdf:about="&Ice;MapMetadata">
+        <rdfs:subClassOf rdf:resource="&Ice;Metadata"/>
+    </owl:Class>
     
 
 
@@ -1879,6 +1903,51 @@
     <owl:NamedIndividual rdf:about="&Ice;MapDelayASPGrounding">
         <rdf:type rdf:resource="&Ice;DelayASPGrounding"/>
         <hasGroundingValue rdf:datatype="&xsd;string">metadataOutput(delay,$system,$element,max,$value1,$value2).</hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapDensityAvgASPGrounding -->
+
+    <owl:NamedIndividual rdf:about="&Ice;MapDensityAvgASPGrounding">
+        <rdf:type rdf:resource="&Ice;DensityASPGrounding"/>
+        <hasGroundingValue rdf:datatype="&xsd;string">metadataOutput(accuracy,$system,$element,avg,$value1,$value2).</hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapDensityFixASPGrounding -->
+
+    <owl:NamedIndividual rdf:about="&Ice;MapDensityFixASPGrounding">
+        <rdf:type rdf:resource="&Ice;DensityASPGrounding"/>
+        <hasGroundingValue rdf:datatype="&xsd;string">metadataOutput(density,$system,$element,fix,$value1,$value2).</hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapDensityMaxASPGrounding -->
+
+    <owl:NamedIndividual rdf:about="&Ice;MapDensityMaxASPGrounding">
+        <rdf:type rdf:resource="&Ice;DensityASPGrounding"/>
+        <hasGroundingValue rdf:datatype="&xsd;string">metadataOutput(accuracy,$system,$element,max,$value1,$value2).</hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapDensityMinASPGrounding -->
+
+    <owl:NamedIndividual rdf:about="&Ice;MapDensityMinASPGrounding">
+        <rdf:type rdf:resource="&Ice;DensityASPGrounding"/>
+        <hasGroundingValue rdf:datatype="&xsd;string">metadataOutput(accuracy,$system,$element,min,$value1,$value2).</hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapDensitySumASPGrounding -->
+
+    <owl:NamedIndividual rdf:about="&Ice;MapDensitySumASPGrounding">
+        <rdf:type rdf:resource="&Ice;DensityASPGrounding"/>
+        <hasGroundingValue rdf:datatype="&xsd;string">metadataOutput(accuracy,$system,$element,sum,$value1,$value2).</hasGroundingValue>
     </owl:NamedIndividual>
     
 

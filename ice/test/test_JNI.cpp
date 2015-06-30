@@ -637,7 +637,10 @@ TEST(JNITest, addMapNodeToSystem)
   EXPECT_EQ("mapNodeTemplate(testSystem2,testMapNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
 
   std::string toTest = std::string(returnValues->at(3)->at(0));
+
   EXPECT_TRUE(toTest.find("#external mapNodeTemplate(testSystem2,testMapNodeInd,any)") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(testSystem2,testMapNodeInd,position,coordinatePositionRep,none,1,1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("outputMap(testSystem2,testMapNodeInd,robot,position,coordinatePositionRep,none).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataProcessing(cost,testSystem2,testMapNodeInd,5).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataOutput(delay,testSystem2,testMapNodeInd,fix,5,5).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataOutput(accuracy,testSystem2,testMapNodeInd,fix,-1,-1).") != std::string::npos);
