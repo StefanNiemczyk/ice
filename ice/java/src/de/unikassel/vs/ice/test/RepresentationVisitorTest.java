@@ -25,7 +25,7 @@ public class RepresentationVisitorTest {
 
 	@Test
 	public final void testNoRepresentations() throws Exception {
-		String res = oi.readRepresentationsAsCsv();
+		String res = oi.readRepresentationsAsCSV();
 		assertTrue("No Representations are extracted to empty string", res.isEmpty());
 	}
 
@@ -38,7 +38,7 @@ public class RepresentationVisitorTest {
 
 		assertTrue(oi.addIndividual(dataString, reprString));
 
-		String res = oi.readRepresentationsAsCsv();
+		String res = oi.readRepresentationsAsCSV();
 		assertFalse("Single Representation doesnt result in empty string", res.isEmpty());
 
 		assertEquals("Single integer representation creates correct line", expectedLine, res);
