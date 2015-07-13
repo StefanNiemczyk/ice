@@ -1,6 +1,6 @@
 package de.unikassel.vs.ice;
 
-public final class RepresentationIndividual {
+public final class RepresentationIndividual implements Comparable<RepresentationIndividual> {
 
 	public static final char DELIM = ';';
 
@@ -26,4 +26,10 @@ public final class RepresentationIndividual {
 		delimStr += DELIM;
 		return representation.ordinal() + delimStr + dataString;
 	}
+
+	@Override
+	public int compareTo(final RepresentationIndividual o) {
+		return representation.ordinal() - o.getRepresentation().ordinal();
+	}
+
 }

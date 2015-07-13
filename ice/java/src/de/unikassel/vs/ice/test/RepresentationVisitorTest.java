@@ -4,8 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import de.unikassel.vs.ice.IceOntologyInterface;
 import de.unikassel.vs.ice.RepresentationIndividual;
 
@@ -44,4 +49,37 @@ public class RepresentationVisitorTest {
 		assertEquals("Single integer representation creates correct line", expectedLine, res);
 	}
 
+	@Test
+	public final void testMultipleRepresentations() throws Exception {
+		String dataString = "987654321";
+		String reprString = "IntegerRep";
+		final RepresentationIndividual expectedInd1 = new RepresentationIndividual(reprString, dataString);
+		assertTrue(oi.addIndividual(dataString, reprString));
+		List<String> expectedLines = new ArrayList<>();
+		expectedLines.add(expectedInd1.toString() + "\n");
+
+		dataString = "HelloWorlds";
+		reprString = "StringRep";
+		final RepresentationIndividual expectedInd2 = new RepresentationIndividual(reprString, dataString);
+		assertTrue(oi.addIndividual(dataString, reprString));
+		expectedLines.add(expectedInd2.toString() + "\n");
+
+		dataString = "3.1415";
+		reprString = "DoubleRep";
+		final RepresentationIndividual expectedInd3 = new RepresentationIndividual(reprString, dataString);
+		assertTrue(oi.addIndividual(dataString, reprString));
+		expectedLines.add(expectedInd3.toString());
+
+		// TODO: Fix sorting
+		Collections.sort(expectedLines);
+		String expectedLinesStr = "";
+		for (String line : expectedLines) {
+			expectedLinesStr += line;
+		}
+
+		String res = oi.readRepresentationsAsCSV();
+		assertFalse("Multiple Representations doesnt result in empty string", res.isEmpty());
+
+		assertEquals("Multiple Representations creates correct lines", expectedLinesStr, res);
+	}
 }

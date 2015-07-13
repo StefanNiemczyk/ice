@@ -1,6 +1,10 @@
 package de.unikassel.vs.ice.test;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.IRI;
@@ -104,16 +108,22 @@ public class RepresentationVisitor extends IceVisitor {
 		super(ioi, ontologies, reasoner, iceIris);
 	}
 
+	public static List<RepresentationIndividual> asSortedList(final Set<RepresentationIndividual> set) {
+		List<RepresentationIndividual> list = new ArrayList<RepresentationIndividual>(set);
+		Collections.sort(list);
+		return list;
+	}
+
 	@Override
 	public final String toString() {
 		String str = "";
 		boolean lineAdded = false;
-		
-		for (RepresentationIndividual ri : individuals) {
+
+		for (RepresentationIndividual ri : asSortedList(individuals)) {
 			str += ri.toString() + '\n';
 			lineAdded = true;
 		}
-		
+
 		if (lineAdded) {
 			str = str.substring(0, str.length() - 1); /* Remove last newline */
 		}
