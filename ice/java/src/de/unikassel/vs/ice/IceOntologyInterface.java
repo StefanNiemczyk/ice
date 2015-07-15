@@ -29,8 +29,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 
-import de.unikassel.vs.ice.test.RepresentationVisitor;
-
 public class IceOntologyInterface {
 	private OWLOntologyManager manager;
 	private OWLOntology mainOntology;

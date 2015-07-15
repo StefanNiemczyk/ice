@@ -1,4 +1,4 @@
-package de.unikassel.vs.ice.test;
+package de.unikassel.vs.ice;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,11 +92,6 @@ import org.semanticweb.owlapi.model.SWRLRule;
 import org.semanticweb.owlapi.model.SWRLSameIndividualAtom;
 import org.semanticweb.owlapi.model.SWRLVariable;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-
-import de.unikassel.vs.ice.IceIris;
-import de.unikassel.vs.ice.IceOntologyInterface;
-import de.unikassel.vs.ice.IceVisitor;
-import de.unikassel.vs.ice.RepresentationIndividual;
 
 public class RepresentationVisitor extends IceVisitor {
 
