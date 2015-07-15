@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Before;
@@ -68,18 +69,32 @@ public class RepresentationVisitorTest {
 		reprString = "DoubleRep";
 		final RepresentationIndividual expectedInd3 = new RepresentationIndividual(reprString, dataString);
 		assertTrue(oi.addIndividual(dataString, reprString));
-		expectedLines.add(expectedInd3.toString());
+		expectedLines.add(expectedInd3.toString() + "\n");
 
-		// TODO: Fix sorting
-		Collections.sort(expectedLines);
+		Collections.sort(expectedLines, new Comparator<String>() {
+			public int extractReprNum(final String str) {
+				String numStr = str.split(RepresentationIndividual.DELIM_STR)[0];
+				return Integer.parseInt(numStr);
+			}
+
+			@Override
+			public int compare(final String o1, final String o2) {
+				final int num1 = extractReprNum(o1);
+				final int num2 = extractReprNum(o2);
+
+				return num1 - num2;
+			}
+		});
+
 		String expectedLinesStr = "";
 		for (String line : expectedLines) {
 			expectedLinesStr += line;
 		}
+		expectedLinesStr = expectedLinesStr.substring(0,
+				expectedLinesStr.length() - 1); /* Remove last newline */
 
 		String res = oi.readRepresentationsAsCSV();
 		assertFalse("Multiple Representations doesnt result in empty string", res.isEmpty());
-
 		assertEquals("Multiple Representations creates correct lines", expectedLinesStr, res);
 	}
 }

@@ -3,6 +3,7 @@ package de.unikassel.vs.ice;
 public final class RepresentationIndividual implements Comparable<RepresentationIndividual> {
 
 	public static final char DELIM = ';';
+	public static final String DELIM_STR = "" + DELIM;
 
 	private Representation representation;
 	private String dataString;
@@ -22,9 +23,7 @@ public final class RepresentationIndividual implements Comparable<Representation
 
 	@Override
 	public String toString() {
-		String delimStr = "";
-		delimStr += DELIM;
-		return representation.ordinal() + delimStr + dataString;
+		return representation.ordinal() + DELIM_STR + dataString;
 	}
 
 	@Override
