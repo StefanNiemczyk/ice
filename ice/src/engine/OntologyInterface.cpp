@@ -138,6 +138,9 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->readInformationStructureAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface,
                                                                      "readInformationStructureAsASP",
                                                                      "()Ljava/lang/String;");
+  this->readRepresentationsAsCSVMethod = this->env->GetMethodID(this->javaOntologyInterface,
+                                                                     "readRepresentationsAsCSV",
+                                                                     "()Ljava/lang/String;");
   this->readNodesAndIROsAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface, "readNodesAndIROsAsASP",
                                                              "(Ljava/lang/String;)[[Ljava/lang/String;");
   this->addNodeIndividualMethod =
@@ -981,6 +984,21 @@ const char* OntologyInterface::readInformationStructureAsASP()
 
 //  std::string sstr(cstr);
 //  delete cstr;
+  return cstr;
+}
+
+const char* OntologyInterface::readRepresentationsAsCSV()
+{
+  this->checkError("readRepresentationsAsCsv", "Error exists, readRepresentationsAsCsv will not be executed");
+
+  jstring result = (jstring)env->CallObjectMethod(this->javaInterface, this->readRepresentationsAsCSVMethod);
+
+  if (this->checkError("readRepresentationsAsCsv", "Error occurred at reading representations"))
+    return "";
+
+  const char* cstr = env->GetStringUTFChars(result, 0);
+  env->ReleaseStringUTFChars(result, 0);
+
   return cstr;
 }
 

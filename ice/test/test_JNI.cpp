@@ -899,4 +899,40 @@ TEST(JNITest, save)
 //  }
 //}
 
+TEST(JNITest, readRepresentationsAsCSV)
+{
+  // Given a valid empty ice ontology
+  std::string path = ros::package::getPath("ice");
+  bool result;
+
+  ice::OntologyInterface oi(path + "/java/lib/");
+
+  oi.addIRIMapper(path + "/ontology/");
+
+  ASSERT_FALSE(oi.errorOccurred());
+
+  result = oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.loadOntologies();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.isConsistent();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  // When adding a single individual
+  result = oi.addIndividual("HelloRepresentation","StringRep");
+  ASSERT_TRUE(result);
+
+  // Then the right csv like string is returned
+  std::string read_csv_res = oi.readRepresentationsAsCSV();
+  ASSERT_EQ("3;HelloRepresentation", read_csv_res);
+}
+
 }

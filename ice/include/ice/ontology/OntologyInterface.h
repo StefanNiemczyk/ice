@@ -72,6 +72,7 @@ public:
   bool addOntologyIRI(std::string const p_iri);
   bool removeOntologyIRI(std::string const p_iri);
   const char* readInformationStructureAsASP();
+  const char* readRepresentationsAsCSV();
   std::unique_ptr<std::vector<std::vector<const char*>*>>readNodesAndIROsAsASP(std::string const p_system);
   bool addNodeIndividual(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::string const p_aboutEntity, std::string const p_aboutRelatedEntity, std::vector<std::string> p_metadatas,
       std::vector<int> p_metadataValues, std::vector<int> p_metadataValues2, std::vector<std::string> p_metadataGroundings);
@@ -126,6 +127,7 @@ private:
   jmethodID addOntologyIRIMethod; /**< Method id */
   jmethodID removeOntologyIRIMethod; /**< Method id */
   jmethodID readInformationStructureAsASPMethod; /**< Method id */
+  jmethodID readRepresentationsAsCSVMethod; /**< Method id */
   jmethodID readNodesAndIROsAsASPMethod; /**< Method id */
   jmethodID addNodeIndividualMethod; /**< Method id */
   jmethodID addIROIndividualMethod; /**< Method id */
