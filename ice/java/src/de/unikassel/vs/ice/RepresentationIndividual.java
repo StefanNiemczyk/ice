@@ -4,6 +4,7 @@ public final class RepresentationIndividual implements Comparable<Representation
 
 	public static final char DELIM = ';';
 	public static final String DELIM_STR = "" + DELIM;
+	public static final String ESCAPED_DELIM_STR = "\\" + DELIM;
 
 	private Representation representation;
 	private String dataString;
@@ -23,7 +24,9 @@ public final class RepresentationIndividual implements Comparable<Representation
 
 	@Override
 	public String toString() {
-		return representation.ordinal() + DELIM_STR + dataString;
+		final int repNum = representation.ordinal();
+		final String dataStr = dataString.replace(DELIM_STR, ESCAPED_DELIM_STR);
+		return repNum + DELIM_STR + dataStr;
 	}
 
 	@Override

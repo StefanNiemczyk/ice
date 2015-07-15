@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.unikassel.vs.ice.IceOntologyInterface;
+import de.unikassel.vs.ice.Representation;
 import de.unikassel.vs.ice.RepresentationIndividual;
 
 public class RepresentationVisitorTest {
@@ -46,7 +47,6 @@ public class RepresentationVisitorTest {
 
 		String res = oi.readRepresentationsAsCSV();
 		assertFalse("Single Representation doesnt result in empty string", res.isEmpty());
-
 		assertEquals("Single integer representation creates correct line", expectedLine, res);
 	}
 
@@ -96,5 +96,19 @@ public class RepresentationVisitorTest {
 		String res = oi.readRepresentationsAsCSV();
 		assertFalse("Multiple Representations doesnt result in empty string", res.isEmpty());
 		assertEquals("Multiple Representations creates correct lines", expectedLinesStr, res);
+	}
+
+	@Test
+	public final void testDelimInValue() throws Exception {
+		final String delim = RepresentationIndividual.DELIM_STR;
+		final String escapedDelim = "\\" + delim;
+		final String dataString = "This is a bad " + delim + " string";
+		final String reprString = "StringRep";
+		final int repNum = Representation.valueOf(reprString).ordinal();
+		final String expectedLine = repNum + delim + dataString.replace(delim, escapedDelim);
+		final RepresentationIndividual ind = new RepresentationIndividual(reprString, dataString);
+		final String line = ind.toString();
+
+		assertEquals("Expected line has espaced delim character", expectedLine, line);
 	}
 }
