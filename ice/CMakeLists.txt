@@ -123,6 +123,9 @@ add_jar(
   java/src/de/unikassel/vs/ice/IceVisitor.java
   java/src/de/unikassel/vs/ice/InfoStructureVisitor.java
   java/src/de/unikassel/vs/ice/NodeIROVisitor.java
+  java/src/de/unikassel/vs/ice/RepresentationVisitor.java
+  java/src/de/unikassel/vs/ice/Representation.java
+  java/src/de/unikassel/vs/ice/RepresentationIndividual.java
   OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/java/lib
 )
 
