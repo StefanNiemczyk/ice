@@ -6,6 +6,7 @@
  */
 
 #include "ice/ontology/OntologyInterface.h"
+#include "ice/representation/Representation.h"
 
 #include "easylogging++.h"
 
@@ -1001,6 +1002,23 @@ const char* OntologyInterface::readRepresentationsAsCSV()
 
   return cstr;
 }
+
+std::unique_ptr<std::vector<Representation>> OntologyInterface::readRepresentations()
+{
+  std::unique_ptr<std::vector<Representation>> reps;
+  this->checkError("readRepresentationsAsCsv", "Error exists, readRepresentationsAsCsv will not be executed");
+
+  jstring result = (jstring)env->CallObjectMethod(this->javaInterface, this->readRepresentationsAsCSVMethod);
+
+  if (this->checkError("readRepresentationsAsCsv", "Error occurred at reading representations"))
+    return reps;
+
+  const char* cstr = env->GetStringUTFChars(result, 0);
+  env->ReleaseStringUTFChars(result, 0);
+
+  return reps;
+}
+
 
 std::unique_ptr<std::vector<std::vector<const char*>*>> OntologyInterface::readNodesAndIROsAsASP(
     std::string const p_system)

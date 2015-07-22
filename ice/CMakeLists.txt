@@ -185,12 +185,14 @@ add_library(${PROJECT_NAME}
   src/engine/ICEngine.cpp 
   src/engine/TimeFactory.cpp
   src/engine/XMLReader.cpp
+  src/engine/Representation.cpp
   
   src/ros/RosCommunication.cpp
   src/ros/RosInformationSender.cpp
   src/ros/RosInformationReceiver.cpp
   src/ros/RosMessageTransform.cpp
   src/ros/RosTimeFactory.cpp
+
 )
 
 ## Declare a cpp executable
@@ -257,7 +259,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
    
  # test/etc/TestTime.cpp
  # test/etc/EngineStuff.cpp
-  test/test_ASPComposition.cpp
+ # test/test_ASPComposition.cpp
  # test/test_ASPRepComputation.cpp
  # test/test_JNI.cpp
  # test/test_ASPCoordinator.cpp
@@ -271,6 +273,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/test_Node.cpp
  # test/test_ModelComperator.cpp
  # test/test_ICEngine.cpp
+  test/test_Representation.cpp
   test/test_main.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
 )
