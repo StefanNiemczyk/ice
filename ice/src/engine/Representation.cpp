@@ -26,6 +26,9 @@ Representation::~Representation() {
     case StringRep:
       delete (char*) data;
       break;
+    case BooleanRep:
+      delete (bool*) data;
+      break;
     default:
       break;
     }
@@ -87,6 +90,17 @@ void *Representation::convertDataStr(const char *dataStr,
   void *res;
 
   switch (type) {
+
+  case BooleanRep:
+    res = new bool;
+    if (strcmp(dataStr, "true") == 0) {
+      *(bool*)res = true;
+    } else if(strcmp(dataStr, "false") == 0) {
+      *(bool*)res = false;
+    } else {
+      // error
+    }
+    break;
 
   case StringRep:
     len = strlen(dataStr) + 1;

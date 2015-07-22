@@ -12,7 +12,18 @@
 namespace
 {
 
-TEST(RepresentationTest, parsingString)
+TEST(RepresentationTest, BooleanRep)
+{
+  ice::Representation r;
+
+  const int res = r.fromCSV("1;true");
+
+  ASSERT_EQ(0, res);
+  ASSERT_EQ(ice::BooleanRep, r.type);
+  ASSERT_TRUE(*(r.get<bool*>()));
+}
+
+TEST(RepresentationTest, StringRep)
 {
   ice::Representation r;
 
