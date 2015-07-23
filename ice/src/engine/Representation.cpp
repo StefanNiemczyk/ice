@@ -37,6 +37,9 @@ Representation::~Representation()
     case UnsignedByteRep:
       delete (unsigned char*) data;
       break;
+    case DoubleRep:
+      delete (double*) data;
+      break;
     default:
       break;
     }
@@ -82,7 +85,7 @@ int Representation::fromCSV(std::string reprStr, const char delim)
   type = static_cast<RepresentationType>(typeNum);
   data = convertDataStr(dataStr, type);
   if (data == NULL) {
-    std::cerr << "Error: Couldn't convert" << dataStr << "to related type "
+    std::cerr << "Error: Couldn't convert " << dataStr << " to related type "
         << type << std::endl;
   }
 
@@ -93,7 +96,9 @@ int Representation::fromCSV(std::string reprStr, const char delim)
 void *Representation::convertDataStr(const char *dataStr,
     RepresentationType type)
 {
+  char *ep;
   size_t len;
+  double double_val = 0;
   void *res = NULL;
 
   switch (type) {
@@ -125,6 +130,16 @@ void *Representation::convertDataStr(const char *dataStr,
     res = new unsigned char;
     // TODO: Parse num for bytes too?
     *(unsigned char*) res = dataStr[0];
+    break;
+
+  case DoubleRep:
+    res = new double;
+    double_val = strtod(dataStr, &ep);
+    if (dataStr == ep || *ep != '\0') {
+      std::cerr << "Error while converting " << dataStr << " to double."
+          << std::endl;
+    }
+    *(double*) res = double_val;
     break;
 
   default:

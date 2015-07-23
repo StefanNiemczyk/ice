@@ -53,7 +53,17 @@ TEST(RepresentationTest, StringRep)
   ASSERT_STREQ("Hello World", r.get<const char*>());
 }
 
+TEST(RepresentationTest, DoubleRep)
+{
+  ice::Representation r;
+  int t = ice::DoubleRep;
 
+  const int res = r.fromCSV("7;3.1415");
+
+  ASSERT_EQ(0, res);
+  ASSERT_EQ(ice::DoubleRep, r.type);
+  ASSERT_EQ(3.1415, *r.get<double*>());
+}
 
 }
 
