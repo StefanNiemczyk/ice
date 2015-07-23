@@ -46,6 +46,9 @@ Representation::~Representation()
     case IntegerRep:
       delete (int*) data;
       break;
+    case LongRep:
+      delete (long*) data;
+      break;
     default:
       break;
     }
@@ -106,6 +109,8 @@ void *Representation::convertDataStr(const char *dataStr,
   size_t len;
   double double_val;
   double float_val;
+  int int_val;
+  long long_val;
   void *res = NULL;
 
   switch (type) {
@@ -161,12 +166,22 @@ void *Representation::convertDataStr(const char *dataStr,
 
   case IntegerRep:
     res = new int;
-    float_val = strtol(dataStr, &ep, 10);
+    int_val = strtol(dataStr, &ep, 10);
     if (dataStr == ep || *ep != '\0') {
       std::cerr << "Error while converting " << dataStr << " to int."
           << std::endl;
     }
-    *(int*) res = float_val;
+    *(int*) res = int_val;
+    break;
+
+  case LongRep:
+    res = new long;
+    long_val = strtol(dataStr, &ep, 10);
+    if (dataStr == ep || *ep != '\0') {
+      std::cerr << "Error while converting " << dataStr << " to long."
+          << std::endl;
+    }
+    *(long*) res = long_val;
     break;
 
   default:

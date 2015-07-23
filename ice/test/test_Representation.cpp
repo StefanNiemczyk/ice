@@ -79,12 +79,24 @@ TEST(RepresentationTest, IntegerRep)
 {
   ice::Representation r;
 
-  const int res = r.fromCSV("10;2147483646");
+  const int res = r.fromCSV("10;32767");
 
   ASSERT_EQ(0, res);
   ASSERT_EQ(ice::IntegerRep, r.type);
-  ASSERT_EQ(2147483646, *r.get<int*>());
+  ASSERT_EQ(32767, *r.get<int*>());
 }
+
+TEST(RepresentationTest, LongRep)
+{
+  ice::Representation r;
+
+  const int res = r.fromCSV("11;2147483646");
+
+  ASSERT_EQ(0, res);
+  ASSERT_EQ(ice::LongRep, r.type);
+  ASSERT_EQ(2147483646, *r.get<long*>());
+}
+
 
 }
 
