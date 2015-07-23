@@ -1003,9 +1003,9 @@ const char* OntologyInterface::readRepresentationsAsCSV()
   return cstr;
 }
 
-std::unique_ptr<std::vector<Representation>> OntologyInterface::readRepresentations()
+std::unique_ptr<std::vector<Representation*>> OntologyInterface::readRepresentations()
 {
-  std::unique_ptr<std::vector<Representation>> reps;
+  std::unique_ptr<std::vector<Representation*>> reps(new std::vector<Representation*>);
   this->checkError("readRepresentationsAsCsv", "Error exists, readRepresentationsAsCsv will not be executed");
 
   jstring result = (jstring)env->CallObjectMethod(this->javaInterface, this->readRepresentationsAsCSVMethod);
@@ -1016,11 +1016,15 @@ std::unique_ptr<std::vector<Representation>> OntologyInterface::readRepresentati
   const char* cstr = env->GetStringUTFChars(result, 0);
   env->ReleaseStringUTFChars(result, 0);
 
-  std::cout << "Reps string: " << cstr << std::endl << std::endl;
+  std::vector<std::string> lines = split(cstr, '\n');
 
+  for (std::string line : lines) {
+    Representation* r = new Representation();
+    r->fromCSV(line);
+    reps->push_back(r);
+  }
 
-
-  return reps;
+  return std::move(reps);
 }
 
 
