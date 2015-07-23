@@ -34,6 +34,9 @@ Representation::~Representation()
     case StringRep:
       delete (char*) data;
       break;
+    case UnsignedByteRep:
+      delete (unsigned char*) data;
+      break;
     default:
       break;
     }
@@ -114,7 +117,14 @@ void *Representation::convertDataStr(const char *dataStr,
 
   case ByteRep:
     res = new char;
+    // TODO: Parse num for bytes too?
     *(char*) res = dataStr[0];
+    break;
+
+  case UnsignedByteRep:
+    res = new unsigned char;
+    // TODO: Parse num for bytes too?
+    *(unsigned char*) res = dataStr[0];
     break;
 
   default:
