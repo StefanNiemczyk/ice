@@ -49,6 +49,18 @@ Representation::~Representation()
     case LongRep:
       delete (long*) data;
       break;
+    case ShortRep:
+      delete (short*) data;
+      break;
+    case UnsignedIntegerRep:
+      delete (unsigned int*) data;
+      break;
+    case UnsignedLongRep:
+      delete (unsigned long*) data;
+      break;
+    case UnsignedShortRep:
+      delete (unsigned short*) data;
+      break;
     default:
       break;
     }
@@ -109,8 +121,8 @@ void *Representation::convertDataStr(const char *dataStr,
   size_t len;
   double double_val;
   double float_val;
-  int int_val;
-  long long_val;
+  long int_val;
+  unsigned long uint_val;
   void *res = NULL;
 
   switch (type) {
@@ -176,12 +188,53 @@ void *Representation::convertDataStr(const char *dataStr,
 
   case LongRep:
     res = new long;
-    long_val = strtol(dataStr, &ep, 10);
+    int_val = strtol(dataStr, &ep, 10);
     if (dataStr == ep || *ep != '\0') {
       std::cerr << "Error while converting " << dataStr << " to long."
           << std::endl;
     }
-    *(long*) res = long_val;
+    *(long*) res = int_val;
+    break;
+
+  case ShortRep:
+    res = new short;
+    int_val = strtol(dataStr, &ep, 10);
+    if (dataStr == ep || *ep != '\0') {
+      std::cerr << "Error while converting " << dataStr << " to short."
+          << std::endl;
+    }
+    // TODO: Proably check if its too big
+    *(short*) res = int_val;
+    break;
+
+  case UnsignedIntegerRep:
+    res = new unsigned int;
+    uint_val = strtoul(dataStr, &ep, 10);
+    if (dataStr == ep || *ep != '\0') {
+      std::cerr << "Error while converting " << dataStr << " to unsigned int."
+          << std::endl;
+    }
+    *(unsigned int*) res = uint_val;
+    break;
+
+  case UnsignedLongRep:
+    res = new unsigned long;
+    uint_val = strtoul(dataStr, &ep, 10);
+    if (dataStr == ep || *ep != '\0') {
+      std::cerr << "Error while converting " << dataStr << " to unsigned long."
+          << std::endl;
+    }
+    *(unsigned long*) res = uint_val;
+    break;
+
+  case UnsignedShortRep:
+    res = new unsigned short;
+    uint_val = strtoul(dataStr, &ep, 10);
+    if (dataStr == ep || *ep != '\0') {
+      std::cerr << "Error while converting " << dataStr << " to unsigned short."
+          << std::endl;
+    }
+    *(unsigned short*) res = uint_val;
     break;
 
   default:

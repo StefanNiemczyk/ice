@@ -97,6 +97,50 @@ TEST(RepresentationTest, LongRep)
   ASSERT_EQ(2147483646, *r.get<long*>());
 }
 
+TEST(RepresentationTest, ShortRep)
+{
+  ice::Representation r;
+
+  const int res = r.fromCSV("12;32767");
+
+  ASSERT_EQ(0, res);
+  ASSERT_EQ(ice::ShortRep, r.type);
+  ASSERT_EQ(32767, *r.get<short*>());
+}
+
+TEST(RepresentationTest, UnsignedIntegerRep)
+{
+  ice::Representation r;
+
+  const int res = r.fromCSV("13;32767");
+
+  ASSERT_EQ(0, res);
+  ASSERT_EQ(ice::UnsignedIntegerRep, r.type);
+  ASSERT_EQ(32767, *r.get<unsigned int*>());
+}
+
+TEST(RepresentationTest, UnsignedLongRep)
+{
+  ice::Representation r;
+
+  const int res = r.fromCSV("14;2147483646");
+
+  ASSERT_EQ(0, res);
+  ASSERT_EQ(ice::UnsignedLongRep, r.type);
+  ASSERT_EQ(2147483646, *r.get<unsigned long*>());
+}
+
+TEST(RepresentationTest, UnsignedShortRep)
+{
+  ice::Representation r;
+
+  const int res = r.fromCSV("15;32767");
+
+  ASSERT_EQ(0, res);
+  ASSERT_EQ(ice::UnsignedShortRep, r.type);
+  ASSERT_EQ(32767, *r.get<unsigned short*>());
+}
+
 
 }
 
