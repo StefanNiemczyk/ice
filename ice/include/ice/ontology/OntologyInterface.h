@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+#include "ice/representation/Representation.h"
+
 // Forward declaration
 namespace el
 {
@@ -22,8 +24,6 @@ class Logger;
 
 namespace ice
 {
-
-class Representation;
 
 class OntologyInterface
 {

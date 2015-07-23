@@ -6,7 +6,7 @@
  */
 
 #include "ice/ontology/OntologyInterface.h"
-#include "ice/representation/Representation.h"
+#include "ice/representation/split.h"
 
 #include "easylogging++.h"
 
@@ -1015,6 +1015,10 @@ std::unique_ptr<std::vector<Representation>> OntologyInterface::readRepresentati
 
   const char* cstr = env->GetStringUTFChars(result, 0);
   env->ReleaseStringUTFChars(result, 0);
+
+  std::cout << "Reps string: " << cstr << std::endl << std::endl;
+
+
 
   return reps;
 }

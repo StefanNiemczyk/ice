@@ -187,6 +187,8 @@ add_library(${PROJECT_NAME}
   src/engine/XMLReader.cpp
   src/engine/Representation.cpp
   
+  src/engine/split.cpp
+
   src/ros/RosCommunication.cpp
   src/ros/RosInformationSender.cpp
   src/ros/RosInformationReceiver.cpp
@@ -261,7 +263,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/etc/EngineStuff.cpp
  # test/test_ASPComposition.cpp
  # test/test_ASPRepComputation.cpp
- # test/test_JNI.cpp
+  test/test_JNI.cpp
  # test/test_ASPCoordinator.cpp
  # test/test_RingBuffer.cpp
  # test/test_Buffer.cpp

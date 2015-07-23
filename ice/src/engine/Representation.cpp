@@ -5,7 +5,6 @@
  *      Author: paspartout
  */
 
-#include <ice/representation/Representation.h>
 #include <stddef.h>
 #include <cctype>
 #include <cerrno>
@@ -13,14 +12,19 @@
 #include <cstring>
 #include <iostream>
 
+#include "ice/representation/Representation.h"
+#include "ice/representation/split.h"
+
 namespace ice {
 
-Representation::Representation() {
+Representation::Representation()
+{
   type = UnknownType;
   data = NULL;
 }
 
-Representation::~Representation() {
+Representation::~Representation()
+{
   if (data != NULL) {
     switch (type) {
     case StringRep:
@@ -35,10 +39,10 @@ Representation::~Representation() {
   }
 }
 
-int Representation::fromCSV(std::string reprStr, const char delim) {
+int Representation::fromCSV(std::string reprStr, const char delim)
+{
   const size_t length = reprStr.length() + 1;
   char *repCstr = new char[length];
-
 
   if (reprStr.empty()) {
     return -1;
@@ -53,22 +57,16 @@ int Representation::fromCSV(std::string reprStr, const char delim) {
     return -1;
   }
 
-  const char *typeStr = strtok(repCstr, &delim);
-  if (typeStr == NULL) {
-    std::cerr << "Error while tokenizing representation string" << std::endl;
-    return -1;
-  }
-  const char *dataStr = strtok(NULL, &delim);
-  if (dataStr == NULL) {
-    std::cerr << "Error while tokenizing representation string" << std::endl;
-    return -1;
-  }
+  std::vector<std::string> tokens = split(repCstr, ';');
+  const char *typeStr = tokens.at(0).c_str();
+  const char *dataStr = tokens.at(1).c_str();
 
   errno = 0;
   char *ep;
   const int typeNum = strtol(typeStr, &ep, 10);
   if (typeStr == ep || *ep != '\0') {
-    std::cerr << "Error while converting " << typeStr << " to int." << std::endl;
+    std::cerr << "Error while converting " << typeStr << " to int."
+        << std::endl;
     return -1;
   }
 
@@ -85,7 +83,8 @@ int Representation::fromCSV(std::string reprStr, const char delim) {
 }
 
 void *Representation::convertDataStr(const char *dataStr,
-    RepresentationType type) {
+    RepresentationType type)
+{
   size_t len;
   void *res;
 
@@ -94,9 +93,9 @@ void *Representation::convertDataStr(const char *dataStr,
   case BooleanRep:
     res = new bool;
     if (strcmp(dataStr, "true") == 0) {
-      *(bool*)res = true;
-    } else if(strcmp(dataStr, "false") == 0) {
-      *(bool*)res = false;
+      *(bool*) res = true;
+    } else if (strcmp(dataStr, "false") == 0) {
+      *(bool*) res = false;
     } else {
       // error
     }
