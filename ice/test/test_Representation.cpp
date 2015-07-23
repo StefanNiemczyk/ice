@@ -56,7 +56,6 @@ TEST(RepresentationTest, StringRep)
 TEST(RepresentationTest, DoubleRep)
 {
   ice::Representation r;
-  int t = ice::DoubleRep;
 
   const int res = r.fromCSV("7;3.1415");
 
@@ -64,6 +63,18 @@ TEST(RepresentationTest, DoubleRep)
   ASSERT_EQ(ice::DoubleRep, r.type);
   ASSERT_EQ(3.1415, *r.get<double*>());
 }
+
+TEST(RepresentationTest, FloatRep)
+{
+  ice::Representation r;
+
+  const int res = r.fromCSV("8;3.14");
+
+  ASSERT_EQ(0, res);
+  ASSERT_EQ(ice::FloatRep, r.type);
+  ASSERT_EQ(3.14f, *r.get<float*>());
+}
+
 
 }
 

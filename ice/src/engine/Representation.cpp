@@ -40,6 +40,9 @@ Representation::~Representation()
     case DoubleRep:
       delete (double*) data;
       break;
+    case FloatRep:
+      delete (float*) data;
+      break;
     default:
       break;
     }
@@ -98,7 +101,8 @@ void *Representation::convertDataStr(const char *dataStr,
 {
   char *ep;
   size_t len;
-  double double_val = 0;
+  double double_val;
+  double float_val;
   void *res = NULL;
 
   switch (type) {
@@ -140,6 +144,16 @@ void *Representation::convertDataStr(const char *dataStr,
           << std::endl;
     }
     *(double*) res = double_val;
+    break;
+
+  case FloatRep:
+    res = new float;
+    float_val = strtof(dataStr, &ep);
+    if (dataStr == ep || *ep != '\0') {
+      std::cerr << "Error while converting " << dataStr << " to float."
+          << std::endl;
+    }
+    *(float*) res = float_val;
     break;
 
   default:
