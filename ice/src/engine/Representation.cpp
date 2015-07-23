@@ -27,11 +27,12 @@ Representation::~Representation()
 {
   if (data != NULL) {
     switch (type) {
-    case StringRep:
-      delete (char*) data;
-      break;
     case BooleanRep:
       delete (bool*) data;
+      break;
+    case ByteRep:
+    case StringRep:
+      delete (char*) data;
       break;
     default:
       break;
@@ -77,6 +78,10 @@ int Representation::fromCSV(std::string reprStr, const char delim)
 
   type = static_cast<RepresentationType>(typeNum);
   data = convertDataStr(dataStr, type);
+  if (data == NULL) {
+    std::cerr << "Error: Couldn't convert" << dataStr << "to related type "
+        << type << std::endl;
+  }
 
   delete repCstr;
   return 0;
@@ -86,15 +91,15 @@ void *Representation::convertDataStr(const char *dataStr,
     RepresentationType type)
 {
   size_t len;
-  void *res;
+  void *res = NULL;
 
   switch (type) {
 
   case BooleanRep:
     res = new bool;
-    if (strcmp(dataStr, "true") == 0) {
+    if (strncmp(dataStr, "true", 4) == 0) {
       *(bool*) res = true;
-    } else if (strcmp(dataStr, "false") == 0) {
+    } else if (strncmp(dataStr, "false", 5) == 0) {
       *(bool*) res = false;
     } else {
       // error
@@ -105,6 +110,11 @@ void *Representation::convertDataStr(const char *dataStr,
     len = strlen(dataStr) + 1;
     res = new char[len];
     strncpy((char*) res, dataStr, len);
+    break;
+
+  case ByteRep:
+    res = new char;
+    *(char*) res = dataStr[0];
     break;
 
   default:
