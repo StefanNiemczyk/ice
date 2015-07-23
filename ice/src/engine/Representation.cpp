@@ -43,6 +43,9 @@ Representation::~Representation()
     case FloatRep:
       delete (float*) data;
       break;
+    case IntegerRep:
+      delete (int*) data;
+      break;
     default:
       break;
     }
@@ -154,6 +157,16 @@ void *Representation::convertDataStr(const char *dataStr,
           << std::endl;
     }
     *(float*) res = float_val;
+    break;
+
+  case IntegerRep:
+    res = new int;
+    float_val = strtol(dataStr, &ep, 10);
+    if (dataStr == ep || *ep != '\0') {
+      std::cerr << "Error while converting " << dataStr << " to int."
+          << std::endl;
+    }
+    *(int*) res = float_val;
     break;
 
   default:

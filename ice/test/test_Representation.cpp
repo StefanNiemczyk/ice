@@ -75,6 +75,16 @@ TEST(RepresentationTest, FloatRep)
   ASSERT_EQ(3.14f, *r.get<float*>());
 }
 
+TEST(RepresentationTest, IntegerRep)
+{
+  ice::Representation r;
+
+  const int res = r.fromCSV("10;2147483646");
+
+  ASSERT_EQ(0, res);
+  ASSERT_EQ(ice::IntegerRep, r.type);
+  ASSERT_EQ(2147483646, *r.get<int*>());
+}
 
 }
 
