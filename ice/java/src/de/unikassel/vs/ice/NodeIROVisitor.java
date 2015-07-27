@@ -214,7 +214,7 @@ public class NodeIROVisitor extends IceVisitor {
 				// #external
 				// requiredMap(SYSTEM,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2)
 				this.elementString = this
-						.replace("requiredMap($system,$type,$scope,$representation,$relatedEntity).\n");
+						.replace("requiredMap($system,informationType($type,$scope,$representation,$relatedEntity)).\n");
 				this.sb.append("#external ");
 				this.sb.append(this.elementString);
 			}

@@ -75,19 +75,16 @@ tnode(k,SYSTEM,IRO,ENTITY,none) :-
 % computing theoretical streams created by nodes
 tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2)) :- 
 	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), 
-%	heuristic(k,SYSTEM,NODE,C),
 	ENTITY2 != none,
 	ENTITY2 != any,
 	output(SYSTEM,NODE,SCOPE,REP,ENTITY2).
 
 tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,none)) :- 
 	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),
-%	heuristic(k,SYSTEM,NODE,C),
 	output(SYSTEM,NODE,SCOPE,REP,none).
 
 tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2)) :- 
 	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), 
-%	heuristic(k,SYSTEM,NODE,C),
 	output(SYSTEM,NODE,SCOPE,REP,any).
 
 
@@ -113,21 +110,21 @@ tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY2,SCOPE,REP,ENTITY)
 
 
 % compute number of inputs for each node
-nodeCount(k,SYSTEM,NODE, MINV+MINV2, MAXV+MAXV2) :- 
+nodeCount(k,SYSTEM,NODE,MINV+MINV2,MAXV+MAXV2) :- 
 	sourceNode(SYSTEM,NODE,_), 
 	MINV = #sum{MIN,SCOPE,REP,ENT2 : input(SYSTEM,NODE,SCOPE,REP,ENT2,MIN,_)}, 
 	MAXV = #sum{MAX,SCOPE,REP,ENT2 : input(SYSTEM,NODE,SCOPE,REP,ENT2,_,MAX)}, 
 	MINV2 = #sum{MIN,SCOPE,REP,ENT2 : input2(SYSTEM,NODE,SCOPE,REP,ENT2,MIN,_)}, 
 	MAXV2 = #sum{MAX,SCOPE,REP,ENT2 : input2(SYSTEM,NODE,SCOPE,REP,ENT2,_,MAX)}.
 
-nodeCount(k,SYSTEM,NODE, MINV+MINV2, MAXV+MAXV2) :- 
+nodeCount(k,SYSTEM,NODE,MINV+MINV2,MAXV+MAXV2) :- 
 	nodeTemplate(SYSTEM,NODE,_), 
 	MINV = #sum{MIN,SCOPE,REP,ENT2 : input(SYSTEM,NODE,SCOPE,REP,ENT2,MIN,_)}, 
 	MAXV = #sum{MAX,SCOPE,REP,ENT2 : input(SYSTEM,NODE,SCOPE,REP,ENT2,_,MAX)}, 
 	MINV2 = #sum{MIN,SCOPE,REP,ENT2 : input2(SYSTEM,NODE,SCOPE,REP,ENT2,MIN,_)}, 
 	MAXV2 = #sum{MAX,SCOPE,REP,ENT2 : input2(SYSTEM,NODE,SCOPE,REP,ENT2,_,MAX)}.
 
-nodeCount(k,SYSTEM,IRO, MINV+MINV2, MAXV+MAXV2) :- 
+nodeCount(k,SYSTEM,IRO,MINV+MINV2,MAXV+MAXV2) :- 
 	iro(SYSTEM,IRO,_,_), 
 	MINV = #sum{MIN,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,MIN,_)}, 
 	MAXV = #sum{MAX,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,_,MAX)}, 
@@ -136,12 +133,21 @@ nodeCount(k,SYSTEM,IRO, MINV+MINV2, MAXV+MAXV2) :-
 
 
 % connect to node
+%*
 MIN { connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP)) : 
 		stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP), 
 		STEP < maxStepCount,
 		PROVIDER != NODE } MAX :- 
 	node(k,SYSTEM,NODE,ENTITY,ENTITY2),
 	tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,MIN,MAX).
+*%
+
+connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP)) :-
+	%node(k,SYSTEM,NODE,ENTITY,ENTITY2),
+	STEP < maxStepCount,
+	PROVIDER != NODE,
+	before(tnode(k,SOURCE,PROVIDER,ENTITY3,ENTITY4),tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,S), 
+	stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP). 
 
 
 % computing meta inforamtion of a node
@@ -149,19 +155,16 @@ nodeMeta(node(k,SYSTEM,NODE,ENTITY,ENTITY2), STEP_MAX, COUNT) :-
 	node(k,SYSTEM,NODE,ENTITY,ENTITY2),
 	nodeCount(k,SYSTEM,NODE,MIN,MAX),
 	MIN != MAX,
-	STEP_MAX = #max{STEP : connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,_,_,_,_,STEP))},
-	COUNT = #count{PROVIDER,SOURCE,INFO,STEP2 : connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP2)), 
-		PROVIDER != NODE, 
-		STEP2 < STEP_MAX+1},
-	COUNT > MIN-1,
-	COUNT < MAX+1,
-	STEP_MAX != #inf.
+	STEP_MAX = #max{STEP : connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(_,_,_,_,_,STEP))},
+	COUNT = #count{STREAM : connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), STREAM)},
+	STEP_MAX != #inf,
+	COUNT < MAX + 1,
+	COUNT > MIN - 1.
 
 nodeMeta(node(k,SYSTEM,IRO,ENTITY,ENTITY2), STEP_MAX, COUNT) :- 
 	node(k,SYSTEM,IRO,ENTITY,ENTITY2),
-	STEP_MAX = #max{STEP : connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(k,_,_,_,_,STEP))},
+	STEP_MAX = #max{STEP : connectToNode(node(k,SYSTEM,IRO,ENTITY,ENTITY2), stream(_,_,_,_,_,STEP))},
 	nodeCount(k,SYSTEM,IRO,COUNT,COUNT),
-	COUNT > 0;
 	STEP_MAX != #inf.
 
 nodeMeta(node(k,SYSTEM,NODE,ENTITY,ENTITY2), 0, 0) :- 
@@ -245,6 +248,37 @@ map(k,SYSTEM_TARGET,PROVIDER,SOURCE,INFO_TYPE,STEP+1) :-
    SYSTEM_SOURCE1 != SYSTEM_SOURCE2.
 
 
+%% transfer of information between islands
+
+transfer(SYSTEM_SOURCE,SYSTEM_TARGET) :- 
+	bridge(ISLAND1,ISLAND2),
+	connectToBridge(SYSTEM_SOURCE,ISLAND2),
+	connectToBridge(SYSTEM_TARGET,ISLAND1),
+	system(SYSTEM_SOURCE,ISLAND1), 
+	system(SYSTEM_TARGET,ISLAND2).
+
+metadataProcessing(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE1+VALUE2+VALUE3) :- 
+	bridge(ISLAND1,ISLAND2), 
+	system(SYSTEM_SOURCE,ISLAND1), 
+	system(SYSTEM_TARGET,ISLAND2),
+	connectToBridge(SYSTEM_SOURCE,ISLAND2),
+	connectToBridge(SYSTEM_TARGET,ISLAND1),
+	metadataProcessing(METADATA,SYSTEM_SOURCE,ISLAND2,VALUE1),
+	metadataProcessing(METADATA,SYSTEM_TARGET,ISLAND1,VALUE2),
+	metadataProcessing(METADATA,ISLAND1,ISLAND2,VALUE3).
+
+metadataOutput(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE1+VALUE2+VALUE3) :- 
+	bridge(ISLAND1,ISLAND2), 
+	system(SYSTEM_SOURCE,ISLAND1), 
+	system(SYSTEM_TARGET,ISLAND2),
+	connectToBridge(SYSTEM_SOURCE,ISLAND2),
+	connectToBridge(SYSTEM_TARGET,ISLAND1),
+	metadataOutput(METADATA,SYSTEM_SOURCE,ISLAND2,VALUE1),
+	metadataOutput(METADATA,SYSTEM_TARGET,ISLAND1,VALUE2),
+	metadataOutput(METADATA,ISLAND1,ISLAND2,VALUE3).
+
+
+
 %% creating a map
 tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,none) :- 
 	mapNodeTemplate(SYSTEM,NODE,ENTITY_TYPE),
@@ -270,6 +304,10 @@ tmap(k,SYSTEM,tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY
 
 
 % computing theoretical inputs for maps
+tinput(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),MIN,MAX) :-
+	entity(ENTITY,ENTITY_TYPE),
+	tmapInput(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENT2),MIN,MAX).
+
 tmapInput(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),MIN,MAX) :- 
 	tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 
 	input(SYSTEM,NODE,SCOPE,REP,ENTITY2,MIN,MAX), 
@@ -306,6 +344,17 @@ tmapInputMap(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_
 
 
 % inputs
+
+connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENT2),STEP),PROVIDER,STEP) :-
+	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 
+	entity(ENTITY,ENTITY_TYPE),
+	before(tnode(k,SOURCE,PROVIDER,ENTITY3,ENTITY4),tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO,S), 
+	tmapInput(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENT2),_,_),
+	STEP < maxStepCount,
+	PROVIDER != NODE,
+	stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENT2),STEP). 
+
+%*
 MIN { connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENT2),STEP),PROVIDER,STEP) : 
 		stream(k,SYSTEM,PROVIDER,SOURCE,information(ENTITY,SCOPE,REP,ENT2),STEP), 
 		STEP < maxStepCount,
@@ -313,6 +362,7 @@ MIN { connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),stream(k,SYSTEM,PR
 	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 
 	entity(ENTITY,ENTITY_TYPE),
 	tmapInput(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENT2),MIN,MAX).
+*%
 
 MIN { connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),map(k,SYSTEM,PROVIDER,SOURCE,INFO_TYPE,STEP),PROVIDER,STEP) : 
 		map(k,SYSTEM,PROVIDER,SOURCE,INFO_TYPE,STEP), 
@@ -323,6 +373,8 @@ MIN { connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),map(k,SYSTEM,PROVI
 
 
 % outputs
+mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 0, 10) :- 
+	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2).
 %*
 mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), MINV+MINV2+MINV_MAP, MAXV+MAXV2+MAXV_MAP) :- 
 	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 
@@ -333,16 +385,38 @@ mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), MINV+MINV2+MINV_MAP, MAXV+M
 	MINV_MAP = #sum{MIN,ENTITY_TYPE,SCOPE,REP,ENT2 : inputMap(SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENT2,MIN,_)}, 
 	MAXV_MAP = #sum{MAX,ENTITY_TYPE,SCOPE,REP,ENT2 : inputMap(SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENT2,_,MAX)}.
 *%
+
+-maxStep(NODE,STEP) :-
+	connectToMap(NODE,_,_,STEP),
+	connectToMap(NODE,_,_,STEP2),
+	STEP2 > STEP.
+
+maxStep(NODE,STEP) :-
+	connectToMap(NODE,_,_,STEP),
+	not -maxStep(NODE,STEP).
+
 mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), STEP_MAX, COUNT) :- 
 	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),
-	STEP_MAX = #max{STEP,CONNECTED,PROVIDER : connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),CONNECTED,PROVIDER,STEP)},
+	maxStep(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),STEP_MAX),
+	%STEP_MAX = #max{STEP,CONNECTED,PROVIDER : connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),CONNECTED,PROVIDER,STEP)},
 	COUNT = #count{CONNECTED,PROVIDER : connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),CONNECTED,PROVIDER,_),PROVIDER != NODE},
 	%mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), MIN, MAX),
 	%MIN != MAX,
 	%COUNT > MIN-1,
 	%COUNT < MAX+1,
 	STEP_MAX != #inf.
-
+%*
+mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 0, COUNT) :- 
+	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),
+	not maxStep(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),_),
+	%STEP_MAX = #max{STEP,CONNECTED,PROVIDER : connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),CONNECTED,PROVIDER,STEP)},
+	COUNT = #count{CONNECTED,PROVIDER : connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),CONNECTED,PROVIDER,_),PROVIDER != NODE},
+	%mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), MIN, MAX),
+	%MIN != MAX,
+	%COUNT > MIN-1,
+	%COUNT < MAX+1,
+	STEP_MAX != #inf.
+*%
 %mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), STEP_MAX, COUNT) :- 
 %	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),
 %	STEP_MAX = #max{STEP,CONNECTED,PROVIDER : connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),CONNECTED,PROVIDER,STEP)},
@@ -351,6 +425,7 @@ mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), STEP_MAX, COUNT) :-
 
 mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 0, 0) :- 
 	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),
+%	not connectToMap(NODE,_,_,_).
 	STEP_MAX = #max{STEP,CONNECTED,PROVIDER : connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),CONNECTED,PROVIDER,STEP)},
 %	mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 0, MAX),
 	STEP_MAX == #inf.
@@ -359,8 +434,7 @@ mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 0, 0) :-
 map(k,SYSTEM,NODE,SYSTEM,informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),STEP_MAX+1) :- 
 	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 
 	outputMap(SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2),
-	mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), STEP_MAX, COUNT),
-	ENTITY2 != any.
+	mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), STEP_MAX, COUNT).
 
 
 
@@ -493,6 +567,14 @@ systemPoints(name,points) :- system(name,default).
 
 #external system(name,island).
 systemPoints(name,points) :- system(name,island).
+
+
+%--------------------------------------------------------------------------------------
+#program connectToBridge(system,island,delayValue,costValue).
+
+connectToBridge(system,island).
+metadataProcessing(cost,system,island,costValue).
+metadataOutput(delay,system,island,delayValue).
 
 
 %--------------------------------------------------------------------------------------

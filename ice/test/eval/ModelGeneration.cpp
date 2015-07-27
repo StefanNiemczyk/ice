@@ -583,7 +583,7 @@ public:
           if (first)
           {
             if (false == verbose)
-              std::cout << std::endl << asp.toStringLastModel(false);
+              std::cout << std::endl << asp.toStringLastModel(false) << std::endl;
             first = false;
           }
 
