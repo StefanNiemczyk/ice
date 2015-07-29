@@ -31,8 +31,10 @@ Representation::~Representation()
       delete (bool*) data;
       break;
     case ByteRep:
-    case StringRep:
       delete (char*) data;
+      break;
+    case StringRep:
+      delete[] (char*) data;
       break;
     case UnsignedByteRep:
       delete (unsigned char*) data;
@@ -70,7 +72,7 @@ Representation::~Representation()
 int Representation::fromCSV(std::string reprStr, const char delim)
 {
   const size_t length = reprStr.length() + 1;
-  char *repCstr = new char[length];
+  char *repCstr = (char*) calloc(length, sizeof(char));
 
   if (reprStr.empty()) {
     return -1;
@@ -82,6 +84,7 @@ int Representation::fromCSV(std::string reprStr, const char delim)
   strncpy(repCstr, reprStr.c_str(), length);
 
   if (repCstr == NULL) {
+    free(repCstr);
     return -1;
   }
 
@@ -95,11 +98,13 @@ int Representation::fromCSV(std::string reprStr, const char delim)
   if (typeStr == ep || *ep != '\0') {
     std::cerr << "Error while converting " << typeStr << " to int."
         << std::endl;
+    free(repCstr);
     return -1;
   }
 
   if (typeNum < 0 || typeNum > UnknownType) {
     std::cerr << "Error: invalid representation type" << std::endl;
+    free(repCstr);
     return -1;
   }
 
@@ -110,7 +115,7 @@ int Representation::fromCSV(std::string reprStr, const char delim)
         << type << std::endl;
   }
 
-  delete repCstr;
+  free(repCstr);
   return 0;
 }
 
