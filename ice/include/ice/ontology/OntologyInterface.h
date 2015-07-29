@@ -53,6 +53,7 @@ public:
   bool addNamedStream(std::string const p_stream, std::string const p_entityScope, std::string const p_representation);
   bool addNamedMap(std::string const p_map, std::string const p_entityType, std::string const p_entityScope, std::string const p_representation);
   bool addRequiredStream(std::string const p_namedStream, std::string const p_namedStreamClass, std::string const p_system, std::string const p_entity, std::string const p_entityRelated);
+  bool addRequiredMap(std::string const p_namedMap, std::string const p_namedMapClass, std::string const p_system, std::string const p_entityRelated);
   bool addSourceNodeClass(std::string const p_node, std::vector<std::string> p_outputs,
                           std::vector<int> p_outputsMinSize, std::vector<int> p_outputsMaxSize);
   bool addComputationNodeClass(std::string const p_node, std::vector<std::string> p_inputs,
@@ -122,6 +123,7 @@ private:
   jmethodID addNamedStreamMethod; /**< Method id */
   jmethodID addNamedMapMethod; /**< Method id */
   jmethodID addRequiredStreamMethod; /**< Method id */
+  jmethodID addRequiredMapMethod; /**< Method id */
   jmethodID addSourceNodeClassMethod; /**< Method id */
   jmethodID addComputationNodeClassMethod; /**< Method id */
   jmethodID addIroNodeClassMethod; /**< Method id */

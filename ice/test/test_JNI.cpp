@@ -547,7 +547,7 @@ TEST(JNITest, addNodeToSystem)
 }
 
 
-TEST(JNITest, addMapNodeToSystem)
+TEST(JNITest, addMapNodeToSystem1)
 {
   std::string path = ros::package::getPath("ice");
   bool result;
@@ -646,6 +646,176 @@ TEST(JNITest, addMapNodeToSystem)
   EXPECT_TRUE(toTest.find("metadataProcessing(cost,testSystem2,testMapNodeInd,5).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataOutput(delay,testSystem2,testMapNodeInd,fix,5,5).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataOutput(accuracy,testSystem2,testMapNodeInd,fix,-1,-1).") != std::string::npos);
+
+  EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
+}
+
+TEST(JNITest, addMapNodeToSystem2)
+{
+  std::string path = ros::package::getPath("ice");
+  bool result;
+  std::vector<std::string> toAdd;
+  std::vector<std::string> inputs;
+  std::vector<int> inputsMin;
+  std::vector<int> inputsMax;
+  std::vector<std::string> inputsRelated;
+  std::vector<int> inputsRelatedMin;
+  std::vector<int> inputsRelatedMax;
+  std::vector<std::string> inputMaps;
+  std::vector<int> inputMapsMin;
+  std::vector<int> inputMapsMax;
+  std::vector<std::string> outputs;
+  std::vector<int> outputsMin;
+  std::vector<int> outputsMax;
+  std::vector<std::string> metadatas;
+  std::vector<int> metadataValues;
+  std::vector<int> metadataValues2;
+  std::vector<std::string> metadataGroundings;
+
+  ice::OntologyInterface oi(path + "/java/lib/");
+
+  oi.addIRIMapper(path + "/ontology/");
+  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.loadOntologies();
+
+  oi.addSystem("TestSystem");
+
+  result = oi.addNamedMap("TestMap", "Robot", "Position", "CoordinatePositionRep");
+
+  result = oi.addNamedStream("TestStream","Position","CoordinatePositionRep");
+
+  inputs.push_back("TestStream");
+  inputsMin.push_back(1);
+  inputsMax.push_back(1);
+
+  outputs.push_back("TestMap");
+  outputsMin.push_back(1);
+  outputsMax.push_back(1);
+
+
+  inputMaps.push_back("TestMap");
+  inputMapsMin.push_back(1);
+  inputMapsMax.push_back(2);
+
+  result = oi.addMapNodeClass("TestMapNode", inputs, inputsMin, inputsMax, inputsRelated, inputsRelatedMin,
+                              inputsRelatedMax, inputMaps, inputMapsMin, inputMapsMax, outputs, outputsMin, outputsMax);
+
+  result = oi.addIndividual("TestEntity1", "Robot");
+  result = oi.addIndividual("TestEntity2", "Robot");
+
+  metadatas.push_back("Delay");
+  metadataValues.push_back(5);
+  metadataValues2.push_back(5);
+  metadataGroundings.push_back("NodeDelayFixASPGrounding");
+  metadatas.push_back("Cost");
+  metadataValues.push_back(5);
+  metadataValues2.push_back(5);
+  metadataGroundings.push_back("NodeCostASPGrounding");
+  metadatas.push_back("Accuracy");
+  metadataValues.push_back(-1);
+  metadataValues2.push_back(-1);
+  metadataGroundings.push_back("NodeAccuracyFixASPGrounding");
+
+  result = oi.addNodeIndividual("TestMapNodeInd", "TestMapNode", "TestSystem", "", "", metadatas, metadataValues, metadataValues2,
+                                metadataGroundings);
+
+
+  result = oi.addSystem("TestSystem2");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  toAdd.push_back("TestMapNodeInd");
+
+  result = oi.addNodesToSystem("TestSystem2", toAdd);
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  auto returnValues = oi.readNodesAndIROsAsASP("TestSystem2");
+
+  ASSERT_EQ(returnValues->size(), 5);
+
+  ASSERT_EQ(returnValues->at(0)->size(), 1);
+  ASSERT_EQ(returnValues->at(1)->size(), 1);
+  ASSERT_EQ(returnValues->at(2)->size(), 1);
+  ASSERT_EQ(returnValues->at(3)->size(), 1);
+  ASSERT_EQ(returnValues->at(4)->size(), 1);
+
+  EXPECT_EQ("MAP_NODE", std::string(returnValues->at(0)->at(0)));
+  EXPECT_EQ("testMapNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("mapNodeTemplate(testSystem2,testMapNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
+
+  std::string toTest = std::string(returnValues->at(3)->at(0));
+
+  EXPECT_TRUE(toTest.find("#external mapNodeTemplate(testSystem2,testMapNodeInd,any)") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(testSystem2,testMapNodeInd,position,coordinatePositionRep,none,1,1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("inputMap(testSystem2,testMapNodeInd,robot,position,coordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("outputMap(testSystem2,testMapNodeInd,robot,position,coordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,testSystem2,testMapNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,testSystem2,testMapNodeInd,fix,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,testSystem2,testMapNodeInd,fix,-1,-1).") != std::string::npos);
+
+  EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
+}
+
+TEST(JNITest, addRequiredMap)
+{
+  std::string path = ros::package::getPath("ice");
+  bool result;
+  std::vector<std::string> toAdd;
+  std::vector<std::string> inputs;
+  std::vector<int> inputsMin;
+  std::vector<int> inputsMax;
+  std::vector<std::string> inputsRelated;
+  std::vector<int> inputsRelatedMin;
+  std::vector<int> inputsRelatedMax;
+  std::vector<std::string> inputMaps;
+  std::vector<int> inputMapsMin;
+  std::vector<int> inputMapsMax;
+  std::vector<std::string> outputs;
+  std::vector<int> outputsMin;
+  std::vector<int> outputsMax;
+  std::vector<std::string> metadatas;
+  std::vector<int> metadataValues;
+  std::vector<int> metadataValues2;
+  std::vector<std::string> metadataGroundings;
+
+  ice::OntologyInterface oi(path + "/java/lib/");
+
+  oi.addIRIMapper(path + "/ontology/");
+  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.loadOntologies();
+
+  oi.addSystem("TestSystem");
+
+  result = oi.addNamedMap("TestMap", "Robot", "Position", "CoordinatePositionRep");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.addRequiredMap("ReqMap", "TestMap", "TestSystem", "");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  auto returnValues = oi.readNodesAndIROsAsASP("TestSystem");
+
+  ASSERT_EQ(returnValues->size(), 5);
+
+  ASSERT_EQ(returnValues->at(0)->size(), 1);
+  ASSERT_EQ(returnValues->at(1)->size(), 1);
+  ASSERT_EQ(returnValues->at(2)->size(), 1);
+  ASSERT_EQ(returnValues->at(3)->size(), 1);
+  ASSERT_EQ(returnValues->at(4)->size(), 1);
+
+  EXPECT_EQ("REQUIRED_MAP", std::string(returnValues->at(0)->at(0)));
+  EXPECT_EQ("reqMap", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("requiredMap(testSystem,informationType(robot,position,coordinatePositionRep,none)).\n", std::string(returnValues->at(2)->at(0)));
+
+  std::string toTest = std::string(returnValues->at(3)->at(0));
+
+  EXPECT_TRUE(toTest.find("#external requiredMap(testSystem,informationType(robot,position,coordinatePositionRep,none))") != std::string::npos);
 
   EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }

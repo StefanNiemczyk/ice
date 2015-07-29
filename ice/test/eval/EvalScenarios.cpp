@@ -1239,6 +1239,377 @@ public:
     system(ss.str().c_str());
   }
 
+  void islandScenario(bool global, bool verbose, bool gnuplot, int runs, int islandsSizeMin, int islandsSizeMax,
+                      int islandsSizeStep, int systemSizeMin, int systemSizeMax, int systemSizeStep)
+  {
+    std::string path = ros::package::getPath("ice");
+      std::vector<std::string> inputs;
+      std::vector<int> inputsMin;
+      std::vector<int> inputsMax;
+      std::vector<std::string> inputsRelated;
+      std::vector<int> inputsRelatedMin;
+      std::vector<int> inputsRelatedMax;
+      std::vector<std::string> outputs;
+      std::vector<int> outputsMin;
+      std::vector<int> outputsMax;
+      std::vector<std::string> metadatas;
+      std::vector<int> metadataValues;
+      std::vector<int> metadataValues2;
+      std::vector<std::string> metadataGroundings;
+      std::stringstream ss;
+
+      ofstream file;
+
+      bool tree = false;
+
+      ss.str("");
+      ss << this->logPath << "/islandScenario_" << (global ? "global" : "local") << "_"
+          << islandsSizeMin << "-" << islandsSizeMax << "_" << systemSizeMin << "-" << systemSizeMax << ".txt";
+      std::string pathStr = ss.str();
+      file.open(pathStr);
+
+      std::string entityType = "IslandEntityType";
+      std::string superValueScope = "SuperEvalValueScope";
+      std::string superRepresentation = "SuperRepresentation";
+
+      for (int islands = islandsSizeMin; islands <= islandsSizeMax; islands += islandsSizeStep)
+      {
+        for (int systems = systemSizeMin; systems <= systemSizeMax; systems += systemSizeStep)
+        {
+          inputs.clear();
+          inputsMin.clear();
+          inputsMax.clear();
+          outputs.clear();
+          outputsMin.clear();
+          outputsMax.clear();
+          metadatas.clear();
+          metadataValues.clear();
+          metadataValues2.clear();
+          metadataGroundings.clear();
+
+          std::cout << std::endl;
+          std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
+          std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
+          std::cout << "Starting eval " << islands << " with " << systems << " systems" << std::endl << std::endl;
+
+
+          ice::OntologyInterface oi(path + "/java/lib/");
+
+          oi.addIRIMapper(path + "/ontology/");
+          oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+          oi.loadOntologies();
+
+          // add information structure
+          std::vector<std::string> scopes;
+
+          ss.str("");
+          ss << "EvalScope";
+          std::string scope = ss.str();
+          ss.str("");
+          ss << "EvalValueScope";
+          std::string valueScope = ss.str();
+
+          oi.addValueScope(superValueScope, valueScope);
+
+          std::vector<std::string> reps;
+          ss.str("");
+          ss << "ReqRepresentation";
+          std::string representation = ss.str();
+
+          std::vector<std::string> vec;
+          vec.push_back(valueScope);
+          oi.addRepresentation(superRepresentation, representation, vec);
+          reps.push_back(representation);
+
+//          ss.str("");
+//          ss << "EvalRepresentation";
+//          representation = ss.str();
+//
+//          oi.addRepresentation(superRepresentation, representation, vec);
+//          reps.push_back(representation);
+
+          oi.addEntityScope(scope, reps);
+
+          scopes.push_back(scope);
+          oi.addEntityType(entityType, scopes);
+
+
+          // Add source stream
+          ss.str("");
+          ss << "EvalSourceStream";
+          std::string stream = ss.str();
+
+          oi.addNamedStream(stream, scope, representation);
+
+          // Add eval node
+          outputs.push_back(stream);
+          outputsMin.push_back(1);
+          outputsMax.push_back(1);
+
+          std::string node = "EvalNodeSource";
+          oi.addSourceNodeClass(node, outputs, outputsMin, outputsMax);
+
+          // Add req map
+          std::string map = "EvalMap";
+          oi.addNamedMap(map, entityType, scope, "ReqRepresentation");
+
+          inputs.clear();
+          inputsMin.clear();
+          inputsMax.clear();
+          outputs.clear();
+          outputsMin.clear();
+          outputsMax.clear();
+
+          inputs.push_back(stream);
+          inputsMin.push_back(0);
+          inputsMax.push_back(1);
+          outputs.push_back(map);
+          outputsMin.push_back(1);
+          outputsMax.push_back(1);
+
+          oi.addMapNodeClass("EvalMapNode", inputs, inputsMin, inputsMax,
+                             std::vector<std::string>(), std::vector<int>(),
+                             std::vector<int>(), std::vector<std::string>(),
+                             std::vector<int>(), std::vector<int>(),
+                             outputs, outputsMin, outputsMax);
+
+          for (int i = 0; i < islands; ++i)
+          {
+            // Entity of island
+            ss.str("");
+            ss << "IslandEntity" << i;
+            std::string entity = ss.str();
+            scopes.push_back(scope);
+            oi.addEntityType(entityType, scopes);
+            oi.addIndividual(entity, entityType);
+
+            for (int j = 0; j < systems; ++j)
+            {
+              ss.str("");
+              ss << "EvalNode" << i << "_" << j;
+              node = ss.str();
+              metadatas.clear();
+              metadataValues.clear();
+              metadataValues2.clear();
+              metadataGroundings.clear();
+
+              ss.str("");
+              ss << "EvalSystem" << i << "_" << j;
+              std::string system = ss.str();
+              oi.addSystem(system);
+
+              metadatas.push_back("Delay");
+              metadataValues.push_back(j);
+              metadataValues2.push_back(0);
+              metadataGroundings.push_back("NodeDelayFixASPGrounding");
+//              metadatas.push_back("Cost");
+//              metadataValues.push_back(1);
+//              metadataValues2.push_back(0);
+//              metadataGroundings.push_back("NodeCostASPGrounding");
+//              metadatas.push_back("Accuracy");
+//              metadataValues.push_back(systems - j);
+//              metadataValues2.push_back(0);
+//              metadataGroundings.push_back("NodeAccuracyFixASPGrounding");
+
+
+              oi.addNodeIndividual(node + "SourceInd", "EvalNodeSource", system, entity, "", metadatas, metadataValues, metadataValues2,
+                                   metadataGroundings);
+
+
+              if (i < 1 && j < 1)
+              {
+
+                metadatas.clear();
+                metadataValues.clear();
+                metadataValues2.clear();
+                metadataGroundings.clear();
+
+                metadatas.push_back("Delay");
+                metadataValues.push_back(1);
+                metadataValues2.push_back(0);
+                metadataGroundings.push_back("MapDelayASPGrounding");
+//                metadatas.push_back("Cost");
+//                metadataValues.push_back(1);
+//                metadataValues2.push_back(0);
+//                metadataGroundings.push_back("MapCostASPGrounding");
+                metadatas.push_back("Density");
+                metadataValues.push_back(0);
+                metadataValues2.push_back(1);
+                metadataGroundings.push_back("MapDensitySumASPGrounding");
+//                metadatas.push_back("Accuracy");
+//                metadataValues.push_back(0);
+//                metadataValues2.push_back(0);
+//                metadataGroundings.push_back("MapAccuracyAvgASPGrounding");
+
+                oi.addNodeIndividual(node + "Ind", "EvalMapNode", system, "", "", metadatas, metadataValues, metadataValues2,
+                                     metadataGroundings);
+
+                ss.str("");
+                ss << "Req" << map << i;
+                oi.addRequiredMap(ss.str(), map, system, "");
+              }
+            }
+          }
+
+          ss.str("");
+          ss << "/tmp/islandScenario_" << (global ? "global" : "local") << "_" << islands << "_" << systems << ".owl";
+          std::string fileName = ss.str();
+          oi.saveOntology(fileName);
+
+          ModelGeneration mg(path);
+
+          std::vector<std::string> toCheck;
+
+          if (global)
+          {
+            ss.str("");
+            ss << "metadataMap(1,delay,map(1,evalSystem0_0,evalNode0_0Ind,evalSystem0_0," <<
+                "informationType(islandEntityType,evalScope,reqRepresentation,none),3),7)";
+            toCheck.push_back(ss.str());
+
+//            ss.str("");
+//            ss << "metadataMap(1,accuracy,map(1,evalSystem0_0,evalNode0_0Ind,evalSystem0_0," <<
+//                "informationType(islandEntityType,evalScope,reqRepresentation,none),3)," << systems << ")";
+//            toCheck.push_back(ss.str());
+          }
+
+          for (int i=1; i < islands; ++i) {
+            ss.str("");
+            ss << "stream(1,evalSystem0_0,evalNode" << i << "_0SourceInd,evalSystem" << i << "_0,information(islandEntity" << i << ",evalScope,reqRepresentation,none),2)";
+            toCheck.push_back(ss.str());
+          }
+
+          ss.str("");
+          ss << "selectedMap(1,evalSystem0_0,evalNode0_0Ind,evalSystem0_0,informationType(islandEntityType,evalScope,reqRepresentation,none),3)";
+          toCheck.push_back(ss.str());
+
+          auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, 10,
+              [&] (supplementary::ClingWrapper *asp){
+            this->lambda(asp);
+
+            ss.str("");
+            ss << "system(evalSystem0_0, island0).";
+            asp->add("base",{},ss.str());
+
+            for (int j=1; j < systems; ++j)
+            {
+              ss.str("");
+              ss << "transfer(evalSystem" << 0 << "_" << 0 << ",evalSystem" << 0 << "_" << j << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataProcessing(cost,evalSystem" << 0 << "_" << 0 << ",evalSystem" << 0 << "_" << j << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataOutput(delay,evalSystem" << 0 << "_" << 0 << ",evalSystem" << 0 << "_" << j << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+
+              ss.str("");
+              ss << "transfer(evalSystem" << 0 << "_" << j << ",evalSystem" << 0 << "_" << 0 << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataProcessing(cost,evalSystem" << 0 << "_" << j << ",evalSystem" << 0 << "_" << 0 << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataOutput(delay,evalSystem" << 0 << "_" << j << ",evalSystem" << 0 << "_" << 0 << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+
+              ss.str("");
+              ss << "system(evalSystem" << 0 << "_" << j << ",island0).";
+              asp->add("base",{},ss.str());
+            }
+
+            for (int i=1; i < islands; ++i)
+            {
+              ss.str("");
+              ss << "bridge(island" << i << ",island" << 0 << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataProcessing(cost,island" << i << ",island" << 0 << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataOutput(delay,island" << i << ",island" << 0 << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+
+              ss.str("");
+              ss << "connectToBridge(evalSystem" << 0 << "_" << 0 << ",island" << i << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataProcessing(cost,evalSystem" << 0 << "_" << 0 << ",island" << i << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataOutput(delay,evalSystem" << 0 << "_" << 0 << ",island" << i << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+
+              for (int j=0; j < systems; ++j)
+              {
+                ss.str("");
+                ss << "connectToBridge(evalSystem" << i << "_" << j << ",island" << 0 << ").";
+                asp->add("base",{},ss.str());
+                ss.str("");
+                ss << "metadataProcessing(cost,evalSystem" << i << "_" << j << ",island" << 0 << "," << 2 << ").";
+                asp->add("base",{},ss.str());
+                ss.str("");
+                ss << "metadataOutput(delay,evalSystem" << i << "_" << j << ",island" << 0 << "," << 2 << ").";
+                asp->add("base",{},ss.str());
+
+                ss.str("");
+                ss << "system(evalSystem" << i << "_" << j << ",island" << i << ").";
+                asp->add("base",{},ss.str());
+              }
+            }
+          });
+
+          result.print();
+
+          // print to file
+          file << islands << "\t";
+          file << systems << "\t";
+          file << result.numberTotal << "\t";
+          file << result.numberSuccessful << "\t";
+          file << result.avg.totalTime << "\t" << result.totalTimeVar << "\t" << result.best.totalTime << "\t"
+              << result.worst.totalTime << "\t";
+          file << result.avg.ontologyReadTime << "\t" << result.ontologyReadTimeVar << "\t" << result.best.ontologyReadTime
+              << "\t" << result.worst.ontologyReadTime << "\t";
+          file << result.avg.ontologyReasonerTime << "\t" << result.ontologyReasonerTimeVar << "\t"
+              << result.best.ontologyReasonerTime << "\t" << result.worst.ontologyReasonerTime << "\t";
+          file << result.avg.ontologyToASPTime << "\t" << result.ontologyToASPTimeVar << "\t" << result.best.ontologyToASPTime
+              << "\t" << result.worst.ontologyToASPTime << "\t";
+          file << result.avg.aspGroundingTime << "\t" << result.aspGroundingTimeVar << "\t" << result.best.aspGroundingTime
+              << "\t" << result.worst.aspGroundingTime << "\t";
+          file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
+              << result.worst.aspSolvingTime << "\t";
+          file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime
+              << "\t" << result.worst.aspSatTime << "\t";
+          file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime
+              << "\t" << result.worst.aspUnsatTime << "\t";
+          file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount
+              << "\t" << result.worst.aspModelCount << "\t";
+          file << result.avg.aspAtomCount << "\t" << result.aspAtomCountVar << "\t" << result.best.aspAtomCount
+              << "\t" << result.worst.aspAtomCount << "\t";
+          file << result.avg.aspBodiesCount << "\t" << result.aspBodiesCountVar << "\t" << result.best.aspBodiesCount
+              << "\t" << result.worst.aspBodiesCount << "\t";
+          file << result.avg.aspAuxAtomCount << "\t" << result.aspAuxAtomCountVar << "\t" << result.best.aspAuxAtomCount
+              << "\t" << result.worst.aspAuxAtomCount << std::endl;
+
+          // gnuplot -persist -e "plot './results_systems50-500.txt' u 1:4 w l t 'sum', './results_systems50-500.txt' u 1:20 w l t 'grounding', './results_systems50-500.txt' u 1:(\$20 + \$24) w l t 'solving'"
+          file.flush();
+        }
+      }
+
+      file.close();
+
+      if (!gnuplot)
+        return;
+
+      ss.str("");
+      ss << "gnuplot -persist -e \"set title '" << pathStr << "'; plot '"
+          << pathStr << "' u 1:5 w l t 'sum', '"
+          << pathStr << "' u 1:21 w l t 'grounding', '"
+          << pathStr << "' u 1:(\\$21 + \\$25) w l t 'solving'\"";
+
+      system(ss.str().c_str());
+    }
+
   private:
     std::string logPath;
     std::function<void(supplementary::ClingWrapper *asp)> lambda;

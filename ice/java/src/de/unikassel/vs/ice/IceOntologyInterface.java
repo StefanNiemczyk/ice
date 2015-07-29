@@ -563,6 +563,84 @@ public class IceOntologyInterface {
 		return true;
 	}
 
+	public boolean addRequiredMap(final String p_requirdMap, final String p_namedMapClass, final String p_system,
+			final String p_relatedEntity) {
+		IRI requiredMapIRI = IRI.create(this.mainIRIPrefix + p_requirdMap);
+		if (this.mainOntology.containsIndividualInSignature(requiredMapIRI))
+			return false;
+
+		// IRI entityIRI = IRI.create(this.mainIRIPrefix + p_entity);
+
+		// if (p_entity == null || p_entity.isEmpty()
+		// || false ==
+		// this.mainOntology.containsIndividualInSignature(entityIRI)) {
+		// log(String.format("Unknown entity '%s' for required stream '%s', stream not created.",
+		// p_entity,
+		// p_requirdStream));
+		// return false;
+		// }
+
+		OWLClass namedMapClass = this.findOWLClass(this.ii.namedMap, p_namedMapClass);
+
+		if (namedMapClass == null) {
+			log(String.format("Unknown named map class '%s' for named map '%s', required map not created.",
+					p_namedMapClass, p_requirdMap));
+			return false;
+		}
+
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+
+		OWLIndividual requiredMap = this.dataFactory.getOWLNamedIndividual(requiredMapIRI);
+		OWLIndividual system = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_system));
+
+		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(namedMapClass, requiredMap);
+		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, ax);
+		changes.add(addAxiomChange);
+
+		OWLObjectPropertyAssertionAxiom assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(
+				this.ii.isSystemOf, system, requiredMap);
+		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+		changes.add(addAxiomChange);
+
+		ax = this.dataFactory.getOWLClassAssertionAxiom(this.ii.requiredMap, requiredMap);
+		addAxiomChange = new AddAxiom(this.mainOntology, ax);
+		changes.add(addAxiomChange);
+
+		// OWLIndividual entityInd =
+		// this.dataFactory.getOWLNamedIndividual(entityIRI);
+		//
+		// assertion =
+		// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.aboutEntity,
+		// requiredStream, entityInd);
+		// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+		// changes.add(addAxiomChange);
+
+		if (p_relatedEntity != null && false == p_relatedEntity.isEmpty()) {
+			IRI relatedEntityIRI = IRI.create(this.mainIRIPrefix + p_relatedEntity);
+			if (false == this.mainOntology.containsIndividualInSignature(relatedEntityIRI)) {
+				log(String.format("Unknown related entity '%s' for required map '%s', required map not created.",
+						p_relatedEntity, p_requirdMap));
+				return false;
+			}
+
+			OWLIndividual relatedEntityInd = this.dataFactory.getOWLNamedIndividual(relatedEntityIRI);
+
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.aboutRelatedEntity, requiredMap,
+					relatedEntityInd);
+			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
+			changes.add(addAxiomChange);
+		}
+
+		// apply changes
+		for (OWLOntologyChange change : changes) {
+			this.manager.applyChange(change);
+		}
+
+		this.dirty = true;
+
+		return true;
+	}
+
 	public boolean addSourceNodeClass(final String p_node, final String p_outputs[], final int p_outputsMinSize[],
 			final int p_outputsMaxSize[]) {
 		return this.addNodeClass(p_node, this.ii.sourceNode, null, null, null, null, null, null, p_outputs,

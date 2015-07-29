@@ -118,6 +118,9 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->addRequiredStreamMethod = this->env->GetMethodID(
       this->javaOntologyInterface, "addRequiredStream",
       "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+  this->addRequiredMapMethod = this->env->GetMethodID(
+          this->javaOntologyInterface, "addRequiredMap",
+          "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
   this->addSourceNodeClassMethod = this->env->GetMethodID(this->javaOntologyInterface, "addSourceNodeClass",
                                                           "(Ljava/lang/String;[Ljava/lang/String;[I[I)Z");
   this->addComputationNodeClassMethod = this->env->GetMethodID(
@@ -611,6 +614,34 @@ bool OntologyInterface::addRequiredStream(std::string const p_namedStream, std::
 
   if (this->checkError("addRequiredStream",
                        "Error occurred adding a required stream " + p_namedStream + " to system " + p_system))
+    return false;
+
+  this->systemDirty = true;
+
+  return result;
+}
+
+
+bool OntologyInterface::addRequiredMap(std::string const p_namedMap, std::string const p_namedMapClass,
+                                          std::string const p_system, std::string const p_relatedEntity)
+{
+  this->checkError("addRequiredMap", "Error exists, method addRequiredMap will not be executed");
+
+  jstring namedMap = env->NewStringUTF(p_namedMap.c_str());
+  jstring namedMapClass = env->NewStringUTF(p_namedMapClass.c_str());
+  jstring system = env->NewStringUTF(p_system.c_str());
+  jstring relatedEntity = env->NewStringUTF(p_relatedEntity.c_str());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addRequiredMapMethod, namedMap,
+                                       namedMapClass, system, relatedEntity);
+
+  env->DeleteLocalRef(namedMap);
+  env->DeleteLocalRef(namedMapClass);
+  env->DeleteLocalRef(system);
+  env->DeleteLocalRef(relatedEntity);
+
+  if (this->checkError("addRequiredMap",
+                       "Error occurred adding a required map " + p_namedMap + " to system " + p_system))
     return false;
 
   this->systemDirty = true;
