@@ -513,7 +513,7 @@ public:
 
         ss.str("");
         ss << "selectedStream(1,evalSystem,node(1,evalSystem,evalNode0_" << reps - 1 <<
-            "Ind,evalEntity,none),evalSystem,information(evalEntity,evalScope,evalRepresentation" << reps - 1 << ",none),2)";
+            "Ind,evalEntity,none),information(evalEntity,evalScope,evalRepresentation" << reps - 1 << ",none),2)";
         toCheck.push_back(ss.str());
 
         ss.str("");

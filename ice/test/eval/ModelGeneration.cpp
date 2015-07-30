@@ -416,8 +416,13 @@ public:
       std::string iri = ontSystem;
       int index = iri.find_last_of("#");
       std::string aspStr = (index != std::string::npos ? iri.substr(index+1, iri.length()) : ontSystem);
+      std::transform(aspStr.begin(),
+                     aspStr.begin()+1,
+                     aspStr.begin(),
+                      ::tolower);
 
-      auto external = asp.getExternal("system", {Gringo::Value(aspStr)}, true);
+
+      auto external = asp.getExternal("system", {Gringo::Value(aspStr), "default"}, "system", {Gringo::Value(aspStr)}, true);
 
       auto nodes = ontology.readNodesAndIROsAsASP(ontSystem);
 

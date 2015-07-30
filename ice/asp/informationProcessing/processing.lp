@@ -422,15 +422,20 @@ map(k,SYSTEM,mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_T
 
 
 % checking point budget of systems
-:- systemPoints(SYSTEM,POINTS), 
-   SUM_STREAMS = #sum{COST,SYSTEM,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP : 
-			streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),_), 
-			metadataProcessing(cost,SYSTEM,SYSTEM_TARGET,COST)}, 
-   SUM_NODES = #sum{COST,SYSTEM,NODE,ENTITY,ENTITY2 : 
-			node(k,SYSTEM,NODE,ENTITY,ENTITY2), 
-			metadataProcessing(cost,SYSTEM,NODE,COST)}, 
-   (SUM_NODES + SUM_STREAMS) > POINTS, 
-   query(k).
+reqPoints(SYSTEM,(SUM_NODES + SUM_STREAMS + SUM_MAP_NODES)) :- 
+	system(SYSTEM,ISLAND), 
+	SUM_STREAMS = #sum{COST,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP : 
+				streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),_), 
+				metadataProcessing(cost,SYSTEM,SYSTEM_TARGET,COST)}, 
+	SUM_NODES = #sum{COST,NODE,ENTITY,ENTITY2 : 
+				node(k,SYSTEM,NODE,ENTITY,ENTITY2), 
+				metadataProcessing(cost,SYSTEM,NODE,COST)}, 
+	SUM_MAP_NODES = #sum{COST,NODE,ENTITY,ENTITY2 : 
+				mapNode(k,SYSTEM,NODE,ENTITY,ENTITY2), 
+				metadataProcessing(cost,SYSTEM,NODE,COST)}.
+
+:- reqPoints(SYSTEM,REQ_POINTS), systemPoints(SYSTEM,POINTS), REQ_POINTS > POINTS.
+
 
 % transfer cost
 #minimize { COST@priorityTransferCost,SYSTEM,SYSTEM_TARGET,PROVIDER,INFO : 
@@ -440,7 +445,7 @@ map(k,SYSTEM,mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_T
 
 
 % cost
-#minimize { COST@priorityCost,SYSTEM,NODE,ENTITY,ENTITY2 : node(k,SYSTEM,NODE,ENTITY,ENTITY2), metadataProcessing(cost,SYSTEM,NODE,COST), query(k) }.
+#minimize { COST@priorityCost,SYSTEM : reqPoints(SYSTEM,COST), query(k) }.
 
 
 
@@ -497,6 +502,11 @@ metadataOutput(delay,system1,system2,delayValue).
 metadataProcessing(cost,system2,system1,costValue).
 metadataOutput(delay,system2,system1,delayValue).
 
+
+%--------------------------------------------------------------------------------------
+#program system(name).
+
+#external system(name,default).
 
 %--------------------------------------------------------------------------------------
 #program system(name,points).
