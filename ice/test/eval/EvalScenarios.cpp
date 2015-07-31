@@ -202,23 +202,23 @@ public:
         if (global)
         {
           ss.str("");
-          ss << "metadataStream(1,accuracy,stream(1,evalSystem,evalNode0_" << chainSize - 1
-              << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
+          ss << "metadataStream(1,accuracy,stream(1,evalSystem,node(1,evalSystem,evalNode0_" << chainSize - 1
+              << "Ind,evalEntity,none),information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
               << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
               << chainSize * nodesMax << ")";
           toCheck.push_back(ss.str());
 
           ss.str("");
-          ss << "metadataStream(1,delay,stream(1,evalSystem,evalNode0_" << chainSize - 1
-              << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
+          ss << "metadataStream(1,delay,stream(1,evalSystem,node(1,evalSystem,evalNode0_" << chainSize - 1
+              << "Ind,evalEntity,none),information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
               << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
               << (chainSize) << ")";
           toCheck.push_back(ss.str());
         }
 
         ss.str("");
-        ss << "selectedStream(1,evalSystem,evalNode0_" << chainSize - 1
-            << "Ind,evalSystem,information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
+        ss << "selectedStream(1,evalSystem,node(1,evalSystem,evalNode0_" << chainSize - 1
+            << "Ind,evalEntity,none),information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
             << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << ")";
         toCheck.push_back(ss.str());
 
@@ -512,8 +512,8 @@ public:
         }
 
         ss.str("");
-        ss << "selectedStream(1,evalSystem,evalNode0_" << reps - 1 <<
-            "Ind,evalSystem,information(evalEntity,evalScope,evalRepresentation" << reps - 1 << ",none),2)";
+        ss << "selectedStream(1,evalSystem,node(1,evalSystem,evalNode0_" << reps - 1 <<
+            "Ind,evalEntity,none),information(evalEntity,evalScope,evalRepresentation" << reps - 1 << ",none),2)";
         toCheck.push_back(ss.str());
 
         ss.str("");
@@ -801,7 +801,7 @@ public:
           if (global)
           {
             ss.str("");
-            ss << "metadataStream(1,delay,stream(1,evalSystem0,evalNode0Ind,evalSystem0," <<
+            ss << "metadataStream(1,delay,stream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none),evalSystem0," <<
                 "information(evalEntity,evalScope,reqRepresentation,none),3)," << (inputsCount + 2 + 1) << ")";
             toCheck.push_back(ss.str());
           }
@@ -809,12 +809,12 @@ public:
           for (int i=1; i <= inputsCount; ++i)
           {
             ss.str("");
-            ss << "stream(1,evalSystem0,evalNode" << i << "SourceInd,evalSystem" << i << ",information(evalEntity,evalScope,evalRepresentation,none),2)";
+            ss << "stream(1,evalSystem0,node(1,evalSystem" << i << ",evalNode" << i << "SourceInd,evalEntity,none),evalSystem" << i << ",information(evalEntity,evalScope,evalRepresentation,none),2)";
             toCheck.push_back(ss.str());
          }
 
           ss.str("");
-          ss << "selectedStream(1,evalSystem0,evalNode0Ind,evalSystem0,information(evalEntity,evalScope,reqRepresentation,none),3)";
+          ss << "selectedStream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none),evalSystem0,information(evalEntity,evalScope,reqRepresentation,none),3)";
           toCheck.push_back(ss.str());
 
 //          ss.str("");
@@ -1463,7 +1463,7 @@ public:
           if (global)
           {
             ss.str("");
-            ss << "metadataMap(1,delay,map(1,evalSystem0_0,evalNode0_0Ind,evalSystem0_0," <<
+            ss << "metadataMap(1,delay,map(1,evalSystem0_0,mapNode(1,evalSystem0_0,evalNode0_0Ind,islandEntityType,none)," <<
                 "informationType(islandEntityType,evalScope,reqRepresentation,none),3),7)";
             toCheck.push_back(ss.str());
 
@@ -1475,12 +1475,12 @@ public:
 
           for (int i=1; i < islands; ++i) {
             ss.str("");
-            ss << "stream(1,evalSystem0_0,evalNode" << i << "_0SourceInd,evalSystem" << i << "_0,information(islandEntity" << i << ",evalScope,reqRepresentation,none),2)";
+            ss << "stream(1,evalSystem0_0,node(1,evalSystem" << i << "_0,evalNode" << i << "_0SourceInd,islandEntity" << i << ",none),information(islandEntity" << i << ",evalScope,reqRepresentation,none),2)";
             toCheck.push_back(ss.str());
           }
 
           ss.str("");
-          ss << "selectedMap(1,evalSystem0_0,evalNode0_0Ind,evalSystem0_0,informationType(islandEntityType,evalScope,reqRepresentation,none),3)";
+          ss << "selectedMap(1,evalSystem0_0,mapNode(1,evalSystem0_0,evalNode0_0Ind,islandEntityType,none),informationType(islandEntityType,evalScope,reqRepresentation,none),3)";
           toCheck.push_back(ss.str());
 
           auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, 10,
