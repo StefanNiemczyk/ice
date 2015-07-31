@@ -185,7 +185,7 @@ add_library(${PROJECT_NAME}
   src/engine/ICEngine.cpp 
   src/engine/TimeFactory.cpp
   src/engine/XMLReader.cpp
-  src/engine/Representation.cpp
+  src/engine/RepresentationFactory.cpp
   
   src/engine/split.cpp
 

@@ -1,3 +1,4 @@
+#include <ice/representation/RepresentationFactory.h>
 #include <iostream>
 #include <jni.h>
 #include <vector>
@@ -5,7 +6,6 @@
 #include <ros/package.h>
 
 #include "ice/ontology/OntologyInterface.h"
-#include "ice/representation/Representation.h"
 #include "ice/representation/RepresentationType.h"
 
 #include "gtest/gtest.h"
@@ -1134,22 +1134,15 @@ TEST(JNITest, representationVector)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  // When adding two individuals
-  result = oi.addIndividual("HelloRepresentation","StringRep");
-  result = oi.addIndividual("true","BooleanRep");
+  // When adding representations
+  std::vector<std::string> dims;
+  oi.addRepresentation("BooleanRep", "EngineRep", dims);
   ASSERT_TRUE(result);
 
   // Then a vector containing these representations is returned
-  std::unique_ptr<std::vector<ice::Representation*>> reps = oi.readRepresentations();
-  ASSERT_EQ(2, reps->size());
 
   // Because BooleanRep = 1 and StringRep = 3 the BooleanRep comes first
   // The java part sorts the outputs by representation ordinal number
-  ASSERT_EQ(ice::BooleanRep, reps->at(0)->type);
-  ASSERT_EQ(true, *reps->at(0)->get<bool*>());
-
-  ASSERT_EQ(ice::StringRep, reps->at(1)->type);
-  ASSERT_STREQ("HelloRepresentation", reps->at(1)->get<const char*>());
 }
 
 }
