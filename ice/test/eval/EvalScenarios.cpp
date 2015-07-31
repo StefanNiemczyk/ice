@@ -801,7 +801,7 @@ public:
           if (global)
           {
             ss.str("");
-            ss << "metadataStream(1,delay,stream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none),evalSystem0," <<
+            ss << "metadataStream(1,delay,stream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none)," <<
                 "information(evalEntity,evalScope,reqRepresentation,none),3)," << (inputsCount + 2 + 1) << ")";
             toCheck.push_back(ss.str());
           }
@@ -809,12 +809,12 @@ public:
           for (int i=1; i <= inputsCount; ++i)
           {
             ss.str("");
-            ss << "stream(1,evalSystem0,node(1,evalSystem" << i << ",evalNode" << i << "SourceInd,evalEntity,none),evalSystem" << i << ",information(evalEntity,evalScope,evalRepresentation,none),2)";
+            ss << "stream(1,evalSystem0,node(1,evalSystem" << i << ",evalNode" << i << "SourceInd,evalEntity,none),information(evalEntity,evalScope,evalRepresentation,none),2)";
             toCheck.push_back(ss.str());
          }
 
           ss.str("");
-          ss << "selectedStream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none),evalSystem0,information(evalEntity,evalScope,reqRepresentation,none),3)";
+          ss << "selectedStream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none),information(evalEntity,evalScope,reqRepresentation,none),3)";
           toCheck.push_back(ss.str());
 
 //          ss.str("");
@@ -1129,20 +1129,20 @@ public:
       if (global)
       {
         ss.str("");
-        ss << "metadataStream(1,delay,stream(1,evalSystem0,evalNode0Ind,evalSystem0," <<
+        ss << "metadataStream(1,delay,stream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none)," <<
             "information(evalEntity,evalScope,reqRepresentation,none),3),8)";
         toCheck.push_back(ss.str());
       }
 
       ss.str("");
-      ss << "stream(1,evalSystem0,evalNode1SourceInd,evalSystem1,information(evalEntity,evalScope,evalRepresentation,none),2)";
+      ss << "stream(1,evalSystem0,node(1,evalSystem1,evalNode1SourceInd,evalEntity,none),information(evalEntity,evalScope,evalRepresentation,none),2)";
       toCheck.push_back(ss.str());
       ss.str("");
-      ss << "stream(1,evalSystem0,evalNode2SourceInd,evalSystem2,information(evalEntity,evalScope,evalRepresentation,none),2)";
+      ss << "stream(1,evalSystem0,node(1,evalSystem2,evalNode2SourceInd,evalEntity,none),information(evalEntity,evalScope,evalRepresentation,none),2)";
       toCheck.push_back(ss.str());
 
       ss.str("");
-      ss << "selectedStream(1,evalSystem0,evalNode0Ind,evalSystem0,information(evalEntity,evalScope,reqRepresentation,none),3)";
+      ss << "selectedStream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none),information(evalEntity,evalScope,reqRepresentation,none),3)";
       toCheck.push_back(ss.str());
 
 //      ss.str("");
