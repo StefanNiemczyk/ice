@@ -125,7 +125,6 @@ add_jar(
   java/src/de/unikassel/vs/ice/NodeIROVisitor.java
   java/src/de/unikassel/vs/ice/RepresentationVisitor.java
   java/src/de/unikassel/vs/ice/Representation.java
-  java/src/de/unikassel/vs/ice/RepresentationIndividual.java
   OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/java/lib
 )
 
@@ -254,16 +253,16 @@ target_link_libraries(ice_node
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test 
-  test/eval/eval_ModelGeneration.cpp
-  test/eval/ModelGeneration.cpp
-  test/eval/EvalScenarios.cpp
+  # test/eval/eval_ModelGeneration.cpp
+  # test/eval/ModelGeneration.cpp
+  # test/eval/EvalScenarios.cpp
  # test/eval/eval_AccessSpeed.cpp
    
  # test/etc/TestTime.cpp
  # test/etc/EngineStuff.cpp
  # test/test_ASPComposition.cpp
  # test/test_ASPRepComputation.cpp
- test/test_JNI.cpp
+  test/test_JNI.cpp
  # test/test_ASPCoordinator.cpp
  # test/test_RingBuffer.cpp
  # test/test_Buffer.cpp

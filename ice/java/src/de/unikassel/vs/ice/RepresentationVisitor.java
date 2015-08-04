@@ -2,6 +2,7 @@ package de.unikassel.vs.ice;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLAsymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataAllValuesFrom;
 import org.semanticweb.owlapi.model.OWLDataComplementOf;
 import org.semanticweb.owlapi.model.OWLDataExactCardinality;
@@ -95,15 +97,15 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 public class RepresentationVisitor extends IceVisitor {
 
-	private Set<RepresentationIndividual> individuals = new HashSet<RepresentationIndividual>();
+	private HashMap<String, Representation> representations = new HashMap<String, Representation>();
 
 	public RepresentationVisitor(final IceOntologyInterface ioi, final Set<OWLOntology> ontologies,
 			final OWLReasoner reasoner, final IceIris iceIris) {
 		super(ioi, ontologies, reasoner, iceIris);
 	}
 
-	public static List<RepresentationIndividual> asSortedList(final Set<RepresentationIndividual> set) {
-		List<RepresentationIndividual> list = new ArrayList<RepresentationIndividual>(set);
+	public static List<Representation> asSortedList(final Set<Representation> set) {
+		List<Representation> list = new ArrayList<Representation>(set);
 		Collections.sort(list);
 		return list;
 	}
@@ -113,7 +115,7 @@ public class RepresentationVisitor extends IceVisitor {
 		String str = "";
 		boolean lineAdded = false;
 
-		for (RepresentationIndividual ri : asSortedList(individuals)) {
+		for (Representation ri : representations.values()) {
 			str += ri.toString() + '\n';
 			lineAdded = true;
 		}
@@ -128,35 +130,54 @@ public class RepresentationVisitor extends IceVisitor {
 		return iri.toString().substring(iri.toString().indexOf("#") + 1);
 	}
 
-	private String extractData(final String str) {
-		String[] spl = str.split("#");
-		String res = null;
-		if (spl.length == 2) {
-			res = spl[1];
-			res = res.substring(0, res.length() - 1);
+	private Representation getParent(final OWLClass cl) {
+		Set<OWLClassExpression> sces = cl.getSuperClasses(ontologies);
+
+		if (sces.size() != 1) {
+			return null;
 		}
 
-		return res;
+		OWLClassExpression sce = null;
+		for (OWLClassExpression owlClassExpression : sces) {
+			sce = owlClassExpression;
+		}
+
+		Set<OWLClass> scls = sce.getClassesInSignature();
+		if (scls.size() != 1) {
+			System.err.println("Warning! Can't handle multiple superclasses yet!");
+			System.err.println("Class: " + cl);
+			return null;
+		}
+
+		OWLClass scl = null;
+		for (OWLClass owlClass : scls) {
+			scl = owlClass;
+		}
+
+		String name = extractRepresentationName(scl.getIRI());
+		Representation rep = representations.get(name);
+		if (rep == null) {
+			rep = new Representation(extractRepresentationName(scl.getIRI()), getParent(scl));
+		}
+
+		return rep;
 	}
 
-	private RepresentationIndividual makeIndividual(final OWLClass cl, final OWLIndividual ind) {
-		String dataStr = null;
-		String representation = extractRepresentationName(cl.getIRI());
+	private Representation makeRepresentation(final OWLClass cl) {
+		String name = extractRepresentationName(cl.getIRI());
+		Representation parent = getParent(cl);
 
-		Set<OWLNamedIndividual> ninds = ind.getIndividualsInSignature();
-		for (OWLNamedIndividual nind : ninds) {
-			dataStr = extractData(nind.toString());
-		}
-
-		return new RepresentationIndividual(representation, dataStr);
+		return new Representation(name, parent);
 	}
 
 	@Override
 	public final void visit(final OWLClass cl) {
-		Set<OWLIndividual> inds = cl.getIndividuals(ontologies);
-		for (OWLIndividual ind : inds) {
-			individuals.add(makeIndividual(cl, ind));
+		Representation r = makeRepresentation(cl);
+		if (r == null) {
+			return;
 		}
+
+		representations.putIfAbsent(r.name, r);
 	}
 
 	/* Ignored visit implementations */

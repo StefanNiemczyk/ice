@@ -300,7 +300,7 @@ public class InfoStructureVisitor extends IceVisitor {
 				} else if (exp instanceof OWLObjectHasValue) {
 					OWLObjectHasValue ohv = (OWLObjectHasValue) exp;
 					if (ohv.getProperty().equals(p_property) && ohv.getValue().isAnonymous() == false) {
-						unit = this.iRIShortName(ohv.getFiller().asOWLNamedIndividual().getIRI());
+						//unit = this.iRIShortName(ohv.getasOWLNamedIndividual().getIRI());
 					}
 				} else if (exp instanceof OWLObjectExactCardinality) {
 					OWLObjectExactCardinality ohv = (OWLObjectExactCardinality) exp;

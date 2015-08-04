@@ -1145,7 +1145,7 @@ public class IceOntologyInterface {
 		Set<OWLOntology> onts = new HashSet<OWLOntology>();
 		onts.add(this.mainOntology);
 		onts.addAll(this.imports);
-
+		
 		RepresentationVisitor rv = new RepresentationVisitor(this, onts, this.getReasoner(), this.ii);
 		Set<OWLClass> classes = this.getReasoner().getSubClasses(this.ii.representation, false).getFlattened();
 
