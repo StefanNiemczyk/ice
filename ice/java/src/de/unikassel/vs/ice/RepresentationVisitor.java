@@ -3,7 +3,6 @@ package de.unikassel.vs.ice;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -48,7 +47,6 @@ import org.semanticweb.owlapi.model.OWLFacetRestriction;
 import org.semanticweb.owlapi.model.OWLFunctionalDataPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLFunctionalObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLHasKeyAxiom;
-import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLInverseObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLIrreflexiveObjectPropertyAxiom;
@@ -97,7 +95,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 public class RepresentationVisitor extends IceVisitor {
 
-	private HashMap<String, Representation> representations = new HashMap<String, Representation>();
+	private final HashMap<String, Representation> representations = new HashMap<String, Representation>();
 
 	public RepresentationVisitor(final IceOntologyInterface ioi, final Set<OWLOntology> ontologies,
 			final OWLReasoner reasoner, final IceIris iceIris) {
@@ -105,7 +103,7 @@ public class RepresentationVisitor extends IceVisitor {
 	}
 
 	public static List<Representation> asSortedList(final Set<Representation> set) {
-		List<Representation> list = new ArrayList<Representation>(set);
+		final List<Representation> list = new ArrayList<Representation>(set);
 		Collections.sort(list);
 		return list;
 	}
@@ -115,7 +113,7 @@ public class RepresentationVisitor extends IceVisitor {
 		String str = "";
 		boolean lineAdded = false;
 
-		for (Representation ri : representations.values()) {
+		for (final Representation ri : representations.values()) {
 			str += ri.toString() + '\n';
 			lineAdded = true;
 		}
@@ -130,19 +128,19 @@ public class RepresentationVisitor extends IceVisitor {
 		return iri.toString().substring(iri.toString().indexOf("#") + 1);
 	}
 
-	private Representation getParent(final OWLClass cl) {
-		Set<OWLClassExpression> sces = cl.getSuperClasses(ontologies);
+	private Representation extractParent(final OWLClass cl) {
+		final Set<OWLClassExpression> sces = cl.getSuperClasses(ontologies);
 
 		if (sces.size() != 1) {
 			return null;
 		}
 
 		OWLClassExpression sce = null;
-		for (OWLClassExpression owlClassExpression : sces) {
+		for (final OWLClassExpression owlClassExpression : sces) {
 			sce = owlClassExpression;
 		}
 
-		Set<OWLClass> scls = sce.getClassesInSignature();
+		final Set<OWLClass> scls = sce.getClassesInSignature();
 		if (scls.size() != 1) {
 			System.err.println("Warning! Can't handle multiple superclasses yet!");
 			System.err.println("Class: " + cl);
@@ -150,368 +148,374 @@ public class RepresentationVisitor extends IceVisitor {
 		}
 
 		OWLClass scl = null;
-		for (OWLClass owlClass : scls) {
+		for (final OWLClass owlClass : scls) {
 			scl = owlClass;
 		}
 
-		String name = extractRepresentationName(scl.getIRI());
+		final String name = extractRepresentationName(scl.getIRI());
 		Representation rep = representations.get(name);
 		if (rep == null) {
-			rep = new Representation(extractRepresentationName(scl.getIRI()), getParent(scl));
+			rep = new Representation(extractRepresentationName(scl.getIRI()), extractParent(scl));
 		}
 
 		return rep;
 	}
 
 	private Representation makeRepresentation(final OWLClass cl) {
-		String name = extractRepresentationName(cl.getIRI());
-		Representation parent = getParent(cl);
+		final String name = extractRepresentationName(cl.getIRI());
+		final Representation parent = extractParent(cl);
 
 		return new Representation(name, parent);
 	}
 
 	@Override
 	public final void visit(final OWLClass cl) {
-		Representation r = makeRepresentation(cl);
+		final Representation r = makeRepresentation(cl);
 		if (r == null) {
 			return;
 		}
 
-		representations.putIfAbsent(r.name, r);
+		if (!representations.containsKey(r.name)) {
+			representations.put(r.name, r);
+		}
+	}
+
+	public HashMap<String, Representation> getRepresentations() {
+		return representations;
 	}
 
 	/* Ignored visit implementations */
 
 	@Override
-	public void visit(OWLOntology arg0) {
+	public void visit(final OWLOntology arg0) {
 	}
 
 	@Override
-	public void visit(OWLDeclarationAxiom arg0) {
+	public void visit(final OWLDeclarationAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLSubClassOfAxiom arg0) {
+	public void visit(final OWLSubClassOfAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLNegativeObjectPropertyAssertionAxiom arg0) {
+	public void visit(final OWLNegativeObjectPropertyAssertionAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLAsymmetricObjectPropertyAxiom arg0) {
+	public void visit(final OWLAsymmetricObjectPropertyAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLReflexiveObjectPropertyAxiom arg0) {
+	public void visit(final OWLReflexiveObjectPropertyAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLDisjointClassesAxiom arg0) {
+	public void visit(final OWLDisjointClassesAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataPropertyDomainAxiom arg0) {
+	public void visit(final OWLDataPropertyDomainAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectPropertyDomainAxiom arg0) {
+	public void visit(final OWLObjectPropertyDomainAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLEquivalentObjectPropertiesAxiom arg0) {
+	public void visit(final OWLEquivalentObjectPropertiesAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLNegativeDataPropertyAssertionAxiom arg0) {
+	public void visit(final OWLNegativeDataPropertyAssertionAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLDifferentIndividualsAxiom arg0) {
+	public void visit(final OWLDifferentIndividualsAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLDisjointDataPropertiesAxiom arg0) {
+	public void visit(final OWLDisjointDataPropertiesAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLDisjointObjectPropertiesAxiom arg0) {
+	public void visit(final OWLDisjointObjectPropertiesAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectPropertyRangeAxiom arg0) {
+	public void visit(final OWLObjectPropertyRangeAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectPropertyAssertionAxiom arg0) {
+	public void visit(final OWLObjectPropertyAssertionAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLFunctionalObjectPropertyAxiom arg0) {
+	public void visit(final OWLFunctionalObjectPropertyAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLSubObjectPropertyOfAxiom arg0) {
+	public void visit(final OWLSubObjectPropertyOfAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLDisjointUnionAxiom arg0) {
+	public void visit(final OWLDisjointUnionAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLSymmetricObjectPropertyAxiom arg0) {
+	public void visit(final OWLSymmetricObjectPropertyAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataPropertyRangeAxiom arg0) {
+	public void visit(final OWLDataPropertyRangeAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLFunctionalDataPropertyAxiom arg0) {
+	public void visit(final OWLFunctionalDataPropertyAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLEquivalentDataPropertiesAxiom arg0) {
+	public void visit(final OWLEquivalentDataPropertiesAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLClassAssertionAxiom arg0) {
+	public void visit(final OWLClassAssertionAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLEquivalentClassesAxiom arg0) {
+	public void visit(final OWLEquivalentClassesAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataPropertyAssertionAxiom arg0) {
+	public void visit(final OWLDataPropertyAssertionAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLTransitiveObjectPropertyAxiom arg0) {
+	public void visit(final OWLTransitiveObjectPropertyAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLIrreflexiveObjectPropertyAxiom arg0) {
+	public void visit(final OWLIrreflexiveObjectPropertyAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLSubDataPropertyOfAxiom arg0) {
+	public void visit(final OWLSubDataPropertyOfAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLInverseFunctionalObjectPropertyAxiom arg0) {
+	public void visit(final OWLInverseFunctionalObjectPropertyAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLSameIndividualAxiom arg0) {
+	public void visit(final OWLSameIndividualAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLSubPropertyChainOfAxiom arg0) {
+	public void visit(final OWLSubPropertyChainOfAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLInverseObjectPropertiesAxiom arg0) {
+	public void visit(final OWLInverseObjectPropertiesAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLHasKeyAxiom arg0) {
+	public void visit(final OWLHasKeyAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLDatatypeDefinitionAxiom arg0) {
+	public void visit(final OWLDatatypeDefinitionAxiom arg0) {
 	}
 
 	@Override
-	public void visit(SWRLRule arg0) {
+	public void visit(final SWRLRule arg0) {
 	}
 
 	@Override
-	public void visit(OWLAnnotationAssertionAxiom arg0) {
+	public void visit(final OWLAnnotationAssertionAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLSubAnnotationPropertyOfAxiom arg0) {
+	public void visit(final OWLSubAnnotationPropertyOfAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLAnnotationPropertyDomainAxiom arg0) {
+	public void visit(final OWLAnnotationPropertyDomainAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLAnnotationPropertyRangeAxiom arg0) {
+	public void visit(final OWLAnnotationPropertyRangeAxiom arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectIntersectionOf arg0) {
+	public void visit(final OWLObjectIntersectionOf arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectUnionOf arg0) {
+	public void visit(final OWLObjectUnionOf arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectComplementOf arg0) {
+	public void visit(final OWLObjectComplementOf arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectSomeValuesFrom arg0) {
+	public void visit(final OWLObjectSomeValuesFrom arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectAllValuesFrom arg0) {
+	public void visit(final OWLObjectAllValuesFrom arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectHasValue arg0) {
+	public void visit(final OWLObjectHasValue arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectMinCardinality arg0) {
+	public void visit(final OWLObjectMinCardinality arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectExactCardinality arg0) {
+	public void visit(final OWLObjectExactCardinality arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectMaxCardinality arg0) {
+	public void visit(final OWLObjectMaxCardinality arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectHasSelf arg0) {
+	public void visit(final OWLObjectHasSelf arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectOneOf arg0) {
+	public void visit(final OWLObjectOneOf arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataSomeValuesFrom arg0) {
+	public void visit(final OWLDataSomeValuesFrom arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataAllValuesFrom arg0) {
+	public void visit(final OWLDataAllValuesFrom arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataHasValue arg0) {
+	public void visit(final OWLDataHasValue arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataMinCardinality arg0) {
+	public void visit(final OWLDataMinCardinality arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataExactCardinality arg0) {
+	public void visit(final OWLDataExactCardinality arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataMaxCardinality arg0) {
+	public void visit(final OWLDataMaxCardinality arg0) {
 	}
 
 	@Override
-	public void visit(OWLLiteral arg0) {
+	public void visit(final OWLLiteral arg0) {
 	}
 
 	@Override
-	public void visit(OWLFacetRestriction arg0) {
+	public void visit(final OWLFacetRestriction arg0) {
 	}
 
 	@Override
-	public void visit(OWLDatatype arg0) {
+	public void visit(final OWLDatatype arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataOneOf arg0) {
+	public void visit(final OWLDataOneOf arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataComplementOf arg0) {
+	public void visit(final OWLDataComplementOf arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataIntersectionOf arg0) {
+	public void visit(final OWLDataIntersectionOf arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataUnionOf arg0) {
+	public void visit(final OWLDataUnionOf arg0) {
 	}
 
 	@Override
-	public void visit(OWLDatatypeRestriction arg0) {
+	public void visit(final OWLDatatypeRestriction arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectProperty arg0) {
+	public void visit(final OWLObjectProperty arg0) {
 	}
 
 	@Override
-	public void visit(OWLObjectInverseOf arg0) {
+	public void visit(final OWLObjectInverseOf arg0) {
 	}
 
 	@Override
-	public void visit(OWLDataProperty arg0) {
+	public void visit(final OWLDataProperty arg0) {
 	}
 
 	@Override
-	public void visit(OWLNamedIndividual arg0) {
+	public void visit(final OWLNamedIndividual arg0) {
 	}
 
 	@Override
-	public void visit(OWLAnonymousIndividual arg0) {
+	public void visit(final OWLAnonymousIndividual arg0) {
 	}
 
 	@Override
-	public void visit(IRI arg0) {
+	public void visit(final IRI arg0) {
 	}
 
 	@Override
-	public void visit(OWLAnnotation arg0) {
+	public void visit(final OWLAnnotation arg0) {
 	}
 
 	@Override
-	public void visit(SWRLClassAtom arg0) {
+	public void visit(final SWRLClassAtom arg0) {
 	}
 
 	@Override
-	public void visit(SWRLDataRangeAtom arg0) {
+	public void visit(final SWRLDataRangeAtom arg0) {
 	}
 
 	@Override
-	public void visit(SWRLObjectPropertyAtom arg0) {
+	public void visit(final SWRLObjectPropertyAtom arg0) {
 	}
 
 	@Override
-	public void visit(SWRLDataPropertyAtom arg0) {
+	public void visit(final SWRLDataPropertyAtom arg0) {
 	}
 
 	@Override
-	public void visit(SWRLBuiltInAtom arg0) {
+	public void visit(final SWRLBuiltInAtom arg0) {
 	}
 
 	@Override
-	public void visit(SWRLIndividualArgument arg0) {
+	public void visit(final SWRLIndividualArgument arg0) {
 	}
 
 	@Override
-	public void visit(SWRLLiteralArgument arg0) {
+	public void visit(final SWRLLiteralArgument arg0) {
 	}
 
 	@Override
-	public void visit(SWRLSameIndividualAtom arg0) {
+	public void visit(final SWRLSameIndividualAtom arg0) {
 	}
 
 	@Override
-	public void visit(SWRLDifferentIndividualsAtom arg0) {
+	public void visit(final SWRLDifferentIndividualsAtom arg0) {
 	}
 
 	@Override
-	public void visit(OWLAnnotationProperty arg0) {
+	public void visit(final OWLAnnotationProperty arg0) {
 	}
 
 	@Override
-	public void visit(SWRLVariable arg0) {
+	public void visit(final SWRLVariable arg0) {
 	}
 
 }
