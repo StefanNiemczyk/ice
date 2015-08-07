@@ -42,18 +42,18 @@ void RosCommunication::init()
   this->coordinationPublisher = this->nodeHandel.advertise<ice_msgs::ICECoordination>("ice/coordination", 100);
   this->coordinationSubscriber = this->nodeHandel.subscribe("ice/coordination", 100, &RosCommunication::onCoordination,
                                                             this);
-  this->informationModelPublisher = this->nodeHandel.advertise<ice_msgs::InformationModel>("ice/information_model",
-                                                                                           100);
-  this->informationModelSubscriber = this->nodeHandel.subscribe("ice/information_model", 100,
-                                                                &RosCommunication::onInformationModel, this);
-  this->cooperationRequestPublisher = this->nodeHandel.advertise<ice_msgs::CooperationRequest>(
-      "ice/cooperation_request", 100);
-  this->cooperationRequestSubscriber = this->nodeHandel.subscribe("ice/cooperation_request", 100,
-                                                                  &RosCommunication::onCooperationRequest, this);
-  this->cooperationResponsePublisher = this->nodeHandel.advertise<ice_msgs::CooperationResponse>(
-      "ice/cooperation_response", 100);
-  this->cooperationResponseSubscriber = this->nodeHandel.subscribe("ice/cooperation_response", 100,
-                                                                   &RosCommunication::onCooperationResponse, this);
+//  this->informationModelPublisher = this->nodeHandel.advertise<ice_msgs::InformationModel>("ice/information_model",
+//                                                                                           100);
+//  this->informationModelSubscriber = this->nodeHandel.subscribe("ice/information_model", 100,
+//                                                                &RosCommunication::onInformationModel, this);
+//  this->cooperationRequestPublisher = this->nodeHandel.advertise<ice_msgs::CooperationRequest>(
+//      "ice/cooperation_request", 100);
+//  this->cooperationRequestSubscriber = this->nodeHandel.subscribe("ice/cooperation_request", 100,
+//                                                                  &RosCommunication::onCooperationRequest, this);
+//  this->cooperationResponsePublisher = this->nodeHandel.advertise<ice_msgs::CooperationResponse>(
+//      "ice/cooperation_response", 100);
+//  this->cooperationResponseSubscriber = this->nodeHandel.subscribe("ice/cooperation_response", 100,
+//                                                                   &RosCommunication::onCooperationResponse, this);
 
   this->running = true;
   this->worker = std::thread(&RosCommunication::workerTask, this);
@@ -83,8 +83,9 @@ void RosCommunication::sendHeartbeat()
 //  }
 //  std::cout << std::endl;
 
-  heartbeat.header.senderId.id.resize(16);
-  std::copy(this->engineId.begin(), this->engineId.end(), heartbeat.header.senderId.id.begin());
+//  heartbeat.header.senderId.id.resize(16);
+//  std::copy(this->engineId.begin(), this->engineId.end(), heartbeat.header.senderId.id.begin());
+  heartbeat.header.senderId.value = this->engineId;
   heartbeat.header.timestamp = ros::Time::now();
 
   this->heartbeatPublisher.publish(heartbeat);
@@ -396,12 +397,14 @@ void RosCommunication::sendCommand(const identifier receiverId, const RosCoordin
   }
 
   ice_msgs::ICECoordination coordinationMsg;
-  coordinationMsg.header.senderId.id.resize(16);
-  std::copy(this->engineId.begin(), this->engineId.end(), coordinationMsg.header.senderId.id.begin());
+  coordinationMsg.header.senderId.value = this->engineId;
+//  coordinationMsg.header.senderId.id.resize(16);
+//  std::copy(this->engineId.begin(), this->engineId.end(), coordinationMsg.header.senderId.id.begin());
 
   ice_msgs::Identifier receiver;
-  receiver.id.resize(16);
-  std::copy(receiverId.begin(), receiverId.end(), receiver.id.begin());
+//  receiver.id.resize(16);
+//  std::copy(receiverId.begin(), receiverId.end(), receiver.id.begin());
+  receiver.value = receiverId;
   coordinationMsg.header.receiverIds.push_back(receiver);
 
   coordinationMsg.command = command;
@@ -424,7 +427,7 @@ void RosCommunication::workerTask()
 
 void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
 {
-  identifier senderId = IDGenerator::getInstance()->getIdentifier(msg->header.senderId.id);
+  identifier senderId = msg->header.senderId.value;//IDGenerator::getInstance()->getIdentifier(msg->header.senderId.value);
 
   _log->verbose(1, "Heartbeat from engine %v", IDGenerator::toString(senderId).c_str());
 
@@ -438,7 +441,7 @@ void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
 
 void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr& msg)
 {
-  identifier senderId = IDGenerator::getInstance()->getIdentifier(msg->header.senderId.id);
+  identifier senderId = msg->header.senderId.value;//IDGenerator::getInstance()->getIdentifier(msg->header.senderId.value);
 
   if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)
     return;
@@ -619,7 +622,7 @@ bool RosCommunication::checkReceiverIds(ice_msgs::ICEHeader header)
 {
   for (auto id : header.receiverIds)
   {
-    identifier receiverId = IDGenerator::getInstance()->getIdentifier(id.id);
+    identifier receiverId = id.value;//IDGenerator::getInstance()->getIdentifier(id.value);
 
     if (receiverId == this->engineId)
       return true;

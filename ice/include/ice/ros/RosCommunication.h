@@ -42,8 +42,7 @@ enum RosCoordinationCommand
 };
 
 static const char* RosCoordinationCommandString[7] = {"REQUEST_INFORMATION_MODEL", "COOPERATION_ACCEPT",
-                                                      "COOPERATION_REFUSE",
-                                                       "NEGOTIATION_FINISHED", "NEGOTIATION_RETRY", "STOP_COOPERATION", "COOPERATION_STOPPED"};
+                                                      "COOPERATION_REFUSE", "NEGOTIATION_FINISHED", "NEGOTIATION_RETRY", "STOP_COOPERATION", "COOPERATION_STOPPED"};
 
 class RosCommunication : public Communication
 {

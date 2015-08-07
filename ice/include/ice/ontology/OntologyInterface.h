@@ -36,6 +36,7 @@ public:
   bool loadOntologies();
   bool loadOntology(std::string const p_path);
   bool saveOntology(std::string const p_path);
+  std::unique_ptr<std::vector<const char*>> getOntologyIDs();
   bool initReasoner(bool const p_force);
   bool isConsistent();
   std::unique_ptr<std::vector<const char*>> getSystems();
@@ -105,6 +106,7 @@ private:
   jmethodID loadOntologiesMethod; /**< Method id */
   jmethodID loadOntologyMethod; /**< Method id */
   jmethodID saveOntologyMethod; /**< Method id */
+  jmethodID getOntologyIDsMethod; /**< Method id */
   jmethodID initReasonerMethod; /**< Method id */
   jmethodID isConsistentMethod; /**< Method id */
   jmethodID getSystemsMethod; /**< Method id */

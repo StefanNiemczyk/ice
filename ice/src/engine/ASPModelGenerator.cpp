@@ -33,28 +33,30 @@ ASPModelGenerator::ASPModelGenerator(std::weak_ptr<ICEngine> engine) : Processin
 
 void ASPModelGenerator::init()
 {
-  std::string path = ros::package::getPath("ice");
-  _log->debug("Default ontology path %v", path.c_str());
+  std::string path = ros::package::getPath("ice") + "/asp/informationProcessing/";
+  _log->debug("Default ASP path %v", path.c_str());
 
   auto en = engine.lock();
   this->nodeStore = en->getNodeStore();
   this->informationStore = en->getInformationStore();
   this->ontology = en->getOntologyInterface();
   this->coordinator = en->getCoordinator();
-  this->self = this->getASPSystemByIRI(en->getIri());
 
   // Initializing ASP
   this->asp = std::make_shared<supplementary::ClingWrapper>();
-  this->asp->addKnowledgeFile(path + "/asp/informationProcessing/processing.lp");
-  this->asp->addKnowledgeFile(path + "/asp/informationProcessing/searchBottomUp.lp");
+  this->asp->addKnowledgeFile(path + "processing.lp");
+  this->asp->addKnowledgeFile(path + "searchBottomUp.lp");
 
   if (this->globalOptimization)
-    this->asp->addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
+    this->asp->addKnowledgeFile(path + "globalOptimization.lp");
   else
-    this->asp->addKnowledgeFile(path + "/asp/informationProcessing/localOptimization.lp");
+    this->asp->addKnowledgeFile(path + "localOptimization.lp"); //DO NOT USE
 
   this->asp->setNoWarnings(true);
   this->asp->init();
+
+  // Look up system
+  this->self = this->getASPSystemByIRI(en->getIri());
 }
 
 void ASPModelGenerator::cleanUp()
@@ -75,26 +77,26 @@ void ASPModelGenerator::createProcessingModel()
 
   if (this->ontology->isLoadDirty())
   {
-    _log->debug("Load flag dirty, reload ontologies");
+    _log->debug("Load flagged dirty, reload ontologies");
     this->ontology->loadOntologies();
   }
 
   if (this->ontology->isInformationDirty())
   {
-    _log->debug("Information model flag dirty, reload information structure");
+    _log->debug("Information model flagged dirty, reload information structure");
     this->readInfoStructureFromOntology();
   }
 
   if (this->ontology->isSystemDirty())
   {
-    _log->debug("System flag dirty, reload systems");
+    _log->debug("System flagged dirty, reload systems");
     this->readSystemsFromOntology();
   }
 
   if (groundingDirty)
   {
     this->groundingDirty = false;
-    _log->debug("Grounding flag dirty, grounding asp program");
+    _log->debug("Grounding flagged dirty, grounding asp program");
 
     if (this->lastQuery)
     {
@@ -115,7 +117,7 @@ void ASPModelGenerator::createProcessingModel()
     bool valid = true;
     std::vector<std::shared_ptr<Node>> nodes;
 
-    // node(1,testSystem,testSourceNodeInd,testEntity1,none)
+    // node(QUERY_INDEX, SYSTEM, NODE , ENTITY, ENTITY2)
     std::vector<Gringo::Value> values;
     values.push_back(this->queryIndex);
     values.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
@@ -154,9 +156,15 @@ void ASPModelGenerator::createProcessingModel()
         case ASPElementType::ASP_COMPUTATION_NODE:
           type = NodeType::PROCESSING;
           break;
+        case ASPElementType::ASP_IRO_NODE:
+          type = NodeType::IRO;
+          break;
+        case ASPElementType::ASP_MAP_NODE:
+          type = NodeType::MAP;
+          break;
       }
 
-      auto node = this->nodeStore->registerNode(type, aspNode->className, aspNode->name, nodeEntity, aspNode->config);
+      auto node = this->nodeStore->registerNode(type, aspNode->className, aspNode->name, nodeEntity, nodeEntity2, aspNode->config);
 
       if (node == nullptr)
       {
@@ -166,7 +174,7 @@ void ASPModelGenerator::createProcessingModel()
         break;
       }
 
-      // connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP))
+      // connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,node(k,SOURCE,PROVIDER,ENTITY3,ENTITY4),INFO,STEP))
       std::vector<Gringo::Value> nodeValues;
       nodeValues.push_back(this->queryIndex);
       nodeValues.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
@@ -177,7 +185,6 @@ void ASPModelGenerator::createProcessingModel()
       std::vector<Gringo::Value> streamValues;
       streamValues.push_back(this->queryIndex);
       streamValues.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
-      streamValues.push_back("?");
       streamValues.push_back("?");
       streamValues.push_back("?");
       streamValues.push_back("?");
@@ -203,13 +210,14 @@ void ASPModelGenerator::createProcessingModel()
         {
           _log->debug("Look up connected stream for node '%v'", nodeName.c_str());
 
-          auto streamValue = connect.args()[1];
+//          auto streamValue = connect.args()[1];
 
-          auto lastProcessing = *streamValue.args()[2].name();
-          auto sourceSystem = *streamValue.args()[3].name();
-          auto info = streamValue.args()[4];
-          auto step = streamValue.args()[5];
-          auto stream = this->getStream(info, lastProcessing, sourceSystem, step);
+//          auto lastProcessing = *streamValue.args()[2].name();
+//          auto sourceSystem = *streamValue.args()[3].name();
+//          auto info = streamValue.args()[4];
+//          auto step = streamValue.args()[5];
+          // get the stream connected to the node
+          auto stream = this->getStream(connect.args()[1]);
 
           if (false == stream)
           {
@@ -224,12 +232,11 @@ void ASPModelGenerator::createProcessingModel()
         }
       }
 
-      // stream(1,testSystem,testSourceNodeInd,testSystem,information(testEntity1,testScope1,testRepresentation1,none),step)
+      // stream(k,SYSTEM,node(k,SOURCE,NODE,ENTITY,ENTITY2),INFO,STEP)
       values.clear();
       values.push_back(this->queryIndex);
       values.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
-      values.push_back(Gringo::Value(aspNode->name));
-      values.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
+      values.push_back(Gringo::Value("node", nodeValues));
       values.push_back("?");
       values.push_back("?");
 
@@ -239,12 +246,7 @@ void ASPModelGenerator::createProcessingModel()
       for (auto output : *streamResult)
       {
         _log->debug("Look up output stream for node '%v'", nodeName.c_str());
-
-        auto lastProcessing = *output.args()[2].name();
-        auto sourceSystem = *output.args()[3].name();
-        auto info = output.args()[4];
-        auto step = output.args()[5];
-        auto stream = this->getStream(info, lastProcessing, sourceSystem, step);
+        auto stream = this->getStream(output);
 
         if (false == stream)
         {
@@ -524,8 +526,9 @@ std::shared_ptr<ASPSystem> ASPModelGenerator::getASPSystemByIRI(std::string p_ir
 
   int index = p_iri.find_last_of("#");
   std::string asp = (index != std::string::npos ? p_iri.substr(index+1, p_iri.length()) : p_iri);
+  std::transform(asp.begin(), asp.begin() + 1, asp.begin(), ::tolower);
 
-  auto external = this->asp->getExternal("system", {Gringo::Value(asp)}, true);
+  auto external = this->asp->getExternal("system", {Gringo::Value(asp), "default"}, "system", {Gringo::Value(asp)}, true);
 
   std::shared_ptr<ASPSystem> system = std::make_shared<ASPSystem>(this->engine, this->coordinator->getEngineState(p_iri), external);
   this->systems.push_back(system);
@@ -555,32 +558,20 @@ std::map<std::string, std::string> ASPModelGenerator::readConfiguration(std::str
   return configuration;
 }
 
-void ASPModelGenerator::readMetadata(std::map<std::string, int>* metadata, const std::string provider,
-                                  const std::string sourceSystem, Gringo::Value information, Gringo::Value step)
+void ASPModelGenerator::readMetadata(std::map<std::string, int>* metadata, const Gringo::Value element)
 {
   // TODO read metadata from ontology
-  this->readMetadata("delay", metadata, provider, sourceSystem, information, step);
-  this->readMetadata("accuracy", metadata, provider, sourceSystem, information, step);
+  this->readMetadata("delay", metadata, element);
+  this->readMetadata("accuracy", metadata, element);
 }
 
-void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int> *metadata, std::string const provider,
-                                  std::string const sourceSystem, Gringo::Value information, Gringo::Value step)
+void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int> *metadata, const Gringo::Value element)
 {
-  // metadataStream(1,accuracy,stream(1,testSystem,testComputationalNodeInd,testSystem,information(testEntity1,testScope1,testRepresentation2,none),2),5)
-
+  // metadataStream(k,METADATA,stream(k,SYSTEM,node(k,SOURCE,NODE,ENTITY,ENTITY2),INFO,STEP),VALUE)
   std::vector<Gringo::Value> values;
   values.push_back(this->queryIndex);
   values.push_back(Gringo::Value(name));
-
-  std::vector<Gringo::Value> valuesStream;
-  valuesStream.push_back(this->queryIndex);
-  valuesStream.push_back(std::string(this->self->getEngineState()->getSystemIriShort()));
-  valuesStream.push_back(Gringo::Value(provider));
-  valuesStream.push_back(Gringo::Value(sourceSystem));
-  valuesStream.push_back(information);
-  valuesStream.push_back(step);
-
-  values.push_back(Gringo::Value("stream",valuesStream));
+  values.push_back(element);
   values.push_back("?");
 
   Gringo::Value query("metadataStream", values);
@@ -589,9 +580,9 @@ void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int
   if (result->size() != 1)
   {
     std::stringstream o;
-    o << information;
-    _log->warn("Wrong size '%v' for metadata '%v' of stream '%v', '%v', '%v'", result->size(), name.c_str(),
-               o.str().c_str(), provider.c_str(), sourceSystem.c_str());
+    o << element;
+    _log->warn("Wrong size '%v' for metadata '%v' of stream '%v'", result->size(), name.c_str(),
+               o.str().c_str());
     return;
   }
 
@@ -600,17 +591,16 @@ void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int
   if (value.type() != Gringo::Value::Type::NUM)
   {
     std::stringstream o, o2;
-    o << information;
+    o << element;
     o2 << value;
-    _log->warn("Wrong type '%v' of '%v' for metadata '%v' of stream '%v', '%v', '%v'", value.type(), o2.str().c_str(),
-               name.c_str(), o.str().c_str(), provider.c_str(), sourceSystem.c_str());
+    _log->warn("Wrong type '%v' of '%v' for metadata '%v' of stream '%v'", value.type(), o2.str().c_str(),
+               name.c_str(), o.str().c_str());
     return;
   }
 
   std::stringstream o;
-     o << information;
-  _log->debug("Metadata '%v' of stream '%v', '%v', '%v' has value '%v'", name.c_str(), o.str().c_str(), provider.c_str(),
-             sourceSystem.c_str(), value.num());
+  o << element;
+  _log->debug("Metadata '%v' of stream '%v' has value '%v'", name.c_str(), o.str().c_str(), value.num());
 
   (*metadata)[name] = value.num();
 }
@@ -621,11 +611,17 @@ std::string ASPModelGenerator::dataTypeForRepresentation(std::string representat
   return representation;
 }
 
-std::shared_ptr<BaseInformationStream> ASPModelGenerator::getStream(Gringo::Value info, std::string lastProcessing,
-                                                                 std::string sourceSystem, Gringo::Value step)
+std::shared_ptr<BaseInformationStream> ASPModelGenerator::getStream(const Gringo::Value streamValue)
 {
+  auto node = streamValue.args()[2];
+  auto info = streamValue.args()[3];
+  auto step = streamValue.args()[4];
+
   auto entity = *info.args()[0].name();
   auto relatedEntity = *info.args()[3].name();
+
+  std::string source = *node.args()[1].name();
+  std::string nodeName = *node.args()[2].name();
 
   if (relatedEntity == "none")
     relatedEntity = "";
@@ -634,12 +630,12 @@ std::shared_ptr<BaseInformationStream> ASPModelGenerator::getStream(Gringo::Valu
                                                              *info.args()[1].name(), *info.args()[2].name(),
                                                              relatedEntity);
 
-  auto stream = this->informationStore->getBaseStream(infoSpec.get(), lastProcessing, sourceSystem);
+  auto stream = this->informationStore->getBaseStream(infoSpec.get(), nodeName, source);
 
   if (false == stream)
   {
     std::map<std::string, int> metadata;
-    this->readMetadata(&metadata, lastProcessing, sourceSystem, info, step);
+    this->readMetadata(&metadata, streamValue);
 
     //        std::shared_ptr<InformationSpecification> specification,
     //        const std::string name,
@@ -649,9 +645,9 @@ std::shared_ptr<BaseInformationStream> ASPModelGenerator::getStream(Gringo::Valu
     //        std::string sourceSystem
 
     std::string dataType = this->dataTypeForRepresentation(*info.args()[2].name());
-    std::string name = *info.args()[0].name() + "-" + lastProcessing + "-" + sourceSystem;
-    stream = this->informationStore->registerBaseStream(dataType, infoSpec, name, 10, metadata, lastProcessing,
-                                                        sourceSystem);
+    std::string name = *info.args()[0].name() + "-" + nodeName + "-" + source;
+    stream = this->informationStore->registerBaseStream(dataType, infoSpec, name, 10, metadata, nodeName,
+                                                        source);
   }
 
   return stream;

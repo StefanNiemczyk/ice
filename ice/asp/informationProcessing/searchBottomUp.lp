@@ -8,7 +8,7 @@
 #program query(k,maxHopCount,maxStepCount).
 
 % select a theoretical stream for each required stream
-1 { before(tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),tnode(k,SYSTEM,none,none,none),INFO,0) : tstream(k,SYSTEM,tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO) } 1 :- 
+0 { before(tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),tnode(k,SYSTEM,none,none,none),INFO,0) : tstream(k,SYSTEM,tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO) } 1 :- 
 	requiredStream(SYSTEM,INFO), 
 	query(k).
 

@@ -18,6 +18,7 @@
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <owl:Ontology rdf:about="http://vs.uni-kassel.de/IceTest">
+        <owl:versionInfo rdf:datatype="&xsd;string">0.7</owl:versionInfo>
         <owl:imports rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/Ice"/>
     </owl:Ontology>
     
@@ -38,6 +39,13 @@
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#Ego2AlloIRO">
         <rdfs:subClassOf rdf:resource="&Ice;IRONode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRelatedInput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasOutput"/>
@@ -72,13 +80,6 @@
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasRelatedInput"/>
-                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -90,27 +91,27 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasOutput"/>
-                <owl:allValuesFrom rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasOutput"/>
-                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasInput"/>
-                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:allValuesFrom rdf:resource="&Ice;StreamPositionCoordinateRep"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasInput"/>
                 <owl:allValuesFrom rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -188,6 +189,12 @@
     <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestMapNode">
         <rdfs:subClassOf rdf:resource="&Ice;MapNode"/>
         <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutputMap"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestMap"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
                     <owl:Restriction>
@@ -202,12 +209,6 @@
                     </owl:Restriction>
                 </owl:intersectionOf>
             </owl:Class>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasOutputMap"/>
-                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestMap"/>
-            </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     

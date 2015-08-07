@@ -39,20 +39,6 @@ public class IceOntologyInterface {
 
 	private IceIris ii;
 
-	// private OWLClass systemOWLClass;
-	// private OWLClass nodeOWLClass;
-	// private OWLClass iroOWLClass;
-	// private OWLClass metadataOWLClass;
-	// private OWLClass entityTypeOWLClass;
-	// private OWLClass aspMetadataGroundingOWLClass;
-	// private OWLObjectProperty hasSystemOWLProperty;
-	// private OWLObjectProperty isSystemOfOWLProperty;
-	// private OWLObjectProperty hasMetadataOWLProperty;
-	// private OWLObjectProperty isMetadataOfOWLProperty;
-	// private OWLObjectProperty hasGroundingOWLProperty;
-	// private OWLObjectProperty isGroundingOfOWLProperty;
-	// private OWLDataProperty hasMetadataValueOWLDataProperty;
-
 	private List<String> ontologyIries;
 	private boolean dirty;
 
@@ -141,6 +127,19 @@ public class IceOntologyInterface {
 			this.log("Exception during saving the ontology " + e.getMessage());
 			return false;
 		}
+	}
+
+	public String[] getOntologyIDs() {
+		String[] ids = new String[this.imports.size() + 1];
+
+		ids[0] = this.mainOntology.getOntologyID().getDefaultDocumentIRI().toString();
+
+		int i = 1;
+		for (OWLOntology ont : this.imports) {
+			ids[i++] = ont.getOntologyID().getDefaultDocumentIRI().toString();
+		}
+
+		return ids;
 	}
 
 	public boolean isConsistent() {

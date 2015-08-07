@@ -97,22 +97,18 @@ metadataMap(k,METADATA,map(k,SYSTEM,mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),i
 	mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),STEP-1,COUNT),
 	COUNT != 0.
 
-
 % max
-
 inputMetaMapNode(NODE,METADATA,VALUE) :-
 	connectToMap(NODE,CONNECTED),
 	metadataElement(k,METADATA,CONNECTED,VALUE).
 
 -maxMetaMap(METADATA,mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),VALUE) :- 
-	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 
 	metadataOutput(METADATA,SYSTEM,NODE,max,_,_),
 	inputMetaMapNode(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),METADATA,VALUE),
 	inputMetaMapNode(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),METADATA,VALUE2),
 	VALUE2 > VALUE.
 	
 maxMetaMap(METADATA,mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),VALUE) :- 
-	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 
 	metadataOutput(METADATA,SYSTEM,NODE,max,_,_),
 	inputMetaMapNode(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),METADATA,VALUE),
 	not -maxMetaMap(METADATA,mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),VALUE).
@@ -136,9 +132,9 @@ metadataMap(k,density,map(k,SYSTEM,mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),in
 	map(k,SYSTEM,mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),STEP), 
 	metadataOutput(density,SYSTEM,NODE,sum,_,_),
 	VALUE = #count{ ENTITY : connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),stream(k,_,_,information(ENTITY,_,_,_),_))}, 
-	VALUE_SUM = #sum{D,CONNECTED : 
-		connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),CONNECTED),
-		metadataElement(k,density,CONNECTED,D)}, 
+	VALUE_SUM = #sum{D,MAP_NODE,INFO_TYPE2,STEP2 : 
+		connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),map(k,SYSTEM,MAP_NODE,INFO_TYPE2,STEP2)),
+		metadataMap(k,density,map(k,SYSTEM,MAP_NODE,INFO_TYPE2,STEP2),D)}, 
 	query(k).
 
 metadataElement(k,METADATA,STREAM,D) :- metadataStream(k,METADATA,STREAM,D).
@@ -164,7 +160,6 @@ metadataMap(k,METADATA,map(k,SYSTEM_TARGET,PROVIDER,INFO_TYPE,STEP+1),VALUE+VALU
 	metadataOutput(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE_PROCESSING).
 
 
-%% TODO
 % checking stream QoS metadata
 :~ requiredStream(SYSTEM,INFO), 
    selectedStream(k,SYSTEM,PROVIDER,INFO,STEP),
@@ -197,31 +192,30 @@ metadataMap(k,METADATA,map(k,SYSTEM_TARGET,PROVIDER,INFO_TYPE,STEP+1),VALUE+VALU
    query(k). [1@4,requiredStream]
 
 
-
 % checking map QoS parameters
-:~ selectedMap(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2,STEP),
-   requiredMetadata(METADATA,SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2,REQUIRED_VALUE), 
-   metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),VALUE),
+:~ selectedMap(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),
+   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,REQUIRED_VALUE), 
+   metadataMap(k,METADATA,map(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
    metadata(information,METADATA,maximize),
    REQUIRED_VALUE < VALUE,
    query(k). [1@4,requiredStream]
-:~ selectedMap(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2,STEP),
-   requiredMetadata(METADATA,SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2,REQUIRED_VALUE), 
-   metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),VALUE),
-   metadata(information,METADATA,minimize), 
+:~ selectedMap(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),
+   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,REQUIRED_VALUE), 
+   metadataMap(k,METADATA,map(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
+   metadata(information,METADATA,minimize),
    REQUIRED_VALUE > VALUE,
    query(k). [1@4,requiredStream]
 
-:~ selectedMap(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2,STEP),
-   requiredMetadata(METADATA,SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2,REQUIRED_VALUE), 
-   metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),VALUE),
-   metadata(stream,METADATA,maximize),
+:~ selectedMap(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),
+   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,REQUIRED_VALUE), 
+   metadataMap(k,METADATA,map(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
+   metadata(map,METADATA,maximize),
    REQUIRED_VALUE < VALUE,
    query(k). [1@4,requiredStream]
-:~ selectedMap(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2,STEP),
-   requiredMetadata(METADATA,SYSTEM,ENTITY_TYPE,SCOPE,REP,ENTITY2,REQUIRED_VALUE), 
-   metadataMap(k,METADATA,map(k,SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,STEP),VALUE),
-   metadata(stream,METADATA,minimize), 
+:~ selectedMap(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),
+   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,REQUIRED_VALUE), 
+   metadataMap(k,METADATA,map(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
+   metadata(map,METADATA,minimize),
    REQUIRED_VALUE > VALUE,
    query(k). [1@4,requiredStream]
 

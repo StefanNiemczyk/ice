@@ -53,13 +53,10 @@ protected:
 private:
   std::shared_ptr<ASPSystem> getASPSystemByIRI(std::string p_iri);
   std::map<std::string, std::string> readConfiguration(std::string const config);
-  void readMetadata(std::map<std::string, int>* metadata, const std::string provider, const std::string sourceSystem,
-                    Gringo::Value information, Gringo::Value step);
-  void readMetadata(std::string name, std::map<std::string, int> *metadata, std::string const provider, std::string const sourceSystem,
-                    Gringo::Value information, Gringo::Value step);
+  void readMetadata(std::map<std::string, int>* metadata, const Gringo::Value element);
+  void readMetadata(std::string name, std::map<std::string, int> *metadata, const Gringo::Value element);
   std::string dataTypeForRepresentation(std::string representation);
-  std::shared_ptr<BaseInformationStream> getStream(Gringo::Value info, std::string lastProcessing,
-                                                   std::string sourceSystem, Gringo::Value step);
+  std::shared_ptr<BaseInformationStream> getStream(const Gringo::Value stream);
 
 private:
   std::shared_ptr<OntologyInterface> ontology; /*< Interface to access the ontology */

@@ -126,7 +126,7 @@ int Coordinator::onEngineHeartbeat(identifier engineId, time timestamp)
     {
       _log->info("Engine rediscovered %v, sending information model request",
                  IDGenerator::toString(engineId).c_str());
-
+      // TODO activate nodes again,
       engineState->setTimeLastActivity(timestamp);
       engineState->setCooperationState(CooperationState::INFORMATION_MODEL_REQUESTED);
 
@@ -943,14 +943,16 @@ void Coordinator::workerTask()
   }
 
   int counter = 1;
+  std::string engineIri = "unknown";
+  {
+     auto e = this->engine.lock();
+     if (e)
+       engineIri = std::string(e->getIri());
+   }
 
   while (this->running)
   {
-    {
-      auto e = this->engine.lock();
-      if (e)
-        _log->info("Sending heartbeat %v, %v", counter, std::string(e->getIri()));
-    }
+    _log->info("Sending heartbeat %v, %v", counter, std::string(engineIri));
 
     {
       std::lock_guard<std::mutex> guard(mtx_);

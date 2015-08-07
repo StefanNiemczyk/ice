@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <mutex>
+#include <vector>
 
 #include "ice/information/StreamDescription.h"
 #include "ice/information/InformationSpecification.h"

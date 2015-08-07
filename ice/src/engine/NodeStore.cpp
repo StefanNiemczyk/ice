@@ -60,18 +60,18 @@ std::shared_ptr<Node> NodeStore::getNode(const std::string nodeName, const ont::
 }
 
 std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::string className, const std::string name,
-                                              const ont::entity entity, std::map<std::string, std::string> config,
+                                              const ont::entity entity, const ont::entity entityRelated, std::map<std::string, std::string> config,
                                               const std::string source)
 {
   auto node = this->getNode(name, entity);
 
   if (node)
   {
-    _log->info("Node '%v' already registered for entity '%v'", name.c_str(), entity.c_str());
+    _log->info("Node '%v' already registered for entity '%v' / '%v'", name.c_str(), entity.c_str(), entityRelated.c_str());
     return node;
   }
 
-  auto desc = std::make_shared<NodeDescription>(type, className, name, entity);
+  auto desc = std::make_shared<NodeDescription>(type, className, name, entity, entityRelated);
 
   if (type == NodeType::SOURCE)
   {

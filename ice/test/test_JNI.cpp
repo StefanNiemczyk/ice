@@ -48,6 +48,43 @@ TEST(JNITest, loadOntology)
   ASSERT_TRUE(result);
 }
 
+TEST(JNITest, getOntologyIDs)
+{
+  std::string path = ros::package::getPath("ice");
+  bool result;
+
+  ice::OntologyInterface oi(path + "/java/lib/");
+
+  oi.addIRIMapper(path + "/ontology/");
+
+  ASSERT_FALSE(oi.errorOccurred());
+
+  result = oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.loadOntologies();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.isConsistent();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  auto ids = oi.getOntologyIDs();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+//  for (auto id : *ids)
+//  {
+//    std::cout << id << std::endl;
+//  }
+}
+
 TEST(JNITest, addSystem)
 {
   std::string path = ros::package::getPath("ice");

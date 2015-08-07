@@ -57,7 +57,7 @@ add_message_files(
   CooperationRequest.msg
   CooperationResponse.msg
   Position.msg
-  Positions.msg
+  Positions.msg 
 )
 
 ## Generate services in the 'srv' folder

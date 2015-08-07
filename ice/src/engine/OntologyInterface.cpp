@@ -91,6 +91,8 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
                                                     "(Ljava/lang/String;)Z");
   this->saveOntologyMethod = this->env->GetMethodID(this->javaOntologyInterface, "saveOntology",
                                                     "(Ljava/lang/String;)Z");
+  this->getOntologyIDsMethod = this->env->GetMethodID(this->javaOntologyInterface, "getOntologyIDs",
+                                                    "()[Ljava/lang/String;");
   this->initReasonerMethod = this->env->GetMethodID(this->javaOntologyInterface, "initReasoner", "(Z)Z");
   this->isConsistentMethod = this->env->GetMethodID(this->javaOntologyInterface, "isConsistent", "()Z");
   this->getSystemsMethod = this->env->GetMethodID(this->javaOntologyInterface, "getSystems", "()[Ljava/lang/String;");
@@ -260,6 +262,33 @@ bool OntologyInterface::saveOntology(std::string const p_path)
   this->systemDirty = true;
 
   return result;
+}
+
+std::unique_ptr<std::vector<const char*>> OntologyInterface::getOntologyIDs()
+{
+  this->checkError("getOntologyIDs", "Error exists, method getOntologyIDs will not be executed");
+
+  jobjectArray result = (jobjectArray)env->CallObjectMethod(this->javaInterface, this->getOntologyIDsMethod);
+
+  if (this->checkError("getOntologyIDs", "Error occurred at reading ontology ids"))
+    return nullptr;
+
+  std::unique_ptr<std::vector<const char*>> ids(new std::vector<const char*>());
+
+  int size = env->GetArrayLength(result);
+
+  for (int i = 0; i < size; ++i)
+  {
+    jstring jstr = (jstring)env->GetObjectArrayElement(result, i);
+    const char* cstr = env->GetStringUTFChars(jstr, 0);
+    ids->push_back(cstr);
+    env->ReleaseStringUTFChars(jstr, 0);
+    env->DeleteLocalRef(jstr);
+  }
+
+  env->DeleteLocalRef(result);
+
+  return std::move(ids);
 }
 
 bool OntologyInterface::initReasoner(bool const p_force)

@@ -9,6 +9,7 @@
 #define COMMUNICATION_H_
 
 #include <memory>
+#include <vector>
 
 #include "ice/Identifier.h"
 
@@ -48,6 +49,21 @@ public:
   virtual void cleanUp();
 
   virtual void sendHeartbeat() = 0;
+
+//  virtual void sendSystemSpecRequest(identifier receiverId) = 0;
+//
+//  virtual void sendSystemSpecResponse(identifier receiverId, std::string systemIri, std::vector<std::string> ontologyIds) = 0;
+//
+//  virtual void sendNodeListRequest(identifier receiverId) = 0;
+//
+//  virtual void sendNodeListResponse(identifier receiverId, std::vector<std::string> nodeIris) = 0;
+//
+//  virtual void sendNodeSpecRequest(identifier receiverId, std::vector<std::string> nodeIris) = 0;
+
+//  virtual void sendNodeSpecResponse(identifier receiverId, std::vector<std::string> nodeIris) = 0; // TODO
+
+
+//---------------------------------------------------------------------------------------------------
 
   virtual void sendInformationRequest(identifier receiverId) = 0;
 

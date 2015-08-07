@@ -20,10 +20,10 @@ metadata(processing,cost,minimize).
 
 #external query(k).
 
-%%%
-%%% Guessing
+%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% stream guessing
 %%% 
-%%%
+%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % computing theoretical nodes
 tnode(k,SYSTEM,NODE,ENTITY,none) :- 
@@ -190,94 +190,16 @@ stream(k,SYSTEM,node(k,SYSTEM,NODE,ENTITY,ENTITY2),information(ENTITY,SCOPE,REP,
 	nodeMeta(node(k,SYSTEM,NODE,ENTITY,ENTITY2),STEP_MAX,_),
 	output(SYSTEM,NODE,SCOPE,REP,any).
 
-
 % Speed up ASP
 :- stream(k,SYSTEM,NODE,INFO,STEP2), 
    stream(k,SYSTEM,NODE,INFO,STEP), 
    STEP != STEP2.
 
 
-% Information that could be used
-requiredInformation(k,SYSTEM,INFO) :- 
-	requiredStream(SYSTEM,INFO).
-
-requiredInformation(k,SYSTEM,INFO) :- 
-	tinput(tnode(k,SYSTEM,_,_,_),INFO,_,_).
-
-requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- 
-	tmapInput(tmapNode(k,SYSTEM,_,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),_,_),
-	entity(ENTITY,ENTITY_TYPE).
-
-requiredInformationType(k,SYSTEM,INFO_TYPE) :- 
-	tmapInputMap(tmapNode(k,SYSTEM,_,_,_),INFO_TYPE,_,_).
-
-
-%% transfer a stream between systems
-tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM_SOURCE,TNODE,INFO)) :-
-	requiredInformation(k,SYSTEM_TARGET,INFO),
-	transfer(SYSTEM_SOURCE,SYSTEM_TARGET),
-	tstream(k,SYSTEM_SOURCE,TNODE,INFO),
-	SYSTEM_TARGET != SYSTEM_SOURCE.
-
-tstream(k,SYSTEM_TARGET,TNODE,INFO) :- 
-	tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM,TNODE,INFO)).
-	
-stream(k,SYSTEM_TARGET,PROVIDER,INFO,STEP+1) :- 
-	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,INFO,STEP),_).
-
-:- streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE1,PROVIDER,INFO,_),_), 
-   streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE2,PROVIDER,INFO,_),_), 
-   SYSTEM_SOURCE1 != SYSTEM_SOURCE2.
-
-
-%% transfer a map between systems
-tmapTransfer(SYSTEM_TARGET,tmap(k,SYSTEM_SOURCE,TNODE,INFO_TYPE)) :-
-	requiredInformationType(k,SYSTEM_TARGET,INFO_TYPE),
-	transfer(SYSTEM_SOURCE,SYSTEM_TARGET),
-	tmap(k,SYSTEM_SOURCE,TNODE,INFO_TYPE),
-	SYSTEM_TARGET != SYSTEM_SOURCE.
-
-tmap(k,SYSTEM_TARGET,TMAP_NODE,INFO_TYPE) :- 
-	tmapTransfer(SYSTEM_TARGET,tmap(k,SYSTEM,TMAP_NODE,INFO_TYPE)).
-	
-map(k,SYSTEM_TARGET,PROVIDER,INFO_TYPE,STEP+1) :- 
-	mapTransfer(k,SYSTEM_TARGET,map(k,SYSTEM_SOURCE,PROVIDER,INFO_TYPE,STEP),_).
-
-:- mapTransfer(k,SYSTEM_TARGET,map(k,SYSTEM_SOURCE1,PROVIDER,INFO_TYPE,_),_), 
-   mapTransfer(k,SYSTEM_TARGET,map(k,SYSTEM_SOURCE2,PROVIDER,INFO_TYPE,_),_), 
-   SYSTEM_SOURCE1 != SYSTEM_SOURCE2.
-
-
-%% transfer of information between islands
-
-transfer(SYSTEM_SOURCE,SYSTEM_TARGET) :- 
-	bridge(ISLAND1,ISLAND2),
-	connectToBridge(SYSTEM_SOURCE,ISLAND2),
-	connectToBridge(SYSTEM_TARGET,ISLAND1),
-	system(SYSTEM_SOURCE,ISLAND1), 
-	system(SYSTEM_TARGET,ISLAND2).
-
-metadataProcessing(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE1+VALUE2+VALUE3) :- 
-	bridge(ISLAND1,ISLAND2), 
-	system(SYSTEM_SOURCE,ISLAND1), 
-	system(SYSTEM_TARGET,ISLAND2),
-	connectToBridge(SYSTEM_SOURCE,ISLAND2),
-	connectToBridge(SYSTEM_TARGET,ISLAND1),
-	metadataProcessing(METADATA,SYSTEM_SOURCE,ISLAND2,VALUE1),
-	metadataProcessing(METADATA,SYSTEM_TARGET,ISLAND1,VALUE2),
-	metadataProcessing(METADATA,ISLAND1,ISLAND2,VALUE3).
-
-metadataOutput(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE1+VALUE2+VALUE3) :- 
-	bridge(ISLAND1,ISLAND2), 
-	system(SYSTEM_SOURCE,ISLAND1), 
-	system(SYSTEM_TARGET,ISLAND2),
-	connectToBridge(SYSTEM_SOURCE,ISLAND2),
-	connectToBridge(SYSTEM_TARGET,ISLAND1),
-	metadataOutput(METADATA,SYSTEM_SOURCE,ISLAND2,VALUE1),
-	metadataOutput(METADATA,SYSTEM_TARGET,ISLAND1,VALUE2),
-	metadataOutput(METADATA,ISLAND1,ISLAND2,VALUE3).
-
-
+%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% map guessing
+%%% 
+%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% creating a map
 tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,none) :- 
@@ -297,9 +219,18 @@ tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2) :-
 	inputMap(SYSTEM,NODE,ENTITY_TYPE,_,_,ENTITY2,_,_),
 	query(k).
 
-%%%%%%%%%%%%%%%% TODO
-nnode(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,none)) :-
-	tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,none).
+% identify special nodes
+snode(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2)) :-
+	tmap(k,SYSTEM,tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE),
+	tmapInputMap(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE2,_,_).
+nnode(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2)) :-
+	tmap(k,SYSTEM,tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE),
+	tmapInputMap(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE2,_,_),
+	INFO_TYPE != INFO_TYPE2.
+
+nnode(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2)) :-
+	tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),
+	not tmapInputMap(tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),_,_,_).
 
 % computing theoretical maps
 tmap(k,SYSTEM,tmapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2)) :- 
@@ -395,28 +326,112 @@ map(k,SYSTEM,mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_T
 	mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), STEP_MAX, COUNT).
 
 % Speed up ASP
-:- map(k,SYSTEM,MAP_NODE,INFO,STEP2), 
-   map(k,SYSTEM,MAP_NODE,INFO,STEP), 
+:- map(k,SYSTEM,MAP_NODE,INFO_TYPE,STEP2), 
+   map(k,SYSTEM,MAP_NODE,INFO_TYPE,STEP), 
    STEP != STEP2.
 
 
+%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% transfer between systems
+%%% 
+%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%
+% Information that could be used
+requiredInformation(k,SYSTEM,INFO) :- 
+	requiredStream(SYSTEM,INFO).
+
+requiredInformation(k,SYSTEM,INFO) :- 
+	tinput(tnode(k,SYSTEM,_,_,_),INFO,_,_).
+
+requiredInformation(k,SYSTEM,information(ENTITY,SCOPE,REP,ENTITY2)) :- 
+	tmapInput(tmapNode(k,SYSTEM,_,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),_,_),
+	entity(ENTITY,ENTITY_TYPE).
+
+requiredInformationType(k,SYSTEM,INFO_TYPE) :- 
+	tmapInputMap(tmapNode(k,SYSTEM,_,_,_),INFO_TYPE,_,_).
+
+
+% transfer a stream between systems
+tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM_SOURCE,TNODE,INFO)) :-
+	requiredInformation(k,SYSTEM_TARGET,INFO),
+	transfer(SYSTEM_SOURCE,SYSTEM_TARGET),
+	tstream(k,SYSTEM_SOURCE,TNODE,INFO),
+	SYSTEM_TARGET != SYSTEM_SOURCE.
+
+tstream(k,SYSTEM_TARGET,TNODE,INFO) :- 
+	tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM,TNODE,INFO)).
+	
+stream(k,SYSTEM_TARGET,PROVIDER,INFO,STEP+1) :- 
+	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,INFO,STEP),_).
+
+:- streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE1,PROVIDER,INFO,_),_), 
+   streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE2,PROVIDER,INFO,_),_), 
+   SYSTEM_SOURCE1 != SYSTEM_SOURCE2.
+
+
+% transfer a map between systems
+tmapTransfer(SYSTEM_TARGET,tmap(k,SYSTEM_SOURCE,TNODE,INFO_TYPE)) :-
+	requiredInformationType(k,SYSTEM_TARGET,INFO_TYPE),
+	transfer(SYSTEM_SOURCE,SYSTEM_TARGET),
+	tmap(k,SYSTEM_SOURCE,TNODE,INFO_TYPE),
+	SYSTEM_TARGET != SYSTEM_SOURCE.
+
+tmap(k,SYSTEM_TARGET,TMAP_NODE,INFO_TYPE) :- 
+	tmapTransfer(SYSTEM_TARGET,tmap(k,SYSTEM,TMAP_NODE,INFO_TYPE)).
+	
+map(k,SYSTEM_TARGET,PROVIDER,INFO_TYPE,STEP+1) :- 
+	mapTransfer(k,SYSTEM_TARGET,map(k,SYSTEM_SOURCE,PROVIDER,INFO_TYPE,STEP),_).
+
+:- mapTransfer(k,SYSTEM_TARGET,map(k,SYSTEM_SOURCE1,PROVIDER,INFO_TYPE,_),_), 
+   mapTransfer(k,SYSTEM_TARGET,map(k,SYSTEM_SOURCE2,PROVIDER,INFO_TYPE,_),_), 
+   SYSTEM_SOURCE1 != SYSTEM_SOURCE2.
+
+
+% transfer of information between islands
+transfer(SYSTEM_SOURCE,SYSTEM_TARGET) :- 
+	bridge(ISLAND1,ISLAND2),
+	connectToBridge(SYSTEM_SOURCE,ISLAND2),
+	connectToBridge(SYSTEM_TARGET,ISLAND1),
+	system(SYSTEM_SOURCE,ISLAND1), 
+	system(SYSTEM_TARGET,ISLAND2).
+
+metadataProcessing(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE1+VALUE2+VALUE3) :- 
+	bridge(ISLAND1,ISLAND2), 
+	system(SYSTEM_SOURCE,ISLAND1), 
+	system(SYSTEM_TARGET,ISLAND2),
+	connectToBridge(SYSTEM_SOURCE,ISLAND2),
+	connectToBridge(SYSTEM_TARGET,ISLAND1),
+	metadataProcessing(METADATA,SYSTEM_SOURCE,ISLAND2,VALUE1),
+	metadataProcessing(METADATA,SYSTEM_TARGET,ISLAND1,VALUE2),
+	metadataProcessing(METADATA,ISLAND1,ISLAND2,VALUE3).
+
+metadataOutput(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE1+VALUE2+VALUE3) :- 
+	bridge(ISLAND1,ISLAND2), 
+	system(SYSTEM_SOURCE,ISLAND1), 
+	system(SYSTEM_TARGET,ISLAND2),
+	connectToBridge(SYSTEM_SOURCE,ISLAND2),
+	connectToBridge(SYSTEM_TARGET,ISLAND1),
+	metadataOutput(METADATA,SYSTEM_SOURCE,ISLAND2,VALUE1),
+	metadataOutput(METADATA,SYSTEM_TARGET,ISLAND1,VALUE2),
+	metadataOutput(METADATA,ISLAND1,ISLAND2,VALUE3).
+
+
+%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Checking
-%%% soft optimization contraint instead of a hard constraint to enable partial solutions
-%%%
+%%% soft optimization constraint to enable partial solutions
+%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% streams
-0 { selectedStream(k,SYSTEM,PROVIDER,INFO,STEP) : stream(k,SYSTEM,PROVIDER,INFO,STEP) } 1 :- 
-	requiredStream(SYSTEM,INFO), query(k).	
+% streams
+selectedStream(k,SYSTEM,node(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO,STEP) :-
+	before(tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),tnode(k,SYSTEM,none,none,none),INFO,0),
+	stream(k,SYSTEM,node(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO,STEP).
 :~ requiredStream(SYSTEM,INFO), not selectedStream(k,SYSTEM,_,INFO,_), query(k). [1@5,requiredStream]
 
-
-%% maps
-0 { selectedMap(k,SYSTEM,PROVIDER,INFO_TYPE,STEP) : map(k,SYSTEM,PROVIDER,INFO_TYPE,STEP) } 1 :- 
-	requiredMap(SYSTEM,INFO_TYPE), query(k).
+% maps
+selectedMap(k,SYSTEM,mapNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO_TYPE,STEP) :-
+	before(tmapNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),tnode(k,SYSTEM,none,none,none),INFO,0),
+	map(k,SYSTEM,mapNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO_TYPE,STEP).
 :~ requiredMap(SYSTEM,INFO_TYPE), not selectedMap(k,SYSTEM,_,INFO_TYPE,_), query(k). [1@5,requiredMap]
-
 
 % checking point budget of systems
 reqPoints(k,SYSTEM,(SUM_NODES + SUM_STREAMS + SUM_MAP_NODES)) :- 
@@ -434,13 +449,11 @@ reqPoints(k,SYSTEM,(SUM_NODES + SUM_STREAMS + SUM_MAP_NODES)) :-
 
 :- reqPoints(k,SYSTEM,REQ_POINTS), systemPoints(SYSTEM,POINTS), REQ_POINTS > POINTS.
 
-
 % transfer cost
-#minimize { COST@priorityTransferCost,SYSTEM,SYSTEM_TARGET,PROVIDER,INFO : 
-		streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,INFO,_),_), 
-		metadataProcessing(cost,SYSTEM,SYSTEM_TARGET,COST), 
-		query(k) }.
-
+%#minimize { COST@priorityTransferCost,SYSTEM,SYSTEM_TARGET,PROVIDER,INFO : 
+%		streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,INFO,_),_), 
+%		metadataProcessing(cost,SYSTEM,SYSTEM_TARGET,COST), 
+%		query(k) }.
 
 % cost
 #minimize { COST@priorityCost,SYSTEM : reqPoints(k,SYSTEM,COST) }.
@@ -463,15 +476,6 @@ output(system,node,scope,rep,none).
 metadataOutput(accuracy,system,node,fix,accuracyFix,0).
 metadataOutput(delay,system,node,fix,delayFix,0).
 metadataProcessing(cost,system,node,costValue).
-
-
-%--------------------------------------------------------------------------------------
-%#program map(system,map,scope,rep,entity2,minCount,maxCount,delayType,delayFix,delayMod,accuracyType,accuracyFix,accuracyMod).
-
-%#external nodeTemplate(system,map,scope,rep,entity2). 
-%inputMap(system,map,minCount,maxCount).
-%metadataMap(delay,system,map,delayType,delayFix,delayMod).
-%metadataMap(accuracy,system,map,accuracyType,accuracyFix,accuracyMod).
 
 
 %--------------------------------------------------------------------------------------

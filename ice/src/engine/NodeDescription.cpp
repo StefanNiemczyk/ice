@@ -13,8 +13,8 @@ namespace ice
 {
 
 NodeDescription::NodeDescription(const NodeType type, const std::string className, const std::string name,
-                                 const ont::entity entity) :
-    type(type), className(className), name(name), entity(entity)
+                                 const ont::entity entity, const ont::entity entityRelated) :
+    type(type), className(className), name(name), entity(entity), entityRelated(entityRelated)
 {
 }
 
@@ -38,6 +38,11 @@ NodeType NodeDescription::getType() const
 ont::entity NodeDescription::getEntity() const
 {
   return this->entity;
+}
+
+ont::entity NodeDescription::getEntityRelated() const
+{
+  return this->entityRelated;
 }
 
 //void NodeDescription::setType(NodeType type)
