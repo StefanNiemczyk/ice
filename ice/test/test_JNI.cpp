@@ -1,12 +1,12 @@
-#include <ice/representation/RepresentationFactory.h>
 #include <iostream>
 #include <jni.h>
 #include <vector>
+#include <string>
 
 #include <ros/package.h>
 
 #include "ice/ontology/OntologyInterface.h"
-#include "ice/representation/RepresentationType.h"
+#include "ice/representation/RepresentationFactory.h"
 
 #include "gtest/gtest.h"
 
@@ -1071,7 +1071,7 @@ TEST(JNITest, save)
 //  }
 //}
 
-TEST(JNITest, readRepresentationsAsCSV)
+TEST(JNITest, readBaseRepresentationsAsCSV)
 {
   // Given a valid empty ice ontology
   std::string path = ros::package::getPath("ice");
@@ -1098,13 +1098,12 @@ TEST(JNITest, readRepresentationsAsCSV)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  // When adding a single individual
-  result = oi.addIndividual("HelloRepresentation","StringRep");
-  ASSERT_TRUE(result);
-
-  // Then the right csv like string is returned
+  // The csv string with the right reps is returned
   std::string read_csv_res = oi.readRepresentationsAsCSV();
-  ASSERT_EQ("3;HelloRepresentation", read_csv_res);
+
+  // Sample testing of integer representation
+  int index = read_csv_res.find("IntegerNumericalRepresentation;NumericalRepresentation;BasicRepresentation;Representation;null");
+  ASSERT_FALSE(index == std::string::npos);
 }
 
 TEST(JNITest, representationVector)
