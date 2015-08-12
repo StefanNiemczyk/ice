@@ -19,7 +19,7 @@ namespace ice {
 
 RepresentationFactory::RepresentationFactory()
 {
-
+  reps = std::make_shared<std::vector<Representation*>>();
 }
 
 RepresentationFactory::~RepresentationFactory()
@@ -27,59 +27,75 @@ RepresentationFactory::~RepresentationFactory()
 
 }
 
-Representation RepresentationFactory::fromCSV(std::string reprStr,
+Representation* RepresentationFactory::fromCSV(std::string reprStr,
     const char delim)
 {
-
   const size_t length = reprStr.length() + 1;
-  char *repCstr = (char*) calloc(length, sizeof(char));
-  Representation res;
+  std::string resName;
+  Representation *rep = NULL;
+  Representation *lastRep = NULL;
 
   if (reprStr.empty()) {
-    return res;
+    return rep;
   }
   if (!isprint(delim)) {
-    return res;
+    return rep;
   }
 
-  strncpy(repCstr, reprStr.c_str(), length);
+  std::vector<std::string> tokens = split(reprStr.c_str(), ';');
+  std::vector<std::string>::reverse_iterator rit = tokens.rbegin();
 
-  if (repCstr == NULL) {
-    free(repCstr);
-    return res;
+  for (int i = 0; rit != tokens.rend(); rit++, i++) {
+    lastRep = rep;
+    rep = addOrGet(*rit);
+    if (rep > 0 && lastRep != NULL) {
+      rep->parent = lastRep;
+    }
   }
 
-  std::vector<std::string> tokens = split(repCstr, ';');
-  const char *typeStr = tokens.at(0).c_str();
-  res.name = tokens.at(1);
+  return rep;
+}
 
-  errno = 0;
-  char *ep;
-  const int typeNum = strtol(typeStr, &ep, 10);
-  if (typeStr == ep || *ep != '\0') {
-    std::cerr << "Error while converting " << typeStr << " to int."
-        << std::endl;
-    free(repCstr);
-    return res;
+Representation* RepresentationFactory::addOrGet(std::string name)
+{
+  Representation *res = NULL;
+
+  if (repNameMap.count(name) > 0) {
+    res = repNameMap.at(name);
+  } else {
+    res = new Representation;
+    res->name = name;
+    res->parent = NULL;
+    repNameMap.insert(std::pair<std::string, Representation*>(name, res));
   }
 
-  // TODO: Implement recursive handling of parent types
-
-  free(repCstr);
   return res;
 }
 
-std::shared_ptr<std::vector<Representation>> RepresentationFactory::fromCSVStrings(
+std::shared_ptr<std::vector<Representation*>> RepresentationFactory::fromCSVStrings(
     std::vector<std::string> lines)
 {
-  reps = std::make_shared<std::vector<Representation>>();
 
   for (std::string line : lines) {
-    Representation r = fromCSV(line);
+    Representation *r = fromCSV(line);
     reps->push_back(r);
   }
 
   return reps;
+}
+
+void RepresentationFactory::printReps()
+{
+  for (Representation* r : *reps) {
+    std::cout << r->name << std::endl;
+    fflush(stdout);
+    Representation* par = r->parent;
+    while (par->name != "null") {
+      std::cout << "    " << par->name << " ADDR: " << par << std::endl;
+      fflush(stdout);
+      par = par->parent;
+    }
+  }
 }
 
 }

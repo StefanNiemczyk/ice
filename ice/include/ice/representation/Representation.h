@@ -7,8 +7,8 @@
 namespace ice {
 
 struct Representation {
-  ice::Representation *parent;
   std::string name;
+  Representation *parent = NULL;
 };
 
 }

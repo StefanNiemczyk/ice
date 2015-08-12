@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
 
 #include "Representation.h"
 
@@ -22,11 +23,18 @@ public:
   RepresentationFactory();
   virtual ~RepresentationFactory();
 
-  Representation fromCSV(std::string reprStr, const char delim = ';');
-  std::shared_ptr<std::vector<Representation>> fromCSVStrings(
+  Representation* fromCSV(std::string reprStr, const char delim = ';');
+  std::shared_ptr<std::vector<Representation*>> fromCSVStrings(
       std::vector<std::string> lines);
 
-  std::shared_ptr<std::vector<Representation>> reps;
+  void printReps();
+
+private:
+  std::shared_ptr<std::vector<Representation*>> reps;
+  std::map<std::string, Representation*> repNameMap;
+
+  Representation* addOrGet(std::string name);
+
 };
 
 }  // namespace ice
