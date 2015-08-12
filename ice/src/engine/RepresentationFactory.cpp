@@ -27,12 +27,13 @@ RepresentationFactory::~RepresentationFactory()
 
 }
 
-RepresentationInstance RepresentationFactory::fromCSV(std::string reprStr,
+Representation RepresentationFactory::fromCSV(std::string reprStr,
     const char delim)
 {
+
   const size_t length = reprStr.length() + 1;
   char *repCstr = (char*) calloc(length, sizeof(char));
-  RepresentationInstance res;
+  Representation res;
 
   if (reprStr.empty()) {
     return res;
@@ -62,29 +63,23 @@ RepresentationInstance RepresentationFactory::fromCSV(std::string reprStr,
     return res;
   }
 
-  if (typeNum < 0 || typeNum > UnknownType) {
-    std::cerr << "Error: invalid superclass" << std::endl;
-    free(repCstr);
-    return res;
-  }
-
-  res.type = static_cast<RepresentationType>(typeNum);
+  // TODO: Implement recursive handling of parent types
 
   free(repCstr);
   return res;
 }
 
-std::shared_ptr<std::vector<RepresentationInstance>> RepresentationFactory::fromCSVStrings(
+std::shared_ptr<std::vector<Representation>> RepresentationFactory::fromCSVStrings(
     std::vector<std::string> lines)
 {
-  instances = std::make_shared<std::vector<RepresentationInstance>>();
+  reps = std::make_shared<std::vector<Representation>>();
 
   for (std::string line : lines) {
-    RepresentationInstance r = fromCSV(line);
-    instances->push_back(r);
+    Representation r = fromCSV(line);
+    reps->push_back(r);
   }
 
-  return instances;
+  return reps;
 }
 
 }

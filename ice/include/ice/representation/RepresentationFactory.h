@@ -8,12 +8,12 @@
 #ifndef ICE_ICE_INCLUDE_ICE_REPRESENTATION_REPRESENTATIONFACTORY_H_
 #define ICE_ICE_INCLUDE_ICE_REPRESENTATION_REPRESENTATIONFACTORY_H_
 
+#include <ice/representation/Representation.h>
 #include <string>
 #include <vector>
 #include <memory>
 
-#include "RepresentationType.h"
-#include "RepresentationInstance.h"
+#include "Representation.h"
 
 namespace ice {
 
@@ -22,11 +22,11 @@ public:
   RepresentationFactory();
   virtual ~RepresentationFactory();
 
-  RepresentationInstance fromCSV(std::string reprStr, const char delim = ';');
-  std::shared_ptr<std::vector<RepresentationInstance>> fromCSVStrings(
+  Representation fromCSV(std::string reprStr, const char delim = ';');
+  std::shared_ptr<std::vector<Representation>> fromCSVStrings(
       std::vector<std::string> lines);
 
-  std::shared_ptr<std::vector<RepresentationInstance>> instances;
+  std::shared_ptr<std::vector<Representation>> reps;
 };
 
 }  // namespace ice
