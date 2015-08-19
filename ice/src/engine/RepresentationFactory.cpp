@@ -19,7 +19,8 @@ namespace ice {
 
 RepresentationFactory::RepresentationFactory()
 {
-  reps = std::make_shared<std::vector<Representation*>>();
+  repVec = std::make_shared<std::vector<Representation*>>();
+  repMap = std::make_shared<std::map<std::string, Representation*>>();
 }
 
 RepresentationFactory::~RepresentationFactory()
@@ -48,7 +49,7 @@ Representation* RepresentationFactory::fromCSV(std::string reprStr,
   for (int i = 0; rit != tokens.rend(); rit++, i++) {
     lastRep = rep;
     rep = addOrGet(*rit);
-    if (rep > 0 && lastRep != NULL) {
+    if (rep != NULL && lastRep != NULL) {
       rep->parent = lastRep;
     }
   }
@@ -60,13 +61,13 @@ Representation* RepresentationFactory::addOrGet(std::string name)
 {
   Representation *res = NULL;
 
-  if (repNameMap.count(name) > 0) {
-    res = repNameMap.at(name);
+  if (repMap->count(name) > 0) {
+    res = repMap->at(name);
   } else {
     res = new Representation;
     res->name = name;
     res->parent = NULL;
-    repNameMap.insert(std::pair<std::string, Representation*>(name, res));
+    repMap->insert(std::pair<std::string, Representation*>(name, res));
   }
 
   return res;
@@ -78,22 +79,35 @@ std::shared_ptr<std::vector<Representation*>> RepresentationFactory::fromCSVStri
 
   for (std::string line : lines) {
     Representation *r = fromCSV(line);
-    reps->push_back(r);
+    repVec->push_back(r);
   }
 
-  return reps;
+  return repVec;
+}
+
+std::shared_ptr<std::vector<Representation*>> RepresentationFactory::getRepVec() {
+  return repVec;
+}
+
+std::shared_ptr<std::map<std::string, Representation*>> RepresentationFactory::getRepMap() {
+  return repMap;
 }
 
 void RepresentationFactory::printReps()
 {
-  for (Representation* r : *reps) {
+  for (Representation* r : *repVec) {
     std::cout << r->name << std::endl;
     fflush(stdout);
     Representation* par = r->parent;
+    int i = 0;
     while (par->name != "null") {
-      std::cout << "    " << par->name << " ADDR: " << par << std::endl;
+      for (int j = 0; j < i; j++) {
+        std::cout << "  ";
+      }
+      std::cout << par->name << " ADDR: " << par << std::endl;
       fflush(stdout);
       par = par->parent;
+      i++;
     }
   }
 }

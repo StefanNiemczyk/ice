@@ -1272,7 +1272,8 @@ TEST(JNITest, representationVector)
 //  oi.addRepresentation("BooleanRep", "EngineRep", dims);
 //  ASSERT_TRUE(result);
 
-  auto fac = oi.readRepresentations();
+
+  std::unique_ptr<ice::RepresentationFactory> fac = oi.readRepresentations();
   fac->printReps();
 }
 

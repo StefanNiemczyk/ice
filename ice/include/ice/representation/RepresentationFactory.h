@@ -27,11 +27,14 @@ public:
   std::shared_ptr<std::vector<Representation*>> fromCSVStrings(
       std::vector<std::string> lines);
 
+  std::shared_ptr<std::vector<Representation*>> getRepVec();
+  std::shared_ptr<std::map<std::string, Representation*>> getRepMap();
+
   void printReps();
 
 private:
-  std::shared_ptr<std::vector<Representation*>> reps;
-  std::map<std::string, Representation*> repNameMap;
+  std::shared_ptr<std::vector<Representation*>> repVec;
+  std::shared_ptr<std::map<std::string, Representation*>> repMap;
 
   Representation* addOrGet(std::string name);
 
