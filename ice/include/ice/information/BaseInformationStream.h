@@ -112,22 +112,6 @@ public:
   const std::string getProvider() const;
 
   /*!
-   * \brief Returns the description of the information stored in this stream.
-   *
-   * Returns the description of the information stored in this stream.
-   */
-//  const std::string getDescription() const;
-
-  /*!
-   * \brief Sets the description of the information stored in this stream.
-   *
-   * Sets the description of the information stored in this stream.
-   *
-   * \param description The new description.
-   */
-//  void setDescription(std::string description);
-
-  /*!
    * \brief Returns the description of this stream.
    *
    * Returns the description of this stream.
@@ -179,20 +163,6 @@ public:
    *  Unregisters an engine state. Returns 1 if the task is already registered, else 0.
    */
   int unregisterEngineState(std::shared_ptr<EngineState> engineState);
-
-  /*!
-   *\brief Returns the stream template used to create this stream, else NULL.
-   *
-   * Returns the stream template used to create this stream, else NULL.
-   */
-//  const std::weak_ptr<InformationStreamTemplate> getStreamTemplate() const;
-
-  /*!
-   * \brief Sets the stream template used to create this stream.
-   *
-   * Sets the stream template used to create this stream.
-   */
-//  void setStreamTemplate(const std::weak_ptr<InformationStreamTemplate> streamTemplate);
 
   /*!
    * \brief Removes the receiver of this stream.
@@ -249,10 +219,6 @@ protected:
 protected:
   const long iid; /**< The internal id */
   int sharingMaxCount; /**< Max number of sharing this stream */
-//  std::string description; /**< The description of this stream */
-//  std::weak_ptr<InformationStreamTemplate> streamTemplate; /**< The template used to create this stream */
-//  std::weak_ptr<InformationType> informationType; /**< The information type */
-//  std::shared_ptr<InformationSpecification> specification; /**< Specification of the information stored in this container */
   std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute events asynchronously */
   std::vector<std::shared_ptr<AsynchronousTask>> taskAsynchronous; /**< List of events which are fired asynchronous if a new element is addes */
   std::vector<std::shared_ptr<AsynchronousTask>> taskSynchronous; /**< List of events which are executed synchronous if a new element is addes */

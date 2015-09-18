@@ -21,6 +21,8 @@
 //Forward declarations
 namespace ice
 {
+class Communication;
+class Coordinator;
 class ICEngine;
 class InformationStore;
 class NodeStore;
@@ -28,7 +30,6 @@ class BaseInformationStream;
 class ASPSystem;
 class EngineState;
 class OntologyInterface;
-class Coordinator;
 }
 
 namespace ice
@@ -40,37 +41,43 @@ public:
   ASPModelGenerator(std::weak_ptr<ICEngine> engine);
   virtual ~ASPModelGenerator();
 
-  void init();
-  void cleanUp();
-  void createProcessingModel();
+  std::shared_ptr<ProcessingModel> createProcessingModel();
   std::shared_ptr<OntologyInterface> getOntologyInterface();
   std::shared_ptr<supplementary::ClingWrapper> getClingWrapper();
 
 protected:
+  void initInternal();
+  void cleanUpInternal();
   void readInfoStructureFromOntology();
   void readSystemsFromOntology();
 
 private:
+  void readOntology();
   std::shared_ptr<ASPSystem> getASPSystemByIRI(std::string p_iri);
   std::map<std::string, std::string> readConfiguration(std::string const config);
   void readMetadata(std::map<std::string, int>* metadata, const Gringo::Value element);
   void readMetadata(std::string name, std::map<std::string, int> *metadata, const Gringo::Value element);
   std::string dataTypeForRepresentation(std::string representation);
-  std::shared_ptr<BaseInformationStream> getStream(const Gringo::Value stream);
+//  std::shared_ptr<BaseInformationStream> getStream(const Gringo::Value stream);
+//  std::shared_ptr<BaseInformationStream> getStream(std::string nodeName, std::string source, std::string entity,
+//                                                   std::string scope, std::string rep, std::string relatedEntity, std::map<std::string, int> metadata);
+//  std::shared_ptr<BaseInformationStream> getStream(TransferDesc &desc);
+  bool extractOwn(std::shared_ptr<ProcessingModel> model);
+  bool extractedSubModel(std::shared_ptr<ASPSystem> system, std::shared_ptr<SubModel> subModel);
+  bool extractNodes(vector<NodeDesc> *nodes, std::shared_ptr<ASPSystem> system);
+  bool extractStreamTransfers(std::shared_ptr<ASPSystem> from, std::shared_ptr<ASPSystem> to, std::vector<TransferDesc> *transfers);
+
 
 private:
-  std::shared_ptr<OntologyInterface> ontology; /*< Interface to access the ontology */
   std::shared_ptr<supplementary::ClingWrapper> asp; /*< Interface to access the asp solver */
   std::vector<std::shared_ptr<ASPSystem>> systems; /**< List of known engines */
   std::shared_ptr<ASPSystem> self; /**< Pointer to the own asp description */
-  std::shared_ptr<NodeStore> nodeStore; /**< The node store */
-  std::shared_ptr<InformationStore> informationStore; /**< The information store */
-  std::shared_ptr<Coordinator> coordinator; /**< Coordinator of engines */
   std::vector<std::string> entities; /**< The entites as strings */
-  std::map<ont::entity, ont::entityType> entityTypeMap; /**< Maps the entity type to each known entity */
+//  std::map<ont::entity, ont::entityType> entityTypeMap; /**< Maps the entity type to each known entity */
   bool groundingDirty; /**< Flag to check if the grounding is dirty */
   bool globalOptimization; /**< True if QoS metadata should be optimized global, false for local */
   int queryIndex; /**< Index of the query */
+  int subModelIndex; /**< Index of the current sub models */
   int maxChainLength; /**< Maximal length of a node chain */
   std::shared_ptr<supplementary::External> lastQuery; /**< The last query */
   el::Logger* _log; /**< Logger */

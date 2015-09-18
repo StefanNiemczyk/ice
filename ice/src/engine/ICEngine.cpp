@@ -10,6 +10,7 @@
 #include <ros/package.h>
 
 #include "ice/model/aspModel/ASPModelGenerator.h"
+#include "ice/model/updateStrategie/FastUpdateStrategie.h"
 
 namespace ice
 {
@@ -34,10 +35,10 @@ ICEngine::~ICEngine()
   this->coordinator->cleanUp();
   this->communication->cleanUp();
 //  this->eventHandler;
-//  this->informationStore;
+  this->informationStore->cleanUp();
 //  this->nodeStore;
-//  this->modelComperator;
   this->modelGenerator->cleanUp();
+  this->updateStrategie->cleanUp();
 }
 
 void ICEngine::init()
@@ -52,13 +53,13 @@ void ICEngine::init()
 
   std::string path = ros::package::getPath("ice");
 
-  this->communication = std::make_shared<RosCommunication>(this->shared_from_this());
   this->eventHandler = std::make_shared<EventHandler>(this->shared_from_this());
+  this->communication = std::make_shared<RosCommunication>(this->shared_from_this());
   this->informationStore = std::make_shared<InformationStore>(this->shared_from_this());
   this->nodeStore = std::make_shared<NodeStore>(this->shared_from_this());
-//  this->modelComperator = std::make_shared<ModelComperator>();
   this->coordinator = std::make_shared<Coordinator>(this->shared_from_this());
-  this->modelGenerator = std::make_shared<ASPModelGenerator>(this->shared_from_this());//TODO set method
+  this->modelGenerator = std::make_shared<ASPModelGenerator>(this->shared_from_this());
+  this->updateStrategie = std::make_shared<FastUpdateStrategie>(this->shared_from_this());
 
   // init ontology
   this->ontologyInterface = std::make_shared<OntologyInterface>(path + "/java/lib/");
@@ -68,6 +69,8 @@ void ICEngine::init()
   this->coordinator->init();
   this->communication->init();
   this->modelGenerator->init();
+  this->informationStore->init();
+  this->updateStrategie->init();
 
   this->initialized = true;
 }
@@ -397,6 +400,11 @@ std::shared_ptr<InformationModel> ICEngine::getInformationModel()
 //  this->nodeStore->addDescriptionsToInformationModel(model);
 
   return model;
+}
+
+std::shared_ptr<UpdateStrategie> ICEngine::getUpdateStrategie()
+{
+  return this->updateStrategie;
 }
 
 } /* namespace ice */

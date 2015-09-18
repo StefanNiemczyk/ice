@@ -98,9 +98,44 @@ bool NodeStore::existNodeCreator(const std::string className)
   return Node::existNodeCreator(className);
 }
 
-void NodeStore::cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes)
+//void NodeStore::cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes)
+//{
+//  _log->verbose(1, "Start removing unused nodes");
+//  int counter = 0;
+//
+//  for (int i = 0; i < this->nodes.size(); ++i)
+//  {
+//    auto node = this->nodes.at(i);
+//    bool found = false;
+//
+//    for (auto usedNode : usedNodes)
+//    {
+//      if (usedNode == node)
+//      {
+//        found = true;
+//        break;
+//      }
+//    }
+//
+//    if (found)
+//      continue;
+//
+//    _log->info("Remove unused node %v", node->toString().c_str());
+//    counter++;
+//
+//    node->deactivate();
+//    node->destroy();
+//
+//    --i;
+//  }
+//
+//  _log->info("Clean up node store: '%v' nodes are removed", counter);
+//}
+
+void NodeStore::unregisterAndCleanUp(std::shared_ptr<EngineState> engineState,
+                                     std::vector<std::shared_ptr<Node>> &nodesToCleanUp)
 {
-  _log->verbose(1, "Start removing unused nodes");
+  _log->verbose(1, "Start unregistering engine from nodes");
   int counter = 0;
 
   for (int i = 0; i < this->nodes.size(); ++i)
@@ -108,25 +143,30 @@ void NodeStore::cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes
     auto node = this->nodes.at(i);
     bool found = false;
 
-    for (auto usedNode : usedNodes)
+    for (auto node : nodesToCleanUp)
     {
-      if (usedNode == node)
-      {
-        found = true;
-        break;
-      }
+      node->unregisterEngine(engineState);
     }
+  }
 
-    if (found)
+  this->cleanUpNodes();
+}
+
+void NodeStore::cleanUpNodes()
+{
+  _log->verbose(1, "Start removing unused nodes");
+  int counter = 0;
+
+  for (auto node : this->nodes)
+  {
+    if (node->getRegisteredEngineCount() > 0)
       continue;
 
-    _log->info("Remove unused node %v", node->toString().c_str());
+    _log->info("Remove node %v", node->toString().c_str());
     counter++;
 
     node->deactivate();
     node->destroy();
-
-    --i;
   }
 
   _log->info("Clean up node store: '%v' nodes are removed", counter);

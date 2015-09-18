@@ -68,14 +68,17 @@ public:
    * @param informationModel The information model.
    */
 //  bool addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel);
-
   std::shared_ptr<Node> registerNode(const NodeType type, const std::string className, const std::string name,
                                      const ont::entity entity, const ont::entity entityRelated,
                                      std::map<std::string, std::string> config, const std::string source = "");
 
   bool existNodeCreator(const std::string className);
 
-  void cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes);
+//  void cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes);
+  void unregisterAndCleanUp(std::shared_ptr<EngineState> engineState,
+                                 std::vector<std::shared_ptr<Node>> &nodesToCleanUp);
+
+  void cleanUpNodes();
 
   void cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp);
 

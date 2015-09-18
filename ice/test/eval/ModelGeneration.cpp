@@ -388,7 +388,7 @@ public:
     std::string item;
 
     ss << infoStructure;
-    delete infoStructure;
+//    delete infoStructure;
 
     while (std::getline(ss, item, '\n'))
     {

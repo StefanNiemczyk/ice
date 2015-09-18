@@ -38,6 +38,12 @@
 #include "ice/processing/NodeStore.h"
 #include "ice/ros/RosCommunication.h"
 
+// Forward declarations
+namespace ice
+{
+class UpdateStrategie;
+} /* namespace ice */
+
 namespace ice
 {
 
@@ -189,6 +195,8 @@ public:
 
   std::string getIri() const;
 
+  std::shared_ptr<UpdateStrategie> getUpdateStrategie();
+
 private:
   int readXMLInformation(XMLInformation* information, const std::string namePrefix);
 
@@ -207,6 +215,7 @@ private:
   std::shared_ptr<ModelComperator> modelComperator; /**< Comparator to find similarities in different information model */
   std::shared_ptr<OntologyInterface> ontologyInterface; /*< Interface to access the ontology */
   std::shared_ptr<ProcessingModelGenerator> modelGenerator; /*< Processing model generator */
+  std::shared_ptr<UpdateStrategie> updateStrategie; /**< Update strategie to modify the information processing */
   std::mutex mtx_; /**< Mutex */
 };
 

@@ -129,14 +129,25 @@ public class IceOntologyInterface {
 		}
 	}
 
-	public String[] getOntologyIDs() {
-		String[] ids = new String[this.imports.size() + 1];
+	public String[][] getOntologyIDs() {
+		String[][] ids = new String[2][this.imports.size() + 1];
 
-		ids[0] = this.mainOntology.getOntologyID().getDefaultDocumentIRI().toString();
+		ids[0][0] = this.mainOntology.getOntologyID().getOntologyIRI().toString();
+		if (this.mainOntology.getOntologyID().getVersionIRI() != null) {
+			ids[1][0] = this.mainOntology.getOntologyID().getVersionIRI().toString();
+		} else {
+			ids[1][0] = null;
+		}
 
 		int i = 1;
 		for (OWLOntology ont : this.imports) {
-			ids[i++] = ont.getOntologyID().getDefaultDocumentIRI().toString();
+			ids[0][i] = ont.getOntologyID().getOntologyIRI().toString();
+			if (ont.getOntologyID().getVersionIRI() != null) {
+				ids[1][i] = ont.getOntologyID().getVersionIRI().toString();
+			} else {
+				ids[1][i] = null;
+			}
+			++i;
 		}
 
 		return ids;

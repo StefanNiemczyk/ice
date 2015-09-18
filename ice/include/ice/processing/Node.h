@@ -15,12 +15,17 @@
 #include <vector>
 #include <sys/time.h>
 
-#include "boost/uuid/uuid.hpp"
-
-#include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationStream.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/processing/NodeDescription.h"
+
+#include "boost/uuid/uuid.hpp"
+
+namespace ice
+{
+  class BaseInformationStream;
+  class EngineState;
+}
 
 namespace ice
 {
@@ -62,10 +67,6 @@ public:
 
   virtual int removeOutput(std::shared_ptr<BaseInformationStream> stream);
 
-//  virtual int addInputTemplate(std::shared_ptr<InformationStreamTemplate> streamTemplate, bool trigger);
-//
-//  virtual int removeInputTemplate(std::shared_ptr<InformationStreamTemplate> streamTemplate);
-
   virtual int init();
 
   virtual int cleanUp();
@@ -92,34 +93,30 @@ public:
 
   void setEventHandler(std::shared_ptr<EventHandler> eventHandler);
 
-//  std::string getStringDescription() const;
-//
-//  void setStringDescription(std::string stringDescription);
-
   std::map<std::string, std::string> getConfiguration() const;
 
   void setConfiguration(std::map<std::string, std::string> configuration);
 
   const std::vector<std::shared_ptr<BaseInformationStream>>* getInputs() const;
 
-//  const std::vector<std::shared_ptr<BaseInformationStream>>* getBaseInputs() const;
-
   const std::vector<std::shared_ptr<BaseInformationStream>>* getTriggeredByInputs() const;
-
-//  const std::vector<std::weak_ptr<InformationStreamTemplate>>* getInputTemplates() const;
 
   const std::vector<std::shared_ptr<BaseInformationStream>>* getOutputs() const;
 
   std::string toString();
 
+  void registerEngine(std::shared_ptr<EngineState> engineState);
+
+  void unregisterEngine(std::shared_ptr<EngineState> engineState);
+
+  int getRegisteredEngineCount();
+
 protected:
   long cyclicTriggerTime; /**< period time of triggering this node */
-//  std::string stringDescription; /**< Description of the node */
   bool active; /**< True if the current node is active, else false */
+  std::set<std::shared_ptr<EngineState>> registeredEngines; /**< Engines which are using this node */
   std::vector<std::shared_ptr<BaseInformationStream>> inputs; /**< Input streams */
-//  std::vector<std::shared_ptr<BaseInformationStream>> baseInputs; /**< Input streams not created by a template */
   std::vector<std::shared_ptr<BaseInformationStream>> triggeredByInputs; /**< Input streams triggering this node */
-//  std::vector<std::weak_ptr<InformationStreamTemplate>> inputTemplates; /**< List of stream templates where created streams are used as input */
   std::vector<std::shared_ptr<BaseInformationStream>> outputs; /**< Output streams */
   std::shared_ptr<EventHandler> eventHandler; /**< The event handler */
   std::map<std::string, std::string> configuration; /**< Node Configuration */

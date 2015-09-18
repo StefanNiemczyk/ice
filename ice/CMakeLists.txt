@@ -171,9 +171,12 @@ add_library(${PROJECT_NAME}
 #  src/engine/InformationType.cpp
   src/engine/StreamFactory.cpp
   
+  src/engine/ProcessingModel.cpp
   src/engine/ProcessingModelGenerator.cpp
   src/engine/ASPSystem.cpp
   src/engine/ASPModelGenerator.cpp
+  src/engine/FastUpdateStrategie.cpp
+  src/engine/UpdateStrategie.cpp
   
   src/engine/OntologyInterface.cpp
   
@@ -257,8 +260,8 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/test_ASPComposition.cpp
  # test/test_ASPRepComputation.cpp
  # test/test_JNI.cpp
- # test/test_ASPCoordinator.cpp
-  test/test_serialize.cpp
+  test/test_ASPCoordinator.cpp
+ # test/test_serialize.cpp
  # test/test_RingBuffer.cpp
  # test/test_Buffer.cpp
  # test/test_InformationStore.cpp

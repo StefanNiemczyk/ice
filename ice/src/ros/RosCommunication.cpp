@@ -14,9 +14,11 @@
 #include "ice/processing/LambdaTask.h"
 #include "ice/processing/NodeDescription.h"
 #include "ice/ros/RosTimeFactory.h"
+#include "ice/ICEngine.h"
 
 #include "ice_msgs/Position.h"
 #include "easylogging++.h"
+#include "serialize.h"
 
 namespace ice
 {
@@ -42,6 +44,7 @@ void RosCommunication::init()
   this->coordinationPublisher = this->nodeHandel.advertise<ice_msgs::ICECoordination>("ice/coordination", 100);
   this->coordinationSubscriber = this->nodeHandel.subscribe("ice/coordination", 100, &RosCommunication::onCoordination,
                                                             this);
+
 //  this->informationModelPublisher = this->nodeHandel.advertise<ice_msgs::InformationModel>("ice/information_model",
 //                                                                                           100);
 //  this->informationModelSubscriber = this->nodeHandel.subscribe("ice/information_model", 100,
@@ -62,6 +65,12 @@ void RosCommunication::init()
 void RosCommunication::cleanUp()
 {
   Communication::cleanUp();
+
+  this->heartbeatPublisher.shutdown();
+  this->heartbeatSubscriber.shutdown();
+  this->coordinationPublisher.shutdown();
+  this->coordinationSubscriber.shutdown();
+
   if (this->running == false)
     return;
 
@@ -90,6 +99,92 @@ void RosCommunication::sendHeartbeat()
 
   this->heartbeatPublisher.publish(heartbeat);
 }
+
+void RosCommunication::sendCoordinationMsg(identifier receiverId, RosCoordinationCommand command)
+{
+  ice_msgs::ICECoordination msg;
+
+  msg.header.senderId.value = this->engineId;
+  msg.header.timestamp = ros::Time::now();
+  ice_msgs::Identifier receiver;
+  receiver.value = receiverId;
+  msg.header.receiverIds.push_back(receiver);
+  msg.command = command;
+
+  this->coordinationPublisher.publish(msg);
+}
+
+void RosCommunication::sendCoordinationMsg(identifier receiverId, RosCoordinationCommand command, std::vector<uint8_t> &bytes)
+{
+  ice_msgs::ICECoordination msg;
+
+  msg.header.senderId.value = this->engineId;
+  msg.header.timestamp = ros::Time::now();
+  ice_msgs::Identifier receiver;
+  receiver.value = receiverId;
+  msg.header.receiverIds.push_back(receiver);
+  msg.command = command;
+  msg.bytes = bytes;
+
+  this->coordinationPublisher.publish(msg);
+}
+
+void RosCommunication::sendSystemSpecRequest(identifier receiverId)
+{
+  _log->info("Sending system spec request to engine '%v'", receiverId);
+
+  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SYSTEM_SPEC_REQUEST);
+}
+
+void RosCommunication::sendSystemSpecResponse(
+    identifier receiverId, std::tuple<std::string, std::vector<std::string>, std::vector<std::string>> &content)
+{
+  _log->info("Sending system specification to engine '%v'", receiverId);
+
+  StreamType res;
+  serialize(content,res);
+
+  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SYSTEM_SPEC_RESPONSE, res);
+}
+
+void RosCommunication::sendSubModelRequest(identifier receiverId, SubModelDesc &modelDesc)
+{
+  _log->info("Sending sub model request to engine '%v'", receiverId);
+
+  StreamType res;
+  serialize(modelDesc,res);
+
+  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SUB_MODEL_REQUEST, res);
+}
+
+void RosCommunication::sendSubModelResponse(identifier receiverId, int index, bool accept)
+{
+  _log->info("Sending sub model response to engine '%v'", receiverId);
+
+  StreamType res;
+  serialize(std::tuple<int, bool>(index, accept),res);
+
+  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SUB_MODEL_RESPONSE, res);
+}
+
+void RosCommunication::sendNegotiationFinished(identifier receiverId)
+{
+  _log->info("Send negotiation finished from engine %v to engine %v",
+             IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
+
+  this->sendCommand(receiverId, RosCoordinationCommand::NEGOTIATION_FINISHED);
+}
+
+void RosCommunication::sendStopCooperation(identifier receiverId)
+{
+  _log->info("Send stop cooperation from engine %v to engine %v",
+             IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
+
+  this->sendCommand(receiverId, RosCoordinationCommand::STOP_COOPERATION);
+}
+
+
+// -#######################################################################
 
 void RosCommunication::sendInformationRequest(identifier receiverId)
 {
@@ -276,28 +371,12 @@ void RosCommunication::sendCooperationAccept(identifier receiverId)
   this->sendCommand(receiverId, RosCoordinationCommand::COOPERATION_ACCEPT);
 }
 
-void RosCommunication::sendNegotiationFinished(identifier receiverId)
-{
-  _log->info("Send negotiation finished from engine %v to engine %v",
-             IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
-
-  this->sendCommand(receiverId, RosCoordinationCommand::NEGOTIATION_FINISHED);
-}
-
 void RosCommunication::sendRetryNegotiation(identifier receiverId)
 {
   _log->info("Send retry negotiation from engine %v to engine %v",
              IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
 
   this->sendCommand(receiverId, RosCoordinationCommand::NEGOTIATION_RETRY);
-}
-
-void RosCommunication::sendStopCooperation(identifier receiverId)
-{
-  _log->info("Send stop cooperation from engine %v to engine %v",
-             IDGenerator::toString(this->engineId).c_str(), IDGenerator::toString(receiverId).c_str());
-
-  this->sendCommand(receiverId, RosCoordinationCommand::STOP_COOPERATION);
 }
 
 void RosCommunication::sendCooperationStopped(identifier receiverId)
@@ -429,10 +508,10 @@ void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
 {
   identifier senderId = msg->header.senderId.value;//IDGenerator::getInstance()->getIdentifier(msg->header.senderId.value);
 
-  _log->verbose(1, "Heartbeat from engine %v", IDGenerator::toString(senderId).c_str());
-
   if (senderId == this->engineId)
     return;
+
+  _log->info("Heartbeat received from engine %v", IDGenerator::toString(senderId).c_str());
 
   this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
   { return this->coordinator->onEngineHeartbeat(senderId, RosTimeFactory::createTime(msg->header.timestamp));}));
@@ -446,39 +525,77 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
   if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)
     return;
 
-  _log->debug("Coordination command from engine %v with command %v",
-              IDGenerator::toString(senderId).c_str(), msg->command);
+  _log->info("Coordination command '%v' received from engine '%v'",
+             std::to_string(msg->command).c_str(), IDGenerator::toString(senderId).c_str());
 
   switch (msg->command)
   {
-    case RosCoordinationCommand::REQUEST_INFORMATION_MODEL:
+    case RosCoordinationCommand::SYSTEM_SPEC_REQUEST:
       this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-      { return this->coordinator->onInformationModelRequest(senderId);}));
+      {
+        return this->coordinator->onSystemSpecRequest(senderId);
+      }));
       break;
-    case RosCoordinationCommand::COOPERATION_ACCEPT:
+    case RosCoordinationCommand::SYSTEM_SPEC_RESPONSE:
       this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-      { return this->coordinator->onCooperationAccept(senderId);}));
+      {
+        auto content = deserialize<std::tuple<std::string, std::vector<std::string>, std::vector<std::string>>>(msg->bytes);
+        return this->coordinator->onSystemSpec(senderId, content);
+      }
+      ));
       break;
-    case RosCoordinationCommand::COOPERATION_REFUSE:
+    case RosCoordinationCommand::SUB_MODEL_REQUEST:
       this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-      { return this->coordinator->onCooperationRefuse(senderId);}));
+      {
+        auto content = deserialize<SubModelDesc>(msg->bytes);
+        return this->coordinator->onSubModelRequest(senderId, content);
+      }
+      ));
+      break;
+    case RosCoordinationCommand::SUB_MODEL_RESPONSE:
+      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+      {
+        auto content = deserialize<std::tuple<int, bool>>(msg->bytes);
+        return this->coordinator->onSubModelResponse(senderId, std::get<0>(content), std::get<1>(content));
+      }
+      ));
       break;
     case RosCoordinationCommand::NEGOTIATION_FINISHED:
       this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
       { return this->coordinator->onNegotiationFinished(senderId);}));
       break;
-    case RosCoordinationCommand::NEGOTIATION_RETRY:
-      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-      { return this->coordinator->onRetryNegotiation(senderId);}));
-      break;
     case RosCoordinationCommand::STOP_COOPERATION:
       this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
       { return this->coordinator->onStopCooperation(senderId);}));
       break;
-    case RosCoordinationCommand::COOPERATION_STOPPED:
-      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-      { return this->coordinator->onCooperationStopped(senderId);}));
-      break;
+//    case RosCoordinationCommand::REQUEST_INFORMATION_MODEL:
+//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+//      { return this->coordinator->onInformationModelRequest(senderId);}));
+//      break;
+//    case RosCoordinationCommand::COOPERATION_ACCEPT:
+//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+//      { return this->coordinator->onCooperationAccept(senderId);}));
+//      break;
+//    case RosCoordinationCommand::COOPERATION_REFUSE:
+//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+//      { return this->coordinator->onCooperationRefuse(senderId);}));
+//      break;
+//    case RosCoordinationCommand::NEGOTIATION_FINISHED:
+//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+//      { return this->coordinator->onNegotiationFinished(senderId);}));
+//      break;
+//    case RosCoordinationCommand::NEGOTIATION_RETRY:
+//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+//      { return this->coordinator->onRetryNegotiation(senderId);}));
+//      break;
+//    case RosCoordinationCommand::STOP_COOPERATION:
+//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+//      { return this->coordinator->onStopCooperation(senderId);}));
+//      break;
+//    case RosCoordinationCommand::COOPERATION_STOPPED:
+//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
+//      { return this->coordinator->onCooperationStopped(senderId);}));
+//      break;
     default:
       _log->error("Unknown coordination command from engine %v with command %v",
                   IDGenerator::toString(senderId).c_str(), msg->command);

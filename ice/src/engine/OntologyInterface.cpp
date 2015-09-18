@@ -92,7 +92,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->saveOntologyMethod = this->env->GetMethodID(this->javaOntologyInterface, "saveOntology",
                                                     "(Ljava/lang/String;)Z");
   this->getOntologyIDsMethod = this->env->GetMethodID(this->javaOntologyInterface, "getOntologyIDs",
-                                                    "()[Ljava/lang/String;");
+                                                    "()[[Ljava/lang/String;");
   this->initReasonerMethod = this->env->GetMethodID(this->javaOntologyInterface, "initReasoner", "(Z)Z");
   this->isConsistentMethod = this->env->GetMethodID(this->javaOntologyInterface, "isConsistent", "()Z");
   this->getSystemsMethod = this->env->GetMethodID(this->javaOntologyInterface, "getSystems", "()[Ljava/lang/String;");
@@ -173,6 +173,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
 OntologyInterface::~OntologyInterface()
 {
   this->env->DeleteLocalRef(this->javaInterface);
+  jvm->DetachCurrentThread();
   // TODO why?
 //  jvm->DestroyJavaVM();
   //delete this->jvm;
@@ -186,11 +187,21 @@ bool OntologyInterface::errorOccurred()
 
 bool OntologyInterface::checkError(std::string p_method, std::string p_error)
 {
-  if (env->ExceptionOccurred())
+  jthrowable exc;
+  exc = env->ExceptionOccurred();
+
+  if (exc)
   {
     this->error = true;
-    this->_log->error("%v, %v", p_method, p_error);
+    _log->error("%v, %v", p_method, p_error);
     env->ExceptionDescribe();
+
+//    jboolean isCopy = false;
+//    jmethodID toString = env->GetMethodID(env->FindClass("java/lang/Object"), "toString", "()Ljava/lang/String;");
+//    jstring s = (jstring)env->CallObjectMethod(exc, toString);
+//    const char* utf = env->GetStringUTFChars(s, &isCopy);
+//    _log->error(utf);
+//    std::cout << "#########################" << utf << std::endl;
   }
   else
   {
@@ -221,6 +232,9 @@ bool OntologyInterface::loadOntologies()
 
   if (this->checkError("loadOntologies", "Error occurred at loading the ontologies"))
     return false;
+
+  this->readSystemsFromOntology();
+  this->readOntologyIDsFromOntology();
 
   this->informationDirty = true;
   this->systemDirty = true;
@@ -259,36 +273,94 @@ bool OntologyInterface::saveOntology(std::string const p_path)
   if (this->checkError("saveOntology", "Error occurred saving ontology " + p_path))
     return false;
 
-  this->systemDirty = true;
-
   return result;
 }
 
-std::unique_ptr<std::vector<const char*>> OntologyInterface::getOntologyIDs()
+std::unique_ptr<std::vector<std::vector<std::string>>> OntologyInterface::getOntologyIDs()
+{
+  std::unique_ptr<std::vector<std::vector<std::string>>> ids(new std::vector<std::vector<std::string>>(this->ontologyIds));
+
+  return std::move(ids);
+}
+
+void OntologyInterface::readOntologyIDsFromOntology()
 {
   this->checkError("getOntologyIDs", "Error exists, method getOntologyIDs will not be executed");
 
   jobjectArray result = (jobjectArray)env->CallObjectMethod(this->javaInterface, this->getOntologyIDsMethod);
 
   if (this->checkError("getOntologyIDs", "Error occurred at reading ontology ids"))
-    return nullptr;
+    return;
 
-  std::unique_ptr<std::vector<const char*>> ids(new std::vector<const char*>());
+  this->ontologyIds.clear();
 
   int size = env->GetArrayLength(result);
 
   for (int i = 0; i < size; ++i)
   {
-    jstring jstr = (jstring)env->GetObjectArrayElement(result, i);
-    const char* cstr = env->GetStringUTFChars(jstr, 0);
-    ids->push_back(cstr);
-    env->ReleaseStringUTFChars(jstr, 0);
-    env->DeleteLocalRef(jstr);
+    jobjectArray arr = (jobjectArray)env->GetObjectArrayElement(result, i);
+    int size2 = env->GetArrayLength(arr);
+    std::vector<std::string> vec2;
+
+    for (int j = 0; j < size2; ++j)
+    {
+      jstring str = (jstring)env->GetObjectArrayElement(arr, j);
+
+      if (str != nullptr)
+      {
+        const char* cstr = env->GetStringUTFChars(str, 0);
+        vec2.push_back(std::string(cstr));
+        delete cstr;
+      }
+      else
+      {
+        vec2.push_back("");
+      }
+      env->ReleaseStringUTFChars(str, 0);
+      env->DeleteLocalRef(str);
+    }
+
+    env->DeleteLocalRef(arr);
+
+    this->ontologyIds.push_back(vec2);
   }
 
   env->DeleteLocalRef(result);
+}
 
-  return std::move(ids);
+std::unique_ptr<std::vector<std::string>> OntologyInterface::compareOntologyIDs(std::vector<std::string>* ids, std::vector<std::string>* versions)
+{
+  int size = ids->size();
+  int sizeOwn = this->ontologyIds.at(0).size();
+  bool found = false;
+
+  std::unique_ptr<std::vector<std::string>> vec(new std::vector<std::string>);
+
+  for (int i = 0; i < size; ++i)
+  {
+    std::string id = ids->at(i);
+    found = false;
+
+    for (int j = 0; j < sizeOwn; ++j)
+    {
+      if (id == this->ontologyIds.at(0).at(j))
+      {
+        if (versions->at(i) ==  this->ontologyIds.at(1).at(j))
+        {
+          found = true;
+        }
+
+        break;
+      }
+    }
+
+    if (false == found)
+    {
+      vec->push_back(id);
+    }
+  }
+
+  return std::move(vec);
 }
 
 bool OntologyInterface::initReasoner(bool const p_force)
@@ -317,31 +389,56 @@ bool OntologyInterface::isConsistent()
   return result;
 }
 
-std::unique_ptr<std::vector<const char*>> OntologyInterface::getSystems()
+std::unique_ptr<std::vector<std::string>> OntologyInterface::getSystems()
 {
-  this->checkError("getSystems", "Error exists, method getSystems will not be executed");
+  if (this->systemDirty)
+  {
+    this->readSystemsFromOntology();
+  }
+
+  std::unique_ptr<std::vector<std::string>> systems(new std::vector<std::string>(this->knownSystem));
+
+  return std::move(systems);
+}
+
+
+bool OntologyInterface::isSystemKnown(std::string const p_system)
+{
+  if (p_system == "")
+    return false;
+
+  for (auto system : this->knownSystem)
+  {
+    if (system == p_system)
+      return true;
+  }
+
+  return false;
+}
+
+void OntologyInterface::readSystemsFromOntology()
+{
+  this->checkError("getSystemsFromOntology", "Error exists, method getSystems will not be executed");
 
   jobjectArray result = (jobjectArray)env->CallObjectMethod(this->javaInterface, this->getSystemsMethod);
 
-  if (this->checkError("getSystems", "Error occurred at reading systems"))
-    return nullptr;
+  if (this->checkError("getSystemsFromOntology", "Error occurred at reading systems"))
+    return;
 
-  std::unique_ptr<std::vector<const char*>> systems(new std::vector<const char*>());
-
+  this->knownSystem.clear();
   int size = env->GetArrayLength(result);
 
   for (int i = 0; i < size; ++i)
   {
     jstring jstr = (jstring)env->GetObjectArrayElement(result, i);
     const char* cstr = env->GetStringUTFChars(jstr, 0);
-    systems->push_back(cstr);
+    this->knownSystem.push_back(std::string(cstr));
+    delete cstr;
     env->ReleaseStringUTFChars(jstr, 0);
     env->DeleteLocalRef(jstr);
   }
 
   env->DeleteLocalRef(result);
-
-  return std::move(systems);
 }
 
 bool OntologyInterface::addSystem(std::string const p_system)
@@ -1027,6 +1124,9 @@ bool OntologyInterface::removeOntologyIRI(std::string const p_iri)
 
 const char* OntologyInterface::readInformationStructureAsASP()
 {
+  if (this->informationDirty == false)
+    return this->informationStructure.c_str();
+
   this->checkError("readInformationStructureAsASP", "Error exists, readInformationStructureAsASP will not be executed");
 
   jstring result = (jstring)env->CallObjectMethod(this->javaInterface, this->readInformationStructureAsASPMethod);
@@ -1039,9 +1139,9 @@ const char* OntologyInterface::readInformationStructureAsASP()
   const char* cstr = env->GetStringUTFChars(result, 0);
   env->ReleaseStringUTFChars(result, 0);
 
-//  std::string sstr(cstr);
-//  delete cstr;
-  return cstr;
+  this->informationStructure = std::string(cstr);
+  delete cstr;
+  return this->informationStructure.c_str();
 }
 
 std::unique_ptr<std::vector<std::vector<const char*>*>> OntologyInterface::readNodesAndIROsAsASP(
@@ -1283,6 +1383,16 @@ bool OntologyInterface::isSystemDirty()
 bool OntologyInterface::isLoadDirty()
 {
   return this->loadDirty;
+}
+
+void OntologyInterface::attachCurrentThread()
+{
+  jvm->AttachCurrentThread((void**)&this->env, NULL);
+}
+
+void OntologyInterface::detachCurrentThread()
+{
+  jvm->DetachCurrentThread();
 }
 
 } /* namespace ice */

@@ -21,16 +21,18 @@
 #include "ice/information/InformationSpecification.h"
 #include "easylogging++.h"
 
+//Forward declarations
 namespace ice
 {
-//Forward declarations
 class ICEngine;
-
 template<typename T>
   class InformationStream;
-
 class StreamFactory;
+class OntologyInterface;
+}
 
+namespace ice
+{
 //* InformationStore
 /**
  * This class stores the information types used by the icengine.
@@ -67,41 +69,9 @@ public:
    */
   virtual ~InformationStore();
 
-  /*!
-   * \brief Returns the UUID of a registered information stream with the given name or a empty uuid if none exist.
-   *
-   * Returns the UUID of a registered information stream with the given name. Returns a empty uuid if no stream
-   * is registered for the given name.
-   *
-   * \param name The name of the information stream
-   */
-//  boost::uuids::uuid getUUIDByName(std::string name);
-  /*!
-   * \brief Registers an information type and returns a shared ptr.
-   *
-   * Registers an information type with a given uuid and specification. If the information type
-   * is already registered the existing type will be returned.
-   *
-   * \param uuid The universal unique identifier.
-   * \param specification The specification of the information type.
-   */
-//  std::shared_ptr<InformationType> registerInformationType(std::shared_ptr<InformationSpecification> specification);
-  /*!
-   * \brief Returns the information type for the given uuid or null.
-   *
-   * Returns the information type for the given uuid or null if no information type with equal uuid exists.
-   *
-   * @param uuid The universal unique identifier of the requested information type.
-   */
-//  std::shared_ptr<InformationType> getInformationType(const boost::uuids::uuid& uuid) const;
-  /*!
-   * \brief Returns the information type for the given name or null.
-   *
-   * Returns the information type for the given name or null if no information type with equal name exists.
-   *
-   * @param name The name of the requested information type.
-   */
-//  std::shared_ptr<InformationType> getInformationType(const std::string& name) const;
+  void init();
+  void cleanUp();
+
   /*!
    * \brief Registers an stream and returns a shared_ptr. Returns null if no matching information type exists.
    *
@@ -196,33 +166,6 @@ public:
   std::shared_ptr<BaseInformationStream> getBaseStream(const std::shared_ptr<StreamDescription> streamDescription);
 
   /*!
-   * \brief Returns a BaseInformationStream for the given stream template description.
-   *
-   * Returns a BaseInformationStream for the given stream template description. NULL is returned if no stream exists.
-   *
-   * \param streamTemplateDescription The description of the searched stream.
-   */
-//  std::shared_ptr<BaseInformationStream> getBaseStream(
-//      const std::shared_ptr<StreamTemplateDescription> streamDescription);
-  /*!
-   * \brief Adds a stream template to the stream template map.
-   *
-   * Adds a stream template to the stream map. Returns 1 if a stream template with this name already
-   * exists, else 0.
-   *
-   * \param streamTemplate The stream template to add.
-   */
-//  int addStreamTemplate(std::shared_ptr<InformationStreamTemplate> streamTemplate);
-  /*!
-   * \brief Returns a InformationStreamTemplate for the given stream name.
-   *
-   * Returns a InformationStreamTemplate with the given stream name. NULL is returned if no stream
-   * template exists.
-   *
-   * \param streamTemplateName The name of the searched stream template.
-   */
-//  std::shared_ptr<InformationStreamTemplate> getStreamTemplate(const std::string streamTemplateName);
-  /*!
    * \brief Adds the stream description and stream template description to the information model.
    *
    * Adds the stream description and stream template description  to the information model. Returns
@@ -234,6 +177,10 @@ public:
 
   void cleanUpStreams();
 
+  ont::entityType getEntityType(ont::entity entity);
+
+  void readEntitiesFromOntology();
+
 private:
   std::shared_ptr<BaseInformationStream> selectBestStream(std::vector<std::shared_ptr<BaseInformationStream>> *streams);
 
@@ -243,6 +190,8 @@ private:
   std::vector<std::shared_ptr<BaseInformationStream>> streams; /**< The information steams */
   std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute events asynchronously */
   std::shared_ptr<StreamFactory> streamFactory; /**< Stream factory to create streams */
+  std::shared_ptr<OntologyInterface> ontology; /**< Interface to access the ontology */
+  std::map<ont::entity, ont::entityType> entityTypeMap; /**< Maps the entity type to each known entity */
   std::mutex _mtx; /**< Mutex */
   el::Logger* _log; /**< Logger */
 };

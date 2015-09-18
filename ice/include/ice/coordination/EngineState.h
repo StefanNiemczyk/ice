@@ -13,6 +13,7 @@
 
 #include "ClingWrapper.h"
 
+#include "ice/model/ProcessingModel.h"
 #include "ice/Identifier.h"
 #include "ice/Time.h"
 
@@ -20,11 +21,10 @@
 namespace ice
 {
 class BaseInformationStream;
-class CooperationRequest;
-class CooperationResponse;
+class Configuration;
+class Communication;
 class ICEngine;
-class InformationModel;
-class IntersectionInformationModel;
+class Node;
 class TimeFactory;
 class EngineState;
 } /* namespace ice */
@@ -55,6 +55,13 @@ struct EngineConnection
 enum CooperationState
 {
   UNKNOWN,                      //< 0 Unknown state
+  SYSTEM_SPEC_REQUESTED,        //< 1 Request the specification of another engine
+  SYSTEM_SPEC_SEND,             //< 2 System specification send
+  SYSTEM_SPEC_RECEIVCED,        //< 3 Received a system specification
+  SUB_MODEL_RECEIVED,           //< 4 Received a sub model description
+  SUB_MODEL_RESPONSE_RECEIVED,  //< 5 Received a response for a sub model
+
+  //-----------------------------------------------------------------------------------
   RETRY_NEGOTIATION,            //< 1 retry the negotiation process
   INFORMATION_MODEL_REQUESTED,  //< 2 information model was requested
   INFORMATION_MODEL_SEND,       //< 3 information model was send
@@ -68,13 +75,27 @@ enum CooperationState
   NO_COOPERATION                //< 11 no cooperation with this engine
 };
 
+//* CooperationContainer
+/**
+ *
+ *
+ */
+struct CooperationContainer
+{
+  CooperationState state = CooperationState::UNKNOWN; /**< State of the cooperation */
+  std::shared_ptr<SubModelDesc> subModel; /**< Sub model description */
+  std::vector<std::shared_ptr<BaseInformationStream>> streamsSend; /**< List of streams send to this engine */
+  std::vector<std::shared_ptr<BaseInformationStream>> streamsReceived; /**< List of streams received from this engine */
+};
+
 //* EngineState
 /**
  * This class stores the meta information from other engines.
  *
  */
-class EngineState
+class EngineState : public enable_shared_from_this<EngineState>
 {
+  friend Node;
 public:
   /*!
    * \brief This constructor initialize the object and sets the unique identifier.
@@ -128,6 +149,15 @@ public:
   const std::string getSystemIri() const;
 
   /*!
+   * \brief Sets the iri of this engine.
+   *
+   * Sets the iri of this engine.
+   *
+   * \param iri The iri
+   */
+  void setSystemIri(const std::string iri);
+
+  /*!
    * \brief Returns the short version of the iri of this engine.
    *
    * Returns the iri short version of the iri of this engine.
@@ -139,7 +169,7 @@ public:
    *
    * Returns the information model of the engine.
    */
-  const std::shared_ptr<InformationModel> getInformationModel() const;
+//  const std::shared_ptr<InformationModel> getInformationModel() const;
 
   /*!
    * \brief Sets the information model of the engine.
@@ -148,7 +178,7 @@ public:
    *
    * \param informationModel The information model.
    */
-  void setInformationModel(const std::shared_ptr<InformationModel> informationModel);
+//  void setInformationModel(const std::shared_ptr<InformationModel> informationModel);
 
   /*!
    * \brief Returns the timestamp of the last activity of this engine.
@@ -174,29 +204,6 @@ public:
   void updateTimeLastActivity();
 
   /*!
-   * \brief Returns a pointer to the vector of intersections.
-   *
-   * Returns a pointer to the vector of intersections.
-   */
-  const std::vector<std::shared_ptr<IntersectionInformationModel>>* getIntersections() const;
-
-  /*!
-   * \brief Returns the cooperation state.
-   *
-   * Returns the cooperation state.
-   */
-  const CooperationState getCooperationState() const;
-
-  /*!
-   * \brief Sets the cooperation state.
-   *
-   * Sets the cooperation state.
-   *
-   * @param cooperationState The new cooperation state.
-   */
-  void setCooperationState(CooperationState cooperationState);
-
-  /*!
    * \brief Returns the time stamp of the last cooperation state update.
    *
    * Returns the time stamp of the last cooperation state update.
@@ -204,50 +211,18 @@ public:
   const time getTimeLastStateUpdate() const;
 
   /*!
-   * \brief Returns the cooperation request.
-   *
-   * Returns the cooperation request.
-   */
-  const std::shared_ptr<CooperationRequest> getCooperationRequest() const;
-
-  /*!
-   * \brief Sets the cooperation request.
-   *
-   * Sets the cooperation request.
-   *
-   * \param cooperationRequest The cooperation request.
-   */
-  void setCooperationRequest(const std::shared_ptr<CooperationRequest> cooperationRequest);
-
-  /*!
-   * \brief Returns the cooperation response.
-   *
-   * Returns the cooperation response.
-   */
-  const std::shared_ptr<CooperationResponse> getCooperationResponse() const;
-
-  /*!
-   * \brief Sets the cooperation response.
-   *
-   * Sets the cooperation response.
-   *
-   * \param cooperationRequest The cooperation response.
-   */
-  void setCooperationResponse(const std::shared_ptr<CooperationResponse> cooperationResponse);
-
-  /*!
    * \brief Returns a pointer to the list of streams offered.
    *
    * Returns a pointer to the list of streams offered.
    */
-  std::vector<std::shared_ptr<BaseInformationStream>>* getStreamsOffered();
+  std::shared_ptr<CooperationContainer> getOffering();
 
   /*!
    * \brief Returns a pointer to the list of streams requested.
    *
    * Returns a pointer to the list of streams requested.
    */
-  std::vector<std::shared_ptr<BaseInformationStream>>* getStreamsRequested();
+  std::shared_ptr<CooperationContainer> getRequesting();
 
   /*!
    * \brief Returns the retry counter.
@@ -279,24 +254,48 @@ public:
    */
   void resetRetryCounter();
 
+  bool isCooperationPossible() const;
+
+  bool isNodesKnown() const;
+
+  void setNodesKnown(bool value);
+
+  void updateOffering(std::vector<std::shared_ptr<Node>> *nodes,
+                      std::vector<std::shared_ptr<BaseInformationStream>> *streamsSend,
+                      std::vector<std::shared_ptr<BaseInformationStream>> *streamsReceived);
+
+  void updateRequesting(std::vector<std::shared_ptr<Node>> *nodes,
+                       std::vector<std::shared_ptr<BaseInformationStream>> *streamsSend,
+                       std::vector<std::shared_ptr<BaseInformationStream>> *streamsReceived);
+
+  void clearOffering();
+
+  void clearRequesting();
+
   std::vector<std::shared_ptr<EngineConnection>> getConnections();
 
 private:
-  identifier engineId; /**< Unique identifier of the engine */
-  const std::string systemIri; /**< The iri of this system */
-  CooperationState cooperationState; /**< State of the cooperation between this engine and the main engine */
+  void updateContainer(std::shared_ptr<CooperationContainer> container, std::vector<std::shared_ptr<Node>> *nodes,
+                       std::vector<std::shared_ptr<BaseInformationStream>> *streamsSend,
+                       std::vector<std::shared_ptr<BaseInformationStream>> *streamsReceived);
+
+  void clearContainer(std::shared_ptr<CooperationContainer> container);
+
+private:
   std::weak_ptr<ICEngine> engine; /**< The main engine */
-  std::shared_ptr<InformationModel> informationModel; /**< The information model of this engine */
+  std::shared_ptr<TimeFactory> timeFactory; /**< Time factory to create and compare time stamps */
+  std::shared_ptr<Configuration> config; /**< Configuration object */
+  std::shared_ptr<Communication> communication; /**< Communication interface */
+  identifier engineId; /**< Unique identifier of the engine */
+  std::string systemIri; /**< The iri of this system */
+  std::shared_ptr<CooperationContainer> offering; /**< Container for parts of the information processing offered to this engine */
+  std::shared_ptr<CooperationContainer> requesting; /**< Container for parts of the information processing requested from this engine */
+  std::set<std::shared_ptr<Node>> nodesActivated; /**< Nodes activated by this engine */
   time timeLastActivity; /**< Time stamp of the last activity of this engine */
   time timeLastStateUpdate; /**< Time stamp of the last cooperation state update */
-  std::shared_ptr<TimeFactory> timeFactory; /**< Time factory */
-  std::shared_ptr<CooperationRequest> cooperationRequest; /**< Cooperation request */
-  std::shared_ptr<CooperationResponse> cooperationResponse; /**< The response to an cooperation request */
-  std::vector<std::shared_ptr<IntersectionInformationModel>> intersections; /**< List of intersections in the information model of the main engine and the model from this engine */
-  std::vector<std::shared_ptr<BaseInformationStream>> streamsOffered; /**< List of streams offered from the main to this engine */
-  std::vector<std::shared_ptr<BaseInformationStream>> streamsRequested; /**< List of streams requested from the main */
   int retryCounter; /**< Counts the retrys of the current activity */
   std::vector<std::shared_ptr<EngineConnection>> connections; /**< Connections of the engine to other engines */
+  bool nodesKnown; /**< True if the nodes of this engine are known, false otherwise */
   el::Logger* _log; /**< Logger */
 };
 

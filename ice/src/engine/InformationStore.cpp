@@ -9,6 +9,8 @@
 
 #include "ice/ICEngine.h"
 #include "ice/information/StreamFactory.h"
+#include "ice/ontology/OntologyInterface.h"
+
 #include "easylogging++.h"
 
 namespace ice
@@ -17,17 +19,27 @@ namespace ice
 InformationStore::InformationStore(std::weak_ptr<ICEngine> engine)
 {
   this->engine = engine;
-  std::shared_ptr<ICEngine> engineObject;
+  this->_log = el::Loggers::getLogger("InformationStore");
+}
 
-  if (engine.expired())
-    return;
-
-  engineObject = engine.lock();
+void InformationStore::init()
+{
+  auto engineObject = engine.lock();
 
   this->eventHandler = engineObject->getEventHandler();
   this->config = engineObject->getConfig();
   this->streamFactory = engineObject->getStreamFactory();
-  this->_log = el::Loggers::getLogger("InformationStore");
+  this->ontology = engineObject->getOntologyInterface();
+
+//  this->readEntitiesFromOntology();
+}
+
+void InformationStore::cleanUp()
+{
+  this->eventHandler.reset();
+  this->config.reset();
+  this->streamFactory.reset();
+  this->ontology.reset();
 }
 
 InformationStore::InformationStore(std::shared_ptr<EventHandler> eventHandler)
@@ -176,6 +188,8 @@ void InformationStore::cleanUpStreams()
   for (int i=0; i < this->streams.size(); ++i)
   {
     auto stream = this->streams.at(i);
+
+
     _log->info("Checking stream '%v', reference count %v", stream->toString().c_str(), stream.use_count());
 
     if (stream.use_count() == 2)
@@ -189,6 +203,49 @@ void InformationStore::cleanUpStreams()
   }
 
   _log->info("Clean up information store: '%v' streams are removed", counter);
+}
+
+ont::entityType InformationStore::getEntityType(ont::entity entity)
+{
+  auto it = this->entityTypeMap.find(entity);
+  if (it != this->entityTypeMap.end())
+    return it->second;
+
+  return "";
+}
+
+void InformationStore::readEntitiesFromOntology()
+{
+  _log->verbose(1, "Read entities and types from ontology");
+
+  if (this->ontology->isLoadDirty())
+    this->ontology->loadOntologies();
+
+  const char* infoStructure = this->ontology->readInformationStructureAsASP();
+
+  _log->debug("Extracted entities from ontology");
+  _log->verbose(1, infoStructure);
+
+  this->entityTypeMap.clear();
+
+  std::stringstream ss;
+  std::string item;
+
+  ss << infoStructure;
+//  delete infoStructure;
+
+  while (std::getline(ss, item, '\n'))
+  {
+    if (item.find("entity(") == 0)
+    {
+      int index1 = item.find(",");
+      int index2 = item.find(")");
+      auto entity = item.substr(7, index1 - 7);
+      auto entityType = item.substr(index1 + 1, index2 - index1 - 1);
+
+      this->entityTypeMap[entity] = entityType;
+    }
+  }
 }
 
 } /* namespace ice */

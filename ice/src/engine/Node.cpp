@@ -7,7 +7,11 @@
 
 #include "ice/processing/Node.h"
 
+#include "ice/coordination/EngineState.h"
+#include "ice/information/BaseInformationStream.h"
+
 #include <sstream>
+#include <set>
 
 namespace ice
 {
@@ -414,6 +418,23 @@ std::string Node::toString()
   ss << "node(" << this->nodeDescription->toString() << "," << this->active << ")";
 
   return ss.str();
+}
+
+void Node::registerEngine(std::shared_ptr<EngineState> engineState)
+{
+  this->registeredEngines.insert(engineState);
+  engineState->nodesActivated.insert(this->shared_from_this());
+}
+
+void Node::unregisterEngine(std::shared_ptr<EngineState> engineState)
+{
+  this->registeredEngines.erase(engineState);
+  engineState->nodesActivated.erase(this->shared_from_this());
+}
+
+int Node::getRegisteredEngineCount()
+{
+  return this->registeredEngines.size();
 }
 
 } /* namespace ice */
