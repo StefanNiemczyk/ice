@@ -164,18 +164,6 @@ bool ice::InformationStore::addDescriptionsToInformationModel(std::shared_ptr<In
   std::lock_guard<std::mutex> guard(this->_mtx);
   bool returnValue = false;
 
-//  for (auto it = this->streamMap.begin(); it != this->streamMap.end(); ++it)
-//  {
-//    informationModel->getStreams()->push_back(it->second->getStreamDescription());
-//    returnValue = true;
-//  }
-
-//  for (auto it = this->streamTemplates.begin(); it != this->streamTemplates.end(); ++it)
-//  {
-//    informationModel->getStreamTemplates()->push_back(it->second->getStreamTemplateDescription());
-//    returnValue = true;
-//  }
-
   return returnValue;
 }
 

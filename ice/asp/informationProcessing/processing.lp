@@ -146,12 +146,12 @@ connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,node(k,SOURCE,
 
 % computing meta inforamtion of a node
 -maxStep(NODE,STEP) :-
-	connectToMap(NODE,stream(_,_,_,_,STEP)),
-	connectToMap(NODE,stream(_,_,_,_,STEP2)),
+	connectToMap(NODE,stream(k,_,_,_,STEP)),
+	connectToMap(NODE,stream(k,_,_,_,STEP2)),
 	STEP2 > STEP.
 
 maxStep(NODE,STEP) :-
-	connectToMap(NODE,stream(_,_,_,_,STEP)),
+	connectToMap(NODE,stream(k,_,_,_,STEP)),
 	not -maxStep(NODE,STEP).
 
 nodeMeta(node(k,SYSTEM,NODE,ENTITY,ENTITY2),STEP_MAX,COUNT) :- 
@@ -297,16 +297,16 @@ mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 0, 100) :-
 	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2).
 
 -maxStep(NODE,STEP) :-
-	connectToMap(NODE,stream(_,_,_,_,STEP)) ; connectToMap(NODE,map(_,_,_,_,STEP)),
-	connectToMap(NODE,stream(_,_,_,_,STEP2)) ; connectToMap(NODE,map(_,_,_,_,STEP2)),
+	connectToMap(NODE,stream(k,_,_,_,STEP)) ; connectToMap(NODE,map(k,_,_,_,STEP)),
+	connectToMap(NODE,stream(k,_,_,_,STEP2)) ; connectToMap(NODE,map(k,_,_,_,STEP2)),
 	STEP2 > STEP.
 
 maxStep(NODE,STEP) :-
-	connectToMap(NODE,stream(_,_,_,_,STEP)),
+	connectToMap(NODE,stream(k,_,_,_,STEP)),
 	not -maxStep(NODE,STEP).
 
 maxStep(NODE,STEP) :-
-	connectToMap(NODE,map(_,_,_,_,STEP)),
+	connectToMap(NODE,map(k,_,_,_,STEP)),
 	not -maxStep(NODE,STEP).
 
 mapMeta(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), STEP_MAX, COUNT) :- 

@@ -113,7 +113,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
       this->lastQuery->assign(false);
       this->lastQuery->release();
     }
-    ++this->queryIndex;
+
     this->lastQuery = this->asp->getExternal("query", {this->queryIndex}, "query",
                                              {this->queryIndex, 3, this->maxChainLength}, true);
   }
@@ -138,8 +138,8 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
   _log->debug("Resulting ASP Model %v", this->asp->toStringLastModel());
   std::shared_ptr<ProcessingModel> model = std::make_shared<ProcessingModel>();
 
-  // Extract processing model
-  if (false == this->extractOwn(model))
+  // Extract nodes that needs to be activated within own system
+  if (false == this->extractNodes(model->getNodes().get(), this->self))
   {
     _log->error("Optimizing failed, error by extracting own processing model");
     return nullptr;
@@ -151,6 +151,8 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
     if (this->self == system || system->getEngineState() == nullptr
         || false == system->getEngineState()->isCooperationPossible())
       continue;
+
+    _log->debug("Check if sub model exists for engine '%v'", system->getIri());
 
     std::shared_ptr<SubModel> subModel = std::make_shared<SubModel>();
     subModel->engine = system->getEngineState();
@@ -196,156 +198,6 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
   _log->info("Model successfully created");
 
   return model;
-}
-
-
-
-bool ASPModelGenerator::extractOwn(std::shared_ptr<ProcessingModel> model)
-{
-  bool valid = true;
-  std::vector<std::shared_ptr<Node>> nodes;
-
-  valid = this->extractNodes(model->getNodes().get(), this->self);
-
-//  // node(QUERY_INDEX, SYSTEM, NODE, ENTITY, ENTITY2)
-//  std::vector<Gringo::Value> values;
-//  values.push_back(this->queryIndex);
-//  values.push_back(std::string(this->self->getShortIri()));
-//  values.push_back("?");
-//  values.push_back("?");
-//  values.push_back("?");
-//
-//  Gringo::Value nodeQuery("node", values);
-//  auto queryResult = this->asp->queryAllTrue(&nodeQuery);
-//
-//  for (auto nodeValue : *queryResult)
-//  {
-//    auto nodeName = *nodeValue.args()[2].name();
-//    auto nodeEntity = *nodeValue.args()[3].name();
-//    auto nodeEntity2 = *nodeValue.args()[4].name();
-//
-//    _log->debug("Look up node '%v' to process entity '%v'", nodeName.c_str(), nodeEntity.c_str());
-//
-//    auto aspNode = this->self->getASPElementByName(nodeName);
-//
-//    if (aspNode == nullptr)
-//    {
-//      _log->error("No node '%v' found, asp system description is invalid!", nodeName.c_str());
-//      valid = false;
-//      break;
-//    }
-//
-//    auto node = this->nodeStore->registerNode(aspNode->getNodeType(), aspNode->className, aspNode->name, nodeEntity,
-//                                              nodeEntity2, aspNode->config);
-//
-//    if (node == nullptr)
-//    {
-//      _log->error("Node '%v' (%v) could not be created, asp system description is invalid!", nodeName.c_str(),
-//                  aspNode->className.c_str());
-//      valid = false;
-//      break;
-//    }
-//
-//    // connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,node(k,SOURCE,PROVIDER,ENTITY3,ENTITY4),INFO,STEP))
-//    std::vector<Gringo::Value> nodeValues;
-//    nodeValues.push_back(this->queryIndex);
-//    nodeValues.push_back(std::string(this->self->getShortIri()));
-//    nodeValues.push_back(Gringo::Value(aspNode->name));
-//    nodeValues.push_back(Gringo::Value(nodeEntity));
-//    nodeValues.push_back(Gringo::Value(nodeEntity2));
-//
-//    std::vector<Gringo::Value> streamValues;
-//    streamValues.push_back(this->queryIndex);
-//    streamValues.push_back(std::string(this->self->getShortIri()));
-//    streamValues.push_back("?");
-//    streamValues.push_back("?");
-//    streamValues.push_back("?");
-//
-//    std::vector<Gringo::Value> values;
-//    values.push_back(Gringo::Value("node", nodeValues));
-//    values.push_back(Gringo::Value("stream", streamValues));
-//
-//    Gringo::Value connectQuery("connectToNode", values);
-//    auto connectResult = this->asp->queryAllTrue(&connectQuery);
-//
-//    if (connectResult == nullptr)
-//    {
-//      _log->error("No asp model by look up of connected streams to node '%v'", aspNode->name.c_str());
-//      valid = false;
-//      break;
-//    }
-//    else
-//    {
-//      for (auto connect : *connectResult)
-//      {
-//        _log->debug("Look up connected stream for node '%v'", nodeName.c_str());
-//
-//        // get the stream connected to the node
-//        auto stream = this->getStream(connect.args()[1]);
-//
-//        if (false == stream)
-//        {
-//          std::stringstream o;
-//          o << connect;
-//          _log->error("Stream '%v' could not be created, asp system description is invalid!", o.str().c_str());
-//          valid = false;
-//          break;
-//        }
-//
-//        node->addInput(stream, true); // TODO stream is trigger?
-//      }
-//    }
-//
-//    // stream(k,SYSTEM,node(k,SOURCE,NODE,ENTITY,ENTITY2),INFO,STEP)
-//    values.clear();
-//    values.push_back(this->queryIndex);
-//    values.push_back(std::string(this->self->getShortIri()));
-//    values.push_back(Gringo::Value("node", nodeValues));
-//    values.push_back("?");
-//    values.push_back("?");
-//
-//    Gringo::Value streamQuery("stream", values);
-//    auto streamResult = this->asp->queryAllTrue(&streamQuery);
-//
-//    for (auto output : *streamResult)
-//    {
-//      _log->debug("Look up output stream for node '%v'", nodeName.c_str());
-//      auto stream = this->getStream(output);
-//
-//      if (false == stream)
-//      {
-//        std::stringstream o;
-//        o << output;
-//        _log->error("Stream '%v' could not be created, asp system description is invalid!", o.str().c_str());
-//        valid = false;
-//        break;
-//      }
-//
-//      node->addOutput(stream);
-//    }
-//
-//    nodes.push_back(node);
-//
-//    if (false == valid)
-//      break;
-//  }
-
-  // TODO interpret map
-  // TODO selected stream
-
-//  if (valid)
-//  {
-//    for (auto node : nodes)
-//    {
-//      node->activate();
-//      node->registerEngine(this->self->getEngineState());
-//    }
-//  }
-
-//  this->nodeStore->cleanUpNodes();
-//  this->informationStore->cleanUpStreams();
-
-  return valid;
 }
 
 bool ASPModelGenerator::extractedSubModel(std::shared_ptr<ASPSystem> system, std::shared_ptr<SubModel> subModel)
@@ -544,13 +396,11 @@ bool ASPModelGenerator::extractStreamTransfers(std::shared_ptr<ASPSystem> from, 
   values.push_back("?");
 
   Gringo::Value sendQuery("stream", values);
-  auto resultsSend = this->asp->queryAllTrue(&sendQuery);
+  auto results = this->asp->queryAllTrue(&sendQuery);
 
-  for (auto element : *resultsSend)
+  // get streams connected to the node
+  for (auto streamValue : *results)
   {
-    // get the stream connected to the node
-    auto streamValue = element.args()[1];
-
     auto node = streamValue.args()[2];
     auto info = streamValue.args()[3];
     auto step = streamValue.args()[4];
@@ -593,7 +443,7 @@ void ASPModelGenerator::readInfoStructureFromOntology()
   _log->debug("Extracted structure from ontology");
   _log->verbose(1, infoStructure);
 
-  std::string programPart = "ontology" + this->queryIndex;
+  std::string programPart = "ontology" + ++this->queryIndex;
   std::stringstream ss;
   std::string item;
 

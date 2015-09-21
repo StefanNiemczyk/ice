@@ -58,11 +58,6 @@ private:
   void readMetadata(std::map<std::string, int>* metadata, const Gringo::Value element);
   void readMetadata(std::string name, std::map<std::string, int> *metadata, const Gringo::Value element);
   std::string dataTypeForRepresentation(std::string representation);
-//  std::shared_ptr<BaseInformationStream> getStream(const Gringo::Value stream);
-//  std::shared_ptr<BaseInformationStream> getStream(std::string nodeName, std::string source, std::string entity,
-//                                                   std::string scope, std::string rep, std::string relatedEntity, std::map<std::string, int> metadata);
-//  std::shared_ptr<BaseInformationStream> getStream(TransferDesc &desc);
-  bool extractOwn(std::shared_ptr<ProcessingModel> model);
   bool extractedSubModel(std::shared_ptr<ASPSystem> system, std::shared_ptr<SubModel> subModel);
   bool extractNodes(vector<NodeDesc> *nodes, std::shared_ptr<ASPSystem> system);
   bool extractStreamTransfers(std::shared_ptr<ASPSystem> from, std::shared_ptr<ASPSystem> to, std::vector<TransferDesc> *transfers);

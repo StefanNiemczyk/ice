@@ -84,6 +84,13 @@ public:
   void init();
 
   /*!
+   * \brief Starts the engine.
+   *
+   * Starts the engine.
+   */
+  void start();
+
+  /*!
    * \brief Returns the time factory used by this engine.
    *
    * Returns the time factory used by this engine.

@@ -75,6 +75,15 @@ void ICEngine::init()
   this->initialized = true;
 }
 
+void ICEngine::start()
+{
+  // reading information structure from ontology
+  this->informationStore->readEntitiesFromOntology();
+
+  // creating processing model
+  this->updateStrategie->update(this->modelGenerator->createProcessingModel());
+}
+
 std::shared_ptr<TimeFactory> ICEngine::getTimeFactory()
 {
   return this->timeFactory;

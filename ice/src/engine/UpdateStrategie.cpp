@@ -348,7 +348,7 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string no
     //        std::string sourceSystem
 
     std::string dataType = this->dataTypeForRepresentation(rep);
-    std::string name = entity + "-" + nodeName + "-" + source;
+    std::string name = entity + "_" + nodeName + "_" + source;
     stream = this->informationStore->registerBaseStream(dataType, infoSpec, name, 10, metadata, nodeName, source);
   }
 

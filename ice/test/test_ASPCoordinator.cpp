@@ -20,13 +20,8 @@ TEST(ASPModelGenerator, create)
   engine->init();
 
   bool result = engine->getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
-  engine->getInformationStore()->readEntitiesFromOntology();
 
-  ASSERT_FALSE(engine->getOntologyInterface()->errorOccurred());
-  ASSERT_TRUE(result);
-
-  engine->getUpdateStrategie()->triggerModelUpdate();
-  std::this_thread::sleep_for(std::chrono::milliseconds {1000});
+  engine->start();
 
   auto spec1 = ice::InformationSpecification("testEntity1", "testEntity", "testScope1", "testRepresentation1");
   auto spec2 = ice::InformationSpecification("testEntity1", "testEntity", "testScope1", "testRepresentation2");
@@ -67,10 +62,7 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd1");
   engine->init();
   bool result = engine->getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
-  engine->getOntologyInterface()->loadOntologies();
-
-  ASSERT_FALSE(engine->getOntologyInterface()->errorOccurred());
-  ASSERT_TRUE(result);
+  engine->start();
 
   // create engine 2
   streamFactory = std::make_shared<TestFactory>();
@@ -78,10 +70,7 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd2");
   engine2->init();
   result = engine2->getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
-  engine2->getOntologyInterface()->loadOntologies();
-
-  ASSERT_FALSE(engine2->getOntologyInterface()->errorOccurred());
-  ASSERT_TRUE(result);
+  engine2->start();
 
   // wait some time to enable the engines to find each other
   std::this_thread::sleep_for(std::chrono::milliseconds {1000});
