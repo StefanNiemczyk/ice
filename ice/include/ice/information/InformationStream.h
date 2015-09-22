@@ -362,7 +362,7 @@ template<typename T>
 
     if (false == comResult)
     {
-      _log->error("No receiver returned for stream %s", std::string(this->streamDescription->getName()).c_str());
+      _log->error("No receiver returned for stream %s", this->streamDescription->getName());
       std::shared_ptr<ice::InformationReceiver> ptr;
       return ptr;
     }

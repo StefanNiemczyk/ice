@@ -41,6 +41,20 @@
         <rdfs:subClassOf rdf:resource="&Ice;IRONode"/>
         <rdfs:subClassOf>
             <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRelatedInput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasOutput"/>
                 <owl:onClass>
                     <owl:Class>
@@ -63,20 +77,6 @@
                         </owl:intersectionOf>
                     </owl:Class>
                 </owl:onClass>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasRelatedInput"/>
-                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasInput"/>
-                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -488,6 +488,33 @@
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd2">
         <rdf:type rdf:resource="&Ice;System"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream1ReqInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd1 -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd1">
+        <rdf:type rdf:resource="&Ice;System"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd2 -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd2">
+        <rdf:type rdf:resource="&Ice;System"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd3 -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd3">
+        <rdf:type rdf:resource="&Ice;System"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2ReqInd"/>
     </owl:NamedIndividual>
     
 

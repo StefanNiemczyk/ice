@@ -70,7 +70,7 @@ std::shared_ptr<BaseInformationStream> InformationStore::registerBaseStream(
   if (ptr)
   {
     _log->warn("InformationStore: Duplicated Stream with '%v', '%v', '%v'",
-                  specification->toString().c_str(), provider.c_str(), sourceSystem.c_str());
+                  specification->toString(), provider, sourceSystem);
     return ptr;
   }
 
@@ -79,14 +79,14 @@ std::shared_ptr<BaseInformationStream> InformationStore::registerBaseStream(
 
   if (stream)
   {
-    _log->debug("Created stream with '%v', '%v', '%v'", specification->toString().c_str(),
-                provider.c_str(), sourceSystem.c_str());
+    _log->debug("Created stream with '%v', '%v', '%v'", specification->toString(),
+                provider, sourceSystem);
     this->streams.push_back(stream);
   }
   else
   {
-    _log->error("Stream with '%v', '%v', '%v' could not be created", specification->toString().c_str(),
-                provider.c_str(), sourceSystem.c_str());
+    _log->error("Stream with '%v', '%v', '%v' could not be created", specification->toString(),
+                provider, sourceSystem);
   }
   return stream;
 }
@@ -109,8 +109,8 @@ std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(Informati
 std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(InformationSpecification *specification,
                                                                        std::string provider, std::string sourceSystem)
 {
-  _log->debug("Get stream by '%v', '%v', '%v'", specification->toString().c_str(), provider.c_str(),
-              sourceSystem.c_str());
+  _log->debug("Get stream by '%v', '%v', '%v'", specification->toString(), provider,
+              sourceSystem);
 
   std::vector<std::shared_ptr<BaseInformationStream>> selected;
 
@@ -185,11 +185,11 @@ void InformationStore::cleanUpStreams()
     auto stream = this->streams.at(i);
 
 
-    _log->info("Checking stream '%v', reference count %v", stream->toString().c_str(), stream.use_count());
+    _log->info("Checking stream '%v', reference count %v", stream->toString(), stream.use_count());
 
     if (stream.use_count() == 2)
     {
-      _log->info("Remove unused stream '%v'", stream->toString().c_str());
+      _log->info("Remove unused stream '%v'", stream->toString());
 
       ++counter;
       this->streams.erase(this->streams.begin() + i);

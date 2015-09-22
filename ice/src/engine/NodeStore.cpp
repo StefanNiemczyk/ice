@@ -67,7 +67,7 @@ std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::st
 
   if (node)
   {
-    _log->info("Node '%v' already registered for entity '%v' / '%v'", name.c_str(), entity.c_str(), entityRelated.c_str());
+    _log->info("Node '%v' already registered for entity '%v' / '%v'", name, entity, entityRelated);
     return node;
   }
 
@@ -82,8 +82,8 @@ std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::st
 
   if (false == node)
   {
-    _log->error("Node '%v' could not be created for entity '%v'. Register missing?", name.c_str(),
-                entity.c_str());
+    _log->error("Node '%v' could not be created for entity '%v'. Register missing?", name,
+                entity);
     return node;
   }
 
@@ -120,7 +120,7 @@ bool NodeStore::existNodeCreator(const std::string className)
 //    if (found)
 //      continue;
 //
-//    _log->info("Remove unused node %v", node->toString().c_str());
+//    _log->info("Remove unused node %v", node->toString());
 //    counter++;
 //
 //    node->deactivate();
@@ -162,7 +162,7 @@ void NodeStore::cleanUpNodes()
     if (node->getRegisteredEngineCount() > 0)
       continue;
 
-    _log->info("Remove node %v", node->toString().c_str());
+    _log->info("Remove node %v", node->toString());
     counter++;
 
     node->deactivate();
@@ -179,7 +179,7 @@ void NodeStore::cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp)
 
   for (auto node : nodesToCleanUp)
   {
-    _log->info("Remove node %v", node->toString().c_str());
+    _log->info("Remove node %v", node->toString());
     counter++;
 
     node->deactivate();

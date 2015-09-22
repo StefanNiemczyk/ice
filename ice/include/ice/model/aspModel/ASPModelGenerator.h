@@ -76,6 +76,9 @@ private:
   int maxChainLength; /**< Maximal length of a node chain */
   std::shared_ptr<supplementary::External> lastQuery; /**< The last query */
   el::Logger* _log; /**< Logger */
+
+
+  static std::mutex mtxModelGen_;
 };
 
 } /* namespace ice */

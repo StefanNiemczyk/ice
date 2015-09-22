@@ -21,6 +21,7 @@ using namespace std;
 
 namespace ice
 {
+std::mutex ASPModelGenerator::mtxModelGen_;
 
 ASPModelGenerator::ASPModelGenerator(std::weak_ptr<ICEngine> engine) :
     ProcessingModelGenerator(engine)
@@ -38,8 +39,10 @@ ASPModelGenerator::ASPModelGenerator(std::weak_ptr<ICEngine> engine) :
 
 void ASPModelGenerator::initInternal()
 {
+  std::lock_guard<std::mutex> guard(mtxModelGen_);
+
   std::string path = ros::package::getPath("ice") + "/asp/informationProcessing/";
-  _log->debug("Default ASP path %v", path.c_str());
+  _log->debug("Default ASP path %v", path);
 
   auto en = this->engine.lock();
 //  this->nodeStore = en->getNodeStore();
@@ -99,6 +102,9 @@ void ASPModelGenerator::readOntology()
 std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
 {
   _log->verbose(1, "Start model creation");
+
+  std::lock_guard<std::mutex> guard(mtxModelGen_);
+
   this->ontology->attachCurrentThread();
 
   this->readOntology();
@@ -202,7 +208,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
 
 bool ASPModelGenerator::extractedSubModel(std::shared_ptr<ASPSystem> system, std::shared_ptr<SubModel> subModel)
 {
-  _log->debug("Look up ASP elements for system '%v'", system->getIri().c_str());
+  _log->debug("Look up ASP elements for system '%v'", system->getIri());
 
   bool valid = true;
   vector<NodeDesc> nodes;
@@ -266,13 +272,13 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> *nodes, std::shared_ptr<AS
     auto nodeEntity = *nodeValue.args()[3].name();
     auto nodeEntity2 = *nodeValue.args()[4].name();
 
-    _log->debug("Look up node '%v' to process entity '%v'", nodeName.c_str(), nodeEntity.c_str());
+    _log->debug("Look up node '%v' to process entity '%v'", nodeName, nodeEntity);
 
     auto aspNode = system->getASPElementByName(nodeName);
 
     if (aspNode == nullptr)
     {
-      _log->error("No node '%v' found, asp system description is invalid!", nodeName.c_str());
+      _log->error("No node '%v' found, asp system description is invalid!", nodeName);
       valid = false;
       break;
     }
@@ -301,7 +307,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> *nodes, std::shared_ptr<AS
 
     for (auto connect : *connectResult)
     {
-      _log->debug("Look up input stream for node '%v'", nodeName.c_str());
+      _log->debug("Look up input stream for node '%v'", nodeName);
 
       // get the stream connected to the node
       auto streamValue = connect.args()[1];
@@ -343,7 +349,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> *nodes, std::shared_ptr<AS
 
     for (auto output : *streamResult)
     {
-      _log->debug("Look up output stream for node '%v'", nodeName.c_str());
+      _log->debug("Look up output stream for node '%v'", nodeName);
       auto info = output.args()[3];
       auto step = output.args()[4];
 
@@ -378,7 +384,7 @@ bool ASPModelGenerator::extractStreamTransfers(std::shared_ptr<ASPSystem> from, 
 {
   bool valid = true;
 
-  _log->debug("Look up streams transfered from '%v' to '%v'", from->getIri().c_str(), to->getIri().c_str());
+  _log->debug("Look up streams transfered from '%v' to '%v'", from->getIri(), to->getIri());
 
   // stream(k,SYSTEM_SOURCE,node(k,SYSTEM_SOURCE,NODE2,ENTITY3,ENTITY4),INFO,STEP)
   std::vector<Gringo::Value> values;
@@ -562,7 +568,7 @@ void ASPModelGenerator::readSystemsFromOntology()
 
       if (!node)
       {
-        _log->info("ASP element '%v' not found, creating new element", std::string(name).c_str());
+        _log->info("ASP element '%v' not found, creating new element", std::string(name));
         auto element = std::make_shared<ASPElement>();
         element->aspString = aspStr;
         element->name = name;
@@ -589,8 +595,8 @@ void ASPModelGenerator::readSystemsFromOntology()
             if (false == this->nodeStore->existNodeCreator(element->className))
             {
               _log->warn("Missing creator for node '%v' of type '%v', cpp grounding '%v', asp external set to false",
-                         element->name.c_str(), ASPElementTypeNames[type].c_str(),
-                         element->className == "" ? "NULL" : element->className.c_str());
+                         element->name, ASPElementTypeNames[type],
+                         element->className == "" ? "NULL" : element->className);
               element->external->assign(false);
             }
             else
@@ -644,7 +650,7 @@ std::shared_ptr<ASPSystem> ASPModelGenerator::getASPSystemByIRI(std::string p_ir
       return system;
   }
 
-  _log->info("New asp system found %v", p_iri.c_str());
+  _log->info("New asp system found %v", p_iri);
 
   int index = p_iri.find_last_of("#");
   std::string asp = (index != std::string::npos ? p_iri.substr(index + 1, p_iri.length()) : p_iri);
@@ -681,7 +687,7 @@ std::map<std::string, std::string> ASPModelGenerator::readConfiguration(std::str
 
     if (index == std::string::npos)
     {
-      _log->warn("Broken configuration '%v', skipped", item.c_str());
+      _log->warn("Broken configuration '%v', skipped", item);
     }
 
     configuration[item.substr(0, index)] = item.substr(index + 1, item.size());
@@ -714,7 +720,7 @@ void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int
   {
     std::stringstream o;
     o << element;
-    _log->warn("Wrong size '%v' for metadata '%v' of stream '%v'", result->size(), name.c_str(), o.str().c_str());
+    _log->warn("Wrong size '%v' for metadata '%v' of stream '%v'", result->size(), name, o.str());
     return;
   }
 
@@ -725,14 +731,14 @@ void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int
     std::stringstream o, o2;
     o << element;
     o2 << value;
-    _log->warn("Wrong type '%v' of '%v' for metadata '%v' of stream '%v'", value.type(), o2.str().c_str(), name.c_str(),
-               o.str().c_str());
+    _log->warn("Wrong type '%v' of '%v' for metadata '%v' of stream '%v'", value.type(), o2.str(), name,
+               o.str());
     return;
   }
 
   std::stringstream o;
   o << element;
-  _log->debug("Metadata '%v' of stream '%v' has value '%v'", name.c_str(), o.str().c_str(), value.num());
+  _log->debug("Metadata '%v' of stream '%v' has value '%v'", name, o.str(), value.num());
 
   (*metadata)[name] = value.num();
 }

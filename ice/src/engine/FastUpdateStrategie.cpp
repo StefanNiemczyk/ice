@@ -70,7 +70,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
 
       if (false == stream)
       {
-//        _log->error("Stream '%v' could not be found, model is invalid!", std::get<1>(transferTo).c_str());
+//        _log->error("Stream '%v' could not be found, model is invalid!", std::get<1>(transferTo));
         valid = false;
         break;
       }
@@ -89,7 +89,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
 
       if (false == stream)
       {
-//        _log->error("Stream '%v' could not be found, model is invalid!", std::get<1>(transferTo).c_str());
+//        _log->error("Stream '%v' could not be found, model is invalid!", std::get<1>(transferTo));
         valid = false;
         break;
       }
@@ -128,7 +128,7 @@ bool FastUpdateStrategie::handleSubModel(std::shared_ptr<EngineState> engineStat
 
 bool FastUpdateStrategie::handleSubModelResponse(std::shared_ptr<EngineState> engineState, int modelIndex)
 {
-  _log->debug("Sub model accepted received from system '%v' with index '%v'", engineState->getSystemIri().c_str(),
+  _log->debug("Sub model accepted received from system '%v' with index '%v'", engineState->getSystemIri(),
               modelIndex);
 
   auto subModel = this->getSubModelDesc(engineState);
