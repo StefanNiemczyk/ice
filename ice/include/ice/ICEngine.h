@@ -204,6 +204,8 @@ public:
 
   std::shared_ptr<UpdateStrategie> getUpdateStrategie();
 
+  bool isRunning();
+
 private:
   int readXMLInformation(XMLInformation* information, const std::string namePrefix);
 
@@ -211,6 +213,7 @@ private:
   identifier id; /**< The identifier of this engine */
   const std::string iri; /**< The iri of this engine */
   bool initialized; /**< True if the engine is initialized, else false */
+  bool running; /**< True if the engine is running, alse false */
   std::shared_ptr<TimeFactory> timeFactory; /**< time factory to create time stamps */
   std::shared_ptr<Configuration> config; /**< The configuration object */
   std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute asynchronous tasks */

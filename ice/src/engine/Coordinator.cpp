@@ -1209,6 +1209,13 @@ void Coordinator::workerTask()
 
   while (this->running)
   {
+    if (false == this->engine.lock()->isRunning())
+    {
+      std::unique_lock<std::mutex> lock(threadMtx_);
+      this->cv.wait_for(lock, std::chrono::milliseconds(1000));
+      continue;
+    }
+
     _log->info("Sending heartbeat %v, %v", counter, std::string(engineIri));
 
     {

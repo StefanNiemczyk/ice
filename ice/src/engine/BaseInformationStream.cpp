@@ -232,4 +232,10 @@ std::string BaseInformationStream::toString()
   return ss.str();
 }
 
+void BaseInformationStream::destroy()
+{
+  this->allEngineStatesUnregistered();
+  this->dropReceiver();
+}
+
 } /* namespace ice */

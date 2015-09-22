@@ -22,6 +22,7 @@ ICEngine::ICEngine(std::shared_ptr<TimeFactory> timeFactory, std::shared_ptr<Str
   this->config = config;
   this->timeFactory = timeFactory;
   this->streamFactory = streamFactory;
+  this->running = false;
 
   // TODO iri -> id
   // TODO load ontology?
@@ -32,9 +33,11 @@ ICEngine::ICEngine(std::shared_ptr<TimeFactory> timeFactory, std::shared_ptr<Str
 
 ICEngine::~ICEngine()
 {
+  this->running = false;
+
+  this->eventHandler->cleanUp();
   this->coordinator->cleanUp();
   this->communication->cleanUp();
-//  this->eventHandler;
   this->informationStore->cleanUp();
 //  this->nodeStore;
   this->modelGenerator->cleanUp();
@@ -66,6 +69,7 @@ void ICEngine::init()
   this->ontologyInterface->addIRIMapper(path + "/ontology/");
 
   // Initialize components
+  this->eventHandler->init();
   this->coordinator->init();
   this->communication->init();
   this->modelGenerator->init();
@@ -82,6 +86,8 @@ void ICEngine::start()
 
   // creating processing model
   this->updateStrategie->update(this->modelGenerator->createProcessingModel());
+
+  this->running = true;
 }
 
 std::shared_ptr<TimeFactory> ICEngine::getTimeFactory()
@@ -414,6 +420,11 @@ std::shared_ptr<InformationModel> ICEngine::getInformationModel()
 std::shared_ptr<UpdateStrategie> ICEngine::getUpdateStrategie()
 {
   return this->updateStrategie;
+}
+
+bool ICEngine::isRunning()
+{
+  return this->running;
 }
 
 } /* namespace ice */

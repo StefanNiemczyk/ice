@@ -212,11 +212,11 @@ bool ASPModelGenerator::extractedSubModel(std::shared_ptr<ASPSystem> system, std
 
   // identify streams send from self -> system
   std::vector<TransferDesc> send;
-  valid = this->extractStreamTransfers(this->self, system, &send);
+  valid = this->extractStreamTransfers(system, this->self, &send);
 
   // identify streams send from system -> self
   std::vector<TransferDesc> receive;
-  valid = this->extractStreamTransfers(system, this->self, &receive);
+  valid = this->extractStreamTransfers(this->self, system, &receive);
 
   if (false == valid)
   {

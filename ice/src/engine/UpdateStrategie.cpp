@@ -366,11 +366,13 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(TransferDesc &
   string rep = std::get<6>(desc);
   string entity2 = std::get<7>(desc);
 
-  _log->debug("Look up stream '%v'", nodeName.c_str());
-
-  auto infoSpec = make_shared<InformationSpecification>(entity, this->informationStore->getEntityType(entity), scope,
-                                                        rep, entity2);
-  return this->informationStore->getBaseStream(infoSpec.get(), nodeName, source);
+//  _log->debug("Look up stream from node '%v'", nodeName.c_str());
+//
+//  auto infoSpec = make_shared<InformationSpecification>(entity, this->informationStore->getEntityType(entity), scope,
+//                                                        rep, entity2);
+  std::map<std::string, int> metadata; //TODO
+  return this->getStream(nodeName, source, entity, scope, rep, entity2, metadata);
+//  return this->informationStore->getBaseStream(infoSpec.get(), nodeName, source);
 }
 
 std::map<std::string, std::string> UpdateStrategie::readConfiguration(std::string const config)

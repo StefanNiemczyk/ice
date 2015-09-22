@@ -40,6 +40,13 @@ void InformationStore::cleanUp()
   this->config.reset();
   this->streamFactory.reset();
   this->ontology.reset();
+
+  for(auto stream : this->streams)
+  {
+    stream->destroy();
+  }
+
+  this->streams.clear();
 }
 
 InformationStore::InformationStore(std::shared_ptr<EventHandler> eventHandler)

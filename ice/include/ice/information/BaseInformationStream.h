@@ -208,6 +208,8 @@ public:
    */
   std::string toString();
 
+  void destroy();
+
 protected:
   /*!
    * \brief This method is calls if the last engine state will be unregistered.

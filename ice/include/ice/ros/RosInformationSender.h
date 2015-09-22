@@ -76,8 +76,6 @@ template<typename ICEType, typename ROSType>
     auto msg = this->messageTransform(informationElement);
 
     msg->header.senderId.value = this->engineId;
-//    msg->header.senderId.id.resize(16);
-//    std::copy(this->engineId.begin(), this->engineId.end(), msg->header.senderId.id.begin());
 
     for (auto identifier : *sendTo)
     {

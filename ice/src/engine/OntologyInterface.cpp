@@ -173,11 +173,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
 OntologyInterface::~OntologyInterface()
 {
   this->env->DeleteLocalRef(this->javaInterface);
-  jvm->DetachCurrentThread();
-  // TODO why?
-//  jvm->DestroyJavaVM();
-  //delete this->jvm;
-  //delete this->env;
+//  jvm->DetachCurrentThread();
 }
 
 bool OntologyInterface::errorOccurred()

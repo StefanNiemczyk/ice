@@ -58,6 +58,10 @@ public:
    */
   virtual ~EventHandler();
 
+  void init();
+
+  void cleanUp();
+
   /*!
    * \brief Adds a new task to perform.
    *

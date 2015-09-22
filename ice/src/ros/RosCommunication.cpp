@@ -506,6 +506,8 @@ void RosCommunication::workerTask()
 
 void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
 {
+  if (false == this->engine.lock()->isRunning())
+    return;
   identifier senderId = msg->header.senderId.value;//IDGenerator::getInstance()->getIdentifier(msg->header.senderId.value);
 
   if (senderId == this->engineId)
@@ -520,6 +522,8 @@ void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
 
 void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr& msg)
 {
+  if (false == this->engine.lock()->isRunning())
+    return;
   identifier senderId = msg->header.senderId.value;//IDGenerator::getInstance()->getIdentifier(msg->header.senderId.value);
 
   if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)

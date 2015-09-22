@@ -86,10 +86,14 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   ASSERT_TRUE((stream2 ? true : false));
 
   // insert element in stream of system 2
+  int x = rand();
+  int y = rand();
+  int z = rand();
+
   std::unique_ptr<ice::Position> position1(new ice::Position());
-  position1->x = 3;
-  position1->y = 2;
-  position1->z = 1;
+  position1->x = x;
+  position1->y = y;
+  position1->z = z;
 
   stream1->add(std::move(position1));
 
@@ -100,7 +104,7 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   auto position2 = stream2->getLast();
 
   ASSERT_TRUE((position2 ? true : false));
-  EXPECT_EQ(3, position2->getInformation().x);
-  EXPECT_EQ(2, position2->getInformation().y);
-  EXPECT_EQ(1, position2->getInformation().z);
+  EXPECT_EQ(x, position2->getInformation().x);
+  EXPECT_EQ(y, position2->getInformation().y);
+  EXPECT_EQ(z, position2->getInformation().z);
 }

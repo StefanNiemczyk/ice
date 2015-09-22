@@ -1,7 +1,9 @@
 package de.unikassel.vs.ice;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +32,8 @@ import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 
 public class IceOntologyInterface {
+	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+
 	private OWLOntologyManager manager;
 	private OWLOntology mainOntology;
 	private Set<OWLOntology> imports;
@@ -1304,7 +1308,8 @@ public class IceOntologyInterface {
 		if (false == this.logging)
 			return;
 
-		System.out.println("java     " + p_msg);
+		System.out
+				.println(DATE_FORMAT.format(new Date()) + " JAVA  [" + this.getClass().getSimpleName() + "] " + p_msg);
 	}
 
 	public int getDefaultMinCardinality() {
