@@ -215,15 +215,15 @@ template<typename T>
     if (ptr)
     {
       _log->warn("InformationStore: Duplicated Stream with '%v', '%v', '%v'",
-                    specification->toString().c_str(), provider.c_str(), sourceSystem.c_str());
+                    specification->toString(), provider, sourceSystem);
       return ptr;
     }
 
     auto desc = std::make_shared<StreamDescription>(specification, name, provider, sourceSystem, metadata);
     auto stream = std::make_shared<InformationStream<T>>(desc, this->eventHandler, streamSize);
 
-    _log->debug("Created stream with '%v', '%v', '%v'", specification->toString().c_str(),
-                provider.c_str(), sourceSystem.c_str());
+    _log->debug("Created stream with '%v', '%v', '%v'", specification->toString(),
+                provider, sourceSystem);
     this->streams.push_back(stream);
 
     return stream;

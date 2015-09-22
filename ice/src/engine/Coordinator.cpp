@@ -151,10 +151,9 @@ int Coordinator::onEngineHeartbeat(identifier engineId, time timestamp)
     _log->verbose(1, "Update lastActiveTime of %v with %v", IDGenerator::toString(engineId),
                   timestamp);
 
-    if (engineState->getRequesting()->state == CooperationState::UNKNOWN)
+    if (this->timeFactory->checkTimeout(engineState->getTimeLastActivity(), this->config->getHeartbeatTimeout()))
     {
-      _log->info("Engine rediscovered %v, ",
-                 IDGenerator::toString(engineId));
+      _log->info("Engine rediscovered %v", IDGenerator::toString(engineId));
 
       if (engineState->isNodesKnown())
       {
@@ -202,6 +201,7 @@ int Coordinator::onSystemSpecRequest(identifier engineId)
 
     engineState->getOffering()->state = CooperationState::UNKNOWN;
   }
+  engineState->updateTimeLastActivity();
 
   // check if current request is ok at current cooperation state
   // TODO
@@ -219,7 +219,6 @@ int Coordinator::onSystemSpecRequest(identifier engineId)
                                                                                    ontologyIds->at(1));
 
   this->communication->sendSystemSpecResponse(engineId, spec);
-  engineState->updateTimeLastActivity();
 
   return 0;
 }
@@ -246,6 +245,8 @@ int Coordinator::onSystemSpec(identifier engineId,
 
      // TODO return?
    }
+
+   engineState->updateTimeLastActivity();
 
    // check if current request is ok at current cooperation state
    // TODO
@@ -317,6 +318,7 @@ int Coordinator::onSubModelRequest(identifier engineId, SubModelDesc modelDesc)
 
     // TODO return?
   }
+  engineState->updateTimeLastActivity();
 
   // check if current request is ok at current cooperation state
   // TODO
@@ -369,6 +371,7 @@ int Coordinator::onSubModelResponse(identifier engineId, int index, bool accept)
 
     return 1;
   }
+  engineState->updateTimeLastActivity();
 
   // check if current request is ok at current cooperation state
   // TODO
@@ -436,6 +439,7 @@ int Coordinator::onNegotiationFinished(identifier engineId)
 
     return 1;
   }
+  engineState->updateTimeLastActivity();
 
   // check if current request is ok at current cooperation state
   // TODO
@@ -476,6 +480,7 @@ int Coordinator::onStopCooperation(identifier engineId)
 
      return 1;
    }
+   engineState->updateTimeLastActivity();
 
    // check if current request is ok at current cooperation state
    // TODO
