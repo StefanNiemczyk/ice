@@ -165,7 +165,7 @@ private:
   const std::string provider; /*< The provider of this stream */
   const std::string sourceSystem; /**< The source system of this stream */
   std::map<std::string, int> metadatas; /*< The metadata of this stream */
-  bool shared; /**< true if the information are shared, else false */
+  bool shared; /**< true if the information is shared, else false */
   identifier id;
 };
 

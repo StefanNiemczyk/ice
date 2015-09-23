@@ -1,7 +1,9 @@
 package de.unikassel.vs.ice;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +32,8 @@ import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 
 public class IceOntologyInterface {
+	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+
 	private OWLOntologyManager manager;
 	private OWLOntology mainOntology;
 	private Set<OWLOntology> imports;
@@ -38,20 +42,6 @@ public class IceOntologyInterface {
 	private OWLDataFactory dataFactory;
 
 	private IceIris ii;
-
-	// private OWLClass systemOWLClass;
-	// private OWLClass nodeOWLClass;
-	// private OWLClass iroOWLClass;
-	// private OWLClass metadataOWLClass;
-	// private OWLClass entityTypeOWLClass;
-	// private OWLClass aspMetadataGroundingOWLClass;
-	// private OWLObjectProperty hasSystemOWLProperty;
-	// private OWLObjectProperty isSystemOfOWLProperty;
-	// private OWLObjectProperty hasMetadataOWLProperty;
-	// private OWLObjectProperty isMetadataOfOWLProperty;
-	// private OWLObjectProperty hasGroundingOWLProperty;
-	// private OWLObjectProperty isGroundingOfOWLProperty;
-	// private OWLDataProperty hasMetadataValueOWLDataProperty;
 
 	private List<String> ontologyIries;
 	private boolean dirty;
@@ -141,6 +131,30 @@ public class IceOntologyInterface {
 			this.log("Exception during saving the ontology " + e.getMessage());
 			return false;
 		}
+	}
+
+	public String[][] getOntologyIDs() {
+		String[][] ids = new String[2][this.imports.size() + 1];
+
+		ids[0][0] = this.mainOntology.getOntologyID().getOntologyIRI().toString();
+		if (this.mainOntology.getOntologyID().getVersionIRI() != null) {
+			ids[1][0] = this.mainOntology.getOntologyID().getVersionIRI().toString();
+		} else {
+			ids[1][0] = null;
+		}
+
+		int i = 1;
+		for (OWLOntology ont : this.imports) {
+			ids[0][i] = ont.getOntologyID().getOntologyIRI().toString();
+			if (ont.getOntologyID().getVersionIRI() != null) {
+				ids[1][i] = ont.getOntologyID().getVersionIRI().toString();
+			} else {
+				ids[1][i] = null;
+			}
+			++i;
+		}
+
+		return ids;
 	}
 
 	public boolean isConsistent() {
@@ -1312,7 +1326,8 @@ public class IceOntologyInterface {
 		if (false == this.logging)
 			return;
 
-		System.out.println("java     " + p_msg);
+		System.out
+				.println(DATE_FORMAT.format(new Date()) + " JAVA  [" + this.getClass().getSimpleName() + "] " + p_msg);
 	}
 
 	public int getDefaultMinCardinality() {

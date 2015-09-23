@@ -295,7 +295,7 @@ template<typename T>
       }
       else
       {
-        _log->error("No sender for stream %v", std::string(this->streamDescription->getName()).c_str());
+        _log->error("No sender for stream %v", this->streamDescription->getName());
       }
     }
 
@@ -334,7 +334,7 @@ template<typename T>
 
     if (false == comResult)
     {
-      _log->error("No sender returned for stream %v", std::string(this->streamDescription->getName()).c_str());
+      _log->error("No sender returned for stream %v", this->streamDescription->getName());
       std::shared_ptr<ice::BaseInformationSender> ptr;
       return ptr;
     }
@@ -347,7 +347,7 @@ template<typename T>
     else
     {
       _log->error("Incorrect type of sender %s for stream %s", comResult->getTypeInfo(),
-                  std::string(this->streamDescription->getName()).c_str());
+                  this->streamDescription->getName());
       std::shared_ptr<ice::BaseInformationSender> ptr;
       return ptr;
     }
@@ -362,7 +362,7 @@ template<typename T>
 
     if (false == comResult)
     {
-      _log->error("No receiver returned for stream %s", std::string(this->streamDescription->getName()).c_str());
+      _log->error("No receiver returned for stream %s", this->streamDescription->getName());
       std::shared_ptr<ice::InformationReceiver> ptr;
       return ptr;
     }

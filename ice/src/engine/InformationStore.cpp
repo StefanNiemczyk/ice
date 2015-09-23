@@ -9,6 +9,8 @@
 
 #include "ice/ICEngine.h"
 #include "ice/information/StreamFactory.h"
+#include "ice/ontology/OntologyInterface.h"
+
 #include "easylogging++.h"
 
 namespace ice
@@ -17,17 +19,34 @@ namespace ice
 InformationStore::InformationStore(std::weak_ptr<ICEngine> engine)
 {
   this->engine = engine;
-  std::shared_ptr<ICEngine> engineObject;
+  this->_log = el::Loggers::getLogger("InformationStore");
+}
 
-  if (engine.expired())
-    return;
-
-  engineObject = engine.lock();
+void InformationStore::init()
+{
+  auto engineObject = engine.lock();
 
   this->eventHandler = engineObject->getEventHandler();
   this->config = engineObject->getConfig();
   this->streamFactory = engineObject->getStreamFactory();
-  this->_log = el::Loggers::getLogger("InformationStore");
+  this->ontology = engineObject->getOntologyInterface();
+
+//  this->readEntitiesFromOntology();
+}
+
+void InformationStore::cleanUp()
+{
+  this->eventHandler.reset();
+  this->config.reset();
+  this->streamFactory.reset();
+  this->ontology.reset();
+
+  for(auto stream : this->streams)
+  {
+    stream->destroy();
+  }
+
+  this->streams.clear();
 }
 
 InformationStore::InformationStore(std::shared_ptr<EventHandler> eventHandler)
@@ -51,7 +70,7 @@ std::shared_ptr<BaseInformationStream> InformationStore::registerBaseStream(
   if (ptr)
   {
     _log->warn("InformationStore: Duplicated Stream with '%v', '%v', '%v'",
-                  specification->toString().c_str(), provider.c_str(), sourceSystem.c_str());
+                  specification->toString(), provider, sourceSystem);
     return ptr;
   }
 
@@ -60,14 +79,14 @@ std::shared_ptr<BaseInformationStream> InformationStore::registerBaseStream(
 
   if (stream)
   {
-    _log->debug("Created stream with '%v', '%v', '%v'", specification->toString().c_str(),
-                provider.c_str(), sourceSystem.c_str());
+    _log->debug("Created stream with '%v', '%v', '%v'", specification->toString(),
+                provider, sourceSystem);
     this->streams.push_back(stream);
   }
   else
   {
-    _log->error("Stream with '%v', '%v', '%v' could not be created", specification->toString().c_str(),
-                provider.c_str(), sourceSystem.c_str());
+    _log->error("Stream with '%v', '%v', '%v' could not be created", specification->toString(),
+                provider, sourceSystem);
   }
   return stream;
 }
@@ -90,8 +109,8 @@ std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(Informati
 std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(InformationSpecification *specification,
                                                                        std::string provider, std::string sourceSystem)
 {
-  _log->debug("Get stream by '%v', '%v', '%v'", specification->toString().c_str(), provider.c_str(),
-              sourceSystem.c_str());
+  _log->debug("Get stream by '%v', '%v', '%v'", specification->toString(), provider,
+              sourceSystem);
 
   std::vector<std::shared_ptr<BaseInformationStream>> selected;
 
@@ -152,18 +171,6 @@ bool ice::InformationStore::addDescriptionsToInformationModel(std::shared_ptr<In
   std::lock_guard<std::mutex> guard(this->_mtx);
   bool returnValue = false;
 
-//  for (auto it = this->streamMap.begin(); it != this->streamMap.end(); ++it)
-//  {
-//    informationModel->getStreams()->push_back(it->second->getStreamDescription());
-//    returnValue = true;
-//  }
-
-//  for (auto it = this->streamTemplates.begin(); it != this->streamTemplates.end(); ++it)
-//  {
-//    informationModel->getStreamTemplates()->push_back(it->second->getStreamTemplateDescription());
-//    returnValue = true;
-//  }
-
   return returnValue;
 }
 
@@ -176,11 +183,13 @@ void InformationStore::cleanUpStreams()
   for (int i=0; i < this->streams.size(); ++i)
   {
     auto stream = this->streams.at(i);
-    _log->info("Checking stream '%v', reference count %v", stream->toString().c_str(), stream.use_count());
+
+
+    _log->info("Checking stream '%v', reference count %v", stream->toString(), stream.use_count());
 
     if (stream.use_count() == 2)
     {
-      _log->info("Remove unused stream '%v'", stream->toString().c_str());
+      _log->info("Remove unused stream '%v'", stream->toString());
 
       ++counter;
       this->streams.erase(this->streams.begin() + i);
@@ -189,6 +198,49 @@ void InformationStore::cleanUpStreams()
   }
 
   _log->info("Clean up information store: '%v' streams are removed", counter);
+}
+
+ont::entityType InformationStore::getEntityType(ont::entity entity)
+{
+  auto it = this->entityTypeMap.find(entity);
+  if (it != this->entityTypeMap.end())
+    return it->second;
+
+  return "";
+}
+
+void InformationStore::readEntitiesFromOntology()
+{
+  _log->verbose(1, "Read entities and types from ontology");
+
+  if (this->ontology->isLoadDirty())
+    this->ontology->loadOntologies();
+
+  const char* infoStructure = this->ontology->readInformationStructureAsASP();
+
+  _log->debug("Extracted entities from ontology");
+  _log->verbose(1, infoStructure);
+
+  this->entityTypeMap.clear();
+
+  std::stringstream ss;
+  std::string item;
+
+  ss << infoStructure;
+//  delete infoStructure;
+
+  while (std::getline(ss, item, '\n'))
+  {
+    if (item.find("entity(") == 0)
+    {
+      int index1 = item.find(",");
+      int index2 = item.find(")");
+      auto entity = item.substr(7, index1 - 7);
+      auto entityType = item.substr(index1 + 1, index2 - index1 - 1);
+
+      this->entityTypeMap[entity] = entityType;
+    }
+  }
 }
 
 } /* namespace ice */

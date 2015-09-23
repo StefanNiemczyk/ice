@@ -9,8 +9,10 @@
 #define COMMUNICATION_H_
 
 #include <memory>
+#include <vector>
 
 #include "ice/Identifier.h"
+#include "ice/model/ProcessingModelGenerator.h"
 
 // Forward declarations
 namespace ice
@@ -49,6 +51,29 @@ public:
 
   virtual void sendHeartbeat() = 0;
 
+  virtual void sendSystemSpecRequest(identifier receiverId) = 0;
+
+  virtual void sendSystemSpecResponse(identifier receiverId, std::tuple<std::string, std::vector<std::string>, std::vector<std::string>> &content) = 0;
+
+//  virtual void sendNodeListRequest(identifier receiverId) = 0;
+//
+//  virtual void sendNodeListResponse(identifier receiverId, std::vector<std::string> nodeIris) = 0;
+//
+//  virtual void sendNodeSpecRequest(identifier receiverId, std::vector<std::string> nodeIris) = 0;
+//
+//  virtual void sendNodeSpecResponse(identifier receiverId, std::vector<std::string> nodeIris) = 0; // TODO
+
+  virtual void sendSubModelRequest(identifier receiverId, SubModelDesc &modelDesc) = 0;
+
+  virtual void sendSubModelResponse(identifier receiverId, int index, bool accept) = 0;
+
+  virtual void sendNegotiationFinished(identifier receiverId) = 0;
+
+  virtual void sendStopCooperation(identifier receiverId) = 0;
+
+//---------------------------------------------------------------------------------------------------
+  // OLD
+
   virtual void sendInformationRequest(identifier receiverId) = 0;
 
   virtual void sendInformationModel(identifier receiverId, std::shared_ptr<InformationModel> informationModel) = 0;
@@ -61,13 +86,13 @@ public:
 
   virtual void sendCooperationAccept(identifier receiverId) = 0;
 
-  virtual void sendNegotiationFinished(identifier receiverId) = 0;
+//  virtual void sendNegotiationFinished(identifier receiverId) = 0;
 
   virtual void sendRetryNegotiation(identifier receiverId) = 0;
 
-  virtual void sendStopCooperation(identifier receiverId) = 0;
-
   virtual void sendCooperationStopped(identifier receiverId) = 0;
+
+//---------------------------------------------------------------------------------------------------
 
   virtual std::shared_ptr<BaseInformationSender> registerStreamAsSender(std::shared_ptr<BaseInformationStream> stream) = 0;
 

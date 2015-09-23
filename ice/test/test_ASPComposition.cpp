@@ -36,8 +36,8 @@ TEST(ClingWrap, simpleTest)
   cw->ground("entity", {"entity1", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", 10}, true);
+  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -146,8 +146,8 @@ TEST(ClingWrap, simpleTestQuery)
   cw->ground("entity", {"entity1", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", 10}, true);
+  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -203,6 +203,7 @@ TEST(ClingWrap, simpleTestQuery)
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2),90)"));
 
   query1->assign(false);
+  query1->release();
   auto query2 = cw->getExternal("query", {2}, "query", {2,3,10}, true);
 
   input3->assign(true);
@@ -220,6 +221,8 @@ TEST(ClingWrap, simpleTestQuery)
 
   node1->assign(false);
   query2->assign(false);
+  query2->release();
+//  query2->assign(false);
   auto query3 = cw->getExternal("query", {3}, "query", {3,3,10}, true);
   cw->solve();
 //  cw->printLastModel();
@@ -248,8 +251,8 @@ TEST(ClingWrap, informationTranslation)
   cw->ground("entity", {"nase", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "nase", "position", "coords", "none", 0, 90, 1});
@@ -269,8 +272,7 @@ TEST(ClingWrap, informationTranslation)
   // add translation
   cw->add("coords2Wgs84", {}, "#external iro(system1,coords2Wgs84,any,none).");
   auto coords2Wgs84 = cw->getExternal("iro", {"system1", "coords2Wgs84", "any", "none"}, "coords2Wgs84", {}, true);
-  cw->add("coords2Wgs84", {},
-          "input(system1,coords2Wgs84,position,coords,none,1,1) :- iro(system1,coords2Wgs84,any,none).");
+  cw->add("coords2Wgs84", {}, "input(system1,coords2Wgs84,position,coords,none,1,1).");
   cw->add("coords2Wgs84", {}, "output(system1,coords2Wgs84,position,wgs84,none).");
   cw->add("coords2Wgs84", {}, "metadataOutput(delay,system1,coords2Wgs84,max,1,0).");
   cw->add("coords2Wgs84", {}, "metadataOutput(accuracy,system1,coords2Wgs84,avg,1,0).");
@@ -302,8 +304,8 @@ TEST(ClingWrap, ego2allo)
   cw->ground("entity", {"bart", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "nase", "position", "coords", "none", 0, 90, 1});
@@ -364,11 +366,11 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   cw->add("base", {}, "hasScope(type,scope1).");
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", 10}, true);
-  auto system3 = cw->getExternal("system", {"system3", 10}, true);
-  auto system4 = cw->getExternal("system", {"system4", 10}, true);
-  auto system5 = cw->getExternal("system", {"system5", 10}, true);
+  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 10}, true);
+  auto system3 = cw->getExternal("system", {"system3", "default"}, "system", {"system1", 10}, true);
+  auto system4 = cw->getExternal("system", {"system4", "default"}, "system", {"system1", 10}, true);
+  auto system5 = cw->getExternal("system", {"system5", "default"}, "system", {"system1", 10}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -441,9 +443,9 @@ TEST(ClingWrap, mapFusion)
   cw->add("base", {}, "hasScope(type,scope1).");
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", 10}, true);
-  auto system3 = cw->getExternal("system", {"system3", 10}, true);
+  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 10}, true);
+  auto system3 = cw->getExternal("system", {"system3", "default"}, "system", {"system1", 10}, true);
 //  auto system4 = cw->getExternal("system", {"system4", 10}, true);
 //  auto system5 = cw->getExternal("system", {"system5", 10}, true);
 
@@ -537,7 +539,7 @@ TEST(ClingWrap, noInputTest)
   cw->ground("entity", {"entity1", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -557,7 +559,7 @@ TEST(ClingWrap, noInputTest)
   cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
   cw->add("node1", {}, "output(system1,node1,scope1,rep1,none).");
   cw->add("node1", {}, "metadataOutput(delay,system1,node1,min,1,0).");
-  cw->add("node1", {}, "metadataProcessing(cost,system1,node1,1).");
+  cw->add("node1", {}, "metadataProcessing(cost,system1,node1,3).");
   cw->add("node1", {}, "metadataOutput(accuracy,system1,node1,min,5,0).");
   cw->ground("node1", {});
 
@@ -726,7 +728,7 @@ TEST(ClingWrap, nodeUsedTwiced)
   cw->ground("entity", {"entity2", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});

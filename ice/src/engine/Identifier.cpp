@@ -6,18 +6,25 @@
  */
 
 #include "ice/Identifier.h"
+
 #include <iostream>
 
 namespace ice {
 
 std::string IDGenerator::toString(identifier id)
 {
-  return boost::lexical_cast<std::string>(id);
+  return std::to_string(id);
+//  return boost::lexical_cast<std::string>(id);
 }
 
-const uint8_t* IDGenerator::toByte(identifier id)
+const std::unique_ptr<char[]> IDGenerator::toByte(identifier id)
 {
-  return id.data;
+  std::unique_ptr<char[]> bytes(new char[sizeof id]);
+  std::copy(static_cast<const char*>(static_cast<const void*>(&id)),
+            static_cast<const char*>(static_cast<const void*>(&id)) + sizeof id,
+            bytes.get());
+
+  return std::move(bytes);
 }
 
 const int IDGenerator::compare(identifier identifier1, identifier identifier2)
@@ -43,22 +50,31 @@ IDGenerator::~IDGenerator()
 
 identifier IDGenerator::getIdentifier()
 {
-  return boost::uuids::random_generator()();
+  static int counter = 1;
+  return ++counter;
+ // return boost::uuids::random_generator()();
 }
 
 identifier IDGenerator::getIdentifier(std::string value)
 {
-  return boost::lexical_cast<boost::uuids::uuid>(value);
+  return std::stoi(value);
+//  return boost::lexical_cast<boost::uuids::uuid>(value);
 }
 
-identifier IDGenerator::getIdentifier(std::vector<uint8_t> value)
+identifier IDGenerator::getIdentifier(char* value)
 {
-  boost::uuids::uuid uuid;
+  int id;
 
-  for (int i=0; i < 16; ++i)
-    uuid.data[i] = value.at(i);
+  std::copy(value, value + sizeof id, &id);
 
-  return uuid;
+  return id;
+
+//  boost::uuids::uuid uuid;
+//
+//  for (int i=0; i < 16; ++i)
+//    uuid.data[i] = value.at(i);
+//
+//  return uuid;
 }
 
 } /* namespace ice */

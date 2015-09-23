@@ -75,14 +75,13 @@ template<typename ICEType, typename ROSType>
   {
     auto msg = this->messageTransform(informationElement);
 
-    msg->header.senderId.id.resize(16);
-    std::copy(this->engineId.begin(), this->engineId.end(), msg->header.senderId.id.begin());
+    msg->header.senderId.value = this->engineId;
 
     for (auto identifier : *sendTo)
     {
       ice_msgs::Identifier receiver;
-      receiver.id.resize(16);
-      std::copy(identifier.begin(), identifier.end(), receiver.id.begin());
+      receiver.value = identifier;
+     // std::copy(identifier.begin(), identifier.end(), receiver.id.begin());
       msg->header.receiverIds.push_back(receiver);
     }
 

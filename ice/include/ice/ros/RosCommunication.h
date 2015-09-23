@@ -32,6 +32,11 @@ namespace ice
 {
 enum RosCoordinationCommand
 {
+  SYSTEM_SPEC_REQUEST,
+  SYSTEM_SPEC_RESPONSE,
+  SUB_MODEL_REQUEST,
+  SUB_MODEL_RESPONSE,
+
   REQUEST_INFORMATION_MODEL, //< Command to request an information model
   COOPERATION_ACCEPT, //< Command to accept the cooperation response
   COOPERATION_REFUSE, //< Command to refuse the cooperation response
@@ -42,8 +47,7 @@ enum RosCoordinationCommand
 };
 
 static const char* RosCoordinationCommandString[7] = {"REQUEST_INFORMATION_MODEL", "COOPERATION_ACCEPT",
-                                                      "COOPERATION_REFUSE",
-                                                       "NEGOTIATION_FINISHED", "NEGOTIATION_RETRY", "STOP_COOPERATION", "COOPERATION_STOPPED"};
+                                                      "COOPERATION_REFUSE", "NEGOTIATION_FINISHED", "NEGOTIATION_RETRY", "STOP_COOPERATION", "COOPERATION_STOPPED"};
 
 class RosCommunication : public Communication
 {
@@ -57,6 +61,20 @@ public:
 
   virtual void sendHeartbeat();
 
+  virtual void sendSystemSpecRequest(identifier receiverId);
+
+  virtual void sendSystemSpecResponse(identifier receiverId, std::tuple<std::string, std::vector<std::string>, std::vector<std::string>> &content);
+
+  virtual void sendSubModelRequest(identifier receiverId, SubModelDesc &modelDesc);
+
+  virtual void sendSubModelResponse(identifier receiverId, int index, bool accept);
+
+  virtual void sendStopCooperation(identifier receiverId);
+
+  virtual void sendNegotiationFinished(identifier receiverId);
+
+   // -----------------------------------------------------------------------
+
   virtual void sendInformationRequest(identifier receiverId);
 
   virtual void sendInformationModel(identifier receiverId, std::shared_ptr<InformationModel> informationModel);
@@ -69,13 +87,11 @@ public:
 
   virtual void sendCooperationAccept(identifier receiverId);
 
-  virtual void sendNegotiationFinished(identifier receiverId);
-
   virtual void sendRetryNegotiation(identifier receiverId);
 
-  virtual void sendStopCooperation(identifier receiverId);
-
   virtual void sendCooperationStopped(identifier receiverId);
+
+  // -----------------------------------------------------------------------
 
   virtual std::shared_ptr<BaseInformationSender> registerStreamAsSender(std::shared_ptr<BaseInformationStream> type);
 
@@ -110,6 +126,8 @@ public:
 
 private:
   bool checkReceiverIds(ice_msgs::ICEHeader header);
+  void sendCoordinationMsg(identifier receiverId, RosCoordinationCommand command);
+  void sendCoordinationMsg(identifier receiverId, RosCoordinationCommand command, std::vector<uint8_t> &bytes);
 
 private:
   ros::NodeHandle nodeHandel; /**< Ros node handle */

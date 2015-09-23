@@ -14,6 +14,28 @@ namespace ice
 EventHandler::EventHandler(std::weak_ptr<ICEngine> engine)
 {
   this->engine = engine;
+  this->running = false;
+}
+
+EventHandler::EventHandler(const int numThreads, const int bufferSize)
+{
+  this->taskBuffer = std::unique_ptr<Buffer<AsynchronousTask> >(new Buffer<AsynchronousTask>(bufferSize, false));
+  this->running = true;
+
+  //initialize threads
+  for (int i = 0; i < numThreads; ++i)
+  {
+    this->threadPool.push_back(std::thread(&EventHandler::performTask, this, i));
+  }
+}
+
+EventHandler::~EventHandler()
+{
+  //
+}
+
+void EventHandler::init()
+{
   std::shared_ptr<Configuration> config;
 
   if (engine.expired())
@@ -31,19 +53,7 @@ EventHandler::EventHandler(std::weak_ptr<ICEngine> engine)
   }
 }
 
-EventHandler::EventHandler(const int numThreads, const int bufferSize)
-{
-  this->taskBuffer = std::unique_ptr<Buffer<AsynchronousTask> >(new Buffer<AsynchronousTask>(bufferSize, false));
-  this->running = true;
-
-  //initialize threads
-  for (int i = 0; i < numThreads; ++i)
-  {
-    this->threadPool.push_back(std::thread(&EventHandler::performTask, this, i));
-  }
-}
-
-EventHandler::~EventHandler()
+void EventHandler::cleanUp()
 {
   //stopping all threads
   this->running = false;

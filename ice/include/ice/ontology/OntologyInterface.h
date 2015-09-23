@@ -12,6 +12,7 @@
 #include <iostream>
 #include <jni.h>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -38,9 +39,12 @@ public:
   bool loadOntologies();
   bool loadOntology(std::string const p_path);
   bool saveOntology(std::string const p_path);
+  std::unique_ptr<std::vector<std::vector<std::string>>> getOntologyIDs();
+  std::unique_ptr<std::vector<std::string>> compareOntologyIDs(std::vector<std::string>* ids, std::vector<std::string>* versions);
   bool initReasoner(bool const p_force);
   bool isConsistent();
-  std::unique_ptr<std::vector<const char*>> getSystems();
+  std::unique_ptr<std::vector<std::string>> getSystems();
+  bool isSystemKnown(std::string const p_system);
   bool addSystem(std::string const p_system);
   bool addNodesToSystem(std::string const p_system, std::vector<std::string> p_toAdd);
   bool addIndividual(std::string const p_individual, std::string const p_class);
@@ -92,8 +96,13 @@ public:
   bool isSystemDirty();
   bool isLoadDirty();
 
+  void attachCurrentThread();
+  void detachCurrentThread();
+
 private:
   bool checkError(std::string p_method, std::string p_error);
+  void readSystemsFromOntology();
+  void readOntologyIDsFromOntology();
 
 private:
   el::Logger* _log; /**< Logger */
@@ -103,12 +112,18 @@ private:
   bool informationDirty; /**< Flag to check if the information model was changed */
   bool systemDirty; /**< Flag to check if the system model was changed */
   bool loadDirty; /**< Flag to check if the ontology needs to be loaded again */
+  std::vector<std::string> knownSystem; /**< List of known systems */
+  std::vector<std::vector<std::string>> ontologyIds; /**< List of ontology iris and version iris */
+  std::string informationStructure; /**< The information structure */
+  std::mutex mtx_; /**< Mutex */
+
   jclass javaOntologyInterface; /**< java class to access the ontology */
   jobject javaInterface; /**< java interface object */
   jmethodID addIRIMapperMethod; /**< Method id */
   jmethodID loadOntologiesMethod; /**< Method id */
   jmethodID loadOntologyMethod; /**< Method id */
   jmethodID saveOntologyMethod; /**< Method id */
+  jmethodID getOntologyIDsMethod; /**< Method id */
   jmethodID initReasonerMethod; /**< Method id */
   jmethodID isConsistentMethod; /**< Method id */
   jmethodID getSystemsMethod; /**< Method id */

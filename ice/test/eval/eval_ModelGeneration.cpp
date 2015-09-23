@@ -7,18 +7,18 @@ using namespace std;
 TEST(EvalModelGeneration, simpleEvalTests)
 {
   std::string path = "/home/sni/Desktop/eval";
-  int runs = 10;
+  int runs = 3;
 
   EvalScenarios scenarios2(path + "", [&] (supplementary::ClingWrapper *asp){
-    asp->setPredefConfiguration(supplementary::PredefinedConfigurations::jumpy);
+    asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
   });
   //                                 global      verbose gnuplot         runs
 //  scenarios2.representationScenario( true,       false,  true,          runs,      2, 10, 1);
-//  scenarios2.systemsStarMashScenario(true,       false,  false,          runs,      true, 10, 150, 1, 1, 149, 1);
-//  scenarios2.systemsStarMashScenario(true,       false,  false,          runs,      false, 100, 100, 1, 2, 2, 1);
-//  scenarios2.systemsFullMashScenario(true,       false,  false,          runs,      10, 20, 1);
-    scenarios2.chainScenario(          true,       true,  false,          runs,      10, 10, 1, 10, 10, 1);
-//    scenarios2.islandScenario(          true,       true,  false,          runs,      10, 10, 1, 10, 10, 1);
+//  scenarios2.systemsStarMashScenario(true,       false,  true,          runs,      true, 10, 150, 10, 10, 50, 10);
+//  scenarios2.systemsStarMashScenario(true,       false,  true,          runs,      false, 100, 180, 10, 10, 50, 10);
+  scenarios2.systemsFullMashScenario(true,       false,  true,          runs,      10, 100, 10, 10, 20, 10);
+//    scenarios2.chainScenario(          true,       true,  true,          runs,      2, 10, 1, 10, 10, 1);
+//    scenarios2.islandScenario(          true,       true,  true,          runs,      5, 10, 1, 30, 30, 1);
 
 
   runs = 1;

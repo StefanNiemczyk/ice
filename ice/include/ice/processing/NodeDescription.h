@@ -23,7 +23,9 @@ namespace ice
 enum NodeType
 {
   PROCESSING, //!< PROCESSING Processing node, has inputs and outputs
-  SOURCE     //!< SOURCE Source node, only outputs
+  SOURCE,     //!< SOURCE Source node, only outputs
+  IRO,        //!< IRO IRO node, transforms information between representations
+  MAP         //!< MAP Map node creates or processes maps
 };
 
 //* NodeDescription
@@ -43,7 +45,7 @@ public:
    * \param name The name of the node.
    * \param entity The entity processed by this node.
    */
-  NodeDescription(const NodeType type, const std::string className, const std::string name, const ont::entity entity);
+  NodeDescription(const NodeType type, const std::string className, const std::string name, const ont::entity entity, const ont::entity entityRelated);
 
   /**
    * \brief Default destructor
@@ -62,6 +64,8 @@ public:
   NodeType getType() const;
 
   ont::entity getEntity() const;
+
+  ont::entity getEntityRelated() const;
 
 //  void setType(NodeType type);
 
@@ -136,7 +140,8 @@ private:
   const NodeType type; /**< Type of the node */
   const std::string className; /**< Name of the class of the node */
   const std::string name; /**< The name of the node */
-  const ont::entity entity; /**< The Entity processed by this node */
+  const ont::entity entity; /**< The entity processed by this node */
+  const ont::entity entityRelated; /**< The related entity processed by this node */
   std::string source; /**< The source of this note, only set if this is a source node */
 //  const std::vector<StreamDescription> inputs; /**< Descriptions of input streams */
 //  const std::vector<StreamDescription> outputs; /**< Descriptions of output streams */

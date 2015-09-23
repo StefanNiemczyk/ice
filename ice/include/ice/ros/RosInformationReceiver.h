@@ -96,7 +96,7 @@ template<typename ICEType, typename ROSType>
   {
     for (auto id : header.receiverIds)
     {
-      identifier receiverId = IDGenerator::getInstance()->getIdentifier(id.id);
+      identifier receiverId = id.value;//IDGenerator::getInstance()->getIdentifier(id.id);
 
       if (receiverId == this->engineId)
         return true;

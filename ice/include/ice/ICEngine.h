@@ -38,6 +38,12 @@
 #include "ice/processing/NodeStore.h"
 #include "ice/ros/RosCommunication.h"
 
+// Forward declarations
+namespace ice
+{
+class UpdateStrategie;
+} /* namespace ice */
+
 namespace ice
 {
 
@@ -76,6 +82,13 @@ public:
    * Initialize the engine.
    */
   void init();
+
+  /*!
+   * \brief Starts the engine.
+   *
+   * Starts the engine.
+   */
+  void start();
 
   /*!
    * \brief Returns the time factory used by this engine.
@@ -189,6 +202,10 @@ public:
 
   std::string getIri() const;
 
+  std::shared_ptr<UpdateStrategie> getUpdateStrategie();
+
+  bool isRunning();
+
 private:
   int readXMLInformation(XMLInformation* information, const std::string namePrefix);
 
@@ -196,6 +213,7 @@ private:
   identifier id; /**< The identifier of this engine */
   const std::string iri; /**< The iri of this engine */
   bool initialized; /**< True if the engine is initialized, else false */
+  bool running; /**< True if the engine is running, alse false */
   std::shared_ptr<TimeFactory> timeFactory; /**< time factory to create time stamps */
   std::shared_ptr<Configuration> config; /**< The configuration object */
   std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute asynchronous tasks */
@@ -207,6 +225,7 @@ private:
   std::shared_ptr<ModelComperator> modelComperator; /**< Comparator to find similarities in different information model */
   std::shared_ptr<OntologyInterface> ontologyInterface; /*< Interface to access the ontology */
   std::shared_ptr<ProcessingModelGenerator> modelGenerator; /*< Processing model generator */
+  std::shared_ptr<UpdateStrategie> updateStrategie; /**< Update strategie to modify the information processing */
   std::mutex mtx_; /**< Mutex */
 };
 

@@ -1,6 +1,7 @@
 package de.unikassel.vs.ice;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -91,6 +92,7 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 		if (false == this.ioi.isLogging())
 			return;
 
-		System.out.println("java     " + p_msg);
+		System.out
+				.println(DATE_FORMAT.format(new Date()) + " JAVA  [" + this.getClass().getSimpleName() + "] " + p_msg);
 	}
 }

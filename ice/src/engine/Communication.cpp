@@ -20,6 +20,7 @@ namespace ice
 Communication::Communication(std::weak_ptr<ICEngine> engine)
 {
   this->engine = engine;
+  this->engineId = engine.lock()->getId();
   this->_log = el::Loggers::getLogger("Communication");
 }
 
@@ -32,7 +33,6 @@ void Communication::init()
 {
   auto e = engine.lock();
   this->coordinator = e->getCoordinator();
-  this->engineId = e->getId();
   this->eventHandler = e->getEventHandler();
 }
 

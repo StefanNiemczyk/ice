@@ -173,9 +173,12 @@ add_library(${PROJECT_NAME}
 #  src/engine/InformationType.cpp
   src/engine/StreamFactory.cpp
   
+  src/engine/ProcessingModel.cpp
   src/engine/ProcessingModelGenerator.cpp
   src/engine/ASPSystem.cpp
   src/engine/ASPModelGenerator.cpp
+  src/engine/FastUpdateStrategie.cpp
+  src/engine/UpdateStrategie.cpp
   
   src/engine/OntologyInterface.cpp
   
@@ -201,7 +204,8 @@ add_executable(ice_node src/node/ice_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(ice_node ice_generate_messages_cpp)
+add_dependencies(ice ice_msgs_generate_messages_cpp)
+add_dependencies(ice_node ice_msgs_generate_messages_cpp)
 add_dependencies(ice_node java_ontology_interface)
 
 ## Specify libraries to link a library or executable target against
@@ -253,17 +257,17 @@ target_link_libraries(ice_node
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test 
-  # test/eval/eval_ModelGeneration.cpp
-  # test/eval/ModelGeneration.cpp
-  # test/eval/EvalScenarios.cpp
+ # test/eval/eval_ModelGeneration.cpp
+ # test/eval/ModelGeneration.cpp
+ # test/eval/EvalScenarios.cpp
  # test/eval/eval_AccessSpeed.cpp
-   
  # test/etc/TestTime.cpp
  # test/etc/EngineStuff.cpp
  # test/test_ASPComposition.cpp
  # test/test_ASPRepComputation.cpp
   test/test_JNI.cpp
  # test/test_ASPCoordinator.cpp
+ # test/test_serialize.cpp
  # test/test_RingBuffer.cpp
  # test/test_Buffer.cpp
  # test/test_InformationStore.cpp
@@ -274,7 +278,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/test_Node.cpp
  # test/test_ModelComperator.cpp
  # test/test_ICEngine.cpp
-  test/test_Representation.cpp
+ # test/test_Representation.cpp
   test/test_main.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
 )

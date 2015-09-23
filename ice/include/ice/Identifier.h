@@ -8,18 +8,18 @@
 #ifndef IDENTIFIER_H_
 #define IDENTIFIER_H_
 
-#include <string.h>
-#include <vector>
+#include <memory>
+#include <string>
 
-#include "boost/lexical_cast.hpp"
-#include "boost/uuid/uuid.hpp"
-#include "boost/uuid/uuid_generators.hpp"
-#include "boost/uuid/uuid_io.hpp"
+//#include "boost/lexical_cast.hpp"
+//#include "boost/uuid/uuid.hpp"
+//#include "boost/uuid/uuid_generators.hpp"
+//#include "boost/uuid/uuid_io.hpp"
 
 namespace ice
 {
 /** Type definition of the time data type */
-typedef boost::uuids::uuid identifier;
+typedef int identifier;
 
 //* IDGenerator
 /**
@@ -30,9 +30,9 @@ class IDGenerator
 {
 public:
   /*!
-   * \brief Returns a pointer to the singleton object;
+   * \brief Returns a pointer to the singleton object.
    *
-   * Returns a pointer to the singleton object;
+   * Returns a pointer to the singleton object.
    */
   static IDGenerator* getInstance()
   {
@@ -52,7 +52,7 @@ public:
    *
    * Transforms the identifier to a std::string.
    */
-  static const uint8_t* toByte(identifier id);
+  static const std::unique_ptr<char[]> toByte(identifier id);
 
   /*!
    * \brief Compares two identifiers.
@@ -100,7 +100,7 @@ public:
    *
    * @param value String of the identifier.
    */
-  identifier getIdentifier(std::vector<uint8_t> value);
+  identifier getIdentifier(char* value);
 };
 
 } /* namespace ice */
