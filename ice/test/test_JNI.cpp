@@ -959,7 +959,6 @@ TEST(JNITest, save)
 
   EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
->>>>>>> master
 
 //TEST(JNITest, create)
 //{
@@ -2223,6 +2222,54 @@ TEST(JNITest, representationVector)
 
   std::unique_ptr<ice::RepresentationFactory> fac = oi.readRepresentations();
   fac->printReps();
+}
+
+TEST(JNITest, representationContainer)
+{
+  // Given a valid empty ice ontology
+  std::string path = ros::package::getPath("ice");
+  bool result;
+
+  ice::OntologyInterface oi(path + "/java/lib/");
+
+  oi.addIRIMapper(path + "/ontology/");
+
+  ASSERT_FALSE(oi.errorOccurred());
+
+  result = oi.addOntologyIRI(
+      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.loadOntologies();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.isConsistent();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  // -----
+
+  const int val = 123;
+
+  std::unique_ptr<ice::RepresentationFactory> fac = oi.readRepresentations();
+  fac->getRepMap();
+
+  ice::Representation *integerRep = fac->getRepMap()->at("IntegerNumericalRepresentation");
+  ice::RepresentationInstance *inst = new ice::RepresentationInstance(integerRep, val);
+  
+  (*fac->getInstanceMap())["testInt"] = inst;
+  
+  ice::RepresentationInstance *instGot = fac->getInstanceMap()->at("testInt");
+  
+  int *valGot = instGot->get<int>();
+  
+  ASSERT_EQ(val, *valGot);
+
 }
 
 }

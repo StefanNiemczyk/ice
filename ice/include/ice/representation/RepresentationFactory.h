@@ -8,13 +8,13 @@
 #ifndef ICE_ICE_INCLUDE_ICE_REPRESENTATION_REPRESENTATIONFACTORY_H_
 #define ICE_ICE_INCLUDE_ICE_REPRESENTATION_REPRESENTATIONFACTORY_H_
 
-#include <ice/representation/Representation.h>
 #include <string>
 #include <vector>
 #include <memory>
 #include <map>
 
 #include "Representation.h"
+#include "RepresentationInstance.h"
 
 namespace ice {
 
@@ -30,14 +30,17 @@ public:
   std::shared_ptr<std::vector<Representation*>> getRepVec();
   std::shared_ptr<std::map<std::string, Representation*>> getRepMap();
 
+  std::shared_ptr<std::map<std::string, RepresentationInstance*>> getInstanceMap();
+
   void printReps();
 
 private:
   std::shared_ptr<std::vector<Representation*>> repVec;
   std::shared_ptr<std::map<std::string, Representation*>> repMap;
 
-  Representation* addOrGet(std::string name);
+  std::shared_ptr<std::map<std::string, RepresentationInstance*>> repInstanceMap;
 
+  Representation* addOrGet(std::string name);
 };
 
 }  // namespace ice
