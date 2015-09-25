@@ -30,7 +30,7 @@ public:
   std::shared_ptr<std::vector<Representation*>> getRepVec();
   std::shared_ptr<std::map<std::string, Representation*>> getRepMap();
 
-  std::shared_ptr<std::map<std::string, RepresentationInstance*>> getInstanceMap();
+  std::shared_ptr<std::map<std::string, BaseRepresentationInstance*>> getInstanceMap();
 
   void printReps();
 
@@ -38,7 +38,7 @@ private:
   std::shared_ptr<std::vector<Representation*>> repVec;
   std::shared_ptr<std::map<std::string, Representation*>> repMap;
 
-  std::shared_ptr<std::map<std::string, RepresentationInstance*>> repInstanceMap;
+  std::shared_ptr<std::map<std::string, BaseRepresentationInstance*>> repInstanceMap;
 
   Representation* addOrGet(std::string name);
 };

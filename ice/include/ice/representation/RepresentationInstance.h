@@ -5,29 +5,22 @@
 
 namespace ice {
 
+class BaseRepresentationInstance {};
 
-class RepresentationInstance {
+template<class T>
+class RepresentationInstance : public BaseRepresentationInstance {
 public:
 
-  template<typename T>
   RepresentationInstance(Representation *rep, T val)
   {
     representation = rep;
-
-    T *p = new T;
-    *p = val;
-    data = (void*)p;
-    
+    data = new T;
+    *data = val;
   }
 
   Representation *representation;
-  void *data;
+  T *data;
   
-  template<typename T>
-  T* get() {
-    T* p = reinterpret_cast<T*>(data);
-    return p;
-  }
 };
 
 }

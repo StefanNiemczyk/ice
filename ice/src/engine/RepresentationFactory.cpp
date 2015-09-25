@@ -21,7 +21,7 @@ RepresentationFactory::RepresentationFactory()
 {
   repVec = std::make_shared<std::vector<Representation*>>();
   repMap = std::make_shared<std::map<std::string, Representation*>>();
-  repInstanceMap = std::make_shared<std::map<std::string, RepresentationInstance*>>();
+  repInstanceMap = std::make_shared<std::map<std::string, BaseRepresentationInstance*>>();
 }
 
 RepresentationFactory::~RepresentationFactory()
@@ -94,7 +94,7 @@ std::shared_ptr<std::map<std::string, Representation*>> RepresentationFactory::g
   return repMap;
 }
 
-std::shared_ptr<std::map<std::string, RepresentationInstance*>> RepresentationFactory::getInstanceMap() {
+std::shared_ptr<std::map<std::string, BaseRepresentationInstance*>> RepresentationFactory::getInstanceMap() {
   return repInstanceMap;
 }
 

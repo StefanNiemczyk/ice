@@ -2259,16 +2259,21 @@ TEST(JNITest, representationContainer)
   std::unique_ptr<ice::RepresentationFactory> fac = oi.readRepresentations();
   fac->getRepMap();
 
+  // Create instance using integer representation
   ice::Representation *integerRep = fac->getRepMap()->at("IntegerNumericalRepresentation");
-  ice::RepresentationInstance *inst = new ice::RepresentationInstance(integerRep, val);
-  
+  ice::RepresentationInstance<int> *inst = new ice::RepresentationInstance<int>(integerRep, val);
+
+  // Put it in map
   (*fac->getInstanceMap())["testInt"] = inst;
-  
-  ice::RepresentationInstance *instGot = fac->getInstanceMap()->at("testInt");
-  
-  int *valGot = instGot->get<int>();
-  
+
+  // Retreive it from map again
+  ice::BaseRepresentationInstance *instRaw = fac->getInstanceMap()->at("testInt"); 
+  ice::RepresentationInstance<int> *instGot = reinterpret_cast<ice::RepresentationInstance<int>*>(instRaw);
+
+  // Check if equal
+  int *valGot = instGot->data;
   ASSERT_EQ(val, *valGot);
+
 
 }
 
