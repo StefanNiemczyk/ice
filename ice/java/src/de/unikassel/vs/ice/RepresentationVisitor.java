@@ -3,8 +3,11 @@ package de.unikassel.vs.ice;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
+import java.util.TreeSet;
 
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -97,12 +100,17 @@ public class RepresentationVisitor extends IceVisitor {
 
 	private final HashMap<String, Representation> representations = new HashMap<String, Representation>();
 
-	public RepresentationVisitor(final IceOntologyInterface ioi, final Set<OWLOntology> ontologies,
-			final OWLReasoner reasoner, final IceIris iceIris) {
+	private final Stack<OWLClass> searchStack = new Stack<OWLClass>();
+	private final HashSet<OWLClass> visited = new HashSet<OWLClass>();
+
+	public RepresentationVisitor(final IceOntologyInterface ioi,
+			final Set<OWLOntology> ontologies, final OWLReasoner reasoner,
+			final IceIris iceIris) {
 		super(ioi, ontologies, reasoner, iceIris);
 	}
 
-	public static List<Representation> asSortedList(final Set<Representation> set) {
+	public static List<Representation> asSortedList(
+			final Set<Representation> set) {
 		final List<Representation> list = new ArrayList<Representation>(set);
 		Collections.sort(list);
 		return list;
@@ -128,55 +136,52 @@ public class RepresentationVisitor extends IceVisitor {
 		return iri.toString().substring(iri.toString().indexOf("#") + 1);
 	}
 
-	private Representation extractParent(final OWLClass cl) {
-		final Set<OWLClassExpression> sces = cl.getSuperClasses(ontologies);
+	private Set<OWLClass> extractClasses(
+			final Set<OWLClassExpression> expressions) {
+		final HashSet<OWLClass> classes = new HashSet<OWLClass>();
 
-		if (sces.size() != 1) {
-			return null;
+		if (expressions.size() < 1) {
+			return classes;
 		}
 
-		OWLClassExpression sce = null;
-		for (final OWLClassExpression owlClassExpression : sces) {
-			sce = owlClassExpression;
+		for (final OWLClassExpression expr : expressions) {
+			final Set<OWLClass> sigClasses = expr.getClassesInSignature();
+			classes.addAll(sigClasses);
 		}
 
-		final Set<OWLClass> scls = sce.getClassesInSignature();
-		if (scls.size() != 1) {
-			System.err.println("Warning! Can't handle multiple superclasses yet!");
-			System.err.println("Class: " + cl);
-			return null;
-		}
-
-		OWLClass scl = null;
-		for (final OWLClass owlClass : scls) {
-			scl = owlClass;
-		}
-
-		final String name = extractRepresentationName(scl.getIRI());
-		Representation rep = representations.get(name);
-		if (rep == null) {
-			rep = new Representation(extractRepresentationName(scl.getIRI()), extractParent(scl));
-		}
-
-		return rep;
+		return classes;
 	}
 
-	private Representation makeRepresentation(final OWLClass cl) {
-		final String name = extractRepresentationName(cl.getIRI());
-		final Representation parent = extractParent(cl);
+	private Representation search(final OWLClass root) {
+		final Set<OWLClassExpression> sces = root.getSubClasses(ontologies);
 
-		return new Representation(name, parent);
+		final Set<OWLClass> classes = extractClasses(sces);
+
+		System.out
+				.println("class: " + extractRepresentationName(root.getIRI()));
+		for (final OWLClass cl : classes) {
+			System.out.println("    subclass: "
+					+ extractRepresentationName(cl.getIRI()));
+		}
+		return null;
 	}
 
 	@Override
 	public final void visit(final OWLClass cl) {
-		final Representation r = makeRepresentation(cl);
-		if (r == null) {
+		if (foundClasses.contains(cl))
 			return;
-		}
+		foundClasses.add(cl);
 
-		if (!representations.containsKey(r.name)) {
-			representations.put(r.name, r);
+		search(cl);
+
+		List<OWLSubClassOfAxiom> subclassAxioms = new ArrayList<OWLSubClassOfAxiom>();
+		for (OWLOntology ont : ontologies) {
+			for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(cl)) {
+				subclassAxioms.add(ax);
+			}
+		}
+		for (OWLSubClassOfAxiom ax : subclassAxioms) {
+			ax.getSuperClass().accept(this);
 		}
 	}
 
@@ -184,338 +189,428 @@ public class RepresentationVisitor extends IceVisitor {
 		return representations;
 	}
 
-	/* Ignored visit implementations */
-
 	@Override
-	public void visit(final OWLOntology arg0) {
-	}
+	public void visit(final OWLObjectSomeValuesFrom ce) {
+		System.out.println("    subsubclass: " + ce.getProperty());
 
-	@Override
-	public void visit(final OWLDeclarationAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLSubClassOfAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLNegativeObjectPropertyAssertionAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLAsymmetricObjectPropertyAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLReflexiveObjectPropertyAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLDisjointClassesAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLDataPropertyDomainAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLObjectPropertyDomainAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLEquivalentObjectPropertiesAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLNegativeDataPropertyAssertionAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLDifferentIndividualsAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLDisjointDataPropertiesAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLDisjointObjectPropertiesAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLObjectPropertyRangeAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLObjectPropertyAssertionAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLFunctionalObjectPropertyAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLSubObjectPropertyOfAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLDisjointUnionAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLSymmetricObjectPropertyAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLDataPropertyRangeAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLFunctionalDataPropertyAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLEquivalentDataPropertiesAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLClassAssertionAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLEquivalentClassesAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLDataPropertyAssertionAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLTransitiveObjectPropertyAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLIrreflexiveObjectPropertyAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLSubDataPropertyOfAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLInverseFunctionalObjectPropertyAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLSameIndividualAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLSubPropertyChainOfAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLInverseObjectPropertiesAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLHasKeyAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLDatatypeDefinitionAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final SWRLRule arg0) {
-	}
-
-	@Override
-	public void visit(final OWLAnnotationAssertionAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLSubAnnotationPropertyOfAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLAnnotationPropertyDomainAxiom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLAnnotationPropertyRangeAxiom arg0) {
 	}
 
 	@Override
 	public void visit(final OWLObjectIntersectionOf arg0) {
-	}
+		System.out.println("    intersection: " + arg0);
 
-	@Override
-	public void visit(final OWLObjectUnionOf arg0) {
-	}
-
-	@Override
-	public void visit(final OWLObjectComplementOf arg0) {
-	}
-
-	@Override
-	public void visit(final OWLObjectSomeValuesFrom arg0) {
+		TreeSet<OWLClassExpression> treeSet = new TreeSet<OWLClassExpression>(
+				arg0.getOperands());
+		for (OWLClassExpression exp : treeSet) {
+			exp.accept(this);
+		}
 	}
 
 	@Override
 	public void visit(final OWLObjectAllValuesFrom arg0) {
-	}
-
-	@Override
-	public void visit(final OWLObjectHasValue arg0) {
+		System.out.println("    all_values: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLObjectMinCardinality arg0) {
+		System.out.println("    mincard: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLObjectExactCardinality arg0) {
+		System.out.println("    exactcard: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLObjectMaxCardinality arg0) {
+		System.out.println("    maxcard: " + arg0);
+	}
+
+	/* Ignored visit implementations */
+
+	@Override
+	public void visit(final OWLSubDataPropertyOfAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLOntology arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLDeclarationAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLSubClassOfAxiom ce) {
+		System.out.println("    arg: " + ce);
+	}
+
+	@Override
+	public void visit(final OWLNegativeObjectPropertyAssertionAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLAsymmetricObjectPropertyAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLReflexiveObjectPropertyAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLDisjointClassesAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLDataPropertyDomainAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLObjectPropertyDomainAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLEquivalentObjectPropertiesAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLNegativeDataPropertyAssertionAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLDifferentIndividualsAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLDisjointDataPropertiesAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLDisjointObjectPropertiesAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLObjectPropertyRangeAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLObjectPropertyAssertionAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLFunctionalObjectPropertyAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLSubObjectPropertyOfAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLDisjointUnionAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLSymmetricObjectPropertyAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLDataPropertyRangeAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLFunctionalDataPropertyAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLEquivalentDataPropertiesAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLClassAssertionAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLEquivalentClassesAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLDataPropertyAssertionAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLTransitiveObjectPropertyAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLIrreflexiveObjectPropertyAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLInverseFunctionalObjectPropertyAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLSameIndividualAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLSubPropertyChainOfAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLInverseObjectPropertiesAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLHasKeyAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLDatatypeDefinitionAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final SWRLRule arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLAnnotationAssertionAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLSubAnnotationPropertyOfAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLAnnotationPropertyDomainAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLAnnotationPropertyRangeAxiom arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLObjectUnionOf arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLObjectComplementOf arg0) {
+		System.out.println("    arg: " + arg0);
+	}
+
+	@Override
+	public void visit(final OWLObjectHasValue arg0) {
+		System.out.println("HasValue: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLObjectHasSelf arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLObjectOneOf arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDataSomeValuesFrom arg0) {
+		System.out.println("DataValues: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDataAllValuesFrom arg0) {
+		System.out.println("AllDataValues: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDataHasValue arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDataMinCardinality arg0) {
+		System.out.println("Min: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDataExactCardinality arg0) {
+		System.out.println("Exact: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDataMaxCardinality arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLLiteral arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLFacetRestriction arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDatatype arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDataOneOf arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDataComplementOf arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDataIntersectionOf arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDataUnionOf arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDatatypeRestriction arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLObjectProperty arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLObjectInverseOf arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLDataProperty arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLNamedIndividual arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLAnonymousIndividual arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final IRI arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLAnnotation arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final SWRLClassAtom arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final SWRLDataRangeAtom arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final SWRLObjectPropertyAtom arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final SWRLDataPropertyAtom arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final SWRLBuiltInAtom arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final SWRLIndividualArgument arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final SWRLLiteralArgument arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final SWRLSameIndividualAtom arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final SWRLDifferentIndividualsAtom arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLAnnotationProperty arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final SWRLVariable arg0) {
+		System.out.println("    arg: " + arg0);
 	}
 
 }
