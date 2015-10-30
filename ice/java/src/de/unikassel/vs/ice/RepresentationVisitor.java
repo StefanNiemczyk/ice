@@ -5,10 +5,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
@@ -98,10 +100,9 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 public class RepresentationVisitor extends IceVisitor {
 
-	private final HashMap<String, Representation> representations = new HashMap<String, Representation>();
-
-	private final Stack<OWLClass> searchStack = new Stack<OWLClass>();
-	private final HashSet<OWLClass> visited = new HashSet<OWLClass>();
+	private final HashMap<String, HashSet<String>> representations = new HashMap<String, HashSet<String>>();
+	private final Stack<String> repStack = new Stack<String>();
+	private final boolean DEBUG = false;
 
 	public RepresentationVisitor(final IceOntologyInterface ioi,
 			final Set<OWLOntology> ontologies, final OWLReasoner reasoner,
@@ -109,133 +110,164 @@ public class RepresentationVisitor extends IceVisitor {
 		super(ioi, ontologies, reasoner, iceIris);
 	}
 
-	public static List<Representation> asSortedList(
-			final Set<Representation> set) {
-		final List<Representation> list = new ArrayList<Representation>(set);
-		Collections.sort(list);
-		return list;
+	private void debuglog(String str) {
+		if (DEBUG)
+			System.err.println(str);
 	}
 
 	@Override
-	public final String toString() {
+	public String toString() {
 		String str = "";
-		boolean lineAdded = false;
 
-		for (final Representation ri : representations.values()) {
-			str += ri.toString() + '\n';
-			lineAdded = true;
+		for (Map.Entry<String, HashSet<String>> entry : representations
+				.entrySet()) {
+			final String key = entry.getKey();
+			final String values = entry.getValue().toString();
+
+			System.out.println(key + ": " + values);
 		}
 
-		if (lineAdded) {
-			str = str.substring(0, str.length() - 1); /* Remove last newline */
-		}
 		return str;
 	}
 
-	private String extractRepresentationName(final IRI iri) {
-		return iri.toString().substring(iri.toString().indexOf("#") + 1);
+	private void addRep(String key, String val) {
+		if (key == null || val == null)
+			return;
+
+		if (!representations.containsKey(key))
+			representations.put(key, new HashSet<String>());
+
+		representations.get(key).add(val);
 	}
 
-	private Set<OWLClass> extractClasses(
-			final Set<OWLClassExpression> expressions) {
-		final HashSet<OWLClass> classes = new HashSet<OWLClass>();
+	public Set<OWLClass> toClassSet(Set<OWLClassExpression> inSet) {
+		HashSet<OWLClass> set = new HashSet<OWLClass>();
 
-		if (expressions.size() < 1) {
-			return classes;
+		for (OWLClassExpression ce : inSet) {
+			if (ce.getClassExpressionType() == ClassExpressionType.OWL_CLASS)
+				set.add(ce.asOWLClass());
 		}
 
-		for (final OWLClassExpression expr : expressions) {
-			final Set<OWLClass> sigClasses = expr.getClassesInSignature();
-			classes.addAll(sigClasses);
-		}
-
-		return classes;
+		return set;
 	}
 
-	private Representation search(final OWLClass root) {
-		final Set<OWLClassExpression> sces = root.getSubClasses(ontologies);
+	private final void visitClassExpression(OWLClassExpression ex) {
+		ClassExpressionType fillerType = ex.getClassExpressionType();
+		debuglog("FILLER_TYPE: " + fillerType);
 
-		final Set<OWLClass> classes = extractClasses(sces);
+		switch (fillerType) {
+		case OWL_CLASS:
+			OWLClass cl = ex.asOWLClass();
+			String repName = iRIShortName(cl.getIRI());
+			addRep(repStack.peek(), repName);
+			if (!foundClasses.contains(cl)) {
+				cl.accept(this);
+			}
+			break;
 
-		System.out
-				.println("class: " + extractRepresentationName(root.getIRI()));
-		for (final OWLClass cl : classes) {
-			System.out.println("    subclass: "
-					+ extractRepresentationName(cl.getIRI()));
+		case OBJECT_SOME_VALUES_FROM: // FALLTHROUGH
+		case OBJECT_EXACT_CARDINALITY:
+		case OBJECT_INTERSECTION_OF:
+		//case OBJECT_HAS_VALUE: // TODO
+			ex.accept(this);
+			break;
+
+		default:
+			break;
 		}
+
+	}
+
+	// //////////////
+	// TODO: Refactor? Needed?
+	private Representation addSubclasses(final OWLClass root) {
+		final Set<OWLClass> subClasses = toClassSet(root
+				.getSubClasses(ontologies));
+
+		for (OWLClass cl : subClasses) {
+			addRep(iRIShortName(root.getIRI()), iRIShortName(cl.getIRI()));
+		}
+
 		return null;
 	}
 
+	// //////////////
+
 	@Override
 	public final void visit(final OWLClass cl) {
+		debuglog("VISITING: " + iRIShortName(cl.getIRI()));
 		if (foundClasses.contains(cl))
 			return;
 		foundClasses.add(cl);
 
-		search(cl);
+		// TODO: Needed or handled by subclassaxioms?
+		addSubclasses(cl);
 
-		List<OWLSubClassOfAxiom> subclassAxioms = new ArrayList<OWLSubClassOfAxiom>();
 		for (OWLOntology ont : ontologies) {
 			for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(cl)) {
-				subclassAxioms.add(ax);
+				String currentRep = iRIShortName(ax.getSubClass().asOWLClass()
+						.getIRI());
+				repStack.push(currentRep);
+				debuglog("SubClassOf: " + currentRep);
+				ax.getSuperClass().accept(this);
+				repStack.pop();
 			}
 		}
-		for (OWLSubClassOfAxiom ax : subclassAxioms) {
-			ax.getSuperClass().accept(this);
-		}
-	}
-
-	public HashMap<String, Representation> getRepresentations() {
-		return representations;
 	}
 
 	@Override
 	public void visit(final OWLObjectSomeValuesFrom ce) {
-		System.out.println("    subsubclass: " + ce.getProperty());
+		debuglog("SOMEVALUESFROM: " + ce.getFiller());
+		visitClassExpression(ce.getFiller());
 
 	}
 
 	@Override
-	public void visit(final OWLObjectIntersectionOf arg0) {
-		System.out.println("    intersection: " + arg0);
+	public void visit(final OWLObjectIntersectionOf is) {
+		debuglog("    intersection: " + is);
 
-		TreeSet<OWLClassExpression> treeSet = new TreeSet<OWLClassExpression>(
-				arg0.getOperands());
-		for (OWLClassExpression exp : treeSet) {
-			exp.accept(this);
+		Set<OWLClassExpression> operands = is.getOperands();
+
+		for (OWLClassExpression exp : operands) {
+			debuglog("\nCURRENT: " + repStack.peek());
+			debuglog("EXTYPE: " + exp.getClassExpressionType());
+			debuglog("EX: " + exp + "\n");
+			visitClassExpression(exp);
 		}
 	}
 
 	@Override
-	public void visit(final OWLObjectAllValuesFrom arg0) {
-		System.out.println("    all_values: " + arg0);
+	public void visit(final OWLObjectExactCardinality ec) {
+		OWLClassExpression filler = ec.getFiller();
+		visitClassExpression(filler);
+	}
+
+	@Override
+	public void visit(final OWLObjectAllValuesFrom av) {
+		OWLClassExpression filler = av.getFiller();
+		visitClassExpression(filler);
 	}
 
 	@Override
 	public void visit(final OWLObjectMinCardinality arg0) {
-		System.out.println("    mincard: " + arg0);
-	}
-
-	@Override
-	public void visit(final OWLObjectExactCardinality arg0) {
-		System.out.println("    exactcard: " + arg0);
+		debuglog("    mincard: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLObjectMaxCardinality arg0) {
-		System.out.println("    maxcard: " + arg0);
+		debuglog("    maxcard: " + arg0);
 	}
 
 	/* Ignored visit implementations */
 
 	@Override
 	public void visit(final OWLSubDataPropertyOfAxiom arg0) {
-		System.out.println("    arg: " + arg0);
+		debuglog("    arg: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLOntology arg0) {
-		System.out.println("    arg: " + arg0);
+		debuglog("    arg: " + arg0);
 	}
 
 	@Override
