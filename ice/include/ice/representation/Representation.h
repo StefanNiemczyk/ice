@@ -8,7 +8,9 @@ namespace ice {
 
 struct Representation {
   std::string name;
-  Representation *parent = NULL;
+
+  Representation *parent;
+  std::vector<Representation*> subclasses;
 };
 
 }

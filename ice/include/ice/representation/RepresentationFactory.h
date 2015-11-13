@@ -32,6 +32,7 @@ public:
 
   std::shared_ptr<std::map<std::string, BaseRepresentationInstance*>> getInstanceMap();
 
+  RepresentationInstance *makeInstance(std::string name);
   void printReps();
 
 private:

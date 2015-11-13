@@ -2182,11 +2182,11 @@ TEST(JNITest, readBaseRepresentationsAsCSV)
   // Sample testing of integer representation
   int index =
       read_csv_res.find(
-          "IntegerNumericalRepresentation;NumericalRepresentation;BasicRepresentation;Representation;null");
+          "nonNumericalRepresentation;byteRep;booleanRep;unsignedByteRep;stringRep");
   ASSERT_FALSE(index == std::string::npos);
 }
 
-TEST(JNITest, representationVector)
+TEST(JNITest, representations)
 {
   // Given a valid empty ice ontology
   std::string path = ros::package::getPath("ice");
@@ -2214,67 +2214,23 @@ TEST(JNITest, representationVector)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-//  // When adding representations
-//  std::vector<std::string> dims;
-//  oi.addRepresentation("BooleanRep", "EngineRep", dims);
-//  ASSERT_TRUE(result);
-
-
   std::unique_ptr<ice::RepresentationFactory> fac = oi.readRepresentations();
-  fac->printReps();
-}
 
-TEST(JNITest, representationContainer)
-{
-  // Given a valid empty ice ontology
-  std::string path = ros::package::getPath("ice");
-  bool result;
+  ice::RepresentationInstance* movement = fac->makeInstance("defaultMovementRep");
 
-  ice::OntologyInterface oi(path + "/java/lib/");
+  const float testVal = 4.2f;
+  movement->subs.at("translation")
+          ->subs.at("floatNumericalRepresentation")
+          ->setValue<float>(testVal);
+  
+  float *val =
+  movement->subs.at("translation")
+          ->subs.at("floatNumericalRepresentation")
+          ->getValue<float>();
+  
+  ASSERT_EQ(testVal, *val);
+  std::cout << "VAL: " << *val << std::endl;
 
-  oi.addIRIMapper(path + "/ontology/");
-
-  ASSERT_FALSE(oi.errorOccurred());
-
-  result = oi.addOntologyIRI(
-      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
-
-  ASSERT_FALSE(oi.errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi.loadOntologies();
-
-  ASSERT_FALSE(oi.errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi.isConsistent();
-
-  ASSERT_FALSE(oi.errorOccurred());
-  ASSERT_TRUE(result);
-
-  // -----
-
-  const int val = 123;
-
-  std::unique_ptr<ice::RepresentationFactory> fac = oi.readRepresentations();
-  fac->getRepMap();
-
-  // Create instance using integer representation
-  ice::Representation *integerRep = fac->getRepMap()->at("IntegerNumericalRepresentation");
-  ice::RepresentationInstance<int> *inst = new ice::RepresentationInstance<int>(integerRep, val);
-
-  // Put it in map
-  (*fac->getInstanceMap())["testInt"] = inst;
-
-  // Retreive it from map again
-  ice::BaseRepresentationInstance *instRaw = fac->getInstanceMap()->at("testInt"); 
-  ice::RepresentationInstance<int> *instGot = reinterpret_cast<ice::RepresentationInstance<int>*>(instRaw);
-
-  // Check if equal
-  int *valGot = instGot->data;
-  ASSERT_EQ(val, *valGot);
-
-
-}
+  }
 
 }

@@ -7,20 +7,29 @@ namespace ice {
 
 class BaseRepresentationInstance {};
 
-template<class T>
 class RepresentationInstance : public BaseRepresentationInstance {
 public:
 
-  RepresentationInstance(Representation *rep, T val)
+  RepresentationInstance(Representation *rep)
   {
     representation = rep;
-    data = new T;
-    *data = val;
+  }
+  
+  template<typename T>
+  void setValue(T val) {
+  	T *v = new T;
+  	*v = val;
+  	data = (void*) v;
   }
 
+  template<typename T>
+  T* getValue() {
+  	return reinterpret_cast<T*>(data);
+  }
+
+  void *data;
   Representation *representation;
-  T *data;
-  
+  std::map<std::string, RepresentationInstance*> subs;
 };
 
 }

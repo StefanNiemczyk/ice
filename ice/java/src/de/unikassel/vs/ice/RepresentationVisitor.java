@@ -118,14 +118,25 @@ public class RepresentationVisitor extends IceVisitor {
 	@Override
 	public String toString() {
 		String str = "";
-
+		String lineStr = "";
+		
 		for (Map.Entry<String, HashSet<String>> entry : representations
 				.entrySet()) {
 			final String key = entry.getKey();
-			final String values = entry.getValue().toString();
 
-			System.out.println(key + ": " + values);
+			//System.out.println(key + ": " + values);
+			
+			lineStr = key;
+			for(String val : entry.getValue()) {
+				lineStr += ";" + val;
+			}
+			
+			lineStr += "\n";
+			str += lineStr;
 		}
+		
+		
+		//System.out.println(str);
 
 		return str;
 	}

@@ -33,33 +33,29 @@ Representation* RepresentationFactory::fromCSV(std::string reprStr,
     const char delim)
 {
   const size_t length = reprStr.length() + 1;
-  std::string resName;
-  Representation *rep = NULL;
-  Representation *lastRep = NULL;
 
   if (reprStr.empty()) {
-    return rep;
+    return NULL;
   }
   if (!isprint(delim)) {
-    return rep;
+    return NULL;
   }
 
   std::vector<std::string> tokens = split(reprStr.c_str(), ';');
-  std::vector<std::string>::reverse_iterator rit = tokens.rbegin();
+  if (tokens.size() < 1)
+    return NULL;
 
-  for (int i = 0; rit != tokens.rend(); rit++, i++) {
-    lastRep = rep;
-    rep = addOrGet(*rit);
-    if (rep != NULL && lastRep != NULL) {
-      rep->parent = lastRep;
-    }
+  Representation *rep = addOrGet(tokens.front());
+  tokens.erase(tokens.begin());
+  
+  for (std::string t : tokens) {
+    rep->subclasses.push_back(addOrGet(t));
   }
 
   return rep;
 }
 
-Representation* RepresentationFactory::addOrGet(std::string name)
-{
+Representation* RepresentationFactory::addOrGet(std::string name) {
   Representation *res = NULL;
 
   if (repMap->count(name) > 0) {
@@ -98,22 +94,27 @@ std::shared_ptr<std::map<std::string, BaseRepresentationInstance*>> Representati
   return repInstanceMap;
 }
 
+RepresentationInstance *RepresentationFactory::makeInstance(std::string repName)
+{
+  Representation *rep = addOrGet(repName);
+  RepresentationInstance *ins = new RepresentationInstance(rep);
+
+  for (Representation *sc : rep->subclasses) {
+    RepresentationInstance *subIns = makeInstance(sc->name);
+    ins->subs[sc->name] = subIns;
+  }
+  
+  return ins;
+}
+
 void RepresentationFactory::printReps()
 {
   for (Representation* r : *repVec) {
-    std::cout << r->name << std::endl;
-    fflush(stdout);
-    Representation* par = r->parent;
-    int i = 0;
-    while (par->name != "null") {
-      for (int j = 0; j < i; j++) {
-        std::cout << "  ";
-      }
-      std::cout << par->name << " ADDR: " << par << std::endl;
-      fflush(stdout);
-      par = par->parent;
-      i++;
+    std::cout << r->name << " = {";
+    for (Representation *sc : r->subclasses) {
+    	std::cout << sc->name << ", ";
     }
+    std::cout << "}" << std::endl;
   }
 }
 
