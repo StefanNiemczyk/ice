@@ -5,6 +5,8 @@
 #include <ros/package.h>
 
 #include "ice/ontology/OntologyInterface.h"
+#include "ice/representation/Representation.h"
+#include "ice/representation/RepresentationType.h"
 
 #include "gtest/gtest.h"
 
@@ -1105,5 +1107,86 @@ TEST(JNITest, save)
 //    }
 //  }
 //}
+
+TEST(JNITest, readRepresentationsAsCSV)
+{
+  // Given a valid empty ice ontology
+  std::string path = ros::package::getPath("ice");
+  bool result;
+
+  ice::OntologyInterface oi(path + "/java/lib/");
+
+  oi.addIRIMapper(path + "/ontology/");
+
+  ASSERT_FALSE(oi.errorOccurred());
+
+  result = oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.loadOntologies();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.isConsistent();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  // When adding a single individual
+  result = oi.addIndividual("HelloRepresentation","StringRep");
+  ASSERT_TRUE(result);
+
+  // Then the right csv like string is returned
+  std::string read_csv_res = oi.readRepresentationsAsCSV();
+  ASSERT_EQ("3;HelloRepresentation", read_csv_res);
+}
+
+TEST(JNITest, representationVector)
+{
+  // Given a valid empty ice ontology
+  std::string path = ros::package::getPath("ice");
+  bool result;
+
+  ice::OntologyInterface oi(path + "/java/lib/");
+
+  oi.addIRIMapper(path + "/ontology/");
+
+  ASSERT_FALSE(oi.errorOccurred());
+
+  result = oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.loadOntologies();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.isConsistent();
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  // When adding two individuals
+  result = oi.addIndividual("HelloRepresentation","StringRep");
+  result = oi.addIndividual("true","BooleanRep");
+  ASSERT_TRUE(result);
+
+  // Then a vector containing these representations is returned
+  std::unique_ptr<std::vector<ice::Representation*>> reps = oi.readRepresentations();
+  ASSERT_EQ(2, reps->size());
+
+  // Because BooleanRep = 1 and StringRep = 3 the BooleanRep comes first
+  // The java part sorts the outputs by representation ordinal number
+  ASSERT_EQ(ice::BooleanRep, reps->at(0)->type);
+  ASSERT_EQ(true, *reps->at(0)->get<bool*>());
+
+  ASSERT_EQ(ice::StringRep, reps->at(1)->type);
+  ASSERT_STREQ("HelloRepresentation", reps->at(1)->get<const char*>());
+}
 
 }

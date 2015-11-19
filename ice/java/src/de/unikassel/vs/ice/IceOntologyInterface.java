@@ -1153,6 +1153,24 @@ public class IceOntologyInterface {
 		return isv.toString();
 	}
 
+	public final String readRepresentationsAsCSV() {
+		String res = "";
+
+		Set<OWLOntology> onts = new HashSet<OWLOntology>();
+		onts.add(this.mainOntology);
+		onts.addAll(this.imports);
+
+		RepresentationVisitor rv = new RepresentationVisitor(this, onts, this.getReasoner(), this.ii);
+		Set<OWLClass> classes = this.getReasoner().getSubClasses(this.ii.representation, false).getFlattened();
+
+		for (OWLClassExpression cls : classes) {
+			cls.accept(rv);
+		}
+		res = rv.toString();
+
+		return res.toString();
+	}
+	
 	public String[][] readNodesAndIROsAsASP(String p_system) {
 		Set<OWLOntology> onts = new HashSet<OWLOntology>();
 		onts.add(this.mainOntology);
@@ -1335,4 +1353,5 @@ public class IceOntologyInterface {
 	public void setLogging(boolean logging) {
 		this.logging = logging;
 	}
+
 }

@@ -1,0 +1,535 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY units "http://www.semanticweb.org/sni/ontologies/2013/7/units#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.semanticweb.org/sni/ontologies/2013/7/units#"
+     xml:base="http://www.semanticweb.org/sni/ontologies/2013/7/units"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:units="http://www.semanticweb.org/sni/ontologies/2013/7/units#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/sni/ontologies/2013/7/units"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#derivedFromUnit -->
+
+    <owl:ObjectProperty rdf:about="&units;derivedFromUnit"/>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#hasPrefix -->
+
+    <owl:ObjectProperty rdf:about="&units;hasPrefix"/>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#productOf -->
+
+    <owl:ObjectProperty rdf:about="&units;productOf">
+        <rdfs:range rdf:resource="&units;Unit"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#hasPower -->
+
+    <owl:DatatypeProperty rdf:about="&units;hasPower">
+        <rdfs:range rdf:resource="&xsd;integer"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#hasScalingNumber -->
+
+    <owl:DatatypeProperty rdf:about="&units;hasScalingNumber">
+        <rdfs:range rdf:resource="&xsd;double"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#hasSymbol -->
+
+    <owl:DatatypeProperty rdf:about="&units;hasSymbol">
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#hasValue -->
+
+    <owl:DatatypeProperty rdf:about="&units;hasValue">
+        <rdfs:range rdf:resource="&xsd;double"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#AngleUnit -->
+
+    <owl:Class rdf:about="&units;AngleUnit">
+        <rdfs:subClassOf rdf:resource="&units;DerivedUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#BaseUnit -->
+
+    <owl:Class rdf:about="&units;BaseUnit">
+        <rdfs:subClassOf rdf:resource="&units;Unit"/>
+        <owl:disjointWith rdf:resource="&units;DerivedUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#DerivedUnit -->
+
+    <owl:Class rdf:about="&units;DerivedUnit">
+        <rdfs:subClassOf rdf:resource="&units;Unit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#LengthUnit -->
+
+    <owl:Class rdf:about="&units;LengthUnit">
+        <rdfs:subClassOf rdf:resource="&units;DerivedUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#PerTimeUnit -->
+
+    <owl:Class rdf:about="&units;PerTimeUnit">
+        <rdfs:subClassOf rdf:resource="&units;DerivedUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#Prefix -->
+
+    <owl:Class rdf:about="&units;Prefix"/>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#TimeUnit -->
+
+    <owl:Class rdf:about="&units;TimeUnit">
+        <rdfs:subClassOf rdf:resource="&units;DerivedUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#Unit -->
+
+    <owl:Class rdf:about="&units;Unit"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#ampere -->
+
+    <owl:NamedIndividual rdf:about="&units;ampere">
+        <rdf:type rdf:resource="&units;BaseUnit"/>
+        <hasSymbol rdf:datatype="&xsd;string">A</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#atto -->
+
+    <owl:NamedIndividual rdf:about="&units;atto">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E-18</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">a</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#candela -->
+
+    <owl:NamedIndividual rdf:about="&units;candela">
+        <rdf:type rdf:resource="&units;BaseUnit"/>
+        <hasSymbol rdf:datatype="&xsd;string">cd</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#centi -->
+
+    <owl:NamedIndividual rdf:about="&units;centi">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">0.01</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">c</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#deci -->
+
+    <owl:NamedIndividual rdf:about="&units;deci">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">0.1</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">d</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#degree -->
+
+    <owl:NamedIndividual rdf:about="&units;degree">
+        <rdf:type rdf:resource="&units;AngleUnit"/>
+        <hasScalingNumber rdf:datatype="&xsd;double">57.29577951308232</hasScalingNumber>
+        <derivedFromUnit rdf:resource="&units;radian"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#exa -->
+
+    <owl:NamedIndividual rdf:about="&units;exa">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E18</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">E</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#femto -->
+
+    <owl:NamedIndividual rdf:about="&units;femto">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E-15</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">f</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#giga -->
+
+    <owl:NamedIndividual rdf:about="&units;giga">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E9</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">G</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#gram -->
+
+    <owl:NamedIndividual rdf:about="&units;gram">
+        <rdf:type rdf:resource="&units;BaseUnit"/>
+        <hasSymbol rdf:datatype="&xsd;string">g</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#hour -->
+
+    <owl:NamedIndividual rdf:about="&units;hour">
+        <rdf:type rdf:resource="&units;TimeUnit"/>
+        <hasScalingNumber rdf:datatype="&xsd;double">3600.0</hasScalingNumber>
+        <derivedFromUnit rdf:resource="&units;second"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#kelvin -->
+
+    <owl:NamedIndividual rdf:about="&units;kelvin">
+        <rdf:type rdf:resource="&units;BaseUnit"/>
+        <hasSymbol rdf:datatype="&xsd;string">K</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#kilo -->
+
+    <owl:NamedIndividual rdf:about="&units;kilo">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1000.0</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">K</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#kiloMeter -->
+
+    <owl:NamedIndividual rdf:about="&units;kiloMeter">
+        <rdf:type rdf:resource="&units;LengthUnit"/>
+        <hasPrefix rdf:resource="&units;kilo"/>
+        <derivedFromUnit rdf:resource="&units;meter"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#kiloMeter_perHour -->
+
+    <owl:NamedIndividual rdf:about="&units;kiloMeter_perHour">
+        <rdf:type rdf:resource="&units;PerTimeUnit"/>
+        <productOf rdf:resource="&units;kiloMeter"/>
+        <productOf rdf:resource="&units;perHour"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#mega -->
+
+    <owl:NamedIndividual rdf:about="&units;mega">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1000000.0</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">M</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#meter -->
+
+    <owl:NamedIndividual rdf:about="&units;meter">
+        <rdf:type rdf:resource="&units;BaseUnit"/>
+        <hasSymbol rdf:datatype="&xsd;string">m</hasSymbol>
+        <owl:sameAs rdf:resource="&units;metre"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#meter_perSecond -->
+
+    <owl:NamedIndividual rdf:about="&units;meter_perSecond">
+        <rdf:type rdf:resource="&units;PerTimeUnit"/>
+        <productOf rdf:resource="&units;meter"/>
+        <productOf rdf:resource="&units;perSecond"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#metre -->
+
+    <owl:NamedIndividual rdf:about="&units;metre">
+        <rdf:type rdf:resource="&units;BaseUnit"/>
+        <hasSymbol rdf:datatype="&xsd;string">m</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#micro -->
+
+    <owl:NamedIndividual rdf:about="&units;micro">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E-6</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">mu</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#milli -->
+
+    <owl:NamedIndividual rdf:about="&units;milli">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">0.001</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">m</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#milliMeter -->
+
+    <owl:NamedIndividual rdf:about="&units;milliMeter">
+        <rdf:type rdf:resource="&units;LengthUnit"/>
+        <derivedFromUnit rdf:resource="&units;meter"/>
+        <hasPrefix rdf:resource="&units;milli"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#milliSecond -->
+
+    <owl:NamedIndividual rdf:about="&units;milliSecond">
+        <rdf:type rdf:resource="&units;TimeUnit"/>
+        <hasPrefix rdf:resource="&units;milli"/>
+        <derivedFromUnit rdf:resource="&units;second"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#mole -->
+
+    <owl:NamedIndividual rdf:about="&units;mole">
+        <rdf:type rdf:resource="&units;BaseUnit"/>
+        <hasSymbol rdf:datatype="&xsd;string">mol</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#nano -->
+
+    <owl:NamedIndividual rdf:about="&units;nano">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E-9</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">n</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#perHour -->
+
+    <owl:NamedIndividual rdf:about="&units;perHour">
+        <rdf:type rdf:resource="&units;PerTimeUnit"/>
+        <hasPower rdf:datatype="&xsd;integer">-1</hasPower>
+        <derivedFromUnit rdf:resource="&units;hour"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#perSecond -->
+
+    <owl:NamedIndividual rdf:about="&units;perSecond">
+        <rdf:type rdf:resource="&units;PerTimeUnit"/>
+        <hasPower rdf:datatype="&xsd;integer">-1</hasPower>
+        <derivedFromUnit rdf:resource="&units;second"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#peta -->
+
+    <owl:NamedIndividual rdf:about="&units;peta">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E15</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">P</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#pico -->
+
+    <owl:NamedIndividual rdf:about="&units;pico">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E-12</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">p</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#radian -->
+
+    <owl:NamedIndividual rdf:about="&units;radian">
+        <rdf:type rdf:resource="&units;BaseUnit"/>
+        <hasSymbol rdf:datatype="&xsd;string">rad</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#second -->
+
+    <owl:NamedIndividual rdf:about="&units;second">
+        <rdf:type rdf:resource="&units;BaseUnit"/>
+        <hasSymbol rdf:datatype="&xsd;string">s</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#tera -->
+
+    <owl:NamedIndividual rdf:about="&units;tera">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E12</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">T</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#yocto -->
+
+    <owl:NamedIndividual rdf:about="&units;yocto">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E-24</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">y</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#yotta -->
+
+    <owl:NamedIndividual rdf:about="&units;yotta">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E24</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">Y</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#zepto -->
+
+    <owl:NamedIndividual rdf:about="&units;zepto">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E-21</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">z</hasSymbol>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/units#zetta -->
+
+    <owl:NamedIndividual rdf:about="&units;zetta">
+        <rdf:type rdf:resource="&units;Prefix"/>
+        <hasValue rdf:datatype="&xsd;double">1.0E21</hasValue>
+        <hasSymbol rdf:datatype="&xsd;string">Z</hasSymbol>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+

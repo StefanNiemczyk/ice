@@ -1,0 +1,668 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY Ice "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#" >
+]>
+
+
+<rdf:RDF xmlns="http://vs.uni-kassel.de/IceTest#"
+     xml:base="http://vs.uni-kassel.de/IceTest"
+     xmlns:Ice="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about="http://vs.uni-kassel.de/IceTest">
+        <owl:imports rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/Ice"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#Ego2AlloIRO -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#Ego2AlloIRO">
+        <rdfs:subClassOf rdf:resource="&Ice;IRONode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
+                <owl:onClass>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;Stream"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="&Ice;isStreamOf"/>
+                                <owl:someValuesFrom>
+                                    <owl:Class>
+                                        <owl:intersectionOf rdf:parseType="Collection">
+                                            <rdf:Description rdf:about="&Ice;Position"/>
+                                            <owl:Restriction>
+                                                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                                <owl:someValuesFrom rdf:resource="&Ice;RelativeCoordinatePositionRep"/>
+                                            </owl:Restriction>
+                                        </owl:intersectionOf>
+                                    </owl:Class>
+                                </owl:someValuesFrom>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:onClass>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRelatedInput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#KalmanFilter -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#KalmanFilter">
+        <rdfs:subClassOf rdf:resource="&Ice;ComputationNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
+                <owl:allValuesFrom rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:onClass rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:allValuesFrom rdf:resource="&Ice;StreamPositionCoordinateRep"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestComputationalNode -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestComputationalNode">
+        <rdfs:subClassOf rdf:resource="&Ice;ComputationNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
+                <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream1"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestEntity -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestEntity">
+        <rdfs:subClassOf rdf:resource="&Ice;EntityType"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasScope"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestScope1"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestMap -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestMap">
+        <rdfs:subClassOf rdf:resource="&Ice;NamedMap"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;isMapOf"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://vs.uni-kassel.de/IceTest#TestScope1"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestRepresentation2"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;aboutEntity"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestEntity"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestMapNode -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestMapNode">
+        <rdfs:subClassOf rdf:resource="&Ice;MapNode"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                        <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2"/>
+                        <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                        <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2"/>
+                        <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutputMap"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestMap"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestRepresentation -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestRepresentation">
+        <rdfs:subClassOf rdf:resource="&Ice;CompositeRepresentation"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestRepresentation1 -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestRepresentation1">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestRepresentation"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                        <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestValue1"/>
+                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                        <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestValue2"/>
+                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestRepresentation2 -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestRepresentation2">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestRepresentation"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestValue3"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestScope1 -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestScope1">
+        <rdfs:subClassOf rdf:resource="&Ice;EntityScope"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestRepresentation"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSinkNode -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestSinkNode">
+        <rdfs:subClassOf rdf:resource="&Ice;SinkNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSourceNode -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNode">
+        <rdfs:subClassOf rdf:resource="&Ice;SourceNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
+                <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream1"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestStream1 -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestStream1">
+        <rdfs:subClassOf rdf:resource="&Ice;NamedStream"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;isStreamOf"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://vs.uni-kassel.de/IceTest#TestScope1"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestRepresentation1"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestStream2 -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestStream2">
+        <rdfs:subClassOf rdf:resource="&Ice;NamedStream"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;isStreamOf"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://vs.uni-kassel.de/IceTest#TestScope1"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestRepresentation2"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestValue1 -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestValue1">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestValueScope"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestValue2 -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestValue2">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestValueScope"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestValue3 -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestValue3">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestValueScope"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestValueScope -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestValueScope">
+        <rdfs:subClassOf rdf:resource="&Ice;ValueScope"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#StreamPositionCoordinateRep -->
+
+    <owl:Class rdf:about="&Ice;StreamPositionCoordinateRep">
+        <rdfs:subClassOf rdf:resource="&Ice;NamedStream"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;isStreamOf"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;Position"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                <owl:someValuesFrom rdf:resource="&Ice;CoordinatePositionRep"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestComputationalNodeAccuracyInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestComputationalNodeAccuracyInd">
+        <rdf:type rdf:resource="&Ice;Accuracy"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">5</Ice:hasMetadataValue2>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyMaxASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestComputationalNodeCostInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestComputationalNodeCostInd">
+        <rdf:type rdf:resource="&Ice;Cost"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">2</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeCostASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestComputationalNodeCppGroundingInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestComputationalNodeCppGroundingInd">
+        <rdf:type rdf:resource="&Ice;CppGrounding"/>
+        <Ice:hasGroundingValue rdf:datatype="&xsd;string">TestComputationalNodeGrounding</Ice:hasGroundingValue>
+        <Ice:hasConfiguration rdf:datatype="&xsd;string">configvalue1=55</Ice:hasConfiguration>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestComputationalNodeDelayInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestComputationalNodeDelayInd">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">1</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeDelayASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/IceTest#TestComputationalNode"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestComputationalNodeAccuracyInd"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestComputationalNodeCostInd"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/IceTest#TestComputationalNodeCppGroundingInd"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestComputationalNodeDelayInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestEntity1 -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestEntity1">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/IceTest#TestEntity"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestMapInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestMapInd">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/IceTest#TestMap"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestMapNodeAccuracyInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestMapNodeAccuracyInd">
+        <rdf:type rdf:resource="&Ice;Accuracy"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">0</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">4</Ice:hasMetadataValue2>
+        <Ice:hasGrounding rdf:resource="&Ice;MapAccuracyAvgASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestMapNodeCostInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestMapNodeCostInd">
+        <rdf:type rdf:resource="&Ice;Cost"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">1</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;MapCostASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestMapNodeDelayInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestMapNodeDelayInd">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">1</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;MapDelayASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestMapNodeInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestMapNodeInd">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/IceTest#TestMapNode"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestMapNodeAccuracyInd"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestMapNodeCostInd"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestMapNodeDelayInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestMapReqAccuracyInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestMapReqAccuracyInd">
+        <rdf:type rdf:resource="&Ice;Accuracy"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">50</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;RequiredMapAccuracyASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestMapReqDelayInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestMapReqDelayInd">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">50</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;RequiredMapDelayASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestMapReqInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestMapReqInd">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/IceTest#TestMap"/>
+        <rdf:type rdf:resource="&Ice;RequiredMap"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestMapReqAccuracyInd"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestMapReqDelayInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSourceNodeAccuracyInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNodeAccuracyInd">
+        <rdf:type rdf:resource="&Ice;Accuracy"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">90</Ice:hasMetadataValue2>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyFixASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSourceNodeCostInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNodeCostInd">
+        <rdf:type rdf:resource="&Ice;Cost"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">12</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeCostASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSourceNodeCppGroundingInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNodeCppGroundingInd">
+        <rdf:type rdf:resource="&Ice;CppGrounding"/>
+        <Ice:hasGroundingValue rdf:datatype="&xsd;string">TestSourceNodeGrounding</Ice:hasGroundingValue>
+        <Ice:hasConfiguration rdf:datatype="&xsd;string">configvalue1=5;configvalue2=cat</Ice:hasConfiguration>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSourceNodeDelayInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNodeDelayInd">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">1</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeDelayFixASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSourceNodeInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNodeInd">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNode"/>
+        <Ice:aboutEntity rdf:resource="http://vs.uni-kassel.de/IceTest#TestEntity1"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeAccuracyInd"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeCostInd"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeCppGroundingInd"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeDelayInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestStream2ReqAccuracyInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestStream2ReqAccuracyInd">
+        <rdf:type rdf:resource="&Ice;Accuracy"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">85</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;RequiredStreamAccuracyASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestStream2ReqDelayInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestStream2ReqDelayInd">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">33</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;RequiredStreamDelayASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestStream2ReqInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestStream2ReqInd">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2"/>
+        <rdf:type rdf:resource="&Ice;RequiredStream"/>
+        <Ice:aboutEntity rdf:resource="http://vs.uni-kassel.de/IceTest#TestEntity1"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2ReqAccuracyInd"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2ReqDelayInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSystem -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSystem">
+        <rdf:type rdf:resource="&Ice;System"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestMapNodeInd"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestMapReqInd"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeInd"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2ReqInd"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.5.0) http://owlapi.sourceforge.net -->
+

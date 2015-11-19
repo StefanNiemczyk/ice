@@ -6,6 +6,7 @@
  */
 
 #include "ice/ontology/OntologyInterface.h"
+#include "ice/representation/split.h"
 
 #include "easylogging++.h"
 
@@ -142,6 +143,9 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
                                                          "(Ljava/lang/String;)Z");
   this->readInformationStructureAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface,
                                                                      "readInformationStructureAsASP",
+                                                                     "()Ljava/lang/String;");
+  this->readRepresentationsAsCSVMethod = this->env->GetMethodID(this->javaOntologyInterface,
+                                                                     "readRepresentationsAsCSV",
                                                                      "()Ljava/lang/String;");
   this->readNodesAndIROsAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface, "readNodesAndIROsAsASP",
                                                              "(Ljava/lang/String;)[[Ljava/lang/String;");
@@ -1139,6 +1143,46 @@ const char* OntologyInterface::readInformationStructureAsASP()
   delete cstr;
   return this->informationStructure.c_str();
 }
+
+const char* OntologyInterface::readRepresentationsAsCSV()
+{
+  this->checkError("readRepresentationsAsCsv", "Error exists, readRepresentationsAsCsv will not be executed");
+
+  jstring result = (jstring)env->CallObjectMethod(this->javaInterface, this->readRepresentationsAsCSVMethod);
+
+  if (this->checkError("readRepresentationsAsCsv", "Error occurred at reading representations"))
+    return "";
+
+  const char* cstr = env->GetStringUTFChars(result, 0);
+  env->ReleaseStringUTFChars(result, 0);
+
+  return cstr;
+}
+
+std::unique_ptr<std::vector<Representation*>> OntologyInterface::readRepresentations()
+{
+  std::unique_ptr<std::vector<Representation*>> reps(new std::vector<Representation*>);
+  this->checkError("readRepresentationsAsCsv", "Error exists, readRepresentationsAsCsv will not be executed");
+
+  jstring result = (jstring)env->CallObjectMethod(this->javaInterface, this->readRepresentationsAsCSVMethod);
+
+  if (this->checkError("readRepresentationsAsCsv", "Error occurred at reading representations"))
+    return reps;
+
+  const char* cstr = env->GetStringUTFChars(result, 0);
+  env->ReleaseStringUTFChars(result, 0);
+
+  std::vector<std::string> lines = split(cstr, '\n');
+
+  for (std::string line : lines) {
+    Representation* r = new Representation();
+    r->fromCSV(line);
+    reps->push_back(r);
+  }
+
+  return std::move(reps);
+}
+
 
 std::unique_ptr<std::vector<std::vector<const char*>*>> OntologyInterface::readNodesAndIROsAsASP(
     std::string const p_system)
