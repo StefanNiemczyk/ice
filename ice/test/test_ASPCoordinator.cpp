@@ -130,14 +130,6 @@ TEST(ASPModelGenerator, threeSystemsSimple)
   result = engine2->getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
   engine2->start();
 
-  // create engine 3
-  streamFactory = std::make_shared<TestFactory>();
-  timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine3 = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd3");
-  engine3->init();
-  result = engine3->getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
-  engine3->start();
-
   // wait some time to enable the engines to find each other
   std::this_thread::sleep_for(std::chrono::milliseconds {2000});
 
@@ -145,22 +137,18 @@ TEST(ASPModelGenerator, threeSystemsSimple)
   auto spec2 = ice::InformationSpecification("testEntity1", "testEntity", "testScope1", "testRepresentation2");
 
   // test processing system 1
-  auto stream1 = engine->getInformationStore()->getStream<ice::Position>(&spec1, "testSourceNodeInd", "testCoordination2_SystemInd1");
-  ASSERT_TRUE((stream1 ? true : false));
+  auto stream11 = engine->getInformationStore()->getStream<ice::Position>(&spec1, "testSourceNodeInd", "testCoordination2_SystemInd1");
+  ASSERT_TRUE((stream11 ? true : false));
+
+  auto stream12 = engine2->getInformationStore()->getStream<ice::Position>(&spec2, "testComputationalNodeInd", "testCoordination2_SystemInd2");
+  ASSERT_TRUE((stream12 ? true : false));
 
   // test processing system 2
-  auto stream2 = engine2->getInformationStore()->getStream<ice::Position>(&spec1, "testSourceNodeInd", "testCoordination2_SystemInd1");
-  ASSERT_TRUE((stream2 ? true : false));
+  auto stream21 = engine2->getInformationStore()->getStream<ice::Position>(&spec1, "testSourceNodeInd", "testCoordination2_SystemInd1");
+  ASSERT_TRUE((stream21 ? true : false));
 
-  stream2 = engine2->getInformationStore()->getStream<ice::Position>(&spec2, "testComputationalNodeInd", "testCoordination2_SystemInd2");
-  ASSERT_TRUE((stream2 ? true : false));
-
-  // test processing system 2
-  auto stream3 = engine3->getInformationStore()->getStream<ice::Position>(&spec1, "testSourceNodeInd", "testCoordination2_SystemInd1");
-  ASSERT_TRUE((stream3 ? true : false));
-
-  stream3 = engine3->getInformationStore()->getStream<ice::Position>(&spec2, "testComputationalNodeInd", "testCoordination2_SystemInd2");
-  ASSERT_TRUE((stream2 ? true : false));
+  auto stream22 = engine2->getInformationStore()->getStream<ice::Position>(&spec2, "testComputationalNodeInd", "testCoordination2_SystemInd2");
+  ASSERT_TRUE((stream22 ? true : false));
 
   // insert element in stream of system 2
   int x = rand();
@@ -172,18 +160,18 @@ TEST(ASPModelGenerator, threeSystemsSimple)
   position1->y = y;
   position1->z = z;
 
-  stream1->add(std::move(position1));
+  stream11->add(std::move(position1));
 
   // wait some time
   std::this_thread::sleep_for(std::chrono::milliseconds {500});
 
   // check if element was send to system 2 and placed in stream2
-  auto position2 = stream2->getLast();
+  auto position2 = stream12->getLast();
 
   ASSERT_TRUE((position2 ? true : false));
-  EXPECT_EQ(x, position2->getInformation().x);
-  EXPECT_EQ(y, position2->getInformation().y);
-  EXPECT_EQ(z, position2->getInformation().z);
+  EXPECT_EQ(x - 1, position2->getInformation().x);
+  EXPECT_EQ(y - 1, position2->getInformation().y);
+  EXPECT_EQ(z - 1, position2->getInformation().z);
 
   // TODO
 }
