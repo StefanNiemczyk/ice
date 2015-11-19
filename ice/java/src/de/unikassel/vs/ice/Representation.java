@@ -1,27 +1,24 @@
 package de.unikassel.vs.ice;
 
-public enum Representation {
-	NonNumericalRepresentation,
-		BooleanRep, ByteRep, StringRep, UnsignedByteRep,
+public final class Representation implements Comparable<Representation> {
+	public static final char DELIM = ';';
+	public static final String DELIM_STR = DELIM + "";
+	public Representation parent;
+	public String name;
 
-	NumericalRepresentation,
-		FloatNumericalRepresentation,
-			DoubleRep, FloatRep,
-		IntegerNumericalRepresentation,
-			IntegerRep, LongRep, ShortRep,
-			UnsignedIntegerRep, UnsignedLongRep, UnsignedShortRep,
+	public Representation(final String name, final Representation parent) {
+		this.name = name;
+		this.parent = parent;
+	}
 
-	CompositeRepresentation,
-		MovementRepresentation,
-			DefaultMovementRep,
-		OrientationRepresentation,
-			EulerAnglesRep,
-			RollPitchYawRep,
-		PositionRepresentation,
-			AddressRep,
-			CoordinatPositionRep,
-			RelativeCoordinatePositionRep,
-			WGS84Rep,
-		TimestampRepresentation,
-			UnixTimeRep,
+	@Override
+	public int compareTo(final Representation o) {
+		// TODO: Check order
+		return name.compareTo(o.name);
+	}
+
+	@Override
+	public String toString() {
+		return name + DELIM + parent;
+	}
 }

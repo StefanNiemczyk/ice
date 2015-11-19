@@ -189,7 +189,7 @@ add_library(${PROJECT_NAME}
   src/engine/ICEngine.cpp 
   src/engine/TimeFactory.cpp
   src/engine/XMLReader.cpp
-  src/engine/Representation.cpp
+  src/engine/RepresentationFactory.cpp
   
   src/engine/split.cpp
 
@@ -270,7 +270,11 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/test_ASPRepComputation.cpp
  # test/test_JNI.cpp
  # test/test_ASPCoordinator.cpp
+=======
+ # test/test_JNI.cpp
+  test/test_ASPCoordinator.cpp
  # test/test_serialize.cpp
+>>>>>>> Temporary merge branch 2
  # test/test_RingBuffer.cpp
  # test/test_Buffer.cpp
  # test/test_InformationStore.cpp
@@ -281,7 +285,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/test_Node.cpp
  # test/test_ModelComperator.cpp
  # test/test_ICEngine.cpp
-  test/test_Representation.cpp
+ # test/test_Representation.cpp
   test/test_main.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
 )

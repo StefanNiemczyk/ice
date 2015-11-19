@@ -1,39 +1,18 @@
-/*
- * Representation.h
- *
- *  Created on: 15.07.2015
- *      Author: paspartout
- */
+#ifndef REPRESENTATION_H
+#define REPRESENTATION_H
 
-#ifndef ICE_ICE_INCLUDE_ICE_REPRESENTATION_REPRESENTATION_H_
-#define ICE_ICE_INCLUDE_ICE_REPRESENTATION_REPRESENTATION_H_
-
-#include "RepresentationType.h"
 #include <string>
-#include <vector>
+
 
 namespace ice {
 
-class Representation {
-public:
-  Representation();
-  virtual ~Representation();
+struct Representation {
+  std::string name;
 
-  RepresentationType type;
-
-  int fromCSV(std::string reprStr, const char delim = ';');
-
-  template<typename T>
-  T get() {
-    return static_cast<T>(data);
-  }
-
-private:
-  void *convertDataStr(const char* dataStrs, RepresentationType type);
-
-  void *data;
+  Representation *parent;
+  std::vector<Representation*> subclasses;
 };
 
-}  // namespace ice
+}
 
-#endif /* ICE_ICE_INCLUDE_ICE_REPRESENTATION_REPRESENTATION_H_ */
+#endif // REPRESENTATION_H
