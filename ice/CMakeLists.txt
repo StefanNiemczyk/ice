@@ -116,6 +116,7 @@ catkin_package(
 ###########
 
 ## Java Build
+#set(CMAKE_JAR_CLASSES_PREFIX java/src/de/unikassel/vs/ice/)
 add_jar(
   java_ontology_interface 
   SOURCES java/src/de/unikassel/vs/ice/IceOntologyInterface.java
