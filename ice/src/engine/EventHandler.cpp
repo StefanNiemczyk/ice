@@ -31,7 +31,8 @@ EventHandler::EventHandler(const int numThreads, const int bufferSize)
 
 EventHandler::~EventHandler()
 {
-  //
+  if (this->running)
+    this->cleanUp();
 }
 
 void EventHandler::init()

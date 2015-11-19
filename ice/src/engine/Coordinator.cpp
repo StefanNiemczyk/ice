@@ -119,11 +119,6 @@ std::shared_ptr<EngineState> Coordinator::getEngineState(identifier engineId)
 {
   std::lock_guard<std::mutex> guard(mtx_);
 
-  return this->getEngineStateNoMutex(engineId);
-}
-
-std::shared_ptr<EngineState> Coordinator::getEngineStateNoMutex(identifier engineId)
-{
   for (auto engineState : this->engineStates)
   {
     if (engineState->getEngineId() == engineId)
@@ -132,6 +127,31 @@ std::shared_ptr<EngineState> Coordinator::getEngineStateNoMutex(identifier engin
 
   std::shared_ptr<EngineState> ptr;
   return ptr;
+}
+
+std::shared_ptr<EngineState> Coordinator::getEngineStateNoMutex(identifier engineId, bool returnNew)
+{
+  for (auto engineState : this->engineStates)
+  {
+    if (engineState->getEngineId() == engineId)
+      return engineState;
+  }
+
+  // New engine, request engine specification
+  _log->info("New engine discovered %v", IDGenerator::toString(engineId));
+
+  auto engineState = std::make_shared<EngineState>(engineId, this->engine);
+  this->engineStates.push_back(engineState);
+
+  engineState->updateTimeLastActivity();
+  engineState->getRequesting()->state = CooperationState::SYSTEM_SPEC_REQUESTED;
+
+  this->communication->sendSystemSpecRequest(engineId);
+
+  if (returnNew)
+    return engineState;
+  else
+    return nullptr;
 }
 
 int Coordinator::onEngineHeartbeat(identifier engineId, time timestamp)
@@ -144,38 +164,23 @@ int Coordinator::onEngineHeartbeat(identifier engineId, time timestamp)
 
   std::lock_guard<std::mutex> guard(mtx_);
 
-  auto engineState = this->getEngineStateNoMutex(engineId);
+  auto engineState = this->getEngineStateNoMutex(engineId, true);
 
-  if (engineState)
+  _log->verbose(1, "Update lastActiveTime of %v with %v", IDGenerator::toString(engineId),
+                timestamp);
+
+  if (this->timeFactory->checkTimeout(engineState->getTimeLastActivity(), this->config->getHeartbeatTimeout()))
   {
-    _log->verbose(1, "Update lastActiveTime of %v with %v", IDGenerator::toString(engineId),
-                  timestamp);
+    _log->info("Engine rediscovered %v", IDGenerator::toString(engineId));
 
-    if (this->timeFactory->checkTimeout(engineState->getTimeLastActivity(), this->config->getHeartbeatTimeout()))
+    if (engineState->isNodesKnown())
     {
-      _log->info("Engine rediscovered %v", IDGenerator::toString(engineId));
-
-      if (engineState->isNodesKnown())
-      {
-        engineState->getRequesting()->state = CooperationState::SYSTEM_SPEC_RECEIVCED;
-        this->updateStrategie->onEngineDiscovered(engineState);
-      }
+      engineState->getRequesting()->state = CooperationState::SYSTEM_SPEC_RECEIVCED;
+      this->updateStrategie->onEngineDiscovered(engineState);
     }
-
-    engineState->setTimeLastActivity(timestamp);
-
-    return 0;
   }
 
-  _log->info("New engine discovered %v", IDGenerator::toString(engineId));
-
-  engineState = std::make_shared<EngineState>(engineId, this->engine);
-  this->engineStates.push_back(engineState);
-
   engineState->setTimeLastActivity(timestamp);
-  engineState->getRequesting()->state = CooperationState::SYSTEM_SPEC_REQUESTED;
-
-  this->communication->sendSystemSpecRequest(engineId);
 
   return 0;
 }
@@ -189,18 +194,7 @@ int Coordinator::onSystemSpecRequest(identifier engineId)
 
   std::lock_guard<std::mutex> guard(mtx_);
 
-  auto engineState = this->getEngineStateNoMutex(engineId);
-
-  // check if requesting engine is already known
-  if (false == engineState)
-  {
-    _log->info("System specification request from unknown engine %v", IDGenerator::toString(engineId));
-
-    engineState = std::make_shared<EngineState>(engineId, this->engine);
-    this->engineStates.push_back(engineState);
-
-    engineState->getOffering()->state = CooperationState::UNKNOWN;
-  }
+  auto engineState = this->getEngineStateNoMutex(engineId, true);
   engineState->updateTimeLastActivity();
 
   // check if current request is ok at current cooperation state
@@ -233,19 +227,7 @@ int Coordinator::onSystemSpec(identifier engineId,
 
   std::lock_guard<std::mutex> guard(mtx_);
 
-  auto engineState = this->getEngineStateNoMutex(engineId);
-
-  // check if engine is already known
-   if (false == engineState)
-   {
-     _log->info("System specification received from unknown engine %v", IDGenerator::toString(engineId));
-
-     engineState = std::make_shared<EngineState>(engineId, this->engine);
-     this->engineStates.push_back(engineState);
-
-     // TODO return?
-   }
-
+  auto engineState = this->getEngineStateNoMutex(engineId, true);
    engineState->updateTimeLastActivity();
 
    // check if current request is ok at current cooperation state
@@ -306,18 +288,7 @@ int Coordinator::onSubModelRequest(identifier engineId, SubModelDesc modelDesc)
 
   std::lock_guard<std::mutex> guard(mtx_);
 
-  auto engineState = this->getEngineStateNoMutex(engineId);
-
-  // check if engine is known
-  if (false == engineState)
-  {
-    _log->info("Sub model request received from unknown engine %v", IDGenerator::toString(engineId));
-
-    engineState = std::make_shared<EngineState>(engineId, this->engine);
-    this->engineStates.push_back(engineState);
-
-    // TODO return?
-  }
+  auto engineState = this->getEngineStateNoMutex(engineId, true);
   engineState->updateTimeLastActivity();
 
   // check if current request is ok at current cooperation state
@@ -359,7 +330,7 @@ int Coordinator::onSubModelResponse(identifier engineId, int index, bool accept)
 
   std::lock_guard<std::mutex> guard(mtx_);
 
-  auto engineState = this->getEngineStateNoMutex(engineId);
+  auto engineState = this->getEngineStateNoMutex(engineId, false);
 
   // check if engine is known
   if (false == engineState)
@@ -427,7 +398,7 @@ int Coordinator::onNegotiationFinished(identifier engineId)
 
   std::lock_guard<std::mutex> guard(mtx_);
 
-  auto engineState = this->getEngineStateNoMutex(engineId);
+  auto engineState = this->getEngineStateNoMutex(engineId, false);
 
   // check if engine is known
   if (false == engineState)
@@ -467,7 +438,7 @@ int Coordinator::onStopCooperation(identifier engineId)
 
    std::lock_guard<std::mutex> guard(mtx_);
 
-   auto engineState = this->getEngineStateNoMutex(engineId);
+   auto engineState = this->getEngineStateNoMutex(engineId, false);
 
    // check if engine is known
    if (false == engineState)

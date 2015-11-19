@@ -18,7 +18,10 @@ TEST(NodeStoreTest, create)
   ice::NodeStore store(engine);
 
   std::map<std::string, std::string> config;
-  auto node = store.registerNode(ice::NodeType::PROCESSING, "smothing", "SmothingProcessingNode", "testEntity1", config);
+//  const NodeType type, const std::string className, const std::string name,
+//                                       const ont::entity entity, const ont::entity entityRelated,
+//                                       std::map<std::string, std::string> config,
+  auto node = store.registerNode(ice::NodeType::PROCESSING, "smothing", "SmothingProcessingNode", "testEntity1", "none", config);
 
   ASSERT_TRUE(node ? true : false);
 }

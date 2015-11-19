@@ -126,7 +126,7 @@ add_jar(
   java/src/de/unikassel/vs/ice/NodeIROVisitor.java
   java/src/de/unikassel/vs/ice/RepresentationVisitor.java
   java/src/de/unikassel/vs/ice/Representation.java
-  java/src/de/unikassel/vs/ice/RepresentationIndividual.java
+  #java/src/de/unikassel/vs/ice/RepresentationIndividual.java
   OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/java/lib
 )
 
@@ -267,14 +267,10 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/etc/TestTime.cpp
  # test/etc/EngineStuff.cpp
  # test/test_ASPComposition.cpp
-  test/test_ASPRepComputation.cpp
- # test/test_JNI.cpp
- # test/test_ASPCoordinator.cpp
-=======
+ # test/test_ASPRepComputation.cpp
  # test/test_JNI.cpp
   test/test_ASPCoordinator.cpp
  # test/test_serialize.cpp
->>>>>>> Temporary merge branch 2
  # test/test_RingBuffer.cpp
  # test/test_Buffer.cpp
  # test/test_InformationStore.cpp

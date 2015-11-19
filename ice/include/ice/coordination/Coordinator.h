@@ -91,7 +91,7 @@ public:
 
   std::shared_ptr<EngineState> getEngineState(std::string p_iri);
 
-  std::shared_ptr<EngineState> getEngineStateNoMutex(identifier engineId);
+  std::shared_ptr<EngineState> getEngineStateNoMutex(identifier engineId, bool returnNew);
 
   std::shared_ptr<EngineState> getEngineStateNoMutex(std::string p_iri);
 
