@@ -1,5 +1,6 @@
 ice/java/lib/java_ontology_interface.jar
 ice/java/lib/CMakeFiles
+ice/test/logs
 
 *.class
 *.lp~
