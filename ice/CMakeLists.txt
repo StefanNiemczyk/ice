@@ -162,6 +162,7 @@ add_library(${PROJECT_NAME}
   src/engine/StreamDescription.cpp
 #  src/engine/StreamTemplateDescription.cpp
   
+  src/engine/AutoIRONode.cpp
   src/engine/AsynchronousTask.cpp
   src/engine/EventHandler.cpp
   src/engine/LambdaTask.cpp
@@ -268,7 +269,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/etc/EngineStuff.cpp
  # test/test_ASPComposition.cpp
  # test/test_ASPRepComputation.cpp
- # test/test_JNI.cpp
+  test/test_JNI.cpp
   test/test_ASPCoordinator.cpp
  # test/test_serialize.cpp
  # test/test_RingBuffer.cpp

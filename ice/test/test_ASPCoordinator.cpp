@@ -73,7 +73,7 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   engine2->start();
 
   // wait some time to enable the engines to find each other
-  std::this_thread::sleep_for(std::chrono::milliseconds {1000});
+  std::this_thread::sleep_for(std::chrono::milliseconds {2000});
 
   // test processing system 1
   auto spec1 = ice::InformationSpecification("testEntity1", "testEntity", "testScope1", "testRepresentation1");
