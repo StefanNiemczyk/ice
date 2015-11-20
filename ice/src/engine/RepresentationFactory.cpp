@@ -47,8 +47,10 @@ Representation* RepresentationFactory::fromCSV(std::string reprStr,
 
   Representation *rep = addOrGet(tokens.front());
   tokens.erase(tokens.begin());
-  
-  for (std::string t : tokens) {
+
+  for (int i = 0; i < tokens.size(); ++i) {
+    std::string t = tokens.at(i);
+    rep->mapping[t] = i;
     rep->subclasses.push_back(addOrGet(t));
   }
 
@@ -97,11 +99,16 @@ std::shared_ptr<std::map<std::string, BaseRepresentationInstance*>> Representati
 RepresentationInstance *RepresentationFactory::makeInstance(std::string repName)
 {
   Representation *rep = addOrGet(repName);
-  RepresentationInstance *ins = new RepresentationInstance(rep);
+  return this->makeInstance(rep);
+}
 
-  for (Representation *sc : rep->subclasses) {
-    RepresentationInstance *subIns = makeInstance(sc->name);
-    ins->subs[sc->name] = subIns;
+RepresentationInstance *RepresentationFactory::makeInstance(Representation* representation)
+{
+  RepresentationInstance *ins = new RepresentationInstance(representation);
+
+  for (Representation *sc : representation->subclasses) {
+    RepresentationInstance *subIns = makeInstance(sc);
+    ins->subs.push_back(subIns);
   }
   
   return ins;

@@ -2219,13 +2219,13 @@ TEST(JNITest, representations)
   ice::RepresentationInstance* movement = fac->makeInstance("defaultMovementRep");
 
   const float testVal = 4.2f;
-  movement->subs.at("translation")
-          ->subs.at("floatNumericalRepresentation")
+  movement->sub("translation")
+          ->sub("floatNumericalRepresentation")
           ->setValue<float>(testVal);
   
   float *val =
-  movement->subs.at("translation")
-          ->subs.at("floatNumericalRepresentation")
+  movement->sub("translation")
+          ->sub("floatNumericalRepresentation")
           ->getValue<float>();
   
   ASSERT_EQ(testVal, *val);

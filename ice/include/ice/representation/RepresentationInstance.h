@@ -2,12 +2,16 @@
 #define REPRESENTATION_INSTANCE_H
 
 #include <iostream>
+#include <vector>
 
 namespace ice {
 
 class BaseRepresentationInstance {};
 
 class RepresentationInstance : public BaseRepresentationInstance {
+  friend class RepresentationFactory;
+
+
 public:
 
   RepresentationInstance(Representation *rep)
@@ -18,8 +22,8 @@ public:
   
   ~RepresentationInstance()
   {
-    if (this->data != nullptr)
-      delete this->data;
+//    if (this->data != nullptr)
+//      delete this->data;
 
     // TODO delete others
   }
@@ -29,8 +33,8 @@ public:
   	T *v = new T;
   	*v = val;
 
-  	if (this->data != nullptr)
-  	  delete this->data;
+//  	if (this->data != nullptr)
+//  	  delete this->data;
 
   	data = (void*) v;
   }
@@ -48,9 +52,22 @@ public:
     return this->data;
   }
 
+  RepresentationInstance* sub(int index)
+  {
+    return this->subs.at(index);
+  }
+
+  RepresentationInstance* sub(std::string name)
+  {
+    int index = this->representation->mapping.at(name);
+    return this->subs.at(index);
+  }
+
+private:
   void *data;
   Representation *representation;
-  std::map<std::string, RepresentationInstance*> subs;
+  std::vector<RepresentationInstance*> subs;
+//  std::map<std::string, RepresentationInstance*> subs;
 };
 
 }

@@ -1,6 +1,7 @@
 #ifndef REPRESENTATION_H
 #define REPRESENTATION_H
 
+#include <map>
 #include <string>
 
 
@@ -11,6 +12,7 @@ struct Representation {
 
   Representation *parent;
   std::vector<Representation*> subclasses;
+  std::map<std::string, int> mapping;
 };
 
 }

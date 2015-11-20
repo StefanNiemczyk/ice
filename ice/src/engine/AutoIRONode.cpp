@@ -39,4 +39,11 @@ int AutoIRONode::cleanUp()
   return 0;
 }
 
+int AutoIRONode::performNode()
+{
+  // TODO
+
+  return 0;
+}
+
 } /* namespace ice */
