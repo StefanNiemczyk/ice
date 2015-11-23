@@ -6,50 +6,58 @@
 
 namespace ice {
 
-class BaseRepresentationInstance {};
-
-class RepresentationInstance : public BaseRepresentationInstance {
-  friend class RepresentationFactory;
-
-
+class RepresentationInstance {
 public:
-
   RepresentationInstance(Representation *rep)
   {
-    representation = rep;
-    this->data = nullptr;
+    this->representation = rep;
+  }
+  virtual ~RepresentationInstance()
+  {
+
+  }
+
+  virtual void* get(int *indecies) = 0;
+
+  virtual void set(int *indecies, const void* value) = 0;
+
+  virtual RepresentationInstance* clone() = 0;
+
+protected:
+  Representation *representation;
+};
+
+class CompositeRepresentationInstance : public RepresentationInstance {
+  friend class RepresentationFactory;
+
+public:
+  CompositeRepresentationInstance(Representation *rep) : RepresentationInstance(rep)
+  {
+    //
   }
   
-  ~RepresentationInstance()
+  virtual ~CompositeRepresentationInstance()
   {
-//    if (this->data != nullptr)
-//      delete this->data;
-
-    // TODO delete others
+    //
   }
 
-  template<typename T>
-  void setValue(T val) {
-  	T *v = new T;
-  	*v = val;
+  virtual RepresentationInstance* clone()
+  {
+    CompositeRepresentationInstance* instance = new CompositeRepresentationInstance(this->representation);
 
-//  	if (this->data != nullptr)
-//  	  delete this->data;
+    instance->subs = this->subs;
 
-  	data = (void*) v;
+    return instance;
   }
 
-  template<typename T>
-  T* getValue() {
-  	return reinterpret_cast<T*>(data);
+  virtual void* get(int *indecies)
+  {
+    return this->subs.at(*indecies)->get(++indecies);
   }
 
-  void setValue(void *value) {
-    this->data = value;
-  }
-
-  void* getRaw() {
-    return this->data;
+  virtual void set(int *indecies, const void* value)
+  {
+    return this->subs.at(*indecies)->set(++indecies, value);
   }
 
   RepresentationInstance* sub(int index)
@@ -64,10 +72,447 @@ public:
   }
 
 private:
-  void *data;
-  Representation *representation;
   std::vector<RepresentationInstance*> subs;
-//  std::map<std::string, RepresentationInstance*> subs;
+};
+
+
+class BasicRepresentationInstance : public RepresentationInstance {
+  // TODO
+public:
+  BasicRepresentationInstance(Representation *rep) : RepresentationInstance(rep)
+  {
+    //
+  }
+
+  virtual ~BasicRepresentationInstance()
+  {
+    //
+  }
+
+  virtual void* get(int *indecies)
+  {
+    return this->getRaw();
+  }
+
+  virtual void set(int *indecies, const void* value)
+  {
+    return this->setRaw(value);
+  }
+
+  virtual void* getRaw() = 0;
+  virtual void setRaw(const void* value) = 0;
+  virtual RepresentationInstance* clone() = 0;
+
+protected:
+  BasicRepresentationType type;
+};
+
+//* BoolRepresentationInstance
+/**
+ * Boolean representation
+ */
+class BoolRepresentationInstance : public BasicRepresentationInstance {
+public:
+  BoolRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    BoolRepresentationInstance* instance = new BoolRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((bool*) value);
+  }
+
+private:
+  bool value;
+};
+
+//* ByteRepresentationInstance
+/**
+ * Byte representation
+ */
+class ByteRepresentationInstance : public BasicRepresentationInstance {
+public:
+  ByteRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    ByteRepresentationInstance* instance = new ByteRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((int8_t*) value);
+  }
+
+private:
+  int8_t value;
+};
+
+//* UnsignedByteRepresentationInstance
+/**
+ * Unsigned byte representation
+ */
+class UnsignedByteRepresentationInstance : public BasicRepresentationInstance {
+public:
+  UnsignedByteRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    UnsignedByteRepresentationInstance* instance = new UnsignedByteRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((uint8_t*) value);
+  }
+
+private:
+  uint8_t value;
+};
+
+//* ShortRepresentationInstance
+/**
+ * Short representation
+ */
+class ShortRepresentationInstance : public BasicRepresentationInstance {
+public:
+  ShortRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    ShortRepresentationInstance* instance = new ShortRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((short*) value);
+  }
+
+private:
+  short value;
+};
+
+//* IntegerRepresentationInstance
+/**
+ * Integer representation
+ */
+class IntegerRepresentationInstance : public BasicRepresentationInstance {
+public:
+  IntegerRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    IntegerRepresentationInstance* instance = new IntegerRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((int*) value);
+  }
+
+private:
+  int value;
+};
+
+//* LongRepresentationInstance
+/**
+ * Long representation
+ */
+class LongRepresentationInstance : public BasicRepresentationInstance {
+public:
+  LongRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    LongRepresentationInstance* instance = new LongRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((long*) value);
+  }
+
+private:
+  long value;
+};
+
+//* UnsignedShortRepresentationInstance
+/**
+ * Unsigned short representation
+ */
+class UnsignedShortRepresentationInstance : public BasicRepresentationInstance {
+public:
+  UnsignedShortRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    UnsignedShortRepresentationInstance* instance = new UnsignedShortRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((unsigned short*) value);
+  }
+
+private:
+  unsigned short value;
+};
+
+//* UnsignedIntegerRepresentationInstance
+/**
+ * Unsigned integer representation
+ */
+class UnsignedIntegerRepresentationInstance : public BasicRepresentationInstance {
+public:
+  UnsignedIntegerRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    UnsignedIntegerRepresentationInstance* instance = new UnsignedIntegerRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((unsigned int*) value);
+  }
+
+private:
+  unsigned int value;
+};
+
+//* UnsignedLongRepresentationInstance
+/**
+ * unsigned long representation
+ */
+class UnsignedLongRepresentationInstance : public BasicRepresentationInstance {
+public:
+  UnsignedLongRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    UnsignedLongRepresentationInstance* instance = new UnsignedLongRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((unsigned long*) value);
+  }
+
+private:
+  unsigned long value;
+};
+
+//* FloatRepresentationInstance
+/**
+ * Float representation
+ */
+class FloatRepresentationInstance : public BasicRepresentationInstance {
+public:
+  FloatRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    FloatRepresentationInstance* instance = new FloatRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((float*) value);
+  }
+
+private:
+  float value;
+};
+
+//* DoubleRepresentationInstance
+/**
+ * Double representation
+ */
+class DoubleRepresentationInstance : public BasicRepresentationInstance {
+public:
+  DoubleRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    DoubleRepresentationInstance* instance = new DoubleRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((double*) value);
+  }
+
+private:
+  double value;
+};
+
+//* StringRepresentationInstance
+/**
+ * String representation
+ */
+class StringRepresentationInstance : public BasicRepresentationInstance {
+public:
+  StringRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  {
+//    this->value = false;
+  }
+
+  virtual RepresentationInstance* clone()
+  {
+    StringRepresentationInstance* instance = new StringRepresentationInstance(this->representation);
+
+    instance->value = this->value;
+
+    return instance;
+  }
+
+  virtual void* getRaw()
+  {
+    return &this->value;
+  }
+
+  virtual void setRaw(const void* value)
+  {
+    this->value = *((std::string*) value);
+  }
+
+private:
+  std::string value;
 };
 
 }

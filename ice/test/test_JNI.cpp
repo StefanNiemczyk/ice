@@ -2215,18 +2215,14 @@ TEST(JNITest, representations)
   ASSERT_TRUE(result);
 
   std::unique_ptr<ice::RepresentationFactory> fac = oi.readRepresentations();
-
-  ice::RepresentationInstance* movement = fac->makeInstance("defaultMovementRep");
+  auto rep = fac->getRepresentation("defaultMovementRep");
+  ice::RepresentationInstance* movement = fac->makeInstance(rep);
 
   const float testVal = 4.2f;
-  movement->sub("translation")
-          ->sub("floatNumericalRepresentation")
-          ->setValue<float>(testVal);
+  int* pos = new int[1]{rep->mapping["translation"]};
+  movement->set(pos, &testVal);
   
-  float *val =
-  movement->sub("translation")
-          ->sub("floatNumericalRepresentation")
-          ->getValue<float>();
+  float *val = (float*) movement->get(pos);
   
   ASSERT_EQ(testVal, *val);
   std::cout << "VAL: " << *val << std::endl;

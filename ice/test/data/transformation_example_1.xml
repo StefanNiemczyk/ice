@@ -1,0 +1,37 @@
+<transformations>
+
+	<transformation name="Coordinates3DToCoordinates2D">
+		<input id="1" representation="Coordinates3D" />
+
+		<output representation="Coordinates2D" />
+
+		<dimensions>
+			<dimension name="XCoordinate">
+				<use from_id="1" value="XCoordinate"/>
+			</dimension>
+			<dimension name="YCoordinate">
+				<use from_id="1" value="YCoordinate"/>			
+			</dimension>
+		</dimensions>
+	</transformation>
+
+
+	<transformation name="Coordinates2DToCoordinates3D">
+		<input id="1" representation="Coordinates2D" />
+
+		<output representation="Coordinates3D" />
+
+		<operations>
+			<dimension name="XCoordinate">
+				<use from_id="1" value="XCoordinate"/>
+			</dimension>
+			<dimension name="YCoordinate">
+				<use from_id="1" value="YCoordinate"/>			
+			</dimension>
+			<dimension name="ZCoordinate">
+				<default value="0"/>
+			</dimension>
+		</operations>
+	</transformation>
+
+</transformations>

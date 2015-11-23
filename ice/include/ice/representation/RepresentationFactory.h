@@ -29,8 +29,10 @@ public:
 
   std::shared_ptr<std::vector<Representation*>> getRepVec();
   std::shared_ptr<std::map<std::string, Representation*>> getRepMap();
+  BasicRepresentationType getBasicRep(std::string rep);
 
-  std::shared_ptr<std::map<std::string, BaseRepresentationInstance*>> getInstanceMap();
+  std::shared_ptr<std::map<std::string, RepresentationInstance*>> getInstanceMap();
+  Representation* getRepresentation(std::string representation);
 
   RepresentationInstance *makeInstance(std::string name);
   RepresentationInstance *makeInstance(Representation* representation);
@@ -38,12 +40,12 @@ public:
   void printReps();
 
 private:
+  Representation* addOrGet(std::string name);
+
   std::shared_ptr<std::vector<Representation*>> repVec;
   std::shared_ptr<std::map<std::string, Representation*>> repMap;
-
-  std::shared_ptr<std::map<std::string, BaseRepresentationInstance*>> repInstanceMap;
-
-  Representation* addOrGet(std::string name);
+  std::shared_ptr<std::map<std::string, RepresentationInstance*>> repInstanceMap;
+  std::map<std::string, BasicRepresentationType> typeMap;
 };
 
 }  // namespace ice
