@@ -229,6 +229,13 @@ public class RepresentationVisitor extends IceVisitor {
 	@Override
 	public void visit(final OWLObjectSomeValuesFrom ce) {
 		debuglog("SOMEVALUESFROM: " + ce.getFiller());
+		OWLClassExpression filler = ce.getFiller();
+		ClassExpressionType fillerType = filler.getClassExpressionType();
+
+		if (fillerType == ClassExpressionType.OWL_CLASS
+				&& iRIShortName(filler.asOWLClass().getIRI()).equals("positionRepresentation"))
+			return;
+
 		visitClassExpression(ce.getFiller());
 
 	}
