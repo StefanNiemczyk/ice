@@ -2613,7 +2613,7 @@ public:
         setGlobally(ConfigurationType::LogFlushThreshold, std::string("0"), true);
 
         setGlobally(ConfigurationType::Format, std::string("%datetime %level [%logger] %msg"), true);
-        set(Level::Debug, ConfigurationType::Format, std::string("%datetime %level [%logger] [%user@%host] [%func] [%loc] %msg"));
+        set(Level::Debug, ConfigurationType::Format, std::string("%datetime %level [%logger] %msg"));
         // INFO and WARNING are set to default by Level::Global
         set(Level::Error, ConfigurationType::Format, std::string("%datetime %level [%logger] %msg"));
         set(Level::Fatal, ConfigurationType::Format, std::string("%datetime %level [%logger] %msg"));
@@ -2641,7 +2641,7 @@ public:
         unsafeSetIfNotExist(Level::Global, ConfigurationType::MaxLogFileSize, std::string("0"));
         unsafeSetIfNotExist(Level::Global, ConfigurationType::Format, std::string("%datetime %level [%logger] %msg"));
         unsafeSetIfNotExist(Level::Debug, ConfigurationType::Format, 
-            std::string("%datetime %level [%logger] [%user@%host] [%func] [%loc] %msg"));
+            std::string("%datetime %level [%logger] %msg"));
         // INFO and WARNING are set to default by Level::Global
         unsafeSetIfNotExist(Level::Error, ConfigurationType::Format, std::string("%datetime %level [%logger] %msg"));
         unsafeSetIfNotExist(Level::Fatal, ConfigurationType::Format, std::string("%datetime %level [%logger] %msg"));
