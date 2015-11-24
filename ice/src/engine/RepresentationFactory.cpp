@@ -90,20 +90,19 @@ BasicRepresentationType RepresentationFactory::getBasicRep(std::string rep)
 
 
 Representation* RepresentationFactory::addOrGet(std::string name) {
-  Representation *res = NULL;
+  Representation *rep = NULL;
 
   if (repMap->count(name) > 0) {
-    res = repMap->at(name);
+    rep = repMap->at(name);
   }
   else {
-    res = new Representation;
-    res->name = name;
-    res->parent = NULL;
-    res->type = BasicRepresentationType::UNSET;
-    repMap->insert(std::pair<std::string, Representation*>(name, res));
+    rep = new Representation;
+    rep->name = name;
+    rep->type = BasicRepresentationType::UNSET;
+    repMap->insert(std::pair<std::string, Representation*>(name, rep));
   }
 
-  return res;
+  return rep;
 }
 
 std::shared_ptr<std::vector<Representation*>> RepresentationFactory::fromCSVStrings(
@@ -111,7 +110,17 @@ std::shared_ptr<std::vector<Representation*>> RepresentationFactory::fromCSVStri
 {
 
   for (std::string line : lines) {
+    if (line == "")
+      continue;
+
     Representation *r = fromCSV(line);
+
+    if (r == nullptr)
+    {
+      std::cout << "Error: No representation extracted from " << line << std::endl;
+      continue;
+    }
+
     repVec->push_back(r);
   }
 
@@ -184,6 +193,9 @@ RepresentationInstance *RepresentationFactory::makeInstance(Representation* repr
         break;
       case STRING:
         ins = new StringRepresentationInstance(representation);
+        break;
+      default:
+        std::cout << "Error: Unknown representation basic type " << representation->name << std::endl;
         break;
     }
 

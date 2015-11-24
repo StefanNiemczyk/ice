@@ -27,7 +27,6 @@ enum BasicRepresentationType {
 struct Representation {
   std::string name;
 
-  Representation *parent;
   std::vector<Representation*> subclasses;
   std::map<std::string, int> mapping;
   BasicRepresentationType type;

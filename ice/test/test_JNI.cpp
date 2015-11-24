@@ -2226,7 +2226,6 @@ TEST(JNITest, representations)
   
   ASSERT_EQ(testVal, *val);
   std::cout << "VAL: " << *val << std::endl;
-
   }
 
 }
