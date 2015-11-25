@@ -184,17 +184,15 @@ add_library(${PROJECT_NAME}
   src/engine/FastUpdateStrategie.cpp
   src/engine/UpdateStrategie.cpp
   
-  src/engine/RepresentationFactory.cpp
+  src/engine/GContainerFactory.cpp
+  src/engine/split.cpp
   src/engine/Transformation.cpp
   
   src/engine/Configuration.cpp
   src/engine/Identifier.cpp
   src/engine/ICEngine.cpp 
   src/engine/TimeFactory.cpp
-  src/engine/XMLReader.cpp
-  
-  
-  src/engine/split.cpp
+  src/engine/XMLReader.cpp  
 
   src/ros/RosCommunication.cpp
   src/ros/RosInformationSender.cpp

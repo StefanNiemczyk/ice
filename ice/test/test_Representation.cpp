@@ -6,7 +6,8 @@
 #include <ros/package.h>
 
 #include "ice/ontology/OntologyInterface.h"
-#include "ice/representation/RepresentationFactory.h"
+#include "ice/representation/GContainer.h"
+#include "ice/representation/GContainerFactory.h"
 #include "ice/representation/Representation.h"
 
 #include "gtest/gtest.h"
@@ -15,7 +16,7 @@
 namespace
 {
 
-TEST(RepresentationTest, representations)
+TEST(GContainerTest, simpleTest)
 {
   // Given a valid empty ice ontology
   std::string path = ros::package::getPath("ice");
@@ -41,18 +42,19 @@ TEST(RepresentationTest, representations)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  std::unique_ptr<ice::RepresentationFactory> fac = oi.readRepresentations();
+  ice::GContainerFactory fac;
+  fac.fromCSVStrings(oi.readRepresentations());
 
-  auto rep = fac->getRepresentation("defaultMovementRep");
-  auto movement = fac->makeInstance(rep);
+  auto rep = fac.getRepresentation("defaultMovementRep");
+  auto movement = fac.makeInstance(rep);
 
   const double testVal = 4.2f;
   int* pos = rep->accessPath({"translation"});
   movement->set(pos, &testVal);
 
-  double *val = (double*) movement->get(pos);
+  double val = movement->getValue<double>(pos);
 
-  ASSERT_EQ(testVal, *val);
+  ASSERT_EQ(testVal, val);
 //  std::cout << "VAL: " << *val << std::endl;
 
 //  movement->print();

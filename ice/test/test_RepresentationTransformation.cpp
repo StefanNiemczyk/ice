@@ -9,7 +9,8 @@
 #include <ros/package.h>
 
 #include "ice/representation/Representation.h"
-#include "ice/representation/RepresentationFactory.h"
+#include "ice/representation/GContainer.h"
+#include "ice/representation/GContainerFactory.h"
 #include "ice/representation/Transformation.h"
 
 #include "gtest/gtest.h"
@@ -19,16 +20,16 @@ namespace
 
 TEST(RepresentationTransformationTest, simpleTransformation)
 {
-  std::shared_ptr<ice::RepresentationFactory> factory = std::make_shared<ice::RepresentationFactory>();
+  std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
 
-  std::vector<std::string> lines;
-  lines.push_back("testRep1;dim1;doubleRep");
-  lines.push_back("testRep1;dim2;integerRep");
-  lines.push_back("|");
-  lines.push_back("testRep2;dim1;integerRep");
-  lines.push_back("testRep2;dim2;doubleRep");
+  std::unique_ptr<std::vector<std::string>> lines(new std::vector<std::string>);
+  lines->push_back("testRep1;dim1;doubleRep");
+  lines->push_back("testRep1;dim2;integerRep");
+  lines->push_back("|");
+  lines->push_back("testRep2;dim1;integerRep");
+  lines->push_back("testRep2;dim2;doubleRep");
 
-  factory->fromCSVStrings(lines);
+  factory->fromCSVStrings(std::move(lines));
 
   auto rep1 = factory->getRepresentation("testRep1");
   auto rep2 = factory->getRepresentation("testRep2");

@@ -1,9 +1,10 @@
 #ifndef SPLIT_H
 #define SPLIT_H
 
-#include <vector>
+#include <memory>
 #include <string>
+#include <vector>
 
-std::vector<std::string> split(const char *str, const char c);
+std::unique_ptr<std::vector<std::string>> split(const char *str, const char c);
 
 #endif // SPLIT_H

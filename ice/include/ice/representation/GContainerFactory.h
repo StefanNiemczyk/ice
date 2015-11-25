@@ -13,25 +13,38 @@
 #include <memory>
 #include <map>
 
-#include "Representation.h"
-#include "RepresentationInstance.h"
+#include "ice/representation/Representation.h"
+
+//Forward declaration
+namespace ice
+{
+class ICEngine;
+class OntologyInterface;
+class GContainer;
+} /* namespace ice */
 
 namespace ice {
 
-class RepresentationFactory {
+class GContainerFactory {
 public:
-  RepresentationFactory();
-  virtual ~RepresentationFactory();
+  GContainerFactory();
+  GContainerFactory(std::weak_ptr<ICEngine> engine);
+  virtual ~GContainerFactory();
 
-  int fromCSVStrings(std::vector<std::string> lines);
+  void init();
+  void cleanUp();
+
+  int fromCSVStrings(std::unique_ptr<std::vector<std::string>> lines);
   std::shared_ptr<Representation> getRepresentation(std::string representation);
 
-  std::shared_ptr<RepresentationInstance> makeInstance(std::string name);
-  std::shared_ptr<RepresentationInstance> makeInstance(std::shared_ptr<Representation> representation);
+  std::shared_ptr<GContainer> makeInstance(std::string name);
+  std::shared_ptr<GContainer> makeInstance(std::shared_ptr<Representation> representation);
 
   void printReps();
 
 private:
+  std::weak_ptr<ICEngine> engine;
+  std::shared_ptr<OntologyInterface> ontologyInterface;
   void printReps(std::shared_ptr<Representation> representation, int depth);
   std::shared_ptr<Representation> fromCSV(std::string reprStr, std::map<std::string, std::shared_ptr<Representation>> *tmpMap, const char delim = ';');
   BasicRepresentationType getBasicRep(std::string rep);

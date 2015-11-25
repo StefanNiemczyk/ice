@@ -11,12 +11,13 @@
 #include <vector>
 #include <memory>
 
-#include "ice/representation/RepresentationInstance.h"
+#include "ice/representation/Representation.h"
 
 //Forward declaration
 namespace ice
 {
-class RepresentationFactory;
+class GContainer;
+class GContainerFactory;
 } /* namespace ice */
 
 namespace ice
@@ -82,10 +83,10 @@ struct Operation {
 class Transformation
 {
 public:
-  Transformation(std::shared_ptr<RepresentationFactory> factory, std::shared_ptr<Representation> targetRepresentation, int inputCount);
+  Transformation(std::shared_ptr<GContainerFactory> factory, std::shared_ptr<Representation> targetRepresentation, int inputCount);
   virtual ~Transformation();
 
-  std::shared_ptr<RepresentationInstance> transform(std::shared_ptr<RepresentationInstance>* inputs);
+  std::shared_ptr<GContainer> transform(std::shared_ptr<GContainer>* inputs);
 
   std::vector<Operation>& getOperations();
 
@@ -93,7 +94,7 @@ private:
   std::shared_ptr<Representation> targetRepresentation;
   int inputCount;
   std::vector<Operation> operations;
-  std::shared_ptr<ice::RepresentationFactory> factory;
+  std::shared_ptr<ice::GContainerFactory> factory;
 };
 
 } /* namespace ice */

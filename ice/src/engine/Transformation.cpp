@@ -7,12 +7,13 @@
 
 #include "ice/representation/Transformation.h"
 
-#include "ice/representation/RepresentationFactory.h"
+#include "ice/representation/GContainer.h"
+#include "ice/representation/GContainerFactory.h"
 
 namespace ice
 {
 
-Transformation::Transformation(std::shared_ptr<ice::RepresentationFactory> factory,
+Transformation::Transformation(std::shared_ptr<ice::GContainerFactory> factory,
                                std::shared_ptr<Representation> targetRepresentation, int inputCount) :
     factory(factory), inputCount(inputCount), targetRepresentation(targetRepresentation)
 {
@@ -23,7 +24,7 @@ Transformation::~Transformation()
   // TODO Auto-generated destructor stub
 }
 
-std::shared_ptr<RepresentationInstance> Transformation::transform(std::shared_ptr<RepresentationInstance>* inputs)
+std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer>* inputs)
 {
   auto target = this->factory->makeInstance(this->targetRepresentation);
 

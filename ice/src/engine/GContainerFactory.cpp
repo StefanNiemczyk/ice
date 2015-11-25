@@ -12,13 +12,15 @@
 #include <cstring>
 #include <iostream>
 
+#include "ice/representation/GContainer.h"
+#include "ice/representation/GContainerFactory.h"
 #include "ice/representation/split.h"
-#include "ice/representation/RepresentationFactory.h"
+#include "ice/ICEngine.h"
 
 namespace ice
 {
 
-RepresentationFactory::RepresentationFactory()
+GContainerFactory::GContainerFactory()
 {
   typeMap.insert(std::pair<std::string, BasicRepresentationType>("booleanRep", BasicRepresentationType::BOOL));
   typeMap.insert(std::pair<std::string, BasicRepresentationType>("byteRep", BasicRepresentationType::BYTE));
@@ -38,12 +40,32 @@ RepresentationFactory::RepresentationFactory()
   typeMap.insert(std::pair<std::string, BasicRepresentationType>("stringRep", BasicRepresentationType::STRING));
 }
 
-RepresentationFactory::~RepresentationFactory()
+GContainerFactory::GContainerFactory(std::weak_ptr<ICEngine> engine) : GContainerFactory()
+{
+  this->engine = engine;
+}
+
+GContainerFactory::~GContainerFactory()
 {
 
 }
 
-std::shared_ptr<Representation> RepresentationFactory::fromCSV(std::string reprStr,
+void GContainerFactory::init()
+{
+  this->engine = engine;
+  auto e = this->engine.lock();
+
+  this->ontologyInterface = e->getOntologyInterface();
+
+  this->fromCSVStrings(this->ontologyInterface->readRepresentations());
+}
+
+void GContainerFactory::cleanUp()
+{
+
+}
+
+std::shared_ptr<Representation> GContainerFactory::fromCSV(std::string reprStr,
                                                                std::map<std::string, std::shared_ptr<Representation>> *tmpMap,
                                                                const char delim)
 {
@@ -56,13 +78,13 @@ std::shared_ptr<Representation> RepresentationFactory::fromCSV(std::string reprS
     return NULL;
   }
 
-  std::vector<std::string> tokens = split(reprStr.c_str(), ';');
-  if (tokens.size() != 3)
+  auto tokens = split(reprStr.c_str(), ';');
+  if (tokens->size() != 3)
     return NULL;
 
-  std::string repStr = tokens.at(0);
-  std::string dimStr = tokens.at(1);
-  std::string dimRepStr = tokens.at(2);
+  std::string repStr = tokens->at(0);
+  std::string dimStr = tokens->at(1);
+  std::string dimRepStr = tokens->at(2);
 
 //  std::cout << repStr << " " << dimStr << " " << dimRepStr << " " << this->getBasicRep(dimRepStr) << std::endl;
 
@@ -78,7 +100,7 @@ std::shared_ptr<Representation> RepresentationFactory::fromCSV(std::string reprS
   return rep;
 }
 
-BasicRepresentationType RepresentationFactory::getBasicRep(std::string rep)
+BasicRepresentationType GContainerFactory::getBasicRep(std::string rep)
 {
   auto pos = this->typeMap.find(rep);
 
@@ -90,7 +112,7 @@ BasicRepresentationType RepresentationFactory::getBasicRep(std::string rep)
   return pos->second;
 }
 
-std::shared_ptr<Representation> RepresentationFactory::addOrGet(std::string name, std::map<std::string, std::shared_ptr<Representation>> *tmpMap)
+std::shared_ptr<Representation> GContainerFactory::addOrGet(std::string name, std::map<std::string, std::shared_ptr<Representation>> *tmpMap)
 {
   std::shared_ptr<Representation> rep = NULL;
 
@@ -109,11 +131,11 @@ std::shared_ptr<Representation> RepresentationFactory::addOrGet(std::string name
   return rep;
 }
 
-int RepresentationFactory::fromCSVStrings(std::vector<std::string> lines)
+int GContainerFactory::fromCSVStrings(std::unique_ptr<std::vector<std::string>> lines)
 {
   std::map<std::string, std::shared_ptr<Representation>> tmpMap;
 
-  for (std::string line : lines)
+  for (std::string line : *lines)
   {
     if (line == "")
       continue;
@@ -138,7 +160,7 @@ int RepresentationFactory::fromCSVStrings(std::vector<std::string> lines)
   return this->repMap.size();
 }
 
-std::shared_ptr<Representation> RepresentationFactory::getRepresentation(std::string representation)
+std::shared_ptr<Representation> GContainerFactory::getRepresentation(std::string representation)
 {
   auto it = this->repMap.find(representation);
 
@@ -148,55 +170,55 @@ std::shared_ptr<Representation> RepresentationFactory::getRepresentation(std::st
   return it->second;
 }
 
-std::shared_ptr<RepresentationInstance> RepresentationFactory::makeInstance(std::string repName)
+std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::string repName)
 {
   return this->makeInstance(this->getRepresentation(repName));
 }
 
-std::shared_ptr<RepresentationInstance> RepresentationFactory::makeInstance(std::shared_ptr<Representation> representation)
+std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::shared_ptr<Representation> representation)
 {
   if (representation->isBasic())
   {
-    std::shared_ptr<BasicRepresentationInstance> ins;
+    std::shared_ptr<BasicGContainer> ins;
     auto rep = representation;
 
     switch (rep->type)
     {
       case BOOL:
-        ins = std::make_shared<BoolRepresentationInstance>(representation);
+        ins = std::make_shared<BoolGContainer>(representation);
         break;
       case BYTE:
-        ins = std::make_shared<ByteRepresentationInstance>(representation);
+        ins = std::make_shared<ByteGContainer>(representation);
         break;
       case UNSIGNED_BYTE:
-        ins = std::make_shared<UnsignedByteRepresentationInstance>(representation);
+        ins = std::make_shared<UnsignedByteGContainer>(representation);
         break;
       case SHORT:
-        ins = std::make_shared<ShortRepresentationInstance>(representation);
+        ins = std::make_shared<ShortGContainer>(representation);
         break;
       case INT:
-        ins = std::make_shared<IntegerRepresentationInstance>(representation);
+        ins = std::make_shared<IntGContainer>(representation);
         break;
       case LONG:
-        ins = std::make_shared<LongRepresentationInstance>(representation);
+        ins = std::make_shared<LongGContainer>(representation);
         break;
       case UNSIGNED_SHORT:
-        ins = std::make_shared<UnsignedShortRepresentationInstance>(representation);
+        ins = std::make_shared<UnsignedShortGContainer>(representation);
         break;
       case UNSIGNED_INT:
-        ins = std::make_shared<UnsignedIntegerRepresentationInstance>(representation);
+        ins = std::make_shared<UnsignedIntGContainer>(representation);
         break;
       case UNSIGNED_LONG:
-        ins = std::make_shared<UnsignedLongRepresentationInstance>(representation);
+        ins = std::make_shared<UnsignedLongGContainer>(representation);
         break;
       case FLOAT:
-        ins = std::make_shared<FloatRepresentationInstance>(representation);
+        ins = std::make_shared<FloatGContainer>(representation);
         break;
       case DOUBLE:
-        ins = std::make_shared<DoubleRepresentationInstance>(representation);
+        ins = std::make_shared<DoubleGContainer>(representation);
         break;
       case STRING:
-        ins = std::make_shared<StringRepresentationInstance>(representation);
+        ins = std::make_shared<StringGContainer>(representation);
         break;
       default:
         std::cout << "Error: Unknown representation basic type " << rep->name << std::endl;
@@ -207,7 +229,7 @@ std::shared_ptr<RepresentationInstance> RepresentationFactory::makeInstance(std:
   }
   else
   {
-    std::shared_ptr<CompositeRepresentationInstance> ins = std::make_shared<CompositeRepresentationInstance>(representation);
+    std::shared_ptr<CompositeGContainer> ins = std::make_shared<CompositeGContainer>(representation);
 
     for (auto sc : representation->dimensions)
     {
@@ -219,7 +241,7 @@ std::shared_ptr<RepresentationInstance> RepresentationFactory::makeInstance(std:
   }
 }
 
-void RepresentationFactory::printReps()
+void GContainerFactory::printReps()
 {
   for (auto it = this->repMap.begin(); it != this->repMap.end(); it++)
   {
@@ -227,7 +249,7 @@ void RepresentationFactory::printReps()
   }
 }
 
-void RepresentationFactory::printReps(std::shared_ptr<Representation> representation, int depth)
+void GContainerFactory::printReps(std::shared_ptr<Representation> representation, int depth)
 {
   std::cout << std::string(depth, ' ') << representation->name << std::endl;
 

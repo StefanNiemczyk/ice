@@ -9,22 +9,28 @@
 namespace ice
 {
 
-class RepresentationInstance
+class GContainer
 {
 public:
-  RepresentationInstance(std::shared_ptr<Representation> rep)
+  GContainer(std::shared_ptr<Representation> rep)
   {
     this->representation = rep;
   }
-  virtual ~RepresentationInstance()
+  virtual ~GContainer()
   {
   }
 
-  virtual void* get(int *indecies) = 0;
+  template <typename T>
+  T getValue(int *indices)
+  {
+    return *((T*) this->get(indices));
+  }
 
-  virtual void set(int *indecies, const void* value) = 0;
+  virtual void* get(int *indices) = 0;
 
-  virtual RepresentationInstance* clone() = 0;
+  virtual void set(int *indices, const void* value) = 0;
+
+  virtual GContainer* clone() = 0;
 
   void print()
   {
@@ -37,39 +43,39 @@ protected:
   std::shared_ptr<Representation> representation;
 };
 
-class CompositeRepresentationInstance : public RepresentationInstance
+class CompositeGContainer : public GContainer
 {
-  friend class RepresentationFactory;
+  friend class GContainerFactory;
 
 public:
-  CompositeRepresentationInstance(std::shared_ptr<Representation> rep) :
-      RepresentationInstance(rep)
+  CompositeGContainer(std::shared_ptr<Representation> rep) :
+      GContainer(rep)
   {
     //
   }
 
-  virtual ~CompositeRepresentationInstance()
+  virtual ~CompositeGContainer()
   {
     //
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    CompositeRepresentationInstance* instance = new CompositeRepresentationInstance(this->representation);
+    CompositeGContainer* instance = new CompositeGContainer(this->representation);
 
     instance->subs = this->subs;
 
     return instance;
   }
 
-  virtual void* get(int *indecies)
+  virtual void* get(int *indices)
   {
-    return this->subs.at(*indecies)->get(++indecies);
+    return this->subs.at(*indices)->get(++indices);
   }
 
-  virtual void set(int *indecies, const void* value)
+  virtual void set(int *indices, const void* value)
   {
-    return this->subs.at(*indecies)->set(++indecies, value);
+    return this->subs.at(*indices)->set(++indices, value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -91,36 +97,36 @@ public:
   }
 
 private:
-  std::vector<std::shared_ptr<RepresentationInstance>> subs;
+  std::vector<std::shared_ptr<GContainer>> subs;
 };
 
-class BasicRepresentationInstance : public RepresentationInstance
+class BasicGContainer : public GContainer
 {
 public:
-  BasicRepresentationInstance(std::shared_ptr<Representation> rep) :
-      RepresentationInstance(rep)
+  BasicGContainer(std::shared_ptr<Representation> rep) :
+      GContainer(rep)
   {
     this->type = BasicRepresentationType::UNSET;
   }
 
-  virtual ~BasicRepresentationInstance()
+  virtual ~BasicGContainer()
   {
     //
   }
 
-  virtual void* get(int *indecies)
+  virtual void* get(int *indices)
   {
     return this->getRaw();
   }
 
-  virtual void set(int *indecies, const void* value)
+  virtual void set(int *indices, const void* value)
   {
     return this->setRaw(value);
   }
 
   virtual void* getRaw() = 0;
   virtual void setRaw(const void* value) = 0;
-  virtual RepresentationInstance* clone() = 0;
+  virtual GContainer* clone() = 0;
 
 protected:
   virtual void print(int level, std::string dimension) = 0;
@@ -129,23 +135,23 @@ protected:
   BasicRepresentationType type;
 };
 
-//* BoolRepresentationInstance
+//* BoolGContainer
 /**
  * Boolean representation
  */
-class BoolRepresentationInstance : public BasicRepresentationInstance
+class BoolGContainer : public BasicGContainer
 {
 public:
-  BoolRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  BoolGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::BOOL;
     this->value = false;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    BoolRepresentationInstance* instance = new BoolRepresentationInstance(this->representation);
+    BoolGContainer* instance = new BoolGContainer(this->representation);
 
     instance->value = this->value;
 
@@ -171,23 +177,23 @@ private:
   bool value;
 };
 
-//* ByteRepresentationInstance
+//* ByteGContainer
 /**
  * Byte representation
  */
-class ByteRepresentationInstance : public BasicRepresentationInstance
+class ByteGContainer : public BasicGContainer
 {
 public:
-  ByteRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  ByteGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::BYTE;
     this->value = 0;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    ByteRepresentationInstance* instance = new ByteRepresentationInstance(this->representation);
+    ByteGContainer* instance = new ByteGContainer(this->representation);
 
     instance->value = this->value;
 
@@ -213,23 +219,23 @@ private:
   int8_t value;
 };
 
-//* UnsignedByteRepresentationInstance
+//* UnsignedByteGContainer
 /**
  * Unsigned byte representation
  */
-class UnsignedByteRepresentationInstance : public BasicRepresentationInstance
+class UnsignedByteGContainer : public BasicGContainer
 {
 public:
-  UnsignedByteRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  UnsignedByteGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::UNSIGNED_BYTE;
     this->value = 0;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    UnsignedByteRepresentationInstance* instance = new UnsignedByteRepresentationInstance(this->representation);
+    UnsignedByteGContainer* instance = new UnsignedByteGContainer(this->representation);
 
     instance->value = this->value;
 
@@ -255,23 +261,23 @@ private:
   uint8_t value;
 };
 
-//* ShortRepresentationInstance
+//* ShortGContainer
 /**
  * Short representation
  */
-class ShortRepresentationInstance : public BasicRepresentationInstance
+class ShortGContainer : public BasicGContainer
 {
 public:
-  ShortRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  ShortGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::SHORT;
     this->value = 0;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    ShortRepresentationInstance* instance = new ShortRepresentationInstance(this->representation);
+    ShortGContainer* instance = new ShortGContainer(this->representation);
 
     instance->value = this->value;
 
@@ -297,23 +303,23 @@ private:
   short value;
 };
 
-//* IntegerRepresentationInstance
+//* IntGContainer
 /**
  * Integer representation
  */
-class IntegerRepresentationInstance : public BasicRepresentationInstance
+class IntGContainer : public BasicGContainer
 {
 public:
-  IntegerRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  IntGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::INT;
     this->value = 0;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    IntegerRepresentationInstance* instance = new IntegerRepresentationInstance(this->representation);
+    IntGContainer* instance = new IntGContainer(this->representation);
 
     instance->value = this->value;
 
@@ -339,23 +345,23 @@ private:
   int value;
 };
 
-//* LongRepresentationInstance
+//* LongGContainer
 /**
  * Long representation
  */
-class LongRepresentationInstance : public BasicRepresentationInstance
+class LongGContainer : public BasicGContainer
 {
 public:
-  LongRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  LongGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::LONG;
     this->value = 0;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    LongRepresentationInstance* instance = new LongRepresentationInstance(this->representation);
+    LongGContainer* instance = new LongGContainer(this->representation);
 
     instance->value = this->value;
 
@@ -381,23 +387,23 @@ private:
   long value;
 };
 
-//* UnsignedShortRepresentationInstance
+//* UnsignedShortGContainer
 /**
  * Unsigned short representation
  */
-class UnsignedShortRepresentationInstance : public BasicRepresentationInstance
+class UnsignedShortGContainer : public BasicGContainer
 {
 public:
-  UnsignedShortRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  UnsignedShortGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::UNSIGNED_SHORT;
     this->value = 0;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    UnsignedShortRepresentationInstance* instance = new UnsignedShortRepresentationInstance(this->representation);
+    UnsignedShortGContainer* instance = new UnsignedShortGContainer(this->representation);
 
     instance->value = this->value;
 
@@ -423,23 +429,23 @@ private:
   unsigned short value;
 };
 
-//* UnsignedIntegerRepresentationInstance
+//* UnsignedIntGContainer
 /**
  * Unsigned integer representation
  */
-class UnsignedIntegerRepresentationInstance : public BasicRepresentationInstance
+class UnsignedIntGContainer : public BasicGContainer
 {
 public:
-  UnsignedIntegerRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  UnsignedIntGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::UNSIGNED_INT;
     this->value = 0;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    UnsignedIntegerRepresentationInstance* instance = new UnsignedIntegerRepresentationInstance(this->representation);
+    UnsignedIntGContainer* instance = new UnsignedIntGContainer(this->representation);
 
     instance->value = this->value;
 
@@ -465,23 +471,23 @@ private:
   unsigned int value;
 };
 
-//* UnsignedLongRepresentationInstance
+//* UnsignedLongGContainer
 /**
  * unsigned long representation
  */
-class UnsignedLongRepresentationInstance : public BasicRepresentationInstance
+class UnsignedLongGContainer : public BasicGContainer
 {
 public:
-  UnsignedLongRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  UnsignedLongGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::UNSIGNED_LONG;
     this->value = 0;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    UnsignedLongRepresentationInstance* instance = new UnsignedLongRepresentationInstance(this->representation);
+    UnsignedLongGContainer* instance = new UnsignedLongGContainer(this->representation);
 
     instance->value = this->value;
 
@@ -507,23 +513,23 @@ private:
   unsigned long value;
 };
 
-//* FloatRepresentationInstance
+//* FloatGContainer
 /**
  * Float representation
  */
-class FloatRepresentationInstance : public BasicRepresentationInstance
+class FloatGContainer : public BasicGContainer
 {
 public:
-  FloatRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  FloatGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::FLOAT;
     this->value = 0;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    FloatRepresentationInstance* instance = new FloatRepresentationInstance(this->representation);
+    FloatGContainer* instance = new FloatGContainer(this->representation);
 
     instance->value = this->value;
 
@@ -549,23 +555,23 @@ private:
   float value;
 };
 
-//* DoubleRepresentationInstance
+//* DoubleGContainer
 /**
  * Double representation
  */
-class DoubleRepresentationInstance : public BasicRepresentationInstance
+class DoubleGContainer : public BasicGContainer
 {
 public:
-  DoubleRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  DoubleGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::DOUBLE;
     this->value = 0;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    DoubleRepresentationInstance* instance = new DoubleRepresentationInstance(this->representation);
+    DoubleGContainer* instance = new DoubleGContainer(this->representation);
 
     instance->value = this->value;
 
@@ -591,22 +597,22 @@ private:
   double value;
 };
 
-//* StringRepresentationInstance
+//* StringGContainer
 /**
  * String representation
  */
-class StringRepresentationInstance : public BasicRepresentationInstance
+class StringGContainer : public BasicGContainer
 {
 public:
-  StringRepresentationInstance(std::shared_ptr<Representation> rep) :
-      BasicRepresentationInstance(rep)
+  StringGContainer(std::shared_ptr<Representation> rep) :
+      BasicGContainer(rep)
   {
     type = BasicRepresentationType::STRING;
   }
 
-  virtual RepresentationInstance* clone()
+  virtual GContainer* clone()
   {
-    StringRepresentationInstance* instance = new StringRepresentationInstance(this->representation);
+    StringGContainer* instance = new StringGContainer(this->representation);
 
     instance->value = this->value;
 

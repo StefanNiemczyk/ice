@@ -1159,24 +1159,24 @@ const char* OntologyInterface::readRepresentationsAsCSV()
   return cstr;
 }
 
-std::unique_ptr<RepresentationFactory> OntologyInterface::readRepresentations()
+std::unique_ptr<std::vector<std::string>> OntologyInterface::readRepresentations()
 {
-  std::unique_ptr<RepresentationFactory> repFactory(new RepresentationFactory());
   this->checkError("readRepresentation", "Error exists, readRepresentations will not be executed");
 
   jstring result = (jstring)env->CallObjectMethod(this->javaInterface, this->readRepresentationsAsCSVMethod);
 
   if (this->checkError("readRepresentationsAsCsv", "Error occurred at reading representations"))
-    return repFactory;
+    return nullptr;
 
   const char* cstr = env->GetStringUTFChars(result, 0);
   env->ReleaseStringUTFChars(result, 0);
 
-  std::vector<std::string> lines = split(cstr, '\n');
+  auto lines = split(cstr, '\n');
 
-  repFactory->fromCSVStrings(lines);
+  env->DeleteLocalRef(result);
+  delete cstr;
 
-  return std::move(repFactory);
+  return std::move(lines);
 }
 
 
