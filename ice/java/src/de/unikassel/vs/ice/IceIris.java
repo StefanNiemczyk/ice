@@ -19,6 +19,7 @@ public class IceIris {
 	public final OWLClass requiredMap;
 	public final OWLClass system;
 	public final OWLClass entityType;
+	public final OWLClass scope;
 	public final OWLClass entityScope;
 	public final OWLClass representation;
 	public final OWLClass compositeRepresentation;
@@ -63,6 +64,7 @@ public class IceIris {
 
 	public IceIris(final OWLDataFactory p_dataFactory) {
 		this.entityType = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "EntityType"));
+		this.scope = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Scope"));
 		this.entityScope = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "EntityScope"));
 		this.representation = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Representation"));
 		this.compositeRepresentation = p_dataFactory

@@ -1,11 +1,8 @@
 package de.unikassel.vs.ice;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
@@ -76,6 +73,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLPropertyExpression;
 import org.semanticweb.owlapi.model.OWLReflexiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLSameIndividualAxiom;
 import org.semanticweb.owlapi.model.OWLSubAnnotationPropertyOfAxiom;
@@ -100,14 +98,34 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 public class RepresentationVisitor extends IceVisitor {
 
-	private final HashMap<String, HashSet<String>> representations = new HashMap<String, HashSet<String>>();
 	private final Stack<String> repStack = new Stack<String>();
+	private final Stack<String> dimStack = new Stack<String>();
 	private final boolean DEBUG = false;
+	private final List<Triple> triples = new ArrayList<Triple>();
+	private final Stack<String> relations = new Stack<String>();
 
-	public RepresentationVisitor(final IceOntologyInterface ioi,
-			final Set<OWLOntology> ontologies, final OWLReasoner reasoner,
-			final IceIris iceIris) {
+	class Triple {
+		public Triple(String rep, String dim, String repDim) {
+			this.representation = rep;
+			this.dimension = dim;
+			this.dimensionRep = repDim;
+		}
+
+		public String representation;
+		public String dimension;
+		public String dimensionRep;
+	}
+
+	public RepresentationVisitor(final IceOntologyInterface ioi, final Set<OWLOntology> ontologies,
+			final OWLReasoner reasoner, final IceIris iceIris) {
 		super(ioi, ontologies, reasoner, iceIris);
+	}
+
+	public void reset() {
+		this.repStack.clear();
+		this.dimStack.clear();
+		this.triples.clear();
+		this.relations.clear();
 	}
 
 	private void debuglog(String str) {
@@ -115,40 +133,12 @@ public class RepresentationVisitor extends IceVisitor {
 			System.err.println(str);
 	}
 
-	@Override
-	public String toString() {
-		String str = "";
-		String lineStr = "";
-		
-		for (Map.Entry<String, HashSet<String>> entry : representations
-				.entrySet()) {
-			final String key = entry.getKey();
-
-			//System.out.println(key + ": " + values);
-			
-			lineStr = key;
-			for(String val : entry.getValue()) {
-				lineStr += ";" + val;
-			}
-			
-			lineStr += "\n";
-			str += lineStr;
+	public int addToStringBuilder(StringBuilder sb) {
+		for (Triple triple : this.triples) {
+			sb.append(triple.representation + ";" + triple.dimension + ";" + triple.dimensionRep + "\n");
 		}
-		
-		
-		//System.out.println(str);
 
-		return str;
-	}
-
-	private void addRep(String key, String val) {
-		if (key == null || val == null)
-			return;
-
-		if (!representations.containsKey(key))
-			representations.put(key, new HashSet<String>());
-
-		representations.get(key).add(val);
+		return this.triples.size();
 	}
 
 	public Set<OWLClass> toClassSet(Set<OWLClassExpression> inSet) {
@@ -162,82 +152,55 @@ public class RepresentationVisitor extends IceVisitor {
 		return set;
 	}
 
-	private final void visitClassExpression(OWLClassExpression ex) {
-		ClassExpressionType fillerType = ex.getClassExpressionType();
-		debuglog("FILLER_TYPE: " + fillerType);
-
-		switch (fillerType) {
-		case OWL_CLASS:
-			OWLClass cl = ex.asOWLClass();
-			String repName = iRIShortName(cl.getIRI());
-			addRep(repStack.peek(), repName);
-			if (!foundClasses.contains(cl)) {
-				cl.accept(this);
-			}
-			break;
-
-		case OBJECT_SOME_VALUES_FROM: // FALLTHROUGH
-		case OBJECT_EXACT_CARDINALITY:
-		case OBJECT_INTERSECTION_OF:
-		//case OBJECT_HAS_VALUE: // TODO
-			ex.accept(this);
-			break;
-
-		default:
-			break;
-		}
-
-	}
-
-	// //////////////
-	// TODO: Refactor? Needed?
-	private Representation addSubclasses(final OWLClass root) {
-		final Set<OWLClass> subClasses = toClassSet(root
-				.getSubClasses(ontologies));
-
-		for (OWLClass cl : subClasses) {
-			addRep(iRIShortName(root.getIRI()), iRIShortName(cl.getIRI()));
-		}
-
-		return null;
-	}
-
-	// //////////////
-
 	@Override
 	public final void visit(final OWLClass cl) {
 		debuglog("VISITING: " + iRIShortName(cl.getIRI()));
-		if (foundClasses.contains(cl))
-			return;
-		foundClasses.add(cl);
 
-		// TODO: Needed or handled by subclassaxioms?
-		addSubclasses(cl);
+		List<OWLSubClassOfAxiom> axioms = new ArrayList<OWLSubClassOfAxiom>();
+		boolean rep = false;
+		boolean dim = false;
 
 		for (OWLOntology ont : ontologies) {
 			for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(cl)) {
-				String currentRep = iRIShortName(ax.getSubClass().asOWLClass()
-						.getIRI());
-				repStack.push(currentRep);
-				debuglog("SubClassOf: " + currentRep);
-				ax.getSuperClass().accept(this);
-				repStack.pop();
+
+				if (this.isSubClassOf(ax.getSuperClass(), this.ii.representation)) {
+					rep = true;
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.scope)) {
+					dim = true;
+				} else {
+					axioms.add(ax);
+				}
+
 			}
+		}
+
+		if (rep) {
+			if (dimStack.isEmpty() == false && repStack.isEmpty() == false) {
+				Triple t = new Triple(repStack.peek(), dimStack.peek(), iRIShortName(cl.getIRI()));
+				this.triples.add(t);
+			}
+
+			repStack.push(iRIShortName(cl.getIRI()));
+		} else if (dim) {
+			dimStack.push(iRIShortName(cl.getIRI()));
+		}
+
+		for (OWLSubClassOfAxiom ax : axioms) {
+			ax.getSuperClass().accept(this);
+		}
+
+		if (rep) {
+			repStack.pop();
+		} else if (dim) {
+			dimStack.pop();
 		}
 	}
 
 	@Override
 	public void visit(final OWLObjectSomeValuesFrom ce) {
 		debuglog("SOMEVALUESFROM: " + ce.getFiller());
-		OWLClassExpression filler = ce.getFiller();
-		ClassExpressionType fillerType = filler.getClassExpressionType();
 
-		if (fillerType == ClassExpressionType.OWL_CLASS
-				&& iRIShortName(filler.asOWLClass().getIRI()).equals("positionRepresentation"))
-			return;
-
-		visitClassExpression(ce.getFiller());
-
+		this.checkProperty(ce.getProperty(), ce.getFiller());
 	}
 
 	@Override
@@ -247,33 +210,84 @@ public class RepresentationVisitor extends IceVisitor {
 		Set<OWLClassExpression> operands = is.getOperands();
 
 		for (OWLClassExpression exp : operands) {
-			debuglog("\nCURRENT: " + repStack.peek());
-			debuglog("EXTYPE: " + exp.getClassExpressionType());
-			debuglog("EX: " + exp + "\n");
-			visitClassExpression(exp);
+			exp.accept(this);
 		}
 	}
 
 	@Override
 	public void visit(final OWLObjectExactCardinality ec) {
-		OWLClassExpression filler = ec.getFiller();
-		visitClassExpression(filler);
+		this.checkProperty(ec.getProperty(), ec.getFiller());
+	}
+
+	public void checkProperty(OWLPropertyExpression p_property, OWLClassExpression p_class) {
+		if (p_property == this.ii.hasDimension) {
+			if (p_class.isAnonymous()) {
+				if (p_class instanceof OWLObjectIntersectionOf) {
+					OWLObjectIntersectionOf intersection = (OWLObjectIntersectionOf) p_class;
+
+					TreeSet<OWLClassExpression> treeSet = new TreeSet<OWLClassExpression>(intersection.getOperands());
+					OWLClass class1 = null;
+					List<OWLClassExpression> exps = new ArrayList<OWLClassExpression>();
+
+					for (OWLClassExpression exp : treeSet) {
+						if (exp instanceof OWLClass) {
+							class1 = (OWLClass) exp;
+						} else {
+							exps.add(exp);
+						}
+					}
+
+					if (class1 != null) {
+						dimStack.push(iRIShortName(class1.getIRI()));
+						relations.push("dimension");
+
+						for (OWLClassExpression exp : exps) {
+							exp.accept(this);
+						}
+
+						relations.pop();
+						dimStack.pop();
+					}
+				}
+
+			} else {
+				relations.push("dimension");
+				p_class.accept(this);
+				relations.pop();
+			}
+		} else if (p_property == this.ii.hasRepresentation) {
+			relations.push("representation");
+			p_class.accept(this);
+			relations.pop();
+		}
 	}
 
 	@Override
 	public void visit(final OWLObjectAllValuesFrom av) {
-		OWLClassExpression filler = av.getFiller();
-		visitClassExpression(filler);
+		// ignore closure axioms
+	}
+
+	@Override
+	public void visit(OWLSubClassOfAxiom axiom) {
+		axiom.getSubClass().accept(this);
+		axiom.getSuperClass().accept(this);
+	}
+
+	@Override
+	public void visit(final OWLObjectHasValue arg0) {
+		// System.out.println("HasValue: " + arg0);
 	}
 
 	@Override
 	public void visit(final OWLObjectMinCardinality arg0) {
 		debuglog("    mincard: " + arg0);
+		this.checkProperty(arg0.getProperty(), arg0.getFiller());
 	}
 
 	@Override
 	public void visit(final OWLObjectMaxCardinality arg0) {
 		debuglog("    maxcard: " + arg0);
+		this.checkProperty(arg0.getProperty(), arg0.getFiller());
 	}
 
 	/* Ignored visit implementations */
@@ -291,11 +305,6 @@ public class RepresentationVisitor extends IceVisitor {
 	@Override
 	public void visit(final OWLDeclarationAxiom arg0) {
 		System.out.println("    arg: " + arg0);
-	}
-
-	@Override
-	public void visit(final OWLSubClassOfAxiom ce) {
-		System.out.println("    arg: " + ce);
 	}
 
 	@Override
@@ -486,11 +495,6 @@ public class RepresentationVisitor extends IceVisitor {
 	@Override
 	public void visit(final OWLObjectComplementOf arg0) {
 		System.out.println("    arg: " + arg0);
-	}
-
-	@Override
-	public void visit(final OWLObjectHasValue arg0) {
-		System.out.println("HasValue: " + arg0);
 	}
 
 	@Override

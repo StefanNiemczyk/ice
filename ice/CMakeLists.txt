@@ -269,7 +269,8 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/etc/EngineStuff.cpp
  # test/test_ASPComposition.cpp
  # test/test_ASPRepComputation.cpp
-  test/test_JNI.cpp
+ # test/test_JNI.cpp
+  test/test_Representation.cpp
  # test/test_ASPCoordinator.cpp
  # test/test_serialize.cpp
  # test/test_RingBuffer.cpp

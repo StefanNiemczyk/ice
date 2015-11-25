@@ -14,7 +14,6 @@ public:
   }
   virtual ~RepresentationInstance()
   {
-
   }
 
   virtual void* get(int *indecies) = 0;
@@ -22,6 +21,13 @@ public:
   virtual void set(int *indecies, const void* value) = 0;
 
   virtual RepresentationInstance* clone() = 0;
+
+  void print()
+  {
+    this->print(0);
+  }
+
+  virtual void print(int level, std::string dimension = "") = 0;
 
 protected:
   Representation *representation;
@@ -60,15 +66,22 @@ public:
     return this->subs.at(*indecies)->set(++indecies, value);
   }
 
-  RepresentationInstance* sub(int index)
+  virtual void print(int level, std::string dimension)
   {
-    return this->subs.at(index);
-  }
+    if (dimension != "")
+    {
+      std::cout << std::string(level, ' ') << dimension << " " << this->representation->name << std::endl;
+    }
+    else
+    {
+      std::cout << std::string(level, ' ') << this->representation->name << std::endl;
+    }
 
-  RepresentationInstance* sub(std::string name)
-  {
-    int index = this->representation->mapping.at(name);
-    return this->subs.at(index);
+    for (int i = 0; i < this->subs.size(); ++i)
+    {
+      auto sub = this->subs.at(i);
+      sub->print(level + 1, this->representation->dimensionNames.at(i));
+    }
   }
 
 private:
@@ -76,12 +89,12 @@ private:
 };
 
 
-class BasicRepresentationInstance : public RepresentationInstance {
-  // TODO
+class BasicRepresentationInstance : public RepresentationInstance
+{
 public:
   BasicRepresentationInstance(Representation *rep) : RepresentationInstance(rep)
   {
-    //
+    this->type = BasicRepresentationType::UNSET;
   }
 
   virtual ~BasicRepresentationInstance()
@@ -104,6 +117,9 @@ public:
   virtual RepresentationInstance* clone() = 0;
 
 protected:
+  virtual void print(int level, std::string dimension) = 0;
+
+protected:
   BasicRepresentationType type;
 };
 
@@ -115,6 +131,7 @@ class BoolRepresentationInstance : public BasicRepresentationInstance {
 public:
   BoolRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
+    type = BasicRepresentationType::BOOL;
     this->value = false;
   }
 
@@ -137,6 +154,11 @@ public:
     this->value = *((bool*) value);
   }
 
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (bool)" << std::endl;
+  }
+
 private:
   bool value;
 };
@@ -149,7 +171,8 @@ class ByteRepresentationInstance : public BasicRepresentationInstance {
 public:
   ByteRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
-    this->value = false;
+    type = BasicRepresentationType::BYTE;
+    this->value = 0;
   }
 
   virtual RepresentationInstance* clone()
@@ -171,6 +194,11 @@ public:
     this->value = *((int8_t*) value);
   }
 
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (byte)" << std::endl;
+  }
+
 private:
   int8_t value;
 };
@@ -183,7 +211,8 @@ class UnsignedByteRepresentationInstance : public BasicRepresentationInstance {
 public:
   UnsignedByteRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
-    this->value = false;
+    type = BasicRepresentationType::UNSIGNED_BYTE;
+    this->value = 0;
   }
 
   virtual RepresentationInstance* clone()
@@ -205,6 +234,11 @@ public:
     this->value = *((uint8_t*) value);
   }
 
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (unsigned byte)" << std::endl;
+  }
+
 private:
   uint8_t value;
 };
@@ -217,7 +251,8 @@ class ShortRepresentationInstance : public BasicRepresentationInstance {
 public:
   ShortRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
-    this->value = false;
+    type = BasicRepresentationType::SHORT;
+    this->value = 0;
   }
 
   virtual RepresentationInstance* clone()
@@ -239,6 +274,11 @@ public:
     this->value = *((short*) value);
   }
 
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (short)" << std::endl;
+  }
+
 private:
   short value;
 };
@@ -251,7 +291,8 @@ class IntegerRepresentationInstance : public BasicRepresentationInstance {
 public:
   IntegerRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
-    this->value = false;
+    type = BasicRepresentationType::INT;
+    this->value = 0;
   }
 
   virtual RepresentationInstance* clone()
@@ -273,6 +314,11 @@ public:
     this->value = *((int*) value);
   }
 
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (int)" << std::endl;
+  }
+
 private:
   int value;
 };
@@ -285,7 +331,8 @@ class LongRepresentationInstance : public BasicRepresentationInstance {
 public:
   LongRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
-    this->value = false;
+    type = BasicRepresentationType::LONG;
+    this->value = 0;
   }
 
   virtual RepresentationInstance* clone()
@@ -307,6 +354,11 @@ public:
     this->value = *((long*) value);
   }
 
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (long)" << std::endl;
+  }
+
 private:
   long value;
 };
@@ -319,7 +371,8 @@ class UnsignedShortRepresentationInstance : public BasicRepresentationInstance {
 public:
   UnsignedShortRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
-    this->value = false;
+    type = BasicRepresentationType::UNSIGNED_SHORT;
+    this->value = 0;
   }
 
   virtual RepresentationInstance* clone()
@@ -341,6 +394,11 @@ public:
     this->value = *((unsigned short*) value);
   }
 
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (unsigned short)" << std::endl;
+  }
+
 private:
   unsigned short value;
 };
@@ -353,7 +411,8 @@ class UnsignedIntegerRepresentationInstance : public BasicRepresentationInstance
 public:
   UnsignedIntegerRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
-    this->value = false;
+    type = BasicRepresentationType::UNSIGNED_INT;
+    this->value = 0;
   }
 
   virtual RepresentationInstance* clone()
@@ -375,6 +434,11 @@ public:
     this->value = *((unsigned int*) value);
   }
 
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (unsigned int)" << std::endl;
+  }
+
 private:
   unsigned int value;
 };
@@ -387,7 +451,8 @@ class UnsignedLongRepresentationInstance : public BasicRepresentationInstance {
 public:
   UnsignedLongRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
-    this->value = false;
+    type = BasicRepresentationType::UNSIGNED_LONG;
+    this->value = 0;
   }
 
   virtual RepresentationInstance* clone()
@@ -409,6 +474,11 @@ public:
     this->value = *((unsigned long*) value);
   }
 
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (unsigned long)" << std::endl;
+  }
+
 private:
   unsigned long value;
 };
@@ -421,7 +491,8 @@ class FloatRepresentationInstance : public BasicRepresentationInstance {
 public:
   FloatRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
-    this->value = false;
+    type = BasicRepresentationType::FLOAT;
+    this->value = 0;
   }
 
   virtual RepresentationInstance* clone()
@@ -443,6 +514,11 @@ public:
     this->value = *((float*) value);
   }
 
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (float)" << std::endl;
+  }
+
 private:
   float value;
 };
@@ -455,7 +531,8 @@ class DoubleRepresentationInstance : public BasicRepresentationInstance {
 public:
   DoubleRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
-    this->value = false;
+    type = BasicRepresentationType::DOUBLE;
+    this->value = 0;
   }
 
   virtual RepresentationInstance* clone()
@@ -477,6 +554,11 @@ public:
     this->value = *((double*) value);
   }
 
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (double)" << std::endl;
+  }
+
 private:
   double value;
 };
@@ -489,7 +571,7 @@ class StringRepresentationInstance : public BasicRepresentationInstance {
 public:
   StringRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
   {
-//    this->value = false;
+    type = BasicRepresentationType::STRING;
   }
 
   virtual RepresentationInstance* clone()
@@ -509,6 +591,11 @@ public:
   virtual void setRaw(const void* value)
   {
     this->value = *((std::string*) value);
+  }
+
+  virtual void print(int level, std::string dimension)
+  {
+    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (string)" << std::endl;
   }
 
 private:
