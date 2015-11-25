@@ -24,24 +24,20 @@ public:
   virtual ~RepresentationFactory();
 
   int fromCSVStrings(std::vector<std::string> lines);
+  std::shared_ptr<Representation> getRepresentation(std::string representation);
 
-//  std::shared_ptr<std::vector<Representation*>> getRepVec();
-//  std::shared_ptr<std::map<std::string, Representation*>> getRepMap();
-
-  Representation* getRepresentation(std::string representation);
-
-  RepresentationInstance *makeInstance(std::string name);
-  RepresentationInstance *makeInstance(Representation* representation);
+  std::shared_ptr<RepresentationInstance> makeInstance(std::string name);
+  std::shared_ptr<RepresentationInstance> makeInstance(std::shared_ptr<Representation> representation);
 
   void printReps();
 
 private:
-  void printReps(Representation* representation, int depth);
-  Representation* fromCSV(std::string reprStr, std::map<std::string, Representation*> *tmpMap, const char delim = ';');
+  void printReps(std::shared_ptr<Representation> representation, int depth);
+  std::shared_ptr<Representation> fromCSV(std::string reprStr, std::map<std::string, std::shared_ptr<Representation>> *tmpMap, const char delim = ';');
   BasicRepresentationType getBasicRep(std::string rep);
-  Representation* addOrGet(std::string name, std::map<std::string, Representation*> *tmpMap);
+  std::shared_ptr<Representation> addOrGet(std::string name, std::map<std::string, std::shared_ptr<Representation>> *tmpMap);
 
-  std::map<std::string, Representation*> repMap;
+  std::map<std::string, std::shared_ptr<Representation>> repMap;
   std::map<std::string, BasicRepresentationType> typeMap;
 };
 

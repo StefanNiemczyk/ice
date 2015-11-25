@@ -2,6 +2,7 @@
 #define REPRESENTATION_H
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -27,7 +28,7 @@ enum BasicRepresentationType {
 struct Representation {
   std::string name;
 
-  std::vector<Representation*> dimensions;
+  std::vector<std::shared_ptr<Representation>> dimensions;
   std::vector<std::string> dimensionNames;
   BasicRepresentationType type;
 

@@ -43,11 +43,10 @@ RepresentationFactory::~RepresentationFactory()
 
 }
 
-Representation* RepresentationFactory::fromCSV(std::string reprStr, std::map<std::string, Representation*> *tmpMap,
-                                               const char delim)
+std::shared_ptr<Representation> RepresentationFactory::fromCSV(std::string reprStr,
+                                                               std::map<std::string, std::shared_ptr<Representation>> *tmpMap,
+                                                               const char delim)
 {
-  const size_t length = reprStr.length() + 1;
-
   if (reprStr.empty())
   {
     return NULL;
@@ -67,10 +66,10 @@ Representation* RepresentationFactory::fromCSV(std::string reprStr, std::map<std
 
 //  std::cout << repStr << " " << dimStr << " " << dimRepStr << " " << this->getBasicRep(dimRepStr) << std::endl;
 
-  Representation *rep = addOrGet(repStr, tmpMap);
+  auto rep = addOrGet(repStr, tmpMap);
   rep->type = this->getBasicRep(repStr);
 
-  Representation *rep2 = addOrGet(dimRepStr, tmpMap);
+  auto rep2 = addOrGet(dimRepStr, tmpMap);
   rep2->type = this->getBasicRep(dimRepStr);
 
   rep->dimensionNames.push_back(dimStr);
@@ -91,9 +90,9 @@ BasicRepresentationType RepresentationFactory::getBasicRep(std::string rep)
   return pos->second;
 }
 
-Representation* RepresentationFactory::addOrGet(std::string name, std::map<std::string, Representation*> *tmpMap)
+std::shared_ptr<Representation> RepresentationFactory::addOrGet(std::string name, std::map<std::string, std::shared_ptr<Representation>> *tmpMap)
 {
-  Representation *rep = NULL;
+  std::shared_ptr<Representation> rep = NULL;
 
   if (tmpMap->count(name) > 0)
   {
@@ -101,10 +100,10 @@ Representation* RepresentationFactory::addOrGet(std::string name, std::map<std::
   }
   else
   {
-    rep = new Representation;
+    rep = std::make_shared<Representation>();
     rep->name = name;
     rep->type = BasicRepresentationType::UNSET;
-    tmpMap->insert(std::pair<std::string, Representation*>(name, rep));
+    tmpMap->insert({name, rep});
   }
 
   return rep;
@@ -112,7 +111,7 @@ Representation* RepresentationFactory::addOrGet(std::string name, std::map<std::
 
 int RepresentationFactory::fromCSVStrings(std::vector<std::string> lines)
 {
-  std::map<std::string, Representation*> tmpMap;
+  std::map<std::string, std::shared_ptr<Representation>> tmpMap;
 
   for (std::string line : lines)
   {
@@ -125,9 +124,9 @@ int RepresentationFactory::fromCSVStrings(std::vector<std::string> lines)
       continue;
     }
 
-    Representation *r = fromCSV(line, &tmpMap);
+    auto r = fromCSV(line, &tmpMap);
 
-    if (r == nullptr)
+    if (false == r)
     {
       std::cout << "Error: No representation extracted from " << line << std::endl;
       continue;
@@ -139,7 +138,7 @@ int RepresentationFactory::fromCSVStrings(std::vector<std::string> lines)
   return this->repMap.size();
 }
 
-Representation* RepresentationFactory::getRepresentation(std::string representation)
+std::shared_ptr<Representation> RepresentationFactory::getRepresentation(std::string representation)
 {
   auto it = this->repMap.find(representation);
 
@@ -149,55 +148,55 @@ Representation* RepresentationFactory::getRepresentation(std::string representat
   return it->second;
 }
 
-RepresentationInstance *RepresentationFactory::makeInstance(std::string repName)
+std::shared_ptr<RepresentationInstance> RepresentationFactory::makeInstance(std::string repName)
 {
   return this->makeInstance(this->getRepresentation(repName));
 }
 
-RepresentationInstance *RepresentationFactory::makeInstance(Representation* representation)
+std::shared_ptr<RepresentationInstance> RepresentationFactory::makeInstance(std::shared_ptr<Representation> representation)
 {
   if (representation->isBasic())
   {
-    BasicRepresentationInstance* ins = nullptr;
+    std::shared_ptr<BasicRepresentationInstance> ins;
     auto rep = representation;
 
     switch (rep->type)
     {
       case BOOL:
-        ins = new BoolRepresentationInstance(representation);
+        ins = std::make_shared<BoolRepresentationInstance>(representation);
         break;
       case BYTE:
-        ins = new ByteRepresentationInstance(representation);
+        ins = std::make_shared<ByteRepresentationInstance>(representation);
         break;
       case UNSIGNED_BYTE:
-        ins = new UnsignedByteRepresentationInstance(representation);
+        ins = std::make_shared<UnsignedByteRepresentationInstance>(representation);
         break;
       case SHORT:
-        ins = new ShortRepresentationInstance(representation);
+        ins = std::make_shared<ShortRepresentationInstance>(representation);
         break;
       case INT:
-        ins = new IntegerRepresentationInstance(representation);
+        ins = std::make_shared<IntegerRepresentationInstance>(representation);
         break;
       case LONG:
-        ins = new LongRepresentationInstance(representation);
+        ins = std::make_shared<LongRepresentationInstance>(representation);
         break;
       case UNSIGNED_SHORT:
-        ins = new UnsignedShortRepresentationInstance(representation);
+        ins = std::make_shared<UnsignedShortRepresentationInstance>(representation);
         break;
       case UNSIGNED_INT:
-        ins = new UnsignedIntegerRepresentationInstance(representation);
+        ins = std::make_shared<UnsignedIntegerRepresentationInstance>(representation);
         break;
       case UNSIGNED_LONG:
-        ins = new UnsignedLongRepresentationInstance(representation);
+        ins = std::make_shared<UnsignedLongRepresentationInstance>(representation);
         break;
       case FLOAT:
-        ins = new FloatRepresentationInstance(representation);
+        ins = std::make_shared<FloatRepresentationInstance>(representation);
         break;
       case DOUBLE:
-        ins = new DoubleRepresentationInstance(representation);
+        ins = std::make_shared<DoubleRepresentationInstance>(representation);
         break;
       case STRING:
-        ins = new StringRepresentationInstance(representation);
+        ins = std::make_shared<StringRepresentationInstance>(representation);
         break;
       default:
         std::cout << "Error: Unknown representation basic type " << rep->name << std::endl;
@@ -208,11 +207,11 @@ RepresentationInstance *RepresentationFactory::makeInstance(Representation* repr
   }
   else
   {
-    CompositeRepresentationInstance *ins = new CompositeRepresentationInstance(representation);
+    std::shared_ptr<CompositeRepresentationInstance> ins = std::make_shared<CompositeRepresentationInstance>(representation);
 
-    for (Representation *sc : representation->dimensions)
+    for (auto sc : representation->dimensions)
     {
-      RepresentationInstance *subIns = makeInstance(sc);
+      auto subIns = makeInstance(sc);
       ins->subs.push_back(subIns);
     }
 
@@ -228,16 +227,17 @@ void RepresentationFactory::printReps()
   }
 }
 
-void RepresentationFactory::printReps(Representation* representation, int depth)
+void RepresentationFactory::printReps(std::shared_ptr<Representation> representation, int depth)
 {
   std::cout << std::string(depth, ' ') << representation->name << std::endl;
 
-  for (int i=0; i < representation->dimensions.size(); ++i)
+  for (int i = 0; i < representation->dimensions.size(); ++i)
   {
     auto rep = representation->dimensions.at(i);
-    std::cout << std::string(depth+1, ' ') << representation->dimensionNames.at(i) << " " << rep->name << " " << std::endl;
+    std::cout << std::string(depth + 1, ' ') << representation->dimensionNames.at(i) << " " << rep->name << " "
+        << std::endl;
     if (rep->isBasic() == false)
-      this->printReps(rep, depth+2);
+      this->printReps(rep, depth + 2);
   }
 
 }

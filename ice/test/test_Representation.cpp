@@ -15,7 +15,7 @@
 namespace
 {
 
-TEST(JNITest, representations)
+TEST(RepresentationTest, representations)
 {
   // Given a valid empty ice ontology
   std::string path = ros::package::getPath("ice");
@@ -44,7 +44,7 @@ TEST(JNITest, representations)
   std::unique_ptr<ice::RepresentationFactory> fac = oi.readRepresentations();
 
   auto rep = fac->getRepresentation("defaultMovementRep");
-  ice::RepresentationInstance* movement = fac->makeInstance(rep);
+  auto movement = fac->makeInstance(rep);
 
   const double testVal = 4.2f;
   int* pos = rep->accessPath({"translation"});

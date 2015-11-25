@@ -4,11 +4,15 @@
 #include <iostream>
 #include <vector>
 
-namespace ice {
+#include "ice/representation/Representation.h"
 
-class RepresentationInstance {
+namespace ice
+{
+
+class RepresentationInstance
+{
 public:
-  RepresentationInstance(Representation *rep)
+  RepresentationInstance(std::shared_ptr<Representation> rep)
   {
     this->representation = rep;
   }
@@ -30,18 +34,20 @@ public:
   virtual void print(int level, std::string dimension = "") = 0;
 
 protected:
-  Representation *representation;
+  std::shared_ptr<Representation> representation;
 };
 
-class CompositeRepresentationInstance : public RepresentationInstance {
+class CompositeRepresentationInstance : public RepresentationInstance
+{
   friend class RepresentationFactory;
 
 public:
-  CompositeRepresentationInstance(Representation *rep) : RepresentationInstance(rep)
+  CompositeRepresentationInstance(std::shared_ptr<Representation> rep) :
+      RepresentationInstance(rep)
   {
     //
   }
-  
+
   virtual ~CompositeRepresentationInstance()
   {
     //
@@ -85,14 +91,14 @@ public:
   }
 
 private:
-  std::vector<RepresentationInstance*> subs;
+  std::vector<std::shared_ptr<RepresentationInstance>> subs;
 };
-
 
 class BasicRepresentationInstance : public RepresentationInstance
 {
 public:
-  BasicRepresentationInstance(Representation *rep) : RepresentationInstance(rep)
+  BasicRepresentationInstance(std::shared_ptr<Representation> rep) :
+      RepresentationInstance(rep)
   {
     this->type = BasicRepresentationType::UNSET;
   }
@@ -127,9 +133,11 @@ protected:
 /**
  * Boolean representation
  */
-class BoolRepresentationInstance : public BasicRepresentationInstance {
+class BoolRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  BoolRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  BoolRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::BOOL;
     this->value = false;
@@ -151,7 +159,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((bool*) value);
+    this->value = *((bool*)value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -167,9 +175,11 @@ private:
 /**
  * Byte representation
  */
-class ByteRepresentationInstance : public BasicRepresentationInstance {
+class ByteRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  ByteRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  ByteRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::BYTE;
     this->value = 0;
@@ -191,7 +201,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((int8_t*) value);
+    this->value = *((int8_t*)value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -207,9 +217,11 @@ private:
 /**
  * Unsigned byte representation
  */
-class UnsignedByteRepresentationInstance : public BasicRepresentationInstance {
+class UnsignedByteRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  UnsignedByteRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  UnsignedByteRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::UNSIGNED_BYTE;
     this->value = 0;
@@ -231,7 +243,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((uint8_t*) value);
+    this->value = *((uint8_t*)value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -247,9 +259,11 @@ private:
 /**
  * Short representation
  */
-class ShortRepresentationInstance : public BasicRepresentationInstance {
+class ShortRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  ShortRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  ShortRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::SHORT;
     this->value = 0;
@@ -271,7 +285,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((short*) value);
+    this->value = *((short*)value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -287,9 +301,11 @@ private:
 /**
  * Integer representation
  */
-class IntegerRepresentationInstance : public BasicRepresentationInstance {
+class IntegerRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  IntegerRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  IntegerRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::INT;
     this->value = 0;
@@ -311,7 +327,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((int*) value);
+    this->value = *((int*)value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -327,9 +343,11 @@ private:
 /**
  * Long representation
  */
-class LongRepresentationInstance : public BasicRepresentationInstance {
+class LongRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  LongRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  LongRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::LONG;
     this->value = 0;
@@ -351,7 +369,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((long*) value);
+    this->value = *((long*)value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -367,9 +385,11 @@ private:
 /**
  * Unsigned short representation
  */
-class UnsignedShortRepresentationInstance : public BasicRepresentationInstance {
+class UnsignedShortRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  UnsignedShortRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  UnsignedShortRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::UNSIGNED_SHORT;
     this->value = 0;
@@ -391,7 +411,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((unsigned short*) value);
+    this->value = *((unsigned short*)value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -407,9 +427,11 @@ private:
 /**
  * Unsigned integer representation
  */
-class UnsignedIntegerRepresentationInstance : public BasicRepresentationInstance {
+class UnsignedIntegerRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  UnsignedIntegerRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  UnsignedIntegerRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::UNSIGNED_INT;
     this->value = 0;
@@ -431,7 +453,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((unsigned int*) value);
+    this->value = *((unsigned int*)value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -447,9 +469,11 @@ private:
 /**
  * unsigned long representation
  */
-class UnsignedLongRepresentationInstance : public BasicRepresentationInstance {
+class UnsignedLongRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  UnsignedLongRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  UnsignedLongRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::UNSIGNED_LONG;
     this->value = 0;
@@ -471,7 +495,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((unsigned long*) value);
+    this->value = *((unsigned long*)value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -487,9 +511,11 @@ private:
 /**
  * Float representation
  */
-class FloatRepresentationInstance : public BasicRepresentationInstance {
+class FloatRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  FloatRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  FloatRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::FLOAT;
     this->value = 0;
@@ -511,7 +537,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((float*) value);
+    this->value = *((float*)value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -527,9 +553,11 @@ private:
 /**
  * Double representation
  */
-class DoubleRepresentationInstance : public BasicRepresentationInstance {
+class DoubleRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  DoubleRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  DoubleRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::DOUBLE;
     this->value = 0;
@@ -551,7 +579,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((double*) value);
+    this->value = *((double*)value);
   }
 
   virtual void print(int level, std::string dimension)
@@ -567,9 +595,11 @@ private:
 /**
  * String representation
  */
-class StringRepresentationInstance : public BasicRepresentationInstance {
+class StringRepresentationInstance : public BasicRepresentationInstance
+{
 public:
-  StringRepresentationInstance(Representation *rep) : BasicRepresentationInstance(rep)
+  StringRepresentationInstance(std::shared_ptr<Representation> rep) :
+      BasicRepresentationInstance(rep)
   {
     type = BasicRepresentationType::STRING;
   }
@@ -590,7 +620,7 @@ public:
 
   virtual void setRaw(const void* value)
   {
-    this->value = *((std::string*) value);
+    this->value = *((std::string*)value);
   }
 
   virtual void print(int level, std::string dimension)

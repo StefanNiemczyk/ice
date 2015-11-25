@@ -126,7 +126,6 @@ add_jar(
   java/src/de/unikassel/vs/ice/NodeIROVisitor.java
   java/src/de/unikassel/vs/ice/RepresentationVisitor.java
   java/src/de/unikassel/vs/ice/Representation.java
-  #java/src/de/unikassel/vs/ice/RepresentationIndividual.java
   OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/java/lib
 )
 
@@ -176,6 +175,8 @@ add_library(${PROJECT_NAME}
 #  src/engine/InformationType.cpp
   src/engine/StreamFactory.cpp
   
+  src/engine/OntologyInterface.cpp
+  
   src/engine/ProcessingModel.cpp
   src/engine/ProcessingModelGenerator.cpp
   src/engine/ASPSystem.cpp
@@ -183,14 +184,15 @@ add_library(${PROJECT_NAME}
   src/engine/FastUpdateStrategie.cpp
   src/engine/UpdateStrategie.cpp
   
-  src/engine/OntologyInterface.cpp
+  src/engine/RepresentationFactory.cpp
+  src/engine/Transformation.cpp
   
   src/engine/Configuration.cpp
   src/engine/Identifier.cpp
   src/engine/ICEngine.cpp 
   src/engine/TimeFactory.cpp
   src/engine/XMLReader.cpp
-  src/engine/RepresentationFactory.cpp
+  
   
   src/engine/split.cpp
 
@@ -271,6 +273,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/test_ASPRepComputation.cpp
  # test/test_JNI.cpp
   test/test_Representation.cpp
+  test/test_RepresentationTransformation.cpp
  # test/test_ASPCoordinator.cpp
  # test/test_serialize.cpp
  # test/test_RingBuffer.cpp
