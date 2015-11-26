@@ -75,18 +75,19 @@ std::shared_ptr<BaseInformationStream> InformationStore::registerBaseStream(
   }
 
   auto desc = std::make_shared<StreamDescription>(specification, name, provider, sourceSystem, metadata);
-  auto stream = this->streamFactory->createStream(dataType, desc, this->eventHandler, streamSize);
+  std::string type = this->ontology->toLongIri(dataType);
+  auto stream = this->streamFactory->createStream(type, desc, this->eventHandler, streamSize);
 
   if (stream)
   {
-    _log->debug("Created stream with '%v', '%v', '%v'", specification->toString(),
-                provider, sourceSystem);
+    _log->debug("Created stream with '%v', '%v', '%v', '%v'", specification->toString(),
+                provider, sourceSystem, type);
     this->streams.push_back(stream);
   }
   else
   {
-    _log->error("Stream with '%v', '%v', '%v' could not be created", specification->toString(),
-                provider, sourceSystem);
+    _log->error("Stream with '%v', '%v', '%v', '%v' could not be created", specification->toString(),
+                provider, sourceSystem, type);
   }
   return stream;
 }

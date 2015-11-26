@@ -40,9 +40,10 @@ GContainerFactory::GContainerFactory()
   typeMap.insert(std::pair<std::string, BasicRepresentationType>("stringRep", BasicRepresentationType::STRING));
 }
 
-GContainerFactory::GContainerFactory(std::weak_ptr<ICEngine> engine) : GContainerFactory()
+GContainerFactory::GContainerFactory(std::weak_ptr<ICEngine> engine) :
+    engine(engine)
 {
-  this->engine = engine;
+
 }
 
 GContainerFactory::~GContainerFactory()
@@ -57,17 +58,38 @@ void GContainerFactory::init()
 
   this->ontologyInterface = e->getOntologyInterface();
 
-  this->fromCSVStrings(this->ontologyInterface->readRepresentations());
+  this->readFromOntology(this->ontologyInterface);
 }
 
 void GContainerFactory::cleanUp()
 {
-
+  this->ontologyInterface.reset();
 }
 
-std::shared_ptr<Representation> GContainerFactory::fromCSV(std::string reprStr,
-                                                               std::map<std::string, std::shared_ptr<Representation>> *tmpMap,
-                                                               const char delim)
+void GContainerFactory::readFromOntology(std::shared_ptr<OntologyInterface> ontologyInterface)
+{
+  std::string iri = "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#";
+
+  auto csv = ontologyInterface->readRepresentations();
+
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "BooleanRep"), BasicRepresentationType::BOOL});
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "ByteRep"), BasicRepresentationType::BYTE});
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "UnsignedByteRep"), BasicRepresentationType::UNSIGNED_BYTE});
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "ShortRep"), BasicRepresentationType::SHORT});
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "IntegerRep"), BasicRepresentationType::INT});
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "LongRep"), BasicRepresentationType::LONG});
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "UnsignedShortRep"), BasicRepresentationType::UNSIGNED_SHORT});
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "UnsignedIntegerRep"), BasicRepresentationType::UNSIGNED_INT});
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "UnsignedLongRep"), BasicRepresentationType::UNSIGNED_LONG});
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "FloatRep"), BasicRepresentationType::FLOAT});
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "DoubleRep"), BasicRepresentationType::DOUBLE});
+  typeMap.insert( {ontologyInterface->toShortIri(iri + "StringRep"), BasicRepresentationType::STRING});
+
+  this->fromCSVStrings(std::move(csv));
+}
+
+std::shared_ptr<Representation> GContainerFactory::fromCSV(
+    std::string reprStr, std::map<std::string, std::shared_ptr<Representation>> *tmpMap, const char delim)
 {
   if (reprStr.empty())
   {
@@ -112,7 +134,8 @@ BasicRepresentationType GContainerFactory::getBasicRep(std::string rep)
   return pos->second;
 }
 
-std::shared_ptr<Representation> GContainerFactory::addOrGet(std::string name, std::map<std::string, std::shared_ptr<Representation>> *tmpMap)
+std::shared_ptr<Representation> GContainerFactory::addOrGet(
+    std::string name, std::map<std::string, std::shared_ptr<Representation>> *tmpMap)
 {
   std::shared_ptr<Representation> rep = NULL;
 
@@ -125,7 +148,7 @@ std::shared_ptr<Representation> GContainerFactory::addOrGet(std::string name, st
     rep = std::make_shared<Representation>();
     rep->name = name;
     rep->type = BasicRepresentationType::UNSET;
-    tmpMap->insert({name, rep});
+    tmpMap->insert( {name, rep});
   }
 
   return rep;
@@ -256,8 +279,7 @@ void GContainerFactory::printReps(std::shared_ptr<Representation> representation
   for (int i = 0; i < representation->dimensions.size(); ++i)
   {
     auto rep = representation->dimensions.at(i);
-    std::cout << std::string(depth + 1, ' ') << representation->dimensionNames.at(i) << " " << rep->name << " "
-        << std::endl;
+    std::cout << std::string(depth + 1, ' ') << representation->dimensionNames.at(i) << " " << rep->name << std::endl;
     if (rep->isBasic() == false)
       this->printReps(rep, depth + 2);
   }

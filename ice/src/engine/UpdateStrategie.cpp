@@ -232,7 +232,10 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
     std::map<std::string, int> metadata; // TODO
 
     _log->debug("Look up output stream for node '%v'", nodeName);
-    auto stream = this->getStream(nodeName, this->self->getSystemIriShort(), entity, scope, rep, entity2, metadata);
+
+    std::string iriShort = this->self->getSystemIriShort();
+
+    auto stream = this->getStream(nodeName, iriShort, entity, scope, rep, entity2, metadata);
 
     if (false == stream)
     {

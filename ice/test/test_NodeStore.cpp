@@ -15,13 +15,13 @@ TEST(NodeStoreTest, create)
   auto streamFactory = std::make_shared<TestFactory>();
   auto timeFactory = std::make_shared<TestTimeFactory>();
   std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "tut");
-  ice::NodeStore store(engine);
+  engine->init();
 
   std::map<std::string, std::string> config;
 //  const NodeType type, const std::string className, const std::string name,
 //                                       const ont::entity entity, const ont::entity entityRelated,
 //                                       std::map<std::string, std::string> config,
-  auto node = store.registerNode(ice::NodeType::PROCESSING, "smothing", "SmothingProcessingNode", "testEntity1", "none", config);
+  auto node = engine->getNodeStore()->registerNode(ice::NodeType::PROCESSING, "smothing", "SmothingProcessingNode", "testEntity1", "none", config);
 
   ASSERT_TRUE(node ? true : false);
 }

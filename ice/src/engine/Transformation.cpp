@@ -21,7 +21,10 @@ Transformation::Transformation(std::shared_ptr<ice::GContainerFactory> factory,
 
 Transformation::~Transformation()
 {
-  // TODO Auto-generated destructor stub
+  for (auto op : this->operations)
+  {
+    delete op;
+  }
 }
 
 std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer>* inputs)
@@ -30,13 +33,13 @@ std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer
 
   for (auto operation : this->operations)
   {
-    switch (operation.type)
+    switch (operation->type)
     {
       case (DEFAULT):
-        target->set(operation.targetDimension, operation.value);
+        target->set(operation->targetDimension, operation->value);
         break;
       case (USE):
-        target->set(operation.targetDimension, inputs[operation.sourceIndex]->get(operation.sourceDimension));
+        target->set(operation->targetDimension, inputs[operation->sourceIndex]->get(operation->sourceDimension));
         break;
       default:
 //TODO
@@ -47,7 +50,7 @@ std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer
   return target;
 }
 
-std::vector<Operation>& Transformation::getOperations()
+std::vector<TransformationOperation*>& Transformation::getOperations()
 {
   return this->operations;
 }

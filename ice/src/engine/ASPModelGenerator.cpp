@@ -62,9 +62,6 @@ void ASPModelGenerator::initInternal()
 
   this->asp->setNoWarnings(true);
   this->asp->init();
-
-  // Look up system
-  this->self = this->getASPSystemByIRI(en->getIri());
 }
 
 void ASPModelGenerator::cleanUpInternal()
@@ -122,6 +119,25 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
 
     this->lastQuery = this->asp->getExternal("query", {this->queryIndex}, "query",
                                              {this->queryIndex, 3, this->maxChainLength}, true);
+  }
+
+  if (false == this->self)
+  {
+    auto en = this->engine.lock();
+    this->self = this->getASPSystemByIRI(en->getIri());
+
+    for (auto system : this->systems)
+    {
+      if (this->self && system != this->self)
+      {
+        // TODO add metadata
+        this->asp->add(
+            "base",
+            {},
+            "transfer(" + system->getShortIri() + "," + this->self->getShortIri() + ") :- system("
+                + system->getShortIri() + ",default).");
+      }
+    }
   }
 
   // activate and deactivate systems
@@ -650,17 +666,16 @@ std::shared_ptr<ASPSystem> ASPModelGenerator::getASPSystemByIRI(std::string p_ir
       return system;
   }
 
-  _log->info("New asp system found %v", p_iri);
+  std::string asp = this->ontology->toShortIri(p_iri);
 
-  int index = p_iri.find_last_of("#");
-  std::string asp = (index != std::string::npos ? p_iri.substr(index + 1, p_iri.length()) : p_iri);
-  std::transform(asp.begin(), asp.begin() + 1, asp.begin(), ::tolower);
+  _log->info("New asp system found %v, short iri '%v'", p_iri, asp);
+
 
   // TODO add island
   auto external = this->asp->getExternal("system", {Gringo::Value(asp), "default"}, "system", {Gringo::Value(asp)},
                                          true);
 
-  std::shared_ptr<ASPSystem> system = std::make_shared<ASPSystem>(p_iri, this->engine,
+  std::shared_ptr<ASPSystem> system = std::make_shared<ASPSystem>(p_iri, asp, this->engine,
                                                                   this->coordinator->getEngineStateNoMutex(p_iri), external);
   this->systems.push_back(system);
 

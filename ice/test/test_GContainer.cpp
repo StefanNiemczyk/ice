@@ -22,44 +22,45 @@ TEST(GContainerTest, simpleTest)
   std::string path = ros::package::getPath("ice");
   bool result;
 
-  ice::OntologyInterface oi(path + "/java/lib/");
-  oi.addIRIMapper(path + "/ontology/");
+  auto oi = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
+  oi->addIRIMapper(path + "/ontology/");
 
-  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_FALSE(oi->errorOccurred());
 
-  result = oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  result = oi->addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
 
-  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_FALSE(oi->errorOccurred());
   ASSERT_TRUE(result);
 
-  result = oi.loadOntologies();
+  result = oi->loadOntologies();
 
-  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_FALSE(oi->errorOccurred());
   ASSERT_TRUE(result);
 
-  result = oi.isConsistent();
+  result = oi->isConsistent();
 
-  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_FALSE(oi->errorOccurred());
   ASSERT_TRUE(result);
 
   ice::GContainerFactory fac;
-  fac.fromCSVStrings(oi.readRepresentations());
+  fac.readFromOntology(oi);
 
-  auto rep = fac.getRepresentation("defaultMovementRep");
+  auto rep = fac.getRepresentation("o0_DefaultMovementRep");
+
+  ASSERT_TRUE(rep != false);
+
   auto movement = fac.makeInstance(rep);
 
   const double testVal = 4.2f;
-  int* pos = rep->accessPath({"translation"});
+  int* pos = rep->accessPath({"o0_Translation"});
+
+  ASSERT_TRUE(pos != nullptr);
+
   movement->set(pos, &testVal);
 
   double val = movement->getValue<double>(pos);
 
   ASSERT_EQ(testVal, val);
-//  std::cout << "VAL: " << *val << std::endl;
-
-//  movement->print();
-
-//  fac->printReps();
   }
 
 }

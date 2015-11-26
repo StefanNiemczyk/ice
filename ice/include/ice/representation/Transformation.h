@@ -23,14 +23,14 @@ class GContainerFactory;
 namespace ice
 {
 
-enum TransformationOperation {
+enum TransformationOperationType {
   DEFAULT,
   USE
 };
 
-struct Operation {
+struct TransformationOperation {
 
-  ~Operation() {
+  ~TransformationOperation() {
     switch (this->valueType)
        {
          case BOOL:
@@ -72,12 +72,15 @@ struct Operation {
        }
   }
 
-  int* sourceDimension;
-  TransformationOperation type;
-  void* value;
-  int* targetDimension;
+  TransformationOperationType type;
+
   int sourceIndex;
+  int* sourceDimension;
+
+  int* targetDimension;
+
   BasicRepresentationType valueType;
+  void* value;
 };
 
 class Transformation
@@ -88,12 +91,12 @@ public:
 
   std::shared_ptr<GContainer> transform(std::shared_ptr<GContainer>* inputs);
 
-  std::vector<Operation>& getOperations();
+  std::vector<TransformationOperation*>& getOperations();
 
 private:
   std::shared_ptr<Representation> targetRepresentation;
   int inputCount;
-  std::vector<Operation> operations;
+  std::vector<TransformationOperation*> operations;
   std::shared_ptr<ice::GContainerFactory> factory;
 };
 

@@ -101,11 +101,12 @@ public:
    * This constructor initialize the object and sets the unique identifier.
    *
    * \param iri The ontology iri of this system
+   * \param iri The ontology iri short version of this system
    * \param engine The main engine.
    * \param state The engine state.
    * \param external The asp external.
    */
-  ASPSystem(std::string iri, std::weak_ptr<ICEngine> engine, std::shared_ptr<EngineState> state,
+  ASPSystem(std::string iri, std::string iriShort, std::weak_ptr<ICEngine> engine, std::shared_ptr<EngineState> state,
             std::shared_ptr<supplementary::External> external);
 
   /*!
@@ -136,6 +137,7 @@ public:
 private:
   std::weak_ptr<ICEngine> engine; /**< The main engine */
   const std::string iri; /**< The ontology iri of this system */
+  const std::string iriShort; /**< The ontology iri of this system */
   std::shared_ptr<EngineState> state; /**< The engine state */
   std::shared_ptr<supplementary::External> systemExternal; /**< The external for the system */
   std::vector<std::shared_ptr<ASPElement>> aspNodes; /**< Vector of asp nodes */

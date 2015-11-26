@@ -9,9 +9,9 @@
 namespace ice
 {
 
-ASPSystem::ASPSystem(std::string iri, std::weak_ptr<ICEngine> engine, std::shared_ptr<EngineState> state,
+ASPSystem::ASPSystem(std::string iri, std::string iriShort, std::weak_ptr<ICEngine> engine, std::shared_ptr<EngineState> state,
                      std::shared_ptr<supplementary::External> external) :
-    iri(iri), engine(engine), state(state), systemExternal(external)
+    iri(iri), iriShort(iriShort), engine(engine), state(state), systemExternal(external)
 {
   this->_log = el::Loggers::getLogger("ASPSystem");
 }
@@ -33,11 +33,12 @@ const std::string ASPSystem::getIri() const
 
 const std::string ASPSystem::getShortIri() const
 {
-  int index = this->iri.find_last_of("#");
-  std::string asp = (index != std::string::npos ? this->iri.substr(index + 1, this->iri.length()) : this->iri);
-  std::transform(asp.begin(), asp.begin() + 1, asp.begin(), ::tolower);
-
-  return asp;
+  return this->iriShort;
+//  int index = this->iri.find_last_of("#");
+//  std::string asp = (index != std::string::npos ? this->iri.substr(index + 1, this->iri.length()) : this->iri);
+//  std::transform(asp.begin(), asp.begin() + 1, asp.begin(), ::tolower);
+//
+//  return asp;
 }
 
 std::shared_ptr<supplementary::External> ASPSystem::getSystemExternal()

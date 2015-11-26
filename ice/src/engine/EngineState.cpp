@@ -82,19 +82,27 @@ void EngineState::setSystemIri(std::string systemIri)
   this->systemIri = systemIri;
 }
 
-const std::string EngineState::getSystemIriShort() const
+const std::string EngineState::getSystemIriShort()
 {
   if (this->systemIri == "")
     return "";
 
-  int index1 = this->systemIri.find("#");
+  if (this->systemIriShort != "")
+    return this->systemIriShort;
 
-  if (index1 == std::string::npos)
-    return this->systemIri;
+  auto e = this->engine.lock();
+  this->systemIriShort = e->getOntologyInterface()->toShortIri(this->systemIri);
 
-  std::string name = this->systemIri.substr(index1 + 1, this->systemIri.size() - index1 - 1);
-  name[0] = std::tolower(name[0]);
-  return name;
+  return this->systemIriShort;
+
+//  int index1 = this->systemIri.find("#");
+//
+//  if (index1 == std::string::npos)
+//    return this->systemIri;
+//
+//  std::string name = this->systemIri.substr(index1 + 1, this->systemIri.size() - index1 - 1);
+//  name[0] = std::tolower(name[0]);
+//  return name;
 }
 
 time EngineState::getTimeLastActivity() const

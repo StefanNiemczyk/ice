@@ -36,6 +36,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->informationDirty = true;
   this->systemDirty = true;
   this->loadDirty = true;
+  this->mappingDirty = true;
 
   /* load and initialize a Java VM, return a JNI interface pointer in env */
   if (jvm == nullptr)
@@ -77,8 +78,8 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   if (this->checkError("Constructor", "Failed to find constructor for class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
 
-  this->javaInterface = this->env->NewObject(this->javaOntologyInterface, cnstrctr,
-                                             this->env->NewStringUTF("testPath"));
+  this->javaInterface = this->env->NewGlobalRef(this->env->NewObject(this->javaOntologyInterface, cnstrctr,
+                                             this->env->NewStringUTF("testPath")));
 
   if (this->checkError("Constructor", "Failed to instantiate class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
@@ -141,6 +142,8 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
                                                       "(Ljava/lang/String;)Z");
   this->removeOntologyIRIMethod = this->env->GetMethodID(this->javaOntologyInterface, "removeOntologyIRI",
                                                          "(Ljava/lang/String;)Z");
+  this->getOntologyIriMappingMethod = this->env->GetMethodID(this->javaOntologyInterface, "getOntologyIriMapping",
+                                                         "()[Ljava/lang/String;");
   this->readInformationStructureAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface,
                                                                      "readInformationStructureAsASP",
                                                                      "()Ljava/lang/String;");
@@ -176,7 +179,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
 
 OntologyInterface::~OntologyInterface()
 {
-  this->env->DeleteLocalRef(this->javaInterface);
+  this->env->DeleteGlobalRef(this->javaInterface);
 //  jvm->DetachCurrentThread();
 }
 
@@ -238,6 +241,7 @@ bool OntologyInterface::loadOntologies()
 
   this->informationDirty = true;
   this->systemDirty = true;
+  this->mappingDirty = true;
   this->loadDirty = false;
 
   return result;
@@ -257,6 +261,8 @@ bool OntologyInterface::loadOntology(std::string const p_path)
     return false;
 
   this->systemDirty = true;
+  this->mappingDirty = true;
+  this->informationDirty = true;
 
   return result;
 }
@@ -285,11 +291,11 @@ std::unique_ptr<std::vector<std::vector<std::string>>> OntologyInterface::getOnt
 
 void OntologyInterface::readOntologyIDsFromOntology()
 {
-  this->checkError("getOntologyIDs", "Error exists, method getOntologyIDs will not be executed");
+  this->checkError("readOntologyIDsFromOntology", "Error exists, method getOntologyIDs will not be executed");
 
   jobjectArray result = (jobjectArray)env->CallObjectMethod(this->javaInterface, this->getOntologyIDsMethod);
 
-  if (this->checkError("getOntologyIDs", "Error occurred at reading ontology ids"))
+  if (this->checkError("readOntologyIDsFromOntology", "Error occurred at reading ontology ids"))
     return;
 
   this->ontologyIds.clear();
@@ -1086,6 +1092,60 @@ bool OntologyInterface::addMapNodeClass(std::string const p_node, std::vector<st
   return result;
 }
 
+std::string OntologyInterface::toLongIri(std::string p_shortIri)
+{
+  if (this->mappingDirty)
+  {
+    this->readOntologyIriMappingFromOntology();
+    this->mappingDirty = false;
+  }
+
+  int index = p_shortIri.find("_");
+
+  if (index == std::string::npos)
+    return "";
+
+  std::string idStr = p_shortIri.substr(1, index);
+  int id = std::stoi(idStr);
+
+  if (this->ontologyIriMapping.size() <= id)
+    return "";
+
+  return this->ontologyIriMapping.at(id) + "#" + p_shortIri.substr(index + 1);
+}
+
+std::string OntologyInterface::toShortIri(std::string p_longIri)
+{
+  if (this->mappingDirty)
+  {
+    this->readOntologyIriMappingFromOntology();
+    this->mappingDirty = false;
+  }
+
+  int index = p_longIri.find("#");
+
+  if (index == std::string::npos)
+    return "";
+
+  std::string iri = p_longIri.substr(0, index);
+
+  int id = -1;
+
+  for (int i=0; i < this->ontologyIriMapping.size(); ++i)
+  {
+    if (this->ontologyIriMapping.at(i) == iri)
+    {
+      id = i;
+      break;
+    }
+  }
+
+  if (id == -1)
+    return "";
+
+  return "o" + std::to_string(id) + "_" + p_longIri.substr(index + 1);
+}
+
 bool OntologyInterface::addOntologyIRI(std::string const p_iri)
 {
   this->checkError("addOntologyIRI", "Error exists, method addOntologyIRI will not be executed");
@@ -1120,6 +1180,40 @@ bool OntologyInterface::removeOntologyIRI(std::string const p_iri)
   this->loadDirty = true;
 
   return result;
+}
+
+std::unique_ptr<std::vector<std::string>> OntologyInterface::getOntologyIriMapping()
+{
+  if (this->mappingDirty)
+  {
+    this->readOntologyIriMappingFromOntology();
+    this->mappingDirty = false;
+  }
+
+  std::unique_ptr<std::vector<std::string>> mapping(new std::vector<std::string>(this->ontologyIriMapping));
+
+  return std::move(mapping);
+}
+
+void OntologyInterface::readOntologyIriMappingFromOntology()
+{
+  this->checkError("readRepresentation", "Error exists, readOntologyIriMappingFromOntology will not be executed");
+
+  jobjectArray result = (jobjectArray)env->CallObjectMethod(this->javaInterface, this->getOntologyIriMappingMethod);
+
+  int size = env->GetArrayLength(result);
+
+  for (int i = 0; i < size; ++i)
+  {
+    jstring jstr = (jstring)env->GetObjectArrayElement(result, i);
+    const char* cstr = env->GetStringUTFChars(jstr, 0);
+    this->ontologyIriMapping.push_back(std::string(cstr));
+    delete cstr;
+    env->ReleaseStringUTFChars(jstr, 0);
+    env->DeleteLocalRef(jstr);
+  }
+
+  env->DeleteLocalRef(result);
 }
 
 const char* OntologyInterface::readInformationStructureAsASP()

@@ -74,9 +74,13 @@ public:
                        std::vector<std::string> p_inputMaps, std::vector<int> p_inputMapsMinSize,
                        std::vector<int> p_inputMapsMaxSize, std::vector<std::string> p_outputMaps,
                        std::vector<int> p_outputMapsMinSize, std::vector<int> p_outputMapsMaxSize);
+  std::string toLongIri(std::string p_shortIri);
+  std::string toShortIri(std::string p_longIri);
 
   bool addOntologyIRI(std::string const p_iri);
   bool removeOntologyIRI(std::string const p_iri);
+  std::unique_ptr<std::vector<std::string>> getOntologyIriMapping();
+  void readOntologyIriMappingFromOntology();
   const char* readInformationStructureAsASP();
   const char* readRepresentationsAsCSV();
   std::unique_ptr<std::vector<std::string>> readRepresentations();
@@ -111,8 +115,10 @@ private:
   bool informationDirty; /**< Flag to check if the information model was changed */
   bool systemDirty; /**< Flag to check if the system model was changed */
   bool loadDirty; /**< Flag to check if the ontology needs to be loaded again */
+  bool mappingDirty; /**< Flag to check if the ontology iri mapping needs to be loaded again */
   std::vector<std::string> knownSystem; /**< List of known systems */
   std::vector<std::vector<std::string>> ontologyIds; /**< List of ontology iris and version iris */
+  std::vector<std::string> ontologyIriMapping; /**< List of ontology iris for Mapping */
   std::string informationStructure; /**< The information structure */
   std::mutex mtx_; /**< Mutex */
 
@@ -145,6 +151,7 @@ private:
 
   jmethodID addOntologyIRIMethod; /**< Method id */
   jmethodID removeOntologyIRIMethod; /**< Method id */
+  jmethodID getOntologyIriMappingMethod; /**< Method id */
   jmethodID readInformationStructureAsASPMethod; /**< Method id */
   jmethodID readRepresentationsAsCSVMethod; /**< Method id */
   jmethodID readNodesAndIROsAsASPMethod; /**< Method id */

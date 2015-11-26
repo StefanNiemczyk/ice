@@ -13,7 +13,7 @@ import org.semanticweb.owlapi.model.OWLObjectVisitor;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-public abstract class IceVisitor extends IceOntologyInterface implements OWLObjectVisitor {
+public abstract class IceVisitor implements OWLObjectVisitor {
 
 	protected final IceOntologyInterface ioi;
 
@@ -75,13 +75,17 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 	}
 
 	protected String iRIShortName(IRI p_iri) {
-		String tmp = p_iri.toString().substring(p_iri.toString().indexOf("#") + 1);
+		return this.ioi.iRIShortName(p_iri);
+
+		// String tmp = p_iri.toString().substring(p_iri.toString().indexOf("#")
+		// + 1);
 		// owlapi 4.0
 		// String tmp =
 		// p_iri.getShortForm().substring(p_iri.getShortForm().indexOf("#") +
 		// 1);
 
-		return Character.toLowerCase(tmp.charAt(0)) + (tmp.length() > 1 ? tmp.substring(1) : "");
+		// return Character.toLowerCase(tmp.charAt(0)) + (tmp.length() > 1 ?
+		// tmp.substring(1) : "");
 	}
 
 	public String toString() {
@@ -92,7 +96,7 @@ public abstract class IceVisitor extends IceOntologyInterface implements OWLObje
 		if (false == this.ioi.isLogging())
 			return;
 
-		System.out
-				.println(DATE_FORMAT.format(new Date()) + " JAVA  [" + this.getClass().getSimpleName() + "] " + p_msg);
+		System.out.println(IceOntologyInterface.DATE_FORMAT.format(new Date()) + " JAVA  ["
+				+ this.getClass().getSimpleName() + "] " + p_msg);
 	}
 }

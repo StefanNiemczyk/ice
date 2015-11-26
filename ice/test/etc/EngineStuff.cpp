@@ -30,12 +30,12 @@ class TestFactory : public ice::StreamFactory
       stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize,
           sharingMaxCount);
     }
-    else if ("testRepresentation1" == className)
+    else if ("http://vs.uni-kassel.de/IceTest#TestRepresentation1" == className)
     {
       stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize,
           sharingMaxCount);
     }
-    else if ("testRepresentation2" == className)
+    else if ("http://vs.uni-kassel.de/IceTest#TestRepresentation2" == className)
     {
       stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize,
           sharingMaxCount);

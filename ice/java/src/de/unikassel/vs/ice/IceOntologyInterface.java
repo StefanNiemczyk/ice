@@ -44,6 +44,7 @@ public class IceOntologyInterface {
 	private IceIris ii;
 
 	private List<String> ontologyIries;
+	private List<String> iriMapping;
 	private boolean dirty;
 
 	private int someMinCardinality;
@@ -69,6 +70,7 @@ public class IceOntologyInterface {
 		this.defaultMaxCardinality = 5;
 		this.dirty = true;
 		this.logging = true;
+		this.iriMapping = new ArrayList<String>();
 	}
 
 	public void cleanUp() {
@@ -90,6 +92,9 @@ public class IceOntologyInterface {
 			this.mainIRI = this.mainOntology.getOntologyID().getOntologyIRI().toString();
 			this.mainIRIPrefix = this.mainIRI + "#";
 			this.imports = this.manager.getImports(this.mainOntology);
+
+			// Updating Mapping
+			this.updateIriMapping();
 
 			// Fetching ontology things: class, properties, usw.
 			this.ii = new IceIris(this.dataFactory);
@@ -114,12 +119,29 @@ public class IceOntologyInterface {
 		this.mainOntology = this.manager.loadOntology(iri);
 		this.imports = this.manager.getImports(this.mainOntology);
 
+		// Updating Mapping
+		this.updateIriMapping();
+
 		// Fetching ontology things: class, properties, usw.
 		this.ii = new IceIris(this.dataFactory);
 
 		this.dirty = true;
 
 		return true;
+	}
+
+	private void updateIriMapping() {
+		if (false == this.iriMapping.contains(this.mainIRI))
+			this.iriMapping.add(this.mainIRI);
+
+		for (OWLOntology o : this.imports) {
+			String iriStr = o.getOntologyID().getOntologyIRI().toString();
+			if (false == this.iriMapping.contains(iriStr))
+				this.iriMapping.add(iriStr);
+		}
+
+		if (false == this.iriMapping.contains("http://www.w3.org/2002/07/owl"))
+			this.iriMapping.add("http://www.w3.org/2002/07/owl");
 	}
 
 	public boolean saveOntology(final String p_saveTo) {
@@ -963,10 +985,9 @@ public class IceOntologyInterface {
 					false);
 
 			if (metadataGrounding == null) {
-				System.out
-						.println(String
-								.format("Unknown Metadata grounding '%s' of grounding '%s' for node '%s' in system '%s', node not created.",
-										grounding, metadata, p_node, p_system));
+				this.log(String
+						.format("Unknown Metadata grounding '%s' of grounding '%s' for node '%s' in system '%s', node not created.",
+								grounding, metadata, p_node, p_system));
 				return false;
 			}
 
@@ -1084,10 +1105,9 @@ public class IceOntologyInterface {
 					false);
 
 			if (metadataGrounding == null) {
-				System.out
-						.println(String
-								.format("Unknown Metadata grounding '%s' of grounding '%s' for IRO '%s' in system '%s', IRO not created.",
-										grounding, metadata, p_iro, p_system));
+				this.log(String
+						.format("Unknown Metadata grounding '%s' of grounding '%s' for IRO '%s' in system '%s', IRO not created.",
+								grounding, metadata, p_iro, p_system));
 				return false;
 			}
 
@@ -1117,6 +1137,9 @@ public class IceOntologyInterface {
 	}
 
 	public boolean addOntologyIRI(final String p_iri) {
+		if (false == this.iriMapping.contains(p_iri))
+			this.iriMapping.add(p_iri);
+
 		return this.ontologyIries.add(p_iri);
 	}
 
@@ -1132,10 +1155,8 @@ public class IceOntologyInterface {
 		onts.addAll(this.imports);
 
 		InfoStructureVisitor isv = new InfoStructureVisitor(this, onts, this.getReasoner(), this.ii);
-		long mid = System.currentTimeMillis();
 
 		Set<OWLClass> classes = this.getReasoner().getSubClasses(this.ii.entityType, false).getFlattened();
-		long mid2 = System.currentTimeMillis();
 
 		for (OWLClassExpression cls : classes) {
 			cls.accept(isv);
@@ -1354,6 +1375,29 @@ public class IceOntologyInterface {
 
 	public void setLogging(boolean logging) {
 		this.logging = logging;
+	}
+
+	public String iRIShortName(IRI p_iri) {
+		String[] values = p_iri.toString().split("#");
+		int index = iriMapping.indexOf(values[0]);
+
+		if (index < 0) {
+			// index = IRI_MAPPING.size();
+			// IRI_MAPPING.add(values[0]);
+
+			this.log(String.format("Unkonwn IRI '%s' from '%s', no mapping to short iri", values[0], p_iri));
+		}
+
+		// System.out.println(index + "   " + values[1] + "   " + values[0] +
+		// "   " + (IRI_MAPPING.size()));
+
+		return "o" + index + "_" + values[1];
+	}
+
+	public String[] getOntologyIriMapping() {
+		String[] stockArr = new String[iriMapping.size()];
+		stockArr = iriMapping.toArray(stockArr);
+		return stockArr;
 	}
 
 }

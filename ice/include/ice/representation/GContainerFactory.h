@@ -34,6 +34,8 @@ public:
   void init();
   void cleanUp();
 
+  void readFromOntology(std::shared_ptr<OntologyInterface> ontologyInterface);
+
   int fromCSVStrings(std::unique_ptr<std::vector<std::string>> lines);
   std::shared_ptr<Representation> getRepresentation(std::string representation);
 

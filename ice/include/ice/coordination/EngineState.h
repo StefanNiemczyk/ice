@@ -162,23 +162,7 @@ public:
    *
    * Returns the iri short version of the iri of this engine.
    */
-  const std::string getSystemIriShort() const;
-
-  /*!
-   * \brief Returns the information model of the engine.
-   *
-   * Returns the information model of the engine.
-   */
-//  const std::shared_ptr<InformationModel> getInformationModel() const;
-
-  /*!
-   * \brief Sets the information model of the engine.
-   *
-   * Sets the information model of the engine.
-   *
-   * \param informationModel The information model.
-   */
-//  void setInformationModel(const std::shared_ptr<InformationModel> informationModel);
+  const std::string getSystemIriShort();
 
   /*!
    * \brief Returns the timestamp of the last activity of this engine.
@@ -288,6 +272,7 @@ private:
   std::shared_ptr<Communication> communication; /**< Communication interface */
   identifier engineId; /**< Unique identifier of the engine */
   std::string systemIri; /**< The iri of this system */
+  std::string systemIriShort; /**< Short iri version */
   std::shared_ptr<CooperationContainer> offering; /**< Container for parts of the information processing offered to this engine */
   std::shared_ptr<CooperationContainer> requesting; /**< Container for parts of the information processing requested from this engine */
   std::set<std::shared_ptr<Node>> nodesActivated; /**< Nodes activated by this engine */
