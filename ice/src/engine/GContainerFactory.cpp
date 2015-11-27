@@ -434,7 +434,10 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
 
         if (index < 0)
         {
-          // TODO
+          _log->error(
+              "Unknown input with id '%v' to source dimension for transformation '%v', transformation can not be created",
+              operation.sourceId, transformation->getName());
+
           return false;
         }
 
