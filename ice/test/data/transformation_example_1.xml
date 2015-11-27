@@ -1,35 +1,35 @@
 <transformations>
 
-	<transformation name="Coordinates3DToCoordinates2D">
-		<input id="1" representation="Coordinates3D" />
+	<transformation name="P3Dto2D">
+		<input id="1" representation="http://vs.uni-kassel.de/IceTest#Pos3D" />
 
-		<output representation="Coordinates2D" />
+		<output representation="http://vs.uni-kassel.de/IceTest#Pos2D" />
 
-		<dimensions>
-			<dimension name="XCoordinate">
-				<use from_id="1" value="XCoordinate"/>
+		<operations>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate">
+				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"/>
 			</dimension>
-			<dimension name="YCoordinate">
-				<use from_id="1" value="YCoordinate"/>			
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate">
+				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"/>			
 			</dimension>
-		</dimensions>
+		</operations>
 	</transformation>
 
 
-	<transformation name="Coordinates2DToCoordinates3D">
-		<input id="1" representation="Coordinates2D" />
+	<transformation name="P2Dto3D">
+		<input id="1" representation="http://vs.uni-kassel.de/IceTest#Pos2D" />
 
-		<output representation="Coordinates3D" />
+		<output representation="http://vs.uni-kassel.de/IceTest#Pos3D" />
 
 		<operations>
-			<dimension name="XCoordinate">
-				<use from_id="1" value="XCoordinate"/>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate">
+				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"/>
 			</dimension>
-			<dimension name="YCoordinate">
-				<use from_id="1" value="YCoordinate"/>			
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate">
+				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"/>			
 			</dimension>
-			<dimension name="ZCoordinate">
-				<default value="0"/>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate">
+				<default value="1"/>
 			</dimension>
 		</operations>
 	</transformation>

@@ -43,7 +43,8 @@ TEST(GContainerTest, simpleTest)
   ASSERT_TRUE(result);
 
   ice::GContainerFactory fac;
-  fac.readFromOntology(oi);
+  fac.setOntologyInterface(oi);
+  fac.init();
 
   auto rep = fac.getRepresentation("o0_DefaultMovementRep");
 

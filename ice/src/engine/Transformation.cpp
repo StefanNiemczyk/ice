@@ -13,9 +13,9 @@
 namespace ice
 {
 
-Transformation::Transformation(std::shared_ptr<ice::GContainerFactory> factory,
-                               std::shared_ptr<Representation> targetRepresentation, int inputCount) :
-    factory(factory), inputCount(inputCount), targetRepresentation(targetRepresentation)
+Transformation::Transformation(std::shared_ptr<ice::GContainerFactory> factory, std::string name,
+                               std::shared_ptr<Representation> targetRepresentation) :
+    factory(factory), name(name), targetRepresentation(targetRepresentation)
 {
 }
 
@@ -41,8 +41,11 @@ std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer
       case (USE):
         target->set(operation->targetDimension, inputs[operation->sourceIndex]->get(operation->sourceDimension));
         break;
+      case (FORMULA):
+        // TODO
+        break;
       default:
-//TODO
+        //TODO
         break;
     }
   }
@@ -50,9 +53,24 @@ std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer
   return target;
 }
 
+const std::string Transformation::getName() const
+{
+  return this->name;
+}
+
+std::shared_ptr<Representation> Transformation::getTargetRepresentation()
+{
+  return this->targetRepresentation;
+}
+
 std::vector<TransformationOperation*>& Transformation::getOperations()
 {
   return this->operations;
+}
+
+std::vector<std::shared_ptr<Representation>>& Transformation::getInputs()
+{
+  return this->inputs;
 }
 
 } /* namespace ice */

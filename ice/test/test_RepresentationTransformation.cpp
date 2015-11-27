@@ -12,6 +12,9 @@
 #include "ice/representation/GContainer.h"
 #include "ice/representation/GContainerFactory.h"
 #include "ice/representation/Transformation.h"
+#include "ice/representation/XMLTransformationReader.h"
+
+#include "ice/ICEngine.h"
 
 #include "gtest/gtest.h"
 
@@ -46,28 +49,28 @@ TEST(RepresentationTransformationTest, useOperation)
   rep1Ind->set(dim11, &testValDouble);
   rep1Ind->set(dim12, &testValInt);
 
-  EXPECT_EQ(testValDouble, *((double*) rep1Ind->get(dim11)));
-  EXPECT_EQ(testValInt, *((int*) rep1Ind->get(dim12)));
+  EXPECT_EQ(testValDouble, *((double* ) rep1Ind->get(dim11)));
+  EXPECT_EQ(testValInt, *((int* ) rep1Ind->get(dim12)));
 
-  ice::Transformation trans(factory, rep2, 1);
+  ice::Transformation trans(factory, "TestTransformation", rep2);
 
   ice::TransformationOperation* o;
   o = new ice::TransformationOperation();
   o->sourceIndex = 0;
-  o->sourceDimension = rep1->accessPath({"dim1"});
+  o->sourceDimension = dim11;
 //  o.valueType = ice::BasicRepresentationType::DOUBLE;
 //  o.value = ;
   o->type = ice::TransformationOperationType::USE;
-  o->targetDimension = rep2->accessPath({"dim2"});
+  o->targetDimension = dim22;
   trans.getOperations().push_back(o);
 
   o = new ice::TransformationOperation();
   o->sourceIndex = 0;
-  o->sourceDimension = rep1->accessPath({"dim2"});
+  o->sourceDimension = dim12;
 //  o.valueType = ice::BasicRepresentationType::DOUBLE;
 //  o.value = ;
   o->type = ice::TransformationOperationType::USE;
-  o->targetDimension = rep2->accessPath({"dim1"});
+  o->targetDimension = dim21;
   trans.getOperations().push_back(o);
 
   auto rep2Ind = trans.transform(&rep1Ind);
@@ -108,19 +111,19 @@ TEST(RepresentationTransformationTest, defaultOperation)
   rep1Ind->set(dim11, &testValDouble);
   rep1Ind->set(dim12, &testValInt);
 
-  EXPECT_EQ(testValDouble, *((double*) rep1Ind->get(dim11)));
-  EXPECT_EQ(testValInt, *((int*) rep1Ind->get(dim12)));
+  EXPECT_EQ(testValDouble, *((double* ) rep1Ind->get(dim11)));
+  EXPECT_EQ(testValInt, *((int* ) rep1Ind->get(dim12)));
 
-  ice::Transformation trans(factory, rep2, 1);
+  ice::Transformation trans(factory, "TestTransformation", rep2);
 
   ice::TransformationOperation* o;
   o = new ice::TransformationOperation();
   o->sourceIndex = 0;
-  o->sourceDimension = rep1->accessPath({"dim1"});
+  o->sourceDimension = rep1->accessPath( {"dim1"});
 //  o.valueType = ice::BasicRepresentationType::DOUBLE;
 //  o.value = ;
   o->type = ice::TransformationOperationType::USE;
-  o->targetDimension = rep2->accessPath({"dim2"});
+  o->targetDimension = rep2->accessPath( {"dim2"});
   trans.getOperations().push_back(o);
 
   o = new ice::TransformationOperation();
@@ -129,7 +132,7 @@ TEST(RepresentationTransformationTest, defaultOperation)
   o->valueType = ice::BasicRepresentationType::INT;
   o->value = new int(0);
   o->type = ice::TransformationOperationType::DEFAULT;
-  o->targetDimension = rep2->accessPath({"dim1"});
+  o->targetDimension = rep2->accessPath( {"dim1"});
   trans.getOperations().push_back(o);
 
   auto rep2Ind = trans.transform(&rep1Ind);
@@ -140,6 +143,110 @@ TEST(RepresentationTransformationTest, defaultOperation)
 //  rep1Ind->print();
 //  std::cout << "----------------------------------------------" << std::endl;
 //  rep2Ind->print();
+}
+
+TEST(RepresentationTransformationTest, xmlReader)
+{
+  std::string path = ros::package::getPath("ice");
+  bool result;
+
+  auto oi = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
+  oi->addIRIMapper(path + "/ontology/");
+
+  ASSERT_FALSE(oi->errorOccurred());
+
+  result = oi->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
+
+  ASSERT_FALSE(oi->errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi->loadOntologies();
+
+  ASSERT_FALSE(oi->errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi->isConsistent();
+
+  ASSERT_FALSE(oi->errorOccurred());
+  ASSERT_TRUE(result);
+
+  std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
+  factory->setOntologyInterface(oi);
+  factory->init();
+
+  ice::XMLTransformationReader reader;
+
+  result = reader.readFile("data/transformation_example_1.xml");
+
+  ASSERT_TRUE(result);
+
+  auto p2dRep = factory->getRepresentation("o0_Pos2D");
+  auto p3dRep = factory->getRepresentation("o0_Pos3D");
+
+  ASSERT_TRUE(p2dRep != false);
+  ASSERT_TRUE(p3dRep != false);
+
+  int* p2dX = p2dRep->accessPath({"o2_XCoordinate"});
+  int* p2dY = p2dRep->accessPath({"o2_YCoordinate"});
+
+  int* p3dX = p3dRep->accessPath({"o2_XCoordinate"});
+  int* p3dY = p3dRep->accessPath({"o2_YCoordinate"});
+  int* p3dZ = p3dRep->accessPath({"o2_ZCoordinate"});
+
+  bool foundP2toP3 = false;
+  bool foundP3toP2 = false;
+
+  for (auto desc : reader.getTransformations())
+  {
+    auto trans = factory->fromXMLDesc(desc);
+
+    ASSERT_TRUE(trans != false);
+
+    if (trans->getName() == "P2Dto3D")
+    {
+      auto p2d = factory->makeInstance(p2dRep);
+
+      double val1 = 3.5;
+      double val2 = 35.5;
+
+      p2d->set(p2dX, &val1);
+      p2d->set(p2dY, &val2);
+
+      auto p3d = trans->transform(&p2d);
+
+      ASSERT_EQ(p3d->getValue<double>(p3dX), val1);
+      ASSERT_EQ(p3d->getValue<double>(p3dY), val2);
+      ASSERT_EQ(p3d->getValue<double>(p3dZ), 1.0);
+
+      foundP2toP3 = true;
+    }
+    else if (trans->getName() == "P3Dto2D")
+    {
+      auto p3d = factory->makeInstance(p3dRep);
+
+      double val1 = 3.5;
+      double val2 = 35.5;
+      double val3 = 315.5;
+
+      p3d->set(p3dX, &val1);
+      p3d->set(p3dY, &val2);
+      p3d->set(p3dZ, &val3);
+
+      auto p2d = trans->transform(&p3d);
+
+      ASSERT_EQ(p2d->getValue<double>(p2dX), val1);
+      ASSERT_EQ(p2d->getValue<double>(p2dY), val2);
+
+      foundP3toP2 = true;
+    }
+    else
+    {
+      ASSERT_FALSE(true);
+    }
+  }
+
+  ASSERT_TRUE(foundP2toP3);
+  ASSERT_TRUE(foundP3toP2);
 }
 
 }

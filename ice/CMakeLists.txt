@@ -187,6 +187,7 @@ add_library(${PROJECT_NAME}
   src/engine/GContainerFactory.cpp
   src/engine/split.cpp
   src/engine/Transformation.cpp
+  src/engine/XMLTransformationReader.cpp
   
   src/engine/Configuration.cpp
   src/engine/Identifier.cpp
@@ -265,20 +266,20 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/eval/EvalScenarios.cpp
  # test/eval/eval_AccessSpeed.cpp
  
-  test/test_ASPCoordinator.cpp
-  test/test_JNI.cpp
-  test/test_ASPComposition.cpp
-  test/test_ASPRepComputation.cpp
-  test/test_GContainer.cpp
+ # test/test_ASPCoordinator.cpp
+ # test/test_JNI.cpp
+ # test/test_ASPComposition.cpp
+ # test/test_ASPRepComputation.cpp
+ # test/test_GContainer.cpp
   test/test_RepresentationTransformation.cpp
-  test/test_serialize.cpp
-  test/test_RingBuffer.cpp
-  test/test_Buffer.cpp
-  test/test_EventHandler.cpp
-  test/test_Time.cpp
-  test/test_InformationStore.cpp
-  test/test_Node.cpp
-  test/test_NodeStore.cpp
+ # test/test_serialize.cpp
+ # test/test_RingBuffer.cpp
+ # test/test_Buffer.cpp
+ # test/test_EventHandler.cpp
+ # test/test_Time.cpp
+ # test/test_InformationStore.cpp
+ # test/test_Node.cpp
+ # test/test_NodeStore.cpp
  
  ## should be fixed...  
  # test/etc/TestTime.cpp

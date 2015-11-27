@@ -5,60 +5,63 @@
  *      Author: paspartout
  */
 
-#include <stddef.h>
-#include <cctype>
-#include <cerrno>
-#include <cstdlib>
-#include <cstring>
+//#include <cctype>
+//#include <cerrno>
+//#include <cstdlib>
+//#include <cstring>
 #include <iostream>
+#include <map>
+//#include <stddef.h>
 
 #include "ice/representation/GContainer.h"
 #include "ice/representation/GContainerFactory.h"
 #include "ice/representation/split.h"
+#include "ice/representation/Transformation.h"
+#include "ice/representation/XMLTransformationReader.h"
 #include "ice/ICEngine.h"
+
+#include "easylogging++.h"
 
 namespace ice
 {
 
 GContainerFactory::GContainerFactory()
 {
-  typeMap.insert(std::pair<std::string, BasicRepresentationType>("booleanRep", BasicRepresentationType::BOOL));
-  typeMap.insert(std::pair<std::string, BasicRepresentationType>("byteRep", BasicRepresentationType::BYTE));
-  typeMap.insert(
-      std::pair<std::string, BasicRepresentationType>("unsignedByteRep", BasicRepresentationType::UNSIGNED_BYTE));
-  typeMap.insert(std::pair<std::string, BasicRepresentationType>("shortRep", BasicRepresentationType::SHORT));
-  typeMap.insert(std::pair<std::string, BasicRepresentationType>("integerRep", BasicRepresentationType::INT));
-  typeMap.insert(std::pair<std::string, BasicRepresentationType>("longRep", BasicRepresentationType::LONG));
-  typeMap.insert(
-      std::pair<std::string, BasicRepresentationType>("unsignedShortRep", BasicRepresentationType::UNSIGNED_SHORT));
-  typeMap.insert(
-      std::pair<std::string, BasicRepresentationType>("unsignedIntegerRep", BasicRepresentationType::UNSIGNED_INT));
-  typeMap.insert(
-      std::pair<std::string, BasicRepresentationType>("unsignedLongRep", BasicRepresentationType::UNSIGNED_LONG));
-  typeMap.insert(std::pair<std::string, BasicRepresentationType>("floatRep", BasicRepresentationType::FLOAT));
-  typeMap.insert(std::pair<std::string, BasicRepresentationType>("doubleRep", BasicRepresentationType::DOUBLE));
-  typeMap.insert(std::pair<std::string, BasicRepresentationType>("stringRep", BasicRepresentationType::STRING));
+  _log = el::Loggers::getLogger("GContainerFactory");
+
+  typeMap.insert( {"booleanRep", BasicRepresentationType::BOOL});
+  typeMap.insert( {"byteRep", BasicRepresentationType::BYTE});
+  typeMap.insert( {"unsignedByteRep", BasicRepresentationType::UNSIGNED_BYTE});
+  typeMap.insert( {"shortRep", BasicRepresentationType::SHORT});
+  typeMap.insert( {"integerRep", BasicRepresentationType::INT});
+  typeMap.insert( {"longRep", BasicRepresentationType::LONG});
+  typeMap.insert( {"unsignedShortRep", BasicRepresentationType::UNSIGNED_SHORT});
+  typeMap.insert( {"unsignedIntegerRep", BasicRepresentationType::UNSIGNED_INT});
+  typeMap.insert( {"unsignedLongRep", BasicRepresentationType::UNSIGNED_LONG});
+  typeMap.insert( {"floatRep", BasicRepresentationType::FLOAT});
+  typeMap.insert( {"doubleRep", BasicRepresentationType::DOUBLE});
+  typeMap.insert( {"stringRep", BasicRepresentationType::STRING});
 }
 
 GContainerFactory::GContainerFactory(std::weak_ptr<ICEngine> engine) :
     engine(engine)
 {
-
+  _log = el::Loggers::getLogger("GContainerFactory");
 }
 
 GContainerFactory::~GContainerFactory()
 {
-
+  //
 }
 
 void GContainerFactory::init()
 {
-  this->engine = engine;
   auto e = this->engine.lock();
 
-  this->ontologyInterface = e->getOntologyInterface();
+  if (e)
+    this->ontologyInterface = e->getOntologyInterface();
 
-  this->readFromOntology(this->ontologyInterface);
+  this->readFromOntology();
 }
 
 void GContainerFactory::cleanUp()
@@ -66,7 +69,12 @@ void GContainerFactory::cleanUp()
   this->ontologyInterface.reset();
 }
 
-void GContainerFactory::readFromOntology(std::shared_ptr<OntologyInterface> ontologyInterface)
+void GContainerFactory::setOntologyInterface(std::shared_ptr<OntologyInterface> ontology)
+{
+  this->ontologyInterface = ontology;
+}
+
+void GContainerFactory::readFromOntology()
 {
   std::string iri = "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#";
 
@@ -173,7 +181,7 @@ int GContainerFactory::fromCSVStrings(std::unique_ptr<std::vector<std::string>> 
 
     if (false == r)
     {
-      std::cout << "Error: No representation extracted from " << line << std::endl;
+      _log->error("No representation extracted from CSV line '%s'", line);
       continue;
     }
 
@@ -244,7 +252,7 @@ std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::shared_ptr<Repr
         ins = std::make_shared<StringGContainer>(representation);
         break;
       default:
-        std::cout << "Error: Unknown representation basic type " << rep->name << std::endl;
+        _log->error("Unknown representation basic type '%v' for representation '%v'", rep->type, rep->name);
         break;
     }
 
@@ -262,6 +270,284 @@ std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::shared_ptr<Repr
 
     return ins;
   }
+}
+
+std::shared_ptr<Transformation> GContainerFactory::fromXMLDesc(TransDesc* desc)
+{
+  auto rep = this->getRepresentation(this->ontologyInterface->toShortIri(desc->output));
+
+  if (false == rep)
+  {
+    _log->error("Unknown target representation '%v' for transformation '%v', transformation can not be created",
+                desc->output, desc->name);
+
+    return std::shared_ptr<Transformation>();
+  }
+
+  int inputCount = desc->inputs.size();
+
+  if (inputCount <= 0)
+  {
+    _log->error("Invalid number of inputs '%v' for transformation '%v', transformation can not be created", inputCount,
+                desc->name);
+
+    return std::shared_ptr<Transformation>();
+  }
+
+  std::shared_ptr<Transformation> trans = std::make_shared<Transformation>(this->shared_from_this(), desc->name, rep);
+
+  // reading inputs
+  std::map<int, std::shared_ptr<Representation>> inputs;
+
+  for (auto input : desc->inputs)
+  {
+    auto inRep = this->getRepresentation(this->ontologyInterface->toShortIri(input.representation));
+
+    if (false == rep)
+    {
+      _log->error("Unknown input representation '%v' for transformation '%v', transformation can not be created",
+                  input.representation, desc->name);
+
+      return std::shared_ptr<Transformation>();
+    }
+
+    if (inputs.find(input.id) != inputs.end())
+    {
+      _log->error(
+          "Duplicated input id for input representation '%v' of transformation '%v', transformation can not be created",
+          input.id, input.representation, desc->name);
+
+      return std::shared_ptr<Transformation>();
+    }
+
+    inputs[input.id] = inRep;
+  }
+
+  vector<int> v;
+  for (auto element : inputs)
+  {
+    v.push_back(element.first);
+  }
+
+  std::sort(v.begin(), v.end());
+
+  for (int index : v)
+  {
+    trans->getInputs().push_back(inputs[index]);
+  }
+
+  // reading dimensions
+  std::vector<std::string> path;
+
+  bool result = this->extractOperations(trans, rep, desc->ops, path, inputs);
+
+  if (false == result)
+  {
+    return std::shared_ptr<Transformation>();
+  }
+
+  return trans;
+}
+
+bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transformation,
+                                          std::shared_ptr<Representation> representation,
+                                          std::vector<DimensionDesc> &ops, std::vector<std::string> &path,
+                                          std::map<int, std::shared_ptr<Representation>> &reps)
+{
+  for (auto operation : ops)
+  {
+    std::shared_ptr<Representation> repDim;
+    std::string shortName = this->ontologyInterface->toShortIri(operation.name);
+
+    for (int i=0; i < representation->dimensionNames.size(); ++i)
+    {
+      if (representation->dimensionNames.at(i) == shortName)
+      {
+        repDim = representation->dimensions.at(i);
+        break;
+      }
+    }
+
+    if (false == repDim)
+    {
+      _log->error("Unknown dimension '%v' for transformation '%v', transformation can not be created",
+                  operation.name, transformation->getName());
+
+      return false;
+    }
+
+    // add to path
+    path.push_back(shortName);
+    int* pathTarget = transformation->getTargetRepresentation()->accessPath(path);
+    bool result = false;
+
+    if (nullptr == pathTarget)
+    {
+      _log->error("Unknown path to target dimension '%v' for transformation '%v', transformation can not be created",
+                  shortName, transformation->getName());
+
+      return false;
+    }
+
+    switch (operation.type)
+    {
+      case (XML_USE):
+      {
+        auto repSource = reps[operation.sourceId];
+
+        if (false == repSource)
+        {
+          _log->error("Unknown dimension source '%v' for transformation '%v', transformation can not be created",
+                      operation.sourceId, transformation->getName());
+
+          return false;
+        }
+
+        auto pathDim = split(operation.path.c_str(), ';');
+
+        for (int i=0; i < pathDim->size(); ++i)
+        {
+          pathDim->at(i) = this->ontologyInterface->toShortIri(pathDim->at(i));
+        }
+
+        int* pathSource = representation->accessPath(pathDim.get());
+
+        if (nullptr == pathSource)
+        {
+          _log->error(
+              "Unknown path '%v' to source dimension for transformation '%v', transformation can not be created",
+              operation.path, transformation->getName());
+
+          return false;
+        }
+
+        int index = -1;
+
+        for (int i=0; i < transformation->getInputs().size(); ++i)
+        {
+          if (transformation->getInputs().at(i) == reps[operation.sourceId])
+          {
+            index = i;
+            break;
+          }
+        }
+
+        if (index < 0)
+        {
+          // TODO
+          return false;
+        }
+
+        ice::TransformationOperation* o = new ice::TransformationOperation();
+        o->sourceIndex = index;
+        o->sourceDimension = pathSource;
+        o->type = ice::TransformationOperationType::USE;
+        o->targetDimension = pathTarget;
+        transformation->getOperations().push_back(o);
+
+        break;
+      }
+      case (XML_DEFAULT):
+      {
+        auto pathDim = split(operation.path.c_str(), ';');
+
+        for (int i=0; i < pathDim->size(); ++i)
+        {
+          pathDim->at(i) = this->ontologyInterface->toShortIri(pathDim->at(i));
+        }
+
+        void* value = this->convert(repDim->type, operation.value);
+
+        if (nullptr == value)
+        {
+          _log->error(
+              "Value '%v' could not be interpreted as default value for dimension '%v' in transformation '%v', transformation can not be created",
+              operation.value, repDim->name, transformation->getName());
+
+          return false;
+        }
+
+        ice::TransformationOperation* o = new ice::TransformationOperation();
+        o->valueType = repDim->type;
+        o->value = value;
+        o->type = TransformationOperationType::DEFAULT;
+        o->targetDimension = pathTarget;
+        transformation->getOperations().push_back(o);
+        break;
+      }
+      case (XML_FORMULA):
+        // TODO
+        break;
+      case (XML_COMPLEX):
+        result = this->extractOperations(transformation, repDim, operation.dims, path, reps);
+
+        if (false == result)
+          return false;
+
+        break;
+      default:
+        _log->error("Unknown operation type '%v' in transformation '%v' from XML", operation.type,
+                    transformation->getName());
+        return false;
+        break;
+    }
+
+    // remove from path
+    path.pop_back();
+  }
+
+  return true;
+}
+
+void* GContainerFactory::convert(BasicRepresentationType type, std::string value)
+{
+  switch (type)
+  {
+    case BOOL:
+      if ("true" == value)
+        return new bool(true);
+      else
+        return new bool(false);
+      break;
+    case BYTE:
+      return new int8_t((int8_t) std::stoi(value));
+      break;
+    case UNSIGNED_BYTE:
+      return new uint8_t((uint8_t) std::stoi(value));
+      break;
+    case SHORT:
+      return new short((short) std::stoi(value));
+      break;
+    case INT:
+      return new int(std::stoi(value));
+      break;
+    case LONG:
+      return new long(std::stol(value));
+      break;
+    case UNSIGNED_SHORT:
+      return new unsigned short((unsigned short) std::stoul(value));
+      break;
+    case UNSIGNED_INT:
+      return new unsigned int((unsigned int) std::stoul(value));
+      break;
+    case UNSIGNED_LONG:
+      return new unsigned long(std::stoul(value));
+      break;
+    case FLOAT:
+      return new float(std::stof(value));
+      break;
+    case DOUBLE:
+      return new double(std::stod(value));
+      break;
+    case STRING:
+      return new std::string(value);
+      break;
+    default:
+      _log->error("Unknown representation basic type '%v' for value '%v'", type, value);
+      break;
+  }
+
+  return nullptr;
 }
 
 void GContainerFactory::printReps()

@@ -18,14 +18,25 @@
 //Forward declaration
 namespace ice
 {
+struct DimensionDesc;
+class GContainer;
 class ICEngine;
 class OntologyInterface;
-class GContainer;
+struct TransDesc;
+class Transformation;
 } /* namespace ice */
 
-namespace ice {
+//Forward declaration
+namespace el
+{
+class Logger;
+} /* namespace el */
 
-class GContainerFactory {
+namespace ice
+{
+
+class GContainerFactory : public std::enable_shared_from_this<GContainerFactory>
+{
 public:
   GContainerFactory();
   GContainerFactory(std::weak_ptr<ICEngine> engine);
@@ -34,7 +45,8 @@ public:
   void init();
   void cleanUp();
 
-  void readFromOntology(std::shared_ptr<OntologyInterface> ontologyInterface);
+  void setOntologyInterface(std::shared_ptr<OntologyInterface> ontology);
+  void readFromOntology();
 
   int fromCSVStrings(std::unique_ptr<std::vector<std::string>> lines);
   std::shared_ptr<Representation> getRepresentation(std::string representation);
@@ -42,15 +54,27 @@ public:
   std::shared_ptr<GContainer> makeInstance(std::string name);
   std::shared_ptr<GContainer> makeInstance(std::shared_ptr<Representation> representation);
 
+  std::shared_ptr<Transformation> fromXMLDesc(TransDesc* desc);
+
   void printReps();
 
 private:
+  bool extractOperations(std::shared_ptr<Transformation> transformation, std::shared_ptr<Representation> representation,
+                         std::vector<DimensionDesc> &ops, std::vector<std::string> &path,
+                         std::map<int, std::shared_ptr<Representation>> &reps);
+  void* convert(BasicRepresentationType type, std::string value);
+
+private:
+  el::Logger* _log;
   std::weak_ptr<ICEngine> engine;
   std::shared_ptr<OntologyInterface> ontologyInterface;
   void printReps(std::shared_ptr<Representation> representation, int depth);
-  std::shared_ptr<Representation> fromCSV(std::string reprStr, std::map<std::string, std::shared_ptr<Representation>> *tmpMap, const char delim = ';');
+  std::shared_ptr<Representation> fromCSV(std::string reprStr,
+                                          std::map<std::string, std::shared_ptr<Representation>> *tmpMap,
+                                          const char delim = ';');
   BasicRepresentationType getBasicRep(std::string rep);
-  std::shared_ptr<Representation> addOrGet(std::string name, std::map<std::string, std::shared_ptr<Representation>> *tmpMap);
+  std::shared_ptr<Representation> addOrGet(std::string name,
+                                           std::map<std::string, std::shared_ptr<Representation>> *tmpMap);
 
   std::map<std::string, std::shared_ptr<Representation>> repMap;
   std::map<std::string, BasicRepresentationType> typeMap;

@@ -23,53 +23,57 @@ class GContainerFactory;
 namespace ice
 {
 
-enum TransformationOperationType {
+enum TransformationOperationType
+{
   DEFAULT,
-  USE
+  USE,
+  FORMULA
 };
 
-struct TransformationOperation {
+struct TransformationOperation
+{
 
-  ~TransformationOperation() {
+  ~TransformationOperation()
+  {
     switch (this->valueType)
-       {
-         case BOOL:
-           delete (bool*) value;
-           break;
-         case BYTE:
-           delete (int8_t*) value;
-           break;
-         case UNSIGNED_BYTE:
-           delete (uint8_t*) value;
-           break;
-         case SHORT:
-           delete (short*) value;
-           break;
-         case INT:
-           delete (int*) value;
-           break;
-         case LONG:
-           delete (long*) value;
-           break;
-         case UNSIGNED_SHORT:
-           delete (unsigned short*) value;
-           break;
-         case UNSIGNED_INT:
-           delete (unsigned int*) value;
-           break;
-         case UNSIGNED_LONG:
-           delete (unsigned long*) value;
-           break;
-         case FLOAT:
-           delete (float*) value;
-           break;
-         case DOUBLE:
-           delete (double*) value;
-           break;
-         case STRING:
-           delete (std::string*) value;
-           break;
-       }
+    {
+      case BOOL:
+        delete (bool*)value;
+        break;
+      case BYTE:
+        delete (int8_t*)value;
+        break;
+      case UNSIGNED_BYTE:
+        delete (uint8_t*)value;
+        break;
+      case SHORT:
+        delete (short*)value;
+        break;
+      case INT:
+        delete (int*)value;
+        break;
+      case LONG:
+        delete (long*)value;
+        break;
+      case UNSIGNED_SHORT:
+        delete (unsigned short*)value;
+        break;
+      case UNSIGNED_INT:
+        delete (unsigned int*)value;
+        break;
+      case UNSIGNED_LONG:
+        delete (unsigned long*)value;
+        break;
+      case FLOAT:
+        delete (float*)value;
+        break;
+      case DOUBLE:
+        delete (double*)value;
+        break;
+      case STRING:
+        delete (std::string*)value;
+        break;
+    }
   }
 
   TransformationOperationType type;
@@ -86,16 +90,21 @@ struct TransformationOperation {
 class Transformation
 {
 public:
-  Transformation(std::shared_ptr<GContainerFactory> factory, std::shared_ptr<Representation> targetRepresentation, int inputCount);
+  Transformation(std::shared_ptr<GContainerFactory> factory, std::string name,
+                 std::shared_ptr<Representation> targetRepresentation);
   virtual ~Transformation();
 
   std::shared_ptr<GContainer> transform(std::shared_ptr<GContainer>* inputs);
 
+  const std::string getName() const;
+  std::shared_ptr<Representation> getTargetRepresentation();
   std::vector<TransformationOperation*>& getOperations();
+  std::vector<std::shared_ptr<Representation>>& getInputs();
 
 private:
+  const std::string name;
   std::shared_ptr<Representation> targetRepresentation;
-  int inputCount;
+  std::vector<std::shared_ptr<Representation>> inputs;
   std::vector<TransformationOperation*> operations;
   std::shared_ptr<ice::GContainerFactory> factory;
 };

@@ -1,6 +1,7 @@
 #ifndef REPRESENTATION_H
 #define REPRESENTATION_H
 
+#include <initializer_list>
 #include <map>
 #include <memory>
 #include <string>
@@ -37,7 +38,21 @@ struct Representation {
     return (this->type != BasicRepresentationType::UNSET && this->type != BasicRepresentationType::NONE);
   }
 
-  int* accessPath(std::vector<std::string> dimensions)
+
+
+  int* accessPath(std::initializer_list<std::string> dimensions)
+   {
+     std::vector<std::string> d = dimensions;
+
+     return this->accessPath(&d);
+   }
+
+  int* accessPath(std::vector<std::string> &dimensions)
+  {
+    return this->accessPath(&dimensions);
+  }
+
+  int* accessPath(std::vector<std::string> *dimensions)
   {
     std::vector<int> path;
     bool result = this->accessPath(dimensions, 0, path);
@@ -52,12 +67,12 @@ struct Representation {
   }
 
 private:
-  bool accessPath(std::vector<std::string> dimensions, int index, std::vector<int> &path)
+  bool accessPath(std::vector<std::string> *dimensions, int index, std::vector<int> &path)
   {
     for (int i=0; i < this->dimensionNames.size(); ++i)
     {
 
-      if (this->dimensionNames.at(i) == dimensions[index])
+      if (this->dimensionNames.at(i) == dimensions->at(index))
       {
         auto dim = this->dimensions.at(i);
         path.push_back(i);
