@@ -22,6 +22,7 @@ public abstract class IceVisitor implements OWLObjectVisitor {
 	protected IceIris ii;
 	protected StringBuffer sb;
 	protected List<OWLClass> foundClasses;
+	protected LogLevel logLevel;
 
 	public IceVisitor(final IceOntologyInterface p_ioi, final Set<OWLOntology> p_ontologies,
 			final OWLReasoner p_reasoner, final IceIris p_iceIris) {
@@ -92,11 +93,29 @@ public abstract class IceVisitor implements OWLObjectVisitor {
 		return this.sb.toString();
 	}
 
-	protected void log(String p_msg) {
-		if (false == this.ioi.isLogging())
-			return;
-
-		System.out.println(IceOntologyInterface.DATE_FORMAT.format(new Date()) + " JAVA  ["
-				+ this.getClass().getSimpleName() + "] " + p_msg);
+	protected void log(LogLevel ll, String msg) {
+		final String date = IceOntologyInterface.DATE_FORMAT.format(new Date());
+		final String className = this.getClass().getSimpleName();
+		final String llstr = ll.toString();
+		
+		if (ioi.getLogLevel() >= ll.getValue()) 
+			System.out.printf("[JAVA][%s][%s][%s]: %s\n", llstr, date, className, msg);
 	}
+	
+	protected void logError(String msg) {
+		log(LogLevel.Error, msg);
+	}
+
+	protected void logWarning(String msg) {
+		log(LogLevel.Warning, msg);
+	}
+
+	protected void logDebug(String msg) {
+		log(LogLevel.Debug, msg);
+	}
+	
+	protected void logInfo(String msg) {
+		log(LogLevel.Info, msg);
+	}
+	
 }

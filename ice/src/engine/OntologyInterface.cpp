@@ -168,8 +168,8 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
                                                              "()I");
   this->setSomeMaxCardinalityMethod = this->env->GetMethodID(this->javaOntologyInterface, "setSomeMaxCardinality",
                                                              "(I)V");
-  this->isLoggingMethod = this->env->GetMethodID(this->javaOntologyInterface, "isLogging", "()Z");
-  this->setLoggingMethod = this->env->GetMethodID(this->javaOntologyInterface, "setLogging", "(Z)V");
+  this->getLogLevelMethod = this->env->GetMethodID(this->javaOntologyInterface, "getLogLevel", "()I");
+  this->setLogLevelMethod = this->env->GetMethodID(this->javaOntologyInterface, "setLogLevel", "(I)V");
 
   if (this->checkError("Constructor", "Failed to lookup method ids for class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
@@ -1476,28 +1476,26 @@ bool OntologyInterface::setSomeMaxCardinality(int p_value)
   return true;
 }
 
-bool OntologyInterface::isLogging()
+LogLevel OntologyInterface::getLogLevel()
 {
-  this->checkError("isLogging", "Error exists, method isLogging will not be executed");
+  this->checkError("getLogLevel", "Error exists, method getLogLevel will not be executed");
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->isLoggingMethod);
+  int result = env->CallIntMethod(this->javaInterface, this->getLogLevelMethod);
 
-  if (this->checkError("isLogging", "Error occurred at requesting logging state"))
-    return false;
+  if (this->checkError("getLogLevel", "Error occurred at requesting log level"))
+    return Error;
 
-  return result;
+  return (LogLevel) result;
 }
 
-bool OntologyInterface::setLogging(bool const p_logging)
+void OntologyInterface::setLogLevel(LogLevel ll)
 {
-  this->checkError("setLogging", "Error exists, method setLogging will not be executed");
+  this->checkError("setLogLevel", "Error exists, method setLogLevel will not be executed");
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->setLoggingMethod, p_logging);
+  env->CallVoidMethod(this->javaInterface, this->setLogLevelMethod, ll);
 
-  if (this->checkError("setLogging", "Error occurred at update logging to " + p_logging))
-    return false;
-
-  return result;
+  if (this->checkError("setLogging", "Error occurred at updating LogLevel to " + ll))
+    return;
 }
 
 bool OntologyInterface::isInformationDirty()

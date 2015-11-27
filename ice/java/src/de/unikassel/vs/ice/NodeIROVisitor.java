@@ -132,7 +132,7 @@ public class NodeIROVisitor extends IceVisitor {
 	}
 
 	public List<List<String>> readInformation(OWLNamedIndividual system) {
-		log("Creating node elements for system " + system);
+		logDebug("Creating node elements for system " + system);
 
 		List<List<String>> result = new ArrayList<List<String>>();
 		result.add(new ArrayList<String>());
@@ -147,7 +147,7 @@ public class NodeIROVisitor extends IceVisitor {
 				.getFlattened();
 
 		for (OWLNamedIndividual grounding : groundings) {
-			log(String.format("Checking grounding %s in system %s", grounding, system));
+			logDebug(String.format("Checking grounding %s in system %s", grounding, system));
 			this.grounding = grounding;
 
 			this.cardinalityContainers = new ArrayList<NodeIROVisitor.CardinalityContainer>();
@@ -232,14 +232,14 @@ public class NodeIROVisitor extends IceVisitor {
 			}
 
 			if (this.elementString.indexOf("$") >= 0 | this.sb.indexOf("$") >= 0) {
-				this.log(String.format("'%s' or grounding '%s' contains unreplaced elements",
+				logWarning(String.format("'%s' or grounding '%s' contains unreplaced elements",
 						this.elementString.replace("\n", ""), this.sb.toString().replace("\n", "||")));
 				continue;
 			}
 
 			// TODO check cardinality containers
 
-			this.log(String.format("Adding asp element '%s' of type '%s'", this.grounding.toString(),
+			logDebug(String.format("Adding asp element '%s' of type '%s'", this.grounding.toString(),
 					this.currentType.toString()));
 
 			result.get(0).add(this.currentType.toString());
@@ -263,7 +263,7 @@ public class NodeIROVisitor extends IceVisitor {
 				.getFlattened();
 
 		if (groundings.size() != 1) {
-			log("Wrong size of hasGrounding properties " + groundings.size() + " " + individual + " will be skipped.");
+			logWarning("Wrong size of hasGrounding properties " + groundings.size() + " " + individual + " will be skipped.");
 		} else {
 			OWLNamedIndividual ind = groundings.iterator().next();
 
@@ -282,7 +282,7 @@ public class NodeIROVisitor extends IceVisitor {
 			}
 
 			if (count != 1) {
-				log("Individual " + individual + " is not grounding and will be skipped.");
+				logWarning("Individual " + individual + " is not grounding and will be skipped.");
 				return;
 			}
 
@@ -290,7 +290,7 @@ public class NodeIROVisitor extends IceVisitor {
 			String value;
 
 			if (literals.size() != 1) {
-				log("Wrong size of hasMetadataValue properties " + literals.size() + " " + individual
+				logWarning("Wrong size of hasMetadataValue properties " + literals.size() + " " + individual
 						+ " will be skipped.");
 				value = null;
 			} else {
@@ -301,7 +301,7 @@ public class NodeIROVisitor extends IceVisitor {
 			String value2;
 
 			if (literals2.size() != 1) {
-				log("Wrong size of hasMetadataValue2 properties " + literals2.size() + " " + individual
+				logWarning("Wrong size of hasMetadataValue2 properties " + literals2.size() + " " + individual
 						+ " will be skipped.");
 				value2 = null;
 			} else {
@@ -341,7 +341,7 @@ public class NodeIROVisitor extends IceVisitor {
 						continue;
 
 					if (this.currentEntity == null) {
-						this.log(String.format("No entity specified for source node %s, skipping node", this.grounding));
+						logWarning(String.format("No entity specified for source node %s, skipping node", this.grounding));
 						continue;
 					}
 
@@ -434,7 +434,7 @@ public class NodeIROVisitor extends IceVisitor {
 			}
 		} else if (ce.getProperty().equals(this.ii.hasRepresentation)) {
 			if (ce.getFiller().isAnonymous()) {
-				log("Anonymous Representation? " + ce.getFiller());
+				logDebug("Anonymous Representation? " + ce.getFiller());
 			} else {
 				this.currentRepresentation = ce.getFiller().asOWLClass();
 			}
@@ -449,7 +449,7 @@ public class NodeIROVisitor extends IceVisitor {
 		} else {
 			if (false == this.processNodeStreamRelation(ce.getProperty(), ce.getFiller(),
 					this.ioi.getSomeMinCardinality(), this.ioi.getSomeMaxCardinality()))
-				log("Unknown OWLObjectSomeValuesFrom " + ce);
+				logWarning("Unknown OWLObjectSomeValuesFrom " + ce);
 		}
 	}
 

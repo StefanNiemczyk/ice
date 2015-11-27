@@ -231,7 +231,7 @@ public class InfoStructureVisitor extends IceVisitor {
 				}
 			}
 		} else {
-			log("Unknown OWLObjectSomeValuesFrom " + ce);
+			logWarning("Unknown OWLObjectSomeValuesFrom " + ce);
 		}
 	}
 
@@ -282,7 +282,7 @@ public class InfoStructureVisitor extends IceVisitor {
 				}
 			}
 		} else {
-			log("Unknown OWLObjectExactCardinality " + ce);
+			logWarning("Unknown OWLObjectExactCardinality " + ce);
 		}
 	}
 
@@ -308,7 +308,7 @@ public class InfoStructureVisitor extends IceVisitor {
 						unit = this.iRIShortName(ohv.getFiller().asOWLClass().getIRI());
 					}
 				} else {
-					log(exp.toString());
+					logDebug(exp.toString());
 				}
 			}
 
@@ -348,7 +348,7 @@ public class InfoStructureVisitor extends IceVisitor {
 						unit = this.iRIShortName(ohv.getFiller().asOWLClass().getIRI());
 					}
 				} else {
-					log(exp.toString());
+					logDebug(exp.toString());
 				}
 			}
 
@@ -390,266 +390,266 @@ public class InfoStructureVisitor extends IceVisitor {
 	public void visit(OWLObjectProperty axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLDeclarationAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLDatatypeDefinitionAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLAnnotationAssertionAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLSubAnnotationPropertyOfAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLAnnotationPropertyDomainAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLAnnotationPropertyRangeAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLAsymmetricObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLReflexiveObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLDisjointClassesAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLDataPropertyDomainAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLObjectPropertyDomainAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLEquivalentObjectPropertiesAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLDifferentIndividualsAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLDisjointDataPropertiesAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLDisjointObjectPropertiesAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLObjectPropertyRangeAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLObjectPropertyAssertionAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLFunctionalObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLSubObjectPropertyOfAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLDisjointUnionAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLSymmetricObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLDataPropertyRangeAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLFunctionalDataPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLEquivalentDataPropertiesAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLClassAssertionAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLEquivalentClassesAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLDataPropertyAssertionAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLTransitiveObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLSubDataPropertyOfAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLSameIndividualAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLSubPropertyChainOfAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLInverseObjectPropertiesAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override
 	public void visit(OWLHasKeyAxiom axiom) {
 		// TODO Auto-generated method stub
 
-		log("Unknown " + axiom);
+		logDebug("Unknown " + axiom);
 	}
 
 	@Override

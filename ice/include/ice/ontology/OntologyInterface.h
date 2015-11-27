@@ -25,6 +25,10 @@ class Logger;
 namespace ice
 {
 
+enum LogLevel { 
+	Error, Warning, Info, Debug
+};
+
 class OntologyInterface
 {
 public:
@@ -93,8 +97,8 @@ public:
   bool setSomeMinCardinality(int p_value);
   int getSomeMaxCardinality();
   bool setSomeMaxCardinality(int p_value);
-  bool isLogging();
-  bool setLogging(bool p_logging);
+  LogLevel getLogLevel();
+  void setLogLevel(LogLevel level);
   bool isInformationDirty();
   bool isSystemDirty();
   bool isLoadDirty();
@@ -161,8 +165,10 @@ private:
   jmethodID setSomeMinCardinalityMethod; /**< Method id */
   jmethodID getSomeMaxCardinalityMethod; /**< Method id */
   jmethodID setSomeMaxCardinalityMethod; /**< Method id */
-  jmethodID isLoggingMethod; /**< Method id */
-  jmethodID setLoggingMethod; /**< Method id */
+
+  jmethodID getLogLevelMethod; /**< Method id */
+  jmethodID setLogLevelMethod; /**< Method id */
+
 };
 
 }

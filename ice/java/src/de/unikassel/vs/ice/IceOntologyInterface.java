@@ -52,7 +52,7 @@ public class IceOntologyInterface {
 	private int defaultMinCardinality;
 	private int defaultMaxCardinality;
 
-	private boolean logging;
+	private LogLevel logLevel = LogLevel.Error;
 
 	private String mainIRI;
 	private String mainIRIPrefix;
@@ -69,7 +69,6 @@ public class IceOntologyInterface {
 		this.defaultMinCardinality = 1;
 		this.defaultMaxCardinality = 5;
 		this.dirty = true;
-		this.logging = true;
 		this.iriMapping = new ArrayList<String>();
 	}
 
@@ -103,7 +102,7 @@ public class IceOntologyInterface {
 
 			return true;
 		} catch (Exception e) {
-			this.log("Exception during loading the ontology " + e.getMessage());
+			logError("Exception during loading the ontology " + e.getMessage());
 			return false;
 		}
 	}
@@ -150,7 +149,7 @@ public class IceOntologyInterface {
 			manager.saveOntology(this.mainOntology, IRI.create(file.toURI()));
 			return true;
 		} catch (Exception e) {
-			this.log("Exception during saving the ontology " + e.getMessage());
+			logError("Exception during saving the ontology " + e.getMessage());
 			return false;
 		}
 	}
@@ -203,7 +202,7 @@ public class IceOntologyInterface {
 		// check existing systems
 		OWLIndividual systemInd = this.findOWLIndividual(this.ii.system, p_system, false);
 		if (systemInd == null) {
-			log(String.format("No system '%s' found, isSystemOf will not be established", p_system));
+			logWarning(String.format("No system '%s' found, isSystemOf will not be established", p_system));
 			return false;
 		}
 
@@ -213,7 +212,7 @@ public class IceOntologyInterface {
 			OWLIndividual nodeInd = this.findOWLIndividual(this.ii.node, toAdd, false);
 
 			if (nodeInd == null) {
-				log(String.format("No node '%s' found, isSystemOf for system '%s' will not be established.", toAdd,
+				logWarning(String.format("No node '%s' found, isSystemOf for system '%s' will not be established.", toAdd,
 						p_system));
 				return false;
 			}
@@ -250,7 +249,7 @@ public class IceOntologyInterface {
 			OWLClass es = this.findOWLClass(this.ii.entityScope, entityScope);
 
 			if (es == null) {
-				log(String.format("Unknown entity scope class '%s' for entity '%s', entity type not created.",
+				logWarning(String.format("Unknown entity scope class '%s' for entity '%s', entity type not created.",
 						entityScope, p_entityType));
 				return false;
 			}
@@ -284,7 +283,7 @@ public class IceOntologyInterface {
 			OWLClass es = this.findOWLClass(this.ii.entityScope, entityScope);
 
 			if (es == null) {
-				log(String.format("Unknown entity scope class '%s' for entity '%s', entity type not created.",
+				logWarning(String.format("Unknown entity scope class '%s' for entity '%s', entity type not created.",
 						entityScope, p_entityType));
 				return false;
 			}
@@ -321,7 +320,7 @@ public class IceOntologyInterface {
 			OWLClass rep = this.findOWLClass(this.ii.representation, representation);
 
 			if (rep == null) {
-				log(String.format("Unknown representation class '%s' for entity scope '%s', entity scope not created.",
+				logWarning(String.format("Unknown representation class '%s' for entity scope '%s', entity scope not created.",
 						representation, p_entityScope));
 				return false;
 			}
@@ -403,7 +402,7 @@ public class IceOntologyInterface {
 			OWLClass dim = this.findOWLClass(this.ii.valueScope, dimension);
 
 			if (dim == null) {
-				log(String.format("Unknown dimension class '%s' for representation '%s', representation not created.",
+				logWarning(String.format("Unknown dimension class '%s' for representation '%s', representation not created.",
 						dimension, p_representation));
 				return false;
 			}
@@ -435,14 +434,9 @@ public class IceOntologyInterface {
 		OWLClass entityScope = this.findOWLClass(this.ii.entityScope, p_entityScope);
 		OWLClass representation = this.findOWLClass(this.ii.representation, p_representation);
 
-		if (entityScope == null) {
-			log(String.format("Unknown entity scope class '%s' for stream '%s', stream not created.", p_entityScope,
+		if (entityScope == null || representation == null) {
+			logWarning(String.format("Unknown entity scope class '%s' for stream '%s', stream not created.", p_entityScope,
 					p_stream));
-			return false;
-		}
-		if (representation == null) {
-			log(String.format("Unknown representation class '%s' for stream '%s', stream not created.",
-					p_representation, p_stream));
 			return false;
 		}
 
@@ -483,17 +477,8 @@ public class IceOntologyInterface {
 		OWLClass entityScope = this.findOWLClass(this.ii.entityScope, p_entityScope);
 		OWLClass representation = this.findOWLClass(this.ii.representation, p_representation);
 
-		if (entity == null) {
-			log(String.format("Unknown entity type class '%s' for map '%s', map not created.", p_aboutEntity, p_map));
-			return false;
-		}
-		if (entityScope == null) {
-			log(String.format("Unknown entity scope class '%s' for map '%s', map not created.", p_entityScope, p_map));
-			return false;
-		}
-		if (representation == null) {
-			log(String.format("Unknown representation class '%s' for map '%s', map not created.", p_representation,
-					p_map));
+		if (entity == null || entityScope == null || representation == null) {
+			logError(String.format("Unknown entity type class '%s' for map '%s', map not created.", p_aboutEntity, p_map));
 			return false;
 		}
 
@@ -536,7 +521,7 @@ public class IceOntologyInterface {
 
 		if (p_entity == null || p_entity.isEmpty()
 				|| false == this.mainOntology.containsIndividualInSignature(entityIRI)) {
-			log(String.format("Unknown entity '%s' for required stream '%s', stream not created.", p_entity,
+			logWarning(String.format("Unknown entity '%s' for required stream '%s', stream not created.", p_entity,
 					p_requirdStream));
 			return false;
 		}
@@ -544,7 +529,7 @@ public class IceOntologyInterface {
 		OWLClass namedStreamClass = this.findOWLClass(this.ii.namedStream, p_namedStreamClass);
 
 		if (namedStreamClass == null) {
-			log(String.format("Unknown named stream class '%s' for named stream '%s', stream not created.",
+			logWarning(String.format("Unknown named stream class '%s' for named stream '%s', stream not created.",
 					p_namedStreamClass, p_requirdStream));
 			return false;
 		}
@@ -576,7 +561,7 @@ public class IceOntologyInterface {
 		if (p_relatedEntity != null && false == p_relatedEntity.isEmpty()) {
 			IRI relatedEntityIRI = IRI.create(this.mainIRIPrefix + p_relatedEntity);
 			if (false == this.mainOntology.containsIndividualInSignature(relatedEntityIRI)) {
-				log(String.format("Unknown related entity '%s' for required stream '%s', stream not created.",
+				logWarning(String.format("Unknown related entity '%s' for required stream '%s', stream not created.",
 						p_entity, p_requirdStream));
 				return false;
 			}
@@ -619,7 +604,7 @@ public class IceOntologyInterface {
 		OWLClass namedMapClass = this.findOWLClass(this.ii.namedMap, p_namedMapClass);
 
 		if (namedMapClass == null) {
-			log(String.format("Unknown named map class '%s' for named map '%s', required map not created.",
+			logWarning(String.format("Unknown named map class '%s' for named map '%s', required map not created.",
 					p_namedMapClass, p_requirdMap));
 			return false;
 		}
@@ -654,7 +639,7 @@ public class IceOntologyInterface {
 		if (p_relatedEntity != null && false == p_relatedEntity.isEmpty()) {
 			IRI relatedEntityIRI = IRI.create(this.mainIRIPrefix + p_relatedEntity);
 			if (false == this.mainOntology.containsIndividualInSignature(relatedEntityIRI)) {
-				log(String.format("Unknown related entity '%s' for required map '%s', required map not created.",
+				logWarning(String.format("Unknown related entity '%s' for required map '%s', required map not created.",
 						p_relatedEntity, p_requirdMap));
 				return false;
 			}
@@ -730,35 +715,35 @@ public class IceOntologyInterface {
 		// create inputs
 		if (false == this.addPropertiesToNode(node, this.ii.hasInput, this.ii.namedStream, p_inputs, p_inputsMinSize,
 				p_inputsMaxSize, changes)) {
-			log(String.format("Node '%s' not created.", p_node));
+			logWarning(String.format("Node '%s' not created.", p_node));
 			return false;
 		}
 
 		// create related inputs
 		if (false == this.addPropertiesToNode(node, this.ii.hasRelatedInput, this.ii.namedStream, p_inputsRelated,
 				p_inputsRelatedMinSize, p_inputsRelatedMaxSize, changes)) {
-			log(String.format("Node '%s' not created.", p_node));
+			logWarning(String.format("Node '%s' not created.", p_node));
 			return false;
 		}
 
 		// create outputs
 		if (false == this.addPropertiesToNode(node, this.ii.hasOutput, this.ii.namedStream, p_outputs,
 				p_outputsMinSize, p_outputsMaxSize, changes)) {
-			log(String.format("Node '%s' not created.", p_node));
+			logWarning(String.format("Node '%s' not created.", p_node));
 			return false;
 		}
 
 		// create input maps
 		if (false == this.addPropertiesToNode(node, this.ii.hasInputMap, this.ii.namedMap, p_inputMaps,
 				p_inputMapsMinSize, p_inputMapsMaxSize, changes)) {
-			log(String.format("Node '%s' not created.", p_node));
+			logWarning(String.format("Node '%s' not created.", p_node));
 			return false;
 		}
 
 		// create output maps
 		if (false == this.addPropertiesToNode(node, this.ii.hasOutputMap, this.ii.namedMap, p_outputMaps,
 				p_outputMapsMinSize, p_outputMapsMaxSize, changes)) {
-			log(String.format("Node '%s' not created.", p_node));
+			logWarning(String.format("Node '%s' not created.", p_node));
 			return false;
 		}
 
@@ -775,7 +760,7 @@ public class IceOntologyInterface {
 		if (p_values != null && p_values.length > 0) {
 			// check size
 			if (p_values.length != p_minSize.length || p_values.length != p_maxSize.length) {
-				log(String.format(
+				logWarning(String.format(
 						"Wrong size of inputs '%d' and sizes of min '%s' and max '%s' for object property %s.",
 						p_values.length, p_minSize.length, p_maxSize.length, p_property.getIRI()));
 				return false;
@@ -785,7 +770,7 @@ public class IceOntologyInterface {
 				OWLClass input = this.findOWLClass(p_class, p_values[i]);
 
 				if (input == null) {
-					log(String.format("Unknown named input '%s' for class '%s', node not created.", p_values[i],
+					logWarning(String.format("Unknown named input '%s' for class '%s', node not created.", p_values[i],
 							p_class.getIRI()));
 					return false;
 				}
@@ -820,13 +805,13 @@ public class IceOntologyInterface {
 	public boolean addIndividual(final String p_individual, final String p_class) {
 		IRI iri = IRI.create(this.mainIRIPrefix + p_individual);
 		if (this.mainOntology.containsIndividualInSignature(iri)) {
-			this.log(String.format("Individual '%s' for class 's' already exists.", p_individual, p_class));
+			this.logWarning(String.format("Individual '%s' for class 's' already exists.", p_individual, p_class));
 			return false;
 		}
 
 		IRI clsIri = IRI.create(this.mainIRIPrefix + p_class);
 		if (false == this.mainOntology.containsClassInSignature(clsIri)) {
-			this.log(String.format("Class '%s' for new individual '%s' is unknown.", p_class, p_individual));
+			this.logWarning(String.format("Class '%s' for new individual '%s' is unknown.", p_class, p_individual));
 			return false;
 		}
 
@@ -879,7 +864,7 @@ public class IceOntologyInterface {
 		OWLClass nodeCls = this.findOWLClass(this.ii.node, p_nodeClass);
 
 		if (nodeCls == null) {
-			log(String.format("Unknown node class '%s' for node '%s' in system '%s', node not created.", p_nodeClass,
+			logWarning(String.format("Unknown node class '%s' for node '%s' in system '%s', node not created.", p_nodeClass,
 					p_node, p_system));
 			return false;
 		}
@@ -898,7 +883,7 @@ public class IceOntologyInterface {
 			OWLIndividual aboutEntity = this.findOWLIndividual(this.ii.entityType, p_aboutEntity, false);
 
 			if (aboutEntity == null) {
-				log(String.format("Unknown about entity '%s' for node '%s' in system '%s', node not created.",
+				logWarning(String.format("Unknown about entity '%s' for node '%s' in system '%s', node not created.",
 						p_aboutEntity, p_node, p_system));
 				return false;
 			}
@@ -913,7 +898,7 @@ public class IceOntologyInterface {
 			OWLIndividual aboutRelatedEntity = this.findOWLIndividual(this.ii.entityType, p_aboutRelatedEntity, false);
 
 			if (aboutRelatedEntity == null) {
-				log(String.format("Unknown about related entity '%s' for node '%s' in system '%s', node not created.",
+				logWarning(String.format("Unknown about related entity '%s' for node '%s' in system '%s', node not created.",
 						p_aboutRelatedEntity, p_node, p_system));
 				return false;
 			}
@@ -943,7 +928,7 @@ public class IceOntologyInterface {
 			OWLClass metadataCls = this.findOWLClass(this.ii.metadataOWLClass, metadata);
 
 			if (metadataCls == null) {
-				log(String.format("Unknown Metadata '%s' for node '%s' in system '%s', node not created.", metadata,
+				logWarning(String.format("Unknown Metadata '%s' for node '%s' in system '%s', node not created.", metadata,
 						p_node, p_system));
 				return false;
 			}
@@ -985,7 +970,7 @@ public class IceOntologyInterface {
 					false);
 
 			if (metadataGrounding == null) {
-				this.log(String
+				logWarning(String
 						.format("Unknown Metadata grounding '%s' of grounding '%s' for node '%s' in system '%s', node not created.",
 								grounding, metadata, p_node, p_system));
 				return false;
@@ -1037,7 +1022,7 @@ public class IceOntologyInterface {
 		OWLClass iroCls = this.findOWLClass(this.ii.iroNode, p_iroClass);
 
 		if (iroCls == null) {
-			log(String.format("Unknown IRO class '%s' for IRO '%s' in system '%s', IRO not created.", p_iroClass,
+			logWarning(String.format("Unknown IRO class '%s' for IRO '%s' in system '%s', IRO not created.", p_iroClass,
 					p_iro, p_system));
 			return false;
 		}
@@ -1069,7 +1054,7 @@ public class IceOntologyInterface {
 			OWLClass metadataCls = this.findOWLClass(this.ii.metadataOWLClass, metadata);
 
 			if (metadataCls == null) {
-				log(String.format("Unknown Metadata '%s' for IRO '%s' in system '%s', IRO not created.", metadata,
+				logWarning(String.format("Unknown Metadata '%s' for IRO '%s' in system '%s', IRO not created.", metadata,
 						p_iro, p_system));
 				return false;
 			}
@@ -1105,7 +1090,7 @@ public class IceOntologyInterface {
 					false);
 
 			if (metadataGrounding == null) {
-				this.log(String
+				logWarning(String
 						.format("Unknown Metadata grounding '%s' of grounding '%s' for IRO '%s' in system '%s', IRO not created.",
 								grounding, metadata, p_iro, p_system));
 				return false;
@@ -1345,14 +1330,31 @@ public class IceOntologyInterface {
 		this.someMaxCardinality = someMaxCardinality;
 	}
 
-	private void log(String p_msg) {
-		if (false == this.logging)
-			return;
-
-		System.out
-				.println(DATE_FORMAT.format(new Date()) + " JAVA  [" + this.getClass().getSimpleName() + "] " + p_msg);
+	private void log(LogLevel ll, String msg) {
+		final String date = DATE_FORMAT.format(new Date());
+		final String className = this.getClass().getSimpleName();
+		final String llstr = ll.toString();
+		
+		if (logLevel.getValue() >= ll.getValue()) 
+			System.out.printf("[JAVA][%s][%s][%s]: %s\n", llstr, date, className, msg);
+	}
+	
+	private void logError(String msg) {
+		log(LogLevel.Error, msg);
 	}
 
+	private void logWarning(String msg) {
+		log(LogLevel.Warning, msg);
+	}
+
+	private void logDebug(String msg) {
+		log(LogLevel.Debug, msg);
+	}
+	
+	private void logInfo(String msg) {
+		log(LogLevel.Info, msg);
+	}
+	
 	public int getDefaultMinCardinality() {
 		return defaultMinCardinality;
 	}
@@ -1369,14 +1371,14 @@ public class IceOntologyInterface {
 		this.defaultMaxCardinality = defaultMaxCardinality;
 	}
 
-	public boolean isLogging() {
-		return logging;
-	}
+	public void setLogLevel(int ll) {
+		logLevel = LogLevel.values()[ll];
+	}	
 
-	public void setLogging(boolean logging) {
-		this.logging = logging;
-	}
-
+	public int getLogLevel() {
+		return logLevel.getValue();
+	}	
+	
 	public String iRIShortName(IRI p_iri) {
 		String[] values = p_iri.toString().split("#");
 		int index = iriMapping.indexOf(values[0]);
@@ -1385,7 +1387,7 @@ public class IceOntologyInterface {
 			// index = IRI_MAPPING.size();
 			// IRI_MAPPING.add(values[0]);
 
-			this.log(String.format("Unkonwn IRI '%s' from '%s', no mapping to short iri", values[0], p_iri));
+			this.logWarning(String.format("Unkonwn IRI '%s' from '%s', no mapping to short iri", values[0], p_iri));
 		}
 
 		// System.out.println(index + "   " + values[1] + "   " + values[0] +

@@ -198,6 +198,7 @@ TEST(JNITest, addRequiredStream)
   bool result;
 
   ice::OntologyInterface oi(path + "/java/lib/");
+  oi.setLogLevel(ice::Info);
 
   oi.addIRIMapper(path + "/ontology/");
   oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
