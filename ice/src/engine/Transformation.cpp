@@ -10,6 +10,8 @@
 #include "ice/representation/GContainer.h"
 #include "ice/representation/GContainerFactory.h"
 
+#include "muParser.h"
+
 namespace ice
 {
 
@@ -42,7 +44,17 @@ std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer
         target->set(operation->targetDimension, inputs[operation->sourceIndex]->get(operation->sourceDimension));
         break;
       case (FORMULA):
-        // TODO
+	{
+		mu::Parser parser;
+		double in = *((double*)inputs[operation->sourceIndex]->get(operation->sourceDimension));
+		parser.DefineVar(operation->variableName, &in);
+		parser.SetExpr(operation->formula);
+		// TODO: Check for memleaks
+		// TODO: Add support for integers and floats
+		double *out = new double;
+		*out = parser.Eval();
+		target->set(operation->targetDimension, out);
+	}
         break;
       default:
         //TODO

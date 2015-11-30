@@ -89,6 +89,9 @@ struct TransformationOperation
 
   std::vector<int>* targetDimension;
 
+  std::string formula;
+  std::string variableName;
+
   BasicRepresentationType valueType;
   void* value;
 };

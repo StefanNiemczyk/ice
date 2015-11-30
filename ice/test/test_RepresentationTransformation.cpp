@@ -181,23 +181,18 @@ TEST(RepresentationTransformationTest, formulaOperation)
   ice::TransformationOperation* o;
 
   o = new ice::TransformationOperation();
+  o->formula = "x^2";
+  o->variableName = "x";
   o->sourceIndex = 0;
-  o->sourceDimension = rep1->accessPath( {"dim1"});
+  o->sourceDimension = dim11;
   o->type = ice::TransformationOperationType::FORMULA;
-  o->targetDimension = rep2->accessPath( {"dim1"});
-  trans.getOperations().push_back(o);
-
-  o = new ice::TransformationOperation();
-  o->sourceIndex = 1;
-  o->sourceDimension = rep1->accessPath( {"dim2"});
-  o->type = ice::TransformationOperationType::FORMULA;
-  o->targetDimension = rep2->accessPath( {"dim2"});
+  o->targetDimension = dim22;
   trans.getOperations().push_back(o);
 
   auto rep2Ind = trans.transform(&rep1Ind);
 
   EXPECT_EQ(testValDouble*testValDouble, rep2Ind->getValue<double>(dim22));
-  EXPECT_EQ(testValInt*testValInt, rep2Ind->getValue<int>(dim21));
+  //EXPECT_EQ(testValInt*testValInt, rep2Ind->getValue<int>(dim21));
 
 }
 
