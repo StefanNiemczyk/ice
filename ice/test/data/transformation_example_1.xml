@@ -34,4 +34,26 @@
 		</operations>
 	</transformation>
 
+
+	<transformation name="TestComplex1">
+		<input id="1" representation="http://vs.uni-kassel.de/IceTest#Pos3DRot" />
+
+		<output representation="http://vs.uni-kassel.de/IceTest#Pos3DRot" />
+
+		<operations>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate">
+				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"/>
+			</dimension>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate">
+				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"/>			
+			</dimension>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate">
+				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"/>		
+			</dimension>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation">
+				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation"/>		
+			</dimension>
+		</operations>
+	</transformation>
+
 </transformations>

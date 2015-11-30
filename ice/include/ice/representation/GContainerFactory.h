@@ -59,6 +59,7 @@ public:
   void printReps();
 
 private:
+  GContainer* makeGContainerInstance(std::shared_ptr<Representation> representation);
   bool extractOperations(std::shared_ptr<Transformation> transformation, std::shared_ptr<Representation> representation,
                          std::vector<DimensionDesc> &ops, std::vector<std::string> &path,
                          std::map<int, std::shared_ptr<Representation>> &reps);

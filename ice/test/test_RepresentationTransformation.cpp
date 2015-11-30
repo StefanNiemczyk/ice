@@ -37,10 +37,10 @@ TEST(RepresentationTransformationTest, useOperation)
   auto rep1 = factory->getRepresentation("testRep1");
   auto rep2 = factory->getRepresentation("testRep2");
 
-  int* dim11 = rep1->accessPath( {"dim1"});
-  int* dim12 = rep1->accessPath( {"dim2"});
-  int* dim21 = rep2->accessPath( {"dim1"});
-  int* dim22 = rep2->accessPath( {"dim2"});
+  auto dim11 = rep1->accessPath( {"dim1"});
+  auto dim12 = rep1->accessPath( {"dim2"});
+  auto dim21 = rep2->accessPath( {"dim1"});
+  auto dim22 = rep2->accessPath( {"dim2"});
 
   const double testValDouble = 4.2f;
   const int testValInt = 358735;
@@ -99,10 +99,10 @@ TEST(RepresentationTransformationTest, defaultOperation)
   auto rep1 = factory->getRepresentation("testRep1");
   auto rep2 = factory->getRepresentation("testRep2");
 
-  int* dim11 = rep1->accessPath( {"dim1"});
-  int* dim12 = rep1->accessPath( {"dim2"});
-  int* dim21 = rep2->accessPath( {"dim1"});
-  int* dim22 = rep2->accessPath( {"dim2"});
+  auto dim11 = rep1->accessPath( {"dim1"});
+  auto dim12 = rep1->accessPath( {"dim2"});
+  auto dim21 = rep2->accessPath( {"dim1"});
+  auto dim22 = rep2->accessPath( {"dim2"});
 
   const double testValDouble = 4.2f;
   const int testValInt = 358735;
@@ -182,19 +182,31 @@ TEST(RepresentationTransformationTest, xmlReader)
 
   auto p2dRep = factory->getRepresentation("o0_Pos2D");
   auto p3dRep = factory->getRepresentation("o0_Pos3D");
+  auto p3dRotRep = factory->getRepresentation("o0_Pos3DRot");
 
   ASSERT_TRUE(p2dRep != false);
   ASSERT_TRUE(p3dRep != false);
+  ASSERT_TRUE(p3dRotRep != false);
 
-  int* p2dX = p2dRep->accessPath({"o2_XCoordinate"});
-  int* p2dY = p2dRep->accessPath({"o2_YCoordinate"});
+  auto p2dX = p2dRep->accessPath({"o2_XCoordinate"});
+  auto p2dY = p2dRep->accessPath({"o2_YCoordinate"});
 
-  int* p3dX = p3dRep->accessPath({"o2_XCoordinate"});
-  int* p3dY = p3dRep->accessPath({"o2_YCoordinate"});
-  int* p3dZ = p3dRep->accessPath({"o2_ZCoordinate"});
+  auto p3dX = p3dRep->accessPath({"o2_XCoordinate"});
+  auto p3dY = p3dRep->accessPath({"o2_YCoordinate"});
+  auto p3dZ = p3dRep->accessPath({"o2_ZCoordinate"});
+
+  auto p3dRotX = p3dRotRep->accessPath({"o2_XCoordinate"});
+  auto p3dRotY = p3dRotRep->accessPath({"o2_YCoordinate"});
+  auto p3dRotZ = p3dRotRep->accessPath({"o2_ZCoordinate"});
+  auto p3dRotOri = p3dRotRep->accessPath({"o2_Orientation"});
+
+  auto p3dRotOriA = p3dRotRep->accessPath({"o2_Orientation", "o2_Alpha"});
+  auto p3dRotOriB = p3dRotRep->accessPath({"o2_Orientation", "o2_Beta"});
+  auto p3dRotOriC = p3dRotRep->accessPath({"o2_Orientation", "o2_Gamma"});
 
   bool foundP2toP3 = false;
   bool foundP3toP2 = false;
+  bool foundP3Rot = false;
 
   for (auto desc : reader.getTransformations())
   {
@@ -239,6 +251,38 @@ TEST(RepresentationTransformationTest, xmlReader)
 
       foundP3toP2 = true;
     }
+    else if (trans->getName() == "TestComplex1")
+    {
+      auto p3dRo1 = factory->makeInstance(p3dRotRep);
+
+      double val1 = 3.5;
+      double val2 = 35.5;
+      double val3 = 315.5;
+
+      double vala = 13.5;
+      double valb = 135.5;
+      double valc = 1315.5;
+
+      p3dRo1->set(p3dRotX, &val1);
+      p3dRo1->set(p3dRotY, &val2);
+      p3dRo1->set(p3dRotZ, &val3);
+
+      p3dRo1->set(p3dRotOriA, &vala);
+      p3dRo1->set(p3dRotOriB, &valb);
+      p3dRo1->set(p3dRotOriC, &valc);
+
+      auto p3dRo2 = trans->transform(&p3dRo1);
+
+      ASSERT_EQ(p3dRo2->getValue<double>(p3dRotX), val1);
+      ASSERT_EQ(p3dRo2->getValue<double>(p3dRotY), val2);
+      ASSERT_EQ(p3dRo2->getValue<double>(p3dRotZ), val3);
+
+      ASSERT_EQ(p3dRo2->getValue<double>(p3dRotOriA), vala);
+      ASSERT_EQ(p3dRo2->getValue<double>(p3dRotOriB), valb);
+      ASSERT_EQ(p3dRo2->getValue<double>(p3dRotOriC), valc);
+
+      foundP3Rot = true;
+    }
     else
     {
       ASSERT_FALSE(true);
@@ -247,6 +291,7 @@ TEST(RepresentationTransformationTest, xmlReader)
 
   ASSERT_TRUE(foundP2toP3);
   ASSERT_TRUE(foundP3toP2);
+  ASSERT_TRUE(foundP3Rot);
 }
 
 }

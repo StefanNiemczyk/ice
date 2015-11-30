@@ -74,14 +74,20 @@ struct TransformationOperation
         delete (std::string*)value;
         break;
     }
+
+    if (nullptr != sourceDimension)
+      delete sourceDimension;
+
+    if (nullptr != targetDimension)
+      delete targetDimension;
   }
 
   TransformationOperationType type;
 
   int sourceIndex;
-  int* sourceDimension;
+  std::vector<int>* sourceDimension;
 
-  int* targetDimension;
+  std::vector<int>* targetDimension;
 
   BasicRepresentationType valueType;
   void* value;

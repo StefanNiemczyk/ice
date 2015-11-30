@@ -2,6 +2,7 @@
 #define REPRESENTATION_H
 
 #include <initializer_list>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -38,49 +39,43 @@ struct Representation {
     return (this->type != BasicRepresentationType::UNSET && this->type != BasicRepresentationType::NONE);
   }
 
-
-
-  int* accessPath(std::initializer_list<std::string> dimensions)
+  std::vector<int>* accessPath(std::initializer_list<std::string> dimensions)
    {
      std::vector<std::string> d = dimensions;
 
      return this->accessPath(&d);
    }
 
-  int* accessPath(std::vector<std::string> &dimensions)
+  std::vector<int>* accessPath(std::vector<std::string> &dimensions)
   {
     return this->accessPath(&dimensions);
   }
 
-  int* accessPath(std::vector<std::string> *dimensions)
+  std::vector<int>* accessPath(std::vector<std::string> *dimensions)
   {
-    std::vector<int> path;
+    std::vector<int>* path = new std::vector<int>();
     bool result = this->accessPath(dimensions, 0, path);
 
     if (result == false)
       return nullptr;
 
-    int* arr = new int[path.size()];
-    std::copy(path.begin(), path.end(), arr);
-
-    return arr;
+    return path;
   }
 
 private:
-  bool accessPath(std::vector<std::string> *dimensions, int index, std::vector<int> &path)
+  bool accessPath(std::vector<std::string> *dimensions, int index, std::vector<int> *path)
   {
     for (int i=0; i < this->dimensionNames.size(); ++i)
     {
-
       if (this->dimensionNames.at(i) == dimensions->at(index))
       {
         auto dim = this->dimensions.at(i);
-        path.push_back(i);
+        path->push_back(i);
 
-        if (dim->isBasic())
-          return true;
-        else
+        if (index+1 < dimensions->size())
           return dim->accessPath(dimensions, index+1, path);
+        else
+          return true;
       }
     }
 

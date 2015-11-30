@@ -208,50 +208,61 @@ std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::string repName)
 
 std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::shared_ptr<Representation> representation)
 {
+  auto container = this->makeGContainerInstance(representation);
+
+  if (container == nullptr)
+    return std::shared_ptr<GContainer>();
+
+  return std::shared_ptr<GContainer>(container);
+}
+
+GContainer* GContainerFactory::makeGContainerInstance(std::shared_ptr<Representation> representation)
+{
   if (representation->isBasic())
   {
-    std::shared_ptr<BasicGContainer> ins;
+    BasicGContainer* ins;
     auto rep = representation;
 
     switch (rep->type)
     {
       case BOOL:
-        ins = std::make_shared<BoolGContainer>(representation);
+        ins = new BoolGContainer(representation);
         break;
       case BYTE:
-        ins = std::make_shared<ByteGContainer>(representation);
+        ins = new ByteGContainer(representation);
         break;
       case UNSIGNED_BYTE:
-        ins = std::make_shared<UnsignedByteGContainer>(representation);
+        ins = new UnsignedByteGContainer(representation);
         break;
       case SHORT:
-        ins = std::make_shared<ShortGContainer>(representation);
+        ins = new ShortGContainer(representation);
         break;
       case INT:
-        ins = std::make_shared<IntGContainer>(representation);
+        ins = new IntGContainer(representation);
         break;
       case LONG:
-        ins = std::make_shared<LongGContainer>(representation);
+        ins = new LongGContainer(representation);
         break;
       case UNSIGNED_SHORT:
-        ins = std::make_shared<UnsignedShortGContainer>(representation);
+        ins = new UnsignedShortGContainer(representation);
         break;
       case UNSIGNED_INT:
-        ins = std::make_shared<UnsignedIntGContainer>(representation);
+        ins = new UnsignedIntGContainer(representation);
         break;
       case UNSIGNED_LONG:
-        ins = std::make_shared<UnsignedLongGContainer>(representation);
+        ins = new UnsignedLongGContainer(representation);
         break;
       case FLOAT:
-        ins = std::make_shared<FloatGContainer>(representation);
+        ins = new FloatGContainer(representation);
         break;
       case DOUBLE:
-        ins = std::make_shared<DoubleGContainer>(representation);
+        ins = new DoubleGContainer(representation);
         break;
       case STRING:
-        ins = std::make_shared<StringGContainer>(representation);
+        ins = new StringGContainer(representation);
         break;
       default:
+        ins = nullptr;
         _log->error("Unknown representation basic type '%v' for representation '%v'", rep->type, rep->name);
         break;
     }
@@ -260,11 +271,11 @@ std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::shared_ptr<Repr
   }
   else
   {
-    std::shared_ptr<CompositeGContainer> ins = std::make_shared<CompositeGContainer>(representation);
+    CompositeGContainer* ins = new CompositeGContainer(representation);
 
     for (auto sc : representation->dimensions)
     {
-      auto subIns = makeInstance(sc);
+      auto subIns = makeGContainerInstance(sc);
       ins->subs.push_back(subIns);
     }
 
@@ -364,6 +375,7 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
       if (representation->dimensionNames.at(i) == shortName)
       {
         repDim = representation->dimensions.at(i);
+
         break;
       }
     }
@@ -378,7 +390,7 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
 
     // add to path
     path.push_back(shortName);
-    int* pathTarget = transformation->getTargetRepresentation()->accessPath(path);
+    auto pathTarget = transformation->getTargetRepresentation()->accessPath(path);
     bool result = false;
 
     if (nullptr == pathTarget)
@@ -410,7 +422,7 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
           pathDim->at(i) = this->ontologyInterface->toShortIri(pathDim->at(i));
         }
 
-        int* pathSource = representation->accessPath(pathDim.get());
+        auto pathSource = representation->accessPath(pathDim.get());
 
         if (nullptr == pathSource)
         {
