@@ -145,6 +145,57 @@ TEST(RepresentationTransformationTest, defaultOperation)
 //  rep2Ind->print();
 }
 
+TEST(RepresentationTransformationTest, formulaOperation)
+{
+  std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
+
+  std::unique_ptr<std::vector<std::string>> lines(new std::vector<std::string>);
+  lines->push_back("testRep1;dim1;doubleRep");
+  lines->push_back("testRep1;dim2;integerRep");
+  lines->push_back("|");
+  lines->push_back("testRep2;dim1;integerRep");
+  lines->push_back("testRep2;dim2;doubleRep");
+
+  factory->fromCSVStrings(std::move(lines));
+
+  auto rep1 = factory->getRepresentation("testRep1");
+  auto rep2 = factory->getRepresentation("testRep2");
+
+  auto dim11 = rep1->accessPath( {"dim1"});
+  auto dim12 = rep1->accessPath( {"dim2"});
+  auto dim21 = rep2->accessPath( {"dim1"});
+  auto dim22 = rep2->accessPath( {"dim2"});
+
+  const double testValDouble = 4.2f;
+  const int testValInt = 8;
+
+  auto rep1Ind = factory->makeInstance(rep1);
+
+  rep1Ind->set(dim11, &testValDouble);
+  rep1Ind->set(dim12, &testValInt);
+
+  EXPECT_EQ(testValDouble, *((double* ) rep1Ind->get(dim11)));
+  EXPECT_EQ(testValInt, *((int* ) rep1Ind->get(dim12)));
+
+  ice::Transformation trans(factory, "TestSquaredTransformation", rep2);
+  ice::TransformationOperation* o;
+
+  o = new ice::TransformationOperation();
+  o->formula = "x^2";
+  o->variableName = "x";
+  o->sourceIndex = 0;
+  o->sourceDimension = dim11;
+  o->type = ice::TransformationOperationType::FORMULA;
+  o->targetDimension = dim22;
+  trans.getOperations().push_back(o);
+
+  auto rep2Ind = trans.transform(&rep1Ind);
+
+  EXPECT_EQ(testValDouble*testValDouble, rep2Ind->getValue<double>(dim22));
+  //EXPECT_EQ(testValInt*testValInt, rep2Ind->getValue<int>(dim21));
+
+}
+
 TEST(RepresentationTransformationTest, xmlReader)
 {
   std::string path = ros::package::getPath("ice");
