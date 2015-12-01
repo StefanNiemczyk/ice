@@ -55,20 +55,18 @@ public:
   std::shared_ptr<GContainer> makeInstance(std::shared_ptr<Representation> representation);
 
   std::shared_ptr<Transformation> fromXMLDesc(TransDesc* desc);
+  void* convertStringToBasic(BasicRepresentationType type, std::string value);
 
   void printReps();
+
+  bool addTransformation(std::string name, std::shared_ptr<Transformation> transformation);
+  std::shared_ptr<Transformation> getTransformation(std::string name);
 
 private:
   GContainer* makeGContainerInstance(std::shared_ptr<Representation> representation);
   bool extractOperations(std::shared_ptr<Transformation> transformation, std::shared_ptr<Representation> representation,
                          std::vector<DimensionDesc> &ops, std::vector<std::string> &path,
                          std::map<int, std::shared_ptr<Representation>> &reps);
-  void* convert(BasicRepresentationType type, std::string value);
-
-private:
-  el::Logger* _log;
-  std::weak_ptr<ICEngine> engine;
-  std::shared_ptr<OntologyInterface> ontologyInterface;
   void printReps(std::shared_ptr<Representation> representation, int depth);
   std::shared_ptr<Representation> fromCSV(std::string reprStr,
                                           std::map<std::string, std::shared_ptr<Representation>> *tmpMap,
@@ -77,8 +75,13 @@ private:
   std::shared_ptr<Representation> addOrGet(std::string name,
                                            std::map<std::string, std::shared_ptr<Representation>> *tmpMap);
 
+private:
+  el::Logger* _log;
+  std::weak_ptr<ICEngine> engine;
+  std::shared_ptr<OntologyInterface> ontologyInterface;
   std::map<std::string, std::shared_ptr<Representation>> repMap;
   std::map<std::string, BasicRepresentationType> typeMap;
+  std::map<std::string, std::shared_ptr<Transformation>> transformations;
 };
 
 }  // namespace ice

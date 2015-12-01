@@ -471,7 +471,7 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
           pathDim->at(i) = this->ontologyInterface->toShortIri(pathDim->at(i));
         }
 
-        void* value = this->convert(repDim->type, operation.value);
+        void* value = this->convertStringToBasic(repDim->type, operation.value);
 
         if (nullptr == value)
         {
@@ -514,7 +514,7 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
   return true;
 }
 
-void* GContainerFactory::convert(BasicRepresentationType type, std::string value)
+void* GContainerFactory::convertStringToBasic(BasicRepresentationType type, std::string value)
 {
   switch (type)
   {
@@ -585,6 +585,28 @@ void GContainerFactory::printReps(std::shared_ptr<Representation> representation
       this->printReps(rep, depth + 2);
   }
 
+}
+
+bool GContainerFactory::addTransformation(std::string name, std::shared_ptr<Transformation> transformation)
+{
+  auto it = this->transformations.find(name);
+
+  if (this->transformations.end() != it)
+    return false;
+
+  this->transformations[name] = transformation;
+
+  return true;
+}
+
+std::shared_ptr<Transformation> GContainerFactory::getTransformation(std::string name)
+{
+  auto it = this->transformations.find(name);
+
+  if (this->transformations.end() == it)
+    return std::shared_ptr<Transformation>();
+
+  return it->second;
 }
 
 }

@@ -53,7 +53,7 @@ TEST(GContainerTest, simpleTest)
   auto movement = fac.makeInstance(rep);
 
   const double testVal = 4.2f;
-  int* pos = rep->accessPath({"o0_Translation"});
+  auto pos = rep->accessPath({"o0_Translation"});
 
   ASSERT_TRUE(pos != nullptr);
 

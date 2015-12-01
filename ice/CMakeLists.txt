@@ -185,6 +185,7 @@ add_library(${PROJECT_NAME}
   src/engine/FastUpdateStrategie.cpp
   src/engine/UpdateStrategie.cpp
   
+  src/engine/ASPTransformationGeneration.cpp
   src/engine/GContainerFactory.cpp
   src/engine/split.cpp
   src/engine/Transformation.cpp
@@ -267,12 +268,14 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/eval/EvalScenarios.cpp
  # test/eval/eval_AccessSpeed.cpp
  
+  test/etc/TestTime.cpp
+  test/etc/EngineStuff.cpp
  # test/test_ASPCoordinator.cpp
  # test/test_JNI.cpp
  # test/test_ASPComposition.cpp
- # test/test_ASPRepComputation.cpp
+  test/test_ASPRepComputation.cpp
  # test/test_GContainer.cpp
-  test/test_RepresentationTransformation.cpp
+ # test/test_RepresentationTransformation.cpp
  # test/test_serialize.cpp
  # test/test_RingBuffer.cpp
  # test/test_Buffer.cpp
@@ -283,8 +286,6 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/test_NodeStore.cpp
  
  ## should be fixed...  
- # test/etc/TestTime.cpp
- # test/etc/EngineStuff.cpp
  # test/test_XMLReader
  # test/test_ModelComperator.cpp
  # test/test_ICEngine.cpp

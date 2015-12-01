@@ -16,7 +16,8 @@ namespace ice
 {
 
 ICEngine::ICEngine(std::shared_ptr<TimeFactory> timeFactory, std::shared_ptr<StreamFactory> streamFactory,
-                   std::string iri, std::shared_ptr<Configuration> config) : iri(iri)
+                   std::string ontologyIri, std::string iri, std::shared_ptr<Configuration> config) :
+    iri(iri), ontologyIri(ontologyIri)
 {
   this->initialized = false;
   this->config = config;
@@ -42,6 +43,8 @@ ICEngine::~ICEngine()
 //  this->nodeStore;
   this->modelGenerator->cleanUp();
   this->updateStrategie->cleanUp();
+  this->gcontainerFactory->cleanUp();
+  this->aspTransformationGenerator->cleanUp();
 }
 
 void ICEngine::init()
@@ -63,10 +66,14 @@ void ICEngine::init()
   this->coordinator = std::make_shared<Coordinator>(this->shared_from_this());
   this->modelGenerator = std::make_shared<ASPModelGenerator>(this->shared_from_this());
   this->updateStrategie = std::make_shared<FastUpdateStrategie>(this->shared_from_this());
+  this->gcontainerFactory = std::make_shared<GContainerFactory>(this->shared_from_this());
+  this->aspTransformationGenerator = std::make_shared<ASPTransformationGeneration>(this->shared_from_this());
 
   // init ontology
   this->ontologyInterface = std::make_shared<OntologyInterface>(path + "/java/lib/");
   this->ontologyInterface->addIRIMapper(path + "/ontology/");
+  this->ontologyInterface->addOntologyIRI(this->ontologyIri);
+  this->ontologyInterface->loadOntologies();
 
   // Initialize components
   this->eventHandler->init();
@@ -75,15 +82,17 @@ void ICEngine::init()
   this->modelGenerator->init();
   this->informationStore->init();
   this->updateStrategie->init();
+  this->gcontainerFactory->init();
+  this->aspTransformationGenerator->init();
+
+  // reading information structure from ontology
+  this->informationStore->readEntitiesFromOntology();
 
   this->initialized = true;
 }
 
 void ICEngine::start()
 {
-  // reading information structure from ontology
-  this->informationStore->readEntitiesFromOntology();
-
   // creating processing model
   this->updateStrategie->update(this->modelGenerator->createProcessingModel());
 
@@ -365,7 +374,6 @@ identifier ICEngine::getId() const
   return this->id;
 }
 
-
 std::string ICEngine::getIri() const
 {
   return this->iri;
@@ -425,6 +433,16 @@ std::shared_ptr<UpdateStrategie> ICEngine::getUpdateStrategie()
 bool ICEngine::isRunning()
 {
   return this->running;
+}
+
+std::shared_ptr<GContainerFactory> ICEngine::getGContainerFactory()
+{
+  return this->gcontainerFactory;
+}
+
+std::shared_ptr<ASPTransformationGeneration> ICEngine::getASPTransformationGeneration()
+{
+  return this->aspTransformationGenerator;
 }
 
 } /* namespace ice */

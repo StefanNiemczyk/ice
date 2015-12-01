@@ -16,10 +16,8 @@ TEST(ASPModelGenerator, simpleTest)
 
   auto streamFactory = std::make_shared<TestFactory>();
   auto timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest#TestSystem");
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest", "http://vs.uni-kassel.de/IceTest#TestSystem");
   engine->init();
-
-  bool result = engine->getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
 
   engine->start();
 
@@ -59,17 +57,15 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   // create engine 1
   auto streamFactory = std::make_shared<TestFactory>();
   auto timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd1");
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest", "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd1");
   engine->init();
-  bool result = engine->getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
   engine->start();
 
   // create engine 2
   streamFactory = std::make_shared<TestFactory>();
   timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd2");
+  std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest", "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd2");
   engine2->init();
-  result = engine2->getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
   engine2->start();
 
   // wait some time to enable the engines to find each other
@@ -117,17 +113,15 @@ TEST(ASPModelGenerator, twoSystemsComplex)
   // create engine 1
   auto streamFactory = std::make_shared<TestFactory>();
   auto timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd1");
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest", "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd1");
   engine->init();
-  bool result = engine->getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
   engine->start();
 
   // create engine 2
   streamFactory = std::make_shared<TestFactory>();
   timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd2");
+  std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest", "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd2");
   engine2->init();
-  result = engine2->getOntologyInterface()->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
   engine2->start();
 
   // wait some time to enable the engines to find each other

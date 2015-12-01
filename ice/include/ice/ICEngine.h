@@ -36,6 +36,8 @@
 #include "ice/processing/EventHandler.h"
 #include "ice/processing/Node.h"
 #include "ice/processing/NodeStore.h"
+#include "ice/representation/GContainerFactory.h"
+#include "ice/representation/ASPTransformationGeneration.h"
 #include "ice/ros/RosCommunication.h"
 
 // Forward declarations
@@ -63,10 +65,11 @@ public:
    *
    * \param timeFactory The time factory to create time stamps.
    * \param streamFActory Factory to create information stream objects.
+   * \param ontologyIri The iri of the main ontology.
    * \param iri The iri of this engine.
    * \param config The configuration object.
    */
-  ICEngine(std::shared_ptr<TimeFactory> timeFactory, std::shared_ptr<StreamFactory> streamFactory, std::string iri,
+  ICEngine(std::shared_ptr<TimeFactory> timeFactory, std::shared_ptr<StreamFactory> streamFactory, std::string ontologyIri, std::string iri,
            std::shared_ptr<Configuration> config = std::make_shared<Configuration>());
 
   /*!
@@ -206,11 +209,16 @@ public:
 
   bool isRunning();
 
+  std::shared_ptr<GContainerFactory> getGContainerFactory();
+
+  std::shared_ptr<ASPTransformationGeneration> getASPTransformationGeneration();
+
 private:
   int readXMLInformation(XMLInformation* information, const std::string namePrefix);
 
 private:
   identifier id; /**< The identifier of this engine */
+  const std::string ontologyIri; /**< The iri of the main ontology */
   const std::string iri; /**< The iri of this engine */
   bool initialized; /**< True if the engine is initialized, else false */
   bool running; /**< True if the engine is running, alse false */
@@ -226,6 +234,8 @@ private:
   std::shared_ptr<OntologyInterface> ontologyInterface; /*< Interface to access the ontology */
   std::shared_ptr<ProcessingModelGenerator> modelGenerator; /*< Processing model generator */
   std::shared_ptr<UpdateStrategie> updateStrategie; /**< Update strategie to modify the information processing */
+  std::shared_ptr<GContainerFactory> gcontainerFactory; /**< Factory to create generic containers */
+  std::shared_ptr<ASPTransformationGeneration> aspTransformationGenerator; /**< Component to create transformations based on an asp programm */
   std::mutex mtx_; /**< Mutex */
 };
 

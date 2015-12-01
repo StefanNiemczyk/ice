@@ -202,16 +202,21 @@ public class InfoStructureVisitor extends IceVisitor {
 				c.accept(this);
 			}
 		} else if (ce.getProperty().equals(this.ii.hasDimension)) {
-			Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
+			if (ce.getFiller().isAnonymous()) {
+				this.createAnonymiousRelatedDimension(ce.getFiller(), this.ii.hasRepresentation,
+						"hasDimension(%s,%s,%s,%d,%d).\n", 1, 1);
+			} else {
+				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
-			for (OWLClass c : subs) {
-				sb.append("hasDimension(");
-				sb.append(this.iRIShortName(this.lastRepresentation.getIRI()));
-				sb.append(',');
-				sb.append(this.iRIShortName(c.getIRI()));
-				sb.append(").\n");
+				for (OWLClass c : subs) {
+					sb.append("hasDimension(");
+					sb.append(this.iRIShortName(this.lastRepresentation.getIRI()));
+					sb.append(',');
+					sb.append(this.iRIShortName(c.getIRI()));
+					sb.append(",1,1).\n");
 
-				c.accept(this);
+					c.accept(this);
+				}
 			}
 		} else if (ce.getProperty().equals(this.ii.hasRelatedDimension)) {
 			if (ce.getFiller().isAnonymous()) {
@@ -248,20 +253,25 @@ public class InfoStructureVisitor extends IceVisitor {
 	public void visit(OWLObjectExactCardinality ce) {
 
 		if (ce.getProperty().equals(this.ii.hasDimension)) {
-			Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
+			if (ce.getFiller().isAnonymous()) {
+				this.createAnonymiousRelatedDimension(ce.getFiller(), this.ii.hasRepresentation,
+						"hasDimension(%s,%s,%s,%d,%d).\n", ce.getCardinality(), ce.getCardinality());
+			} else {
+				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
-			for (OWLClass c : subs) {
-				sb.append("hasDimension(");
-				sb.append(this.iRIShortName(this.lastRepresentation.getIRI()));
-				sb.append(',');
-				sb.append(this.iRIShortName(c.getIRI()));
-				sb.append(",");
-				sb.append(ce.getCardinality());
-				sb.append(",");
-				sb.append(ce.getCardinality());
-				sb.append(").\n");
+				for (OWLClass c : subs) {
+					sb.append("hasDimension(");
+					sb.append(this.iRIShortName(this.lastRepresentation.getIRI()));
+					sb.append(',');
+					sb.append(this.iRIShortName(c.getIRI()));
+					sb.append(",");
+					sb.append(ce.getCardinality());
+					sb.append(",");
+					sb.append(ce.getCardinality());
+					sb.append(").\n");
 
-				c.accept(this);
+					c.accept(this);
+				}
 			}
 		} else if (ce.getProperty().equals(this.ii.hasRepresentation)) {
 			if (ce.getFiller().isAnonymous()) {
@@ -300,7 +310,8 @@ public class InfoStructureVisitor extends IceVisitor {
 				} else if (exp instanceof OWLObjectHasValue) {
 					OWLObjectHasValue ohv = (OWLObjectHasValue) exp;
 					if (ohv.getProperty().equals(p_property) && ohv.getValue().isAnonymous() == false) {
-						//unit = this.iRIShortName(ohv.getasOWLNamedIndividual().getIRI());
+						// unit =
+						// this.iRIShortName(ohv.getasOWLNamedIndividual().getIRI());
 					}
 				} else if (exp instanceof OWLObjectExactCardinality) {
 					OWLObjectExactCardinality ohv = (OWLObjectExactCardinality) exp;

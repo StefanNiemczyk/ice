@@ -67,7 +67,7 @@ dimensionDeviation(simRep(SCOPE,REP1,REP2),SCOPE,REP,miss) :-
 
 dimensionDeviation(simRep(SCOPE,REP1,REP2),SCOPE,REP,miss) :-
 	simRep(SCOPE,REP1,REP2),
-	hasDimension(REP1,SCOPE,REP,COUNT,COUNT1),
+	hasDimension(REP1,SCOPE,REP,COUNT1,COUNT1),
 	hasDimension(REP2,SCOPE,REP,COUNT2,COUNT2),
 	COUNT2 < COUNT1.
 
