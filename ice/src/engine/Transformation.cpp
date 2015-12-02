@@ -46,14 +46,91 @@ std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer
       case (FORMULA):
       {
         mu::Parser parser;
-        double in = *((double*)inputs[operation->sourceIndex]->get(operation->sourceDimension));
+        void *in_raw = inputs[operation->sourceIndex]->get(operation->sourceDimension);
+	double in;
+	double out;
+	void *out_raw;
+
+        switch (operation->valueType) {
+        case BYTE:
+          in = (double)(*((char*)in_raw));
+          break;
+        case UNSIGNED_BYTE:
+          in = (double)(*((unsigned char*)in_raw));
+          break;
+        case INT:
+          in = (double)(*((int*)in_raw));
+          break;
+        case SHORT:
+          in = (double)(*((short*)in_raw));
+          break;
+        case LONG:
+          in = (double)(*((long*)in_raw));
+          break;
+        case UNSIGNED_INT:
+          in = (double)(*((unsigned int*)in_raw));
+          break;
+        case UNSIGNED_LONG:
+          in = (double)(*((unsigned long*)in_raw));
+          break;
+        case FLOAT:
+          in = (double)(*((float*)in_raw));
+          break;
+        case DOUBLE:
+          in = *((double*)in_raw);
+          break;
+        default:
+          std::cerr << "Error: Unsupported formula datatype!" << std::endl;
+          break;
+	}
+
         parser.DefineVar(operation->varname, &in);
         parser.SetExpr(operation->formula);
-        // TODO: Check for memleaks
-        // TODO: Add support for integers and floats
-        double *out = new double;
-        *out = parser.Eval();
-        target->set(operation->targetDimension, out);
+        out = parser.Eval();
+
+        switch (operation->valueType) {
+        case BYTE:
+          out_raw = (new char);
+          *((char*)out_raw) = (char)out;
+          break;
+        case UNSIGNED_BYTE:
+          out_raw = (new unsigned char);
+          *((unsigned char*)out_raw) = (unsigned char)out;
+         break;
+        case INT:
+          out_raw = (new int);
+          *((int*)out_raw) = (int)out;
+        break;
+        case SHORT:
+          out_raw = (new short);
+          *((short*)out_raw) = (short)out;
+        break;
+        case LONG:
+          out_raw = (new long);
+          *((long*)out_raw) = (long)out;
+          break;
+        case UNSIGNED_INT:
+          out_raw = (new unsigned int);
+          *((unsigned int*)out_raw) = (unsigned int)out;
+          break;
+        case UNSIGNED_LONG:
+          out_raw = (new unsigned long);
+          *((unsigned long*)out_raw) = (unsigned long)out;
+          break;
+        case FLOAT:
+          out_raw = (new float);
+          *((float*)out_raw) = (float)out;
+          break;
+        case DOUBLE:
+          out_raw = (new double);
+          *((double*)out_raw) = (double)out;
+          break;
+        default:
+          std::cerr << "Error: Unsupported formula datatype!" << std::endl;
+          break;
+	}
+
+        target->set(operation->targetDimension, out_raw);
       }
         break;
       default:

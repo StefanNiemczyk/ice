@@ -181,6 +181,7 @@ TEST(RepresentationTransformationTest, formulaOperation)
   ice::TransformationOperation* o;
 
   o = new ice::TransformationOperation();
+  o->valueType = ice::DOUBLE;
   o->formula = "x^2";
   o->varname= "x";
   o->sourceIndex = 0;
@@ -190,6 +191,7 @@ TEST(RepresentationTransformationTest, formulaOperation)
   trans.getOperations().push_back(o);
 
   o = new ice::TransformationOperation();
+  o->valueType = ice::INT;
   o->formula = "x^2";
   o->varname= "x";
   o->sourceIndex = 0;
