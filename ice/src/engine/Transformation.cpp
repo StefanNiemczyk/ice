@@ -47,7 +47,7 @@ std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer
       {
         mu::Parser parser;
         double in = *((double*)inputs[operation->sourceIndex]->get(operation->sourceDimension));
-        parser.DefineVar(operation->variableName, &in);
+        parser.DefineVar(operation->varname, &in);
         parser.SetExpr(operation->formula);
         // TODO: Check for memleaks
         // TODO: Add support for integers and floats

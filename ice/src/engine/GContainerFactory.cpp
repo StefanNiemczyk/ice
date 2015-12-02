@@ -491,8 +491,16 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
         break;
       }
       case (XML_FORMULA):
-        // TODO
+      {
+        ice::TransformationOperation* o = new ice::TransformationOperation();
+        o->valueType = repDim->type;
+        o->formula = operation.formula;
+        o->varname= operation.varname;
+        o->type = TransformationOperationType::FORMULA;
+        o->targetDimension = pathTarget;
+        transformation->getOperations().push_back(o);
         break;
+      }
       case (XML_COMPLEX):
         result = this->extractOperations(transformation, repDim, operation.dims, path, reps);
 
