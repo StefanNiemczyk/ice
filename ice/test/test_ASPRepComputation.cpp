@@ -95,5 +95,45 @@ TEST(ASPRepComp, ontology)
   asp.readInfoStructureFromOntology();// TODO
   asp.extractTransformations();
 
-//  ASSERT_TRUE(factory->getTransformation());
+  auto trans = factory->getTransformation("autoTrans_o2_Position-o2_CoordinatePositionRep-o0_Pos3D");
+
+  ASSERT_TRUE(trans != false);
+
+  auto repIn = factory->getRepresentation("o2_CoordinatePositionRep");
+  auto repOut = factory->getRepresentation("o0_Pos3D");
+
+  ASSERT_TRUE(repIn != false);
+  ASSERT_TRUE(repOut != false);
+
+  auto inX = repIn->accessPath({"o2_XCoordinate"});
+  auto inY = repIn->accessPath({"o2_YCoordinate"});
+  auto inZ = repIn->accessPath({"o2_ZCoordinate"});
+
+  auto outX = repOut->accessPath({"o2_XCoordinate"});
+  auto outY = repOut->accessPath({"o2_YCoordinate"});
+  auto outZ = repOut->accessPath({"o2_ZCoordinate"});
+
+  ASSERT_TRUE(inX != nullptr);
+  ASSERT_TRUE(inY != nullptr);
+  ASSERT_TRUE(inZ != nullptr);
+
+  ASSERT_TRUE(outX != nullptr);
+  ASSERT_TRUE(outY != nullptr);
+  ASSERT_TRUE(outZ != nullptr);
+
+  auto in = factory->makeInstance(repIn);
+
+  double x = 4.44;
+  double y = 5.55;
+  double z = 6.66;
+
+  in->set(inX, &x);
+  in->set(inY, &y);
+  in->set(inZ, &z);
+
+  auto out = trans->transform(&in);
+
+  EXPECT_EQ(out->getValue<double>(outX), x);
+  EXPECT_EQ(out->getValue<double>(outY), y);
+  EXPECT_EQ(out->getValue<double>(outZ), z);
 }

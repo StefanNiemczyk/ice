@@ -204,7 +204,7 @@ public class InfoStructureVisitor extends IceVisitor {
 		} else if (ce.getProperty().equals(this.ii.hasDimension)) {
 			if (ce.getFiller().isAnonymous()) {
 				this.createAnonymiousRelatedDimension(ce.getFiller(), this.ii.hasRepresentation,
-						"hasDimension(%s,%s,%s,%d,%d).\n", 1, 1);
+						"hasDimension(%s,%s,%d,%d).\n", 1, 1);
 			} else {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
@@ -221,7 +221,7 @@ public class InfoStructureVisitor extends IceVisitor {
 		} else if (ce.getProperty().equals(this.ii.hasRelatedDimension)) {
 			if (ce.getFiller().isAnonymous()) {
 				this.createAnonymiousRelatedDimension(ce.getFiller(), this.ii.hasRepresentation,
-						"hasRelatedDimension(%s,%s,%s,%d,%d).\n", 1, 1);
+						"hasRelatedDimension(%s,%s,%d,%d).\n", 1, 1);
 			} else {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
@@ -230,7 +230,7 @@ public class InfoStructureVisitor extends IceVisitor {
 					sb.append(this.iRIShortName(this.lastRepresentation.getIRI()));
 					sb.append(',');
 					sb.append(this.iRIShortName(c.getIRI()));
-					sb.append(").\n");
+					sb.append(",1,1).\n");
 
 					c.accept(this);
 				}
@@ -255,7 +255,7 @@ public class InfoStructureVisitor extends IceVisitor {
 		if (ce.getProperty().equals(this.ii.hasDimension)) {
 			if (ce.getFiller().isAnonymous()) {
 				this.createAnonymiousRelatedDimension(ce.getFiller(), this.ii.hasRepresentation,
-						"hasDimension(%s,%s,%s,%d,%d).\n", ce.getCardinality(), ce.getCardinality());
+						"hasDimension(%s,%s,%d,%d).\n", ce.getCardinality(), ce.getCardinality());
 			} else {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
@@ -307,11 +307,10 @@ public class InfoStructureVisitor extends IceVisitor {
 			for (OWLClassExpression exp : treeSet) {
 				if (exp instanceof OWLClass) {
 					class1 = (OWLClass) exp;
-				} else if (exp instanceof OWLObjectHasValue) {
-					OWLObjectHasValue ohv = (OWLObjectHasValue) exp;
-					if (ohv.getProperty().equals(p_property) && ohv.getValue().isAnonymous() == false) {
-						// unit =
-						// this.iRIShortName(ohv.getasOWLNamedIndividual().getIRI());
+				} else if (exp instanceof OWLObjectSomeValuesFrom) {
+					OWLObjectSomeValuesFrom ohv = (OWLObjectSomeValuesFrom) exp;
+					if (ohv.getProperty().equals(p_property) && ohv.getFiller().isAnonymous() == false) {
+						unit = this.iRIShortName(ohv.getFiller().asOWLClass().getIRI());
 					}
 				} else if (exp instanceof OWLObjectExactCardinality) {
 					OWLObjectExactCardinality ohv = (OWLObjectExactCardinality) exp;
@@ -319,19 +318,16 @@ public class InfoStructureVisitor extends IceVisitor {
 						unit = this.iRIShortName(ohv.getFiller().asOWLClass().getIRI());
 					}
 				} else {
+					System.out.println(exp.toString());
 					logDebug(exp.toString());
 				}
 			}
 
 			if (class1 != null && unit != null) {
-				sb.append(String.format(p_axiom, this.iRIShortName(this.lastRepresentation.getIRI()),
-						this.iRIShortName(class1.getIRI()), unit, min, max));
-
-				// if (false == this.anonymiousThings.contains(newUnit)) {
-				// this.anonymiousThings.add(newUnit);
-				//
-				// sb.append(String.format(p_create, newUnit, unit));
-				// }
+				sb.append(String.format(p_axiom, this.iRIShortName(this.lastRepresentation.getIRI()), unit, min, max));
+				// sb.append(String.format(p_axiom,
+				// this.iRIShortName(this.lastRepresentation.getIRI()),
+				// this.iRIShortName(class1.getIRI()), unit, min, max));
 			}
 		}
 

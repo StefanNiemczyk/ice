@@ -59,19 +59,6 @@ dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,miss) :-
 	hasDimension(REP2,DIM,COUNT2,COUNT2),
 	COUNT2 < COUNT1.
 
-%complex
-dimensionDeviation(simRep(SCOPE,REP1,REP2),SCOPE,REP,miss) :-
-	simRep(SCOPE,REP1,REP2),
-	hasDimension(REP1,SCOPE,REP,_,_),
-	not hasDimension(REP2,SCOPE,REP,_,_).
-
-dimensionDeviation(simRep(SCOPE,REP1,REP2),SCOPE,REP,miss) :-
-	simRep(SCOPE,REP1,REP2),
-	hasDimension(REP1,SCOPE,REP,COUNT1,COUNT1),
-	hasDimension(REP2,SCOPE,REP,COUNT2,COUNT2),
-	COUNT2 < COUNT1.
-
-
 % missing dimension in source representation
 %simple
 dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,empty) :-
@@ -81,11 +68,17 @@ dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,empty) :-
 
 dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,empty) :-
 	simRep(SCOPE,REP1,REP2),
-	hasDimension(REP1,DIM,COUNT,COUNT1),
+	hasDimension(REP1,DIM,COUNT1,COUNT1),
 	hasDimension(REP2,DIM,COUNT2,COUNT2),
 	COUNT1 < COUNT2.
 
+dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,empty) :-
+	simRep(SCOPE,REP1,REP2),
+	not hasDimension(REP1,DIM,_,_),
+	hasDimension(REP2,DIM,_,_).
+
 %complex
+%*
 dimensionDeviation(simRep(SCOPE,REP1,REP2),SCOPE,REP,empty) :-
 	simRep(SCOPE,REP1,REP2),
 	not hasDimension(REP1,SCOPE,REP,_,_),
@@ -97,6 +90,11 @@ dimensionDeviation(simRep(SCOPE,REP1,REP2),SCOPE,REP,empty) :-
 	hasDimension(REP2,SCOPE,REP,COUNT2,COUNT2),
 	COUNT1 < COUNT2.
 
+dimensionDeviation(simRep(SCOPE,REP1,REP2),SCOPE,REP,empty) :-
+	simRep(SCOPE,REP1,REP2),
+	not hasDimension(REP1,SCOPE,REP,_,_),
+	hasDimension(REP2,SCOPE,REP,_,_).
+*%
 
 % try to fix if at least 50% dimensions are matching
 tryFix(simRep(SCOPE,REP1,REP2),MATCHING) :-

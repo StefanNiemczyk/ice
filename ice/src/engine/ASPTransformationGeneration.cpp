@@ -328,6 +328,7 @@ void ASPTransformationGeneration::extractTransformations()
 
     _log->info("Created transformation '%v' from ontology", name);
     this->containerFactory->addTransformation(name, transformation);
+//    transformation->print();
   }
 }
 

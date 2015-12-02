@@ -44,17 +44,17 @@ std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer
         target->set(operation->targetDimension, inputs[operation->sourceIndex]->get(operation->sourceDimension));
         break;
       case (FORMULA):
-	{
-		mu::Parser parser;
-		double in = *((double*)inputs[operation->sourceIndex]->get(operation->sourceDimension));
-		parser.DefineVar(operation->variableName, &in);
-		parser.SetExpr(operation->formula);
-		// TODO: Check for memleaks
-		// TODO: Add support for integers and floats
-		double *out = new double;
-		*out = parser.Eval();
-		target->set(operation->targetDimension, out);
-	}
+      {
+        mu::Parser parser;
+        double in = *((double*)inputs[operation->sourceIndex]->get(operation->sourceDimension));
+        parser.DefineVar(operation->variableName, &in);
+        parser.SetExpr(operation->formula);
+        // TODO: Check for memleaks
+        // TODO: Add support for integers and floats
+        double *out = new double;
+        *out = parser.Eval();
+        target->set(operation->targetDimension, out);
+      }
         break;
       default:
         //TODO
@@ -83,6 +83,37 @@ std::vector<TransformationOperation*>& Transformation::getOperations()
 std::vector<std::shared_ptr<Representation>>& Transformation::getInputs()
 {
   return this->inputs;
+}
+
+void Transformation::print()
+{
+  std::cout << "Transformation: " << this->name << std::endl;
+  std::cout << "Inputs: " << this->inputs.size() << std::endl;
+
+  for (auto input : this->inputs)
+  {
+    std::cout << "   " << input->name << std::endl;
+  }
+
+  std::cout << "Operations: " << this->operations.size() << std::endl;
+
+  for (auto op : this->operations)
+  {
+    switch (op->type)
+    {
+      case DEFAULT:
+        std::cout << "   " << this->targetRepresentation->pathToString(op->targetDimension) << " Default Value "
+            << op->value << std::endl;
+        break;
+      case USE:
+        std::cout << "   " << this->targetRepresentation->pathToString(op->targetDimension) << " Use from index "
+            << op->sourceIndex << ": " << this->inputs.at(op->sourceIndex)->pathToString(op->sourceDimension) << std::endl;
+        break;
+      case FORMULA:
+        std::cout << "   " << this->targetRepresentation->pathToString(op->targetDimension) << " Formula " << std::endl;
+        break;
+    }
+  }
 }
 
 } /* namespace ice */

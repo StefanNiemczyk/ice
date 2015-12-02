@@ -109,6 +109,7 @@ public:
   std::shared_ptr<Representation> getTargetRepresentation();
   std::vector<TransformationOperation*>& getOperations();
   std::vector<std::shared_ptr<Representation>>& getInputs();
+  void print();
 
 private:
   const std::string name;
