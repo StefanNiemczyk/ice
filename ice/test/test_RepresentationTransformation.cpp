@@ -345,6 +345,24 @@ TEST(RepresentationTransformationTest, xmlReader)
 
       foundP3Rot = true;
     }
+    else if (trans->getName() == "FormulaTest1")
+    {
+      auto p3d1 = factory->makeInstance(p3dRep);
+
+      double val1 = 3.5;
+      double val2 = 35.5;
+      double val3 = 315.5;
+
+      p3d1->set(p3dX, &val1);
+      p3d1->set(p3dY, &val2);
+      p3d1->set(p3dZ, &val3);
+
+      auto p3d2 = trans->transform(&p3d1);
+
+      ASSERT_EQ(p3d2->getValue<double>(p3dX), val1*val1);
+      ASSERT_EQ(p3d2->getValue<double>(p3dY), val2*val2*val2);
+      ASSERT_EQ(p3d2->getValue<double>(p3dZ), val3*val3*val3*val3);
+    }
     else
     {
       ASSERT_FALSE(true);

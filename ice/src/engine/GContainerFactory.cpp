@@ -492,7 +492,56 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
       }
       case (XML_FORMULA):
       {
+        auto repSource = reps[operation.sourceId];
+
+        if (false == repSource)
+        {
+          _log->error("Unknown dimension source '%v' for transformation '%v', transformation can not be created",
+                      operation.sourceId, transformation->getName());
+
+          return false;
+        }
+
+        auto pathDim = split(operation.path.c_str(), ';');
+
+        for (int i=0; i < pathDim->size(); ++i)
+        {
+          pathDim->at(i) = this->ontologyInterface->toShortIri(pathDim->at(i));
+        }
+
+        auto pathSource = representation->accessPath(pathDim.get());
+
+        if (nullptr == pathSource)
+        {
+          _log->error(
+              "Unknown path '%v' to source dimension for transformation '%v', transformation can not be created",
+              operation.path, transformation->getName());
+
+          return false;
+        }
+
+        int index = -1;
+
+        for (int i=0; i < transformation->getInputs().size(); ++i)
+        {
+          if (transformation->getInputs().at(i) == reps[operation.sourceId])
+          {
+            index = i;
+            break;
+          }
+        }
+
+        if (index < 0)
+        {
+          _log->error(
+              "Unknown input with id '%v' to source dimension for transformation '%v', transformation can not be created",
+              operation.sourceId, transformation->getName());
+
+          return false;
+        }
         ice::TransformationOperation* o = new ice::TransformationOperation();
+        o->sourceIndex = index;
+        o->sourceDimension = pathSource;
         o->valueType = repDim->type;
         o->formula = operation.formula;
         o->varname= operation.varname;

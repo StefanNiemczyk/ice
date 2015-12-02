@@ -45,13 +45,34 @@
 				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"/>
 			</dimension>
 			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate">
-				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"/>			
+				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"/>
 			</dimension>
 			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate">
 				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"/>		
 			</dimension>
 			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation">
 				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation"/>		
+			</dimension>
+		</operations>
+	</transformation>
+
+	<transformation name="FormulaTest1">
+		<input id="1" representation="http://vs.uni-kassel.de/IceTest#Pos3D" />
+
+		<output representation="http://vs.uni-kassel.de/IceTest#Pos3D" />
+
+		<operations>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate">
+				<formula id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"
+                                 formula="x^2" varname="x"/>
+			</dimension>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate">
+				<formula id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"
+                                 formula="x^3" varname="x"/>
+			</dimension>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate">
+				<formula id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"
+                                 formula="x^4" varname="x"/>
 			</dimension>
 		</operations>
 	</transformation>

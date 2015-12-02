@@ -158,6 +158,8 @@ bool XMLTransformationReader::readOperations(TiXmlElement* element, std::vector<
       else if (strcmp("formula", eName) == 0)
       {
         desc.type = XMLDimensionOperations::XML_FORMULA;
+        desc.sourceId = std::stoi(e->Attribute("id"));
+        desc.path = std::string(e->Attribute("path"));
         desc.formula = std::string(e->Attribute("formula"));
         desc.varname = std::string(e->Attribute("varname"));
       }
