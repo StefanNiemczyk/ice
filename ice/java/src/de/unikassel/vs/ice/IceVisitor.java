@@ -1,7 +1,6 @@
 package de.unikassel.vs.ice;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +21,8 @@ public abstract class IceVisitor implements OWLObjectVisitor {
 	protected IceIris ii;
 	protected StringBuffer sb;
 	protected List<OWLClass> foundClasses;
-	protected LogLevel logLevel;
+
+	// protected LogLevel logLevel;
 
 	public IceVisitor(final IceOntologyInterface p_ioi, final Set<OWLOntology> p_ontologies,
 			final OWLReasoner p_reasoner, final IceIris p_iceIris) {
@@ -94,28 +94,23 @@ public abstract class IceVisitor implements OWLObjectVisitor {
 	}
 
 	protected void log(LogLevel ll, String msg) {
-		final String date = IceOntologyInterface.DATE_FORMAT.format(new Date());
-		final String className = this.getClass().getSimpleName();
-		final String llstr = ll.toString();
-		
-		if (ioi.getLogLevel() >= ll.getValue()) 
-			System.out.printf("[JAVA][%s][%s][%s]: %s\n", llstr, date, className, msg);
+		this.ioi.log(ll, msg);
 	}
-	
+
 	protected void logError(String msg) {
-		log(LogLevel.Error, msg);
+		this.ioi.log(LogLevel.Error, msg);
 	}
 
 	protected void logWarning(String msg) {
-		log(LogLevel.Warning, msg);
+		this.ioi.log(LogLevel.Warn, msg);
 	}
 
 	protected void logDebug(String msg) {
-		log(LogLevel.Debug, msg);
+		this.ioi.log(LogLevel.Debug, msg);
 	}
-	
+
 	protected void logInfo(String msg) {
-		log(LogLevel.Info, msg);
+		this.ioi.log(LogLevel.Info, msg);
 	}
-	
+
 }

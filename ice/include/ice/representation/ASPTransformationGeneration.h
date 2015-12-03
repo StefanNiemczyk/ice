@@ -23,6 +23,7 @@ namespace ice
 class GContainerFactory;
 class ICEngine;
 class OntologyInterface;
+class Representation;
 class Transformation;
 } /* namespace ice */
 
@@ -51,7 +52,9 @@ public:
   void setGContainerFactory(std::shared_ptr<GContainerFactory> factory);
 
 private:
-  void extractDeviation(supplementary::ClingWrapper &asp, std::vector<std::tuple<std::string, std::string>> &deviations,
+  bool readOperations(supplementary::ClingWrapper &asp, std::shared_ptr<Transformation> transformation,
+                      Gringo::Value simRep, std::shared_ptr<Representation> rep1, std::shared_ptr<Representation> rep2, std::vector<std::string> &path);
+  void extractDeviation(supplementary::ClingWrapper &asp, std::vector<std::string> &deviations,
                         Gringo::Value &simRep, std::string type);
 
 private:

@@ -36,16 +36,16 @@ hasDimension(relCoords,x,1,1).
 hasDimension(relCoords,y,1,1).
 hasDimension(relCoords,z,1,1).
 
-hasDimension(coords,x,1,1).
-hasDimension(coords,y,1,1).
-hasDimension(coords,z,1,1).
+hasDimension(coords,x,floatRep,1,1).
+hasDimension(coords,y,floatRep,1,1).
+hasDimension(coords,z,floatRep,1,1).
 
-hasDimension(coords2D,x,1,1).
-hasDimension(coords2D,y,1,1).
+hasDimension(coords2D,x,floatRep,1,1).
+hasDimension(coords2D,y,floatRep,1,1).
 
-hasDimension(wgs84,lat,1,1).
-hasDimension(wgs84,lon,1,1).
-hasDimension(wgs84,alt,1,1).
+hasDimension(wgs84,lat,floatRep,1,1).
+hasDimension(wgs84,lon,floatRep,1,1).
+hasDimension(wgs84,alt,floatRep,1,1).
 
 hasRepresentation(x,floatRep).
 hasRepresentation(y,floatRep).

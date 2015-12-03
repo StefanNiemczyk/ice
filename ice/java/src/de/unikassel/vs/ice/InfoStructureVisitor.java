@@ -133,7 +133,6 @@ public class InfoStructureVisitor extends IceVisitor {
 					this.lastEntity = ce;
 					sb.append(").\n");
 
-					// TODO
 					Set<OWLNamedIndividual> entities = this.reasoner.getInstances(ce, true).getFlattened();
 
 					for (OWLNamedIndividual ind : entities) {
@@ -203,8 +202,8 @@ public class InfoStructureVisitor extends IceVisitor {
 			}
 		} else if (ce.getProperty().equals(this.ii.hasDimension)) {
 			if (ce.getFiller().isAnonymous()) {
-				this.createAnonymiousRelatedDimension(ce.getFiller(), this.ii.hasRepresentation,
-						"hasDimension(%s,%s,%d,%d).\n", 1, 1);
+				this.createAnonymiousDimension(ce.getFiller(), this.ii.hasRepresentation,
+						"hasDimension(%s,%s,%s,%d,%d).\n", 1, 1);
 			} else {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
@@ -213,15 +212,15 @@ public class InfoStructureVisitor extends IceVisitor {
 					sb.append(this.iRIShortName(this.lastRepresentation.getIRI()));
 					sb.append(',');
 					sb.append(this.iRIShortName(c.getIRI()));
-					sb.append(",1,1).\n");
+					sb.append("todo,1,1).\n"); // TODO
 
 					c.accept(this);
 				}
 			}
 		} else if (ce.getProperty().equals(this.ii.hasRelatedDimension)) {
 			if (ce.getFiller().isAnonymous()) {
-				this.createAnonymiousRelatedDimension(ce.getFiller(), this.ii.hasRepresentation,
-						"hasRelatedDimension(%s,%s,%d,%d).\n", 1, 1);
+				this.createAnonymiousDimension(ce.getFiller(), this.ii.hasRepresentation,
+						"hasRelatedDimension(%s,%s,%s,%d,%d).\n", 1, 1);
 			} else {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
@@ -230,6 +229,8 @@ public class InfoStructureVisitor extends IceVisitor {
 					sb.append(this.iRIShortName(this.lastRepresentation.getIRI()));
 					sb.append(',');
 					sb.append(this.iRIShortName(c.getIRI()));
+					sb.append(',');
+					sb.append("todo"); // TODO
 					sb.append(",1,1).\n");
 
 					c.accept(this);
@@ -254,8 +255,8 @@ public class InfoStructureVisitor extends IceVisitor {
 
 		if (ce.getProperty().equals(this.ii.hasDimension)) {
 			if (ce.getFiller().isAnonymous()) {
-				this.createAnonymiousRelatedDimension(ce.getFiller(), this.ii.hasRepresentation,
-						"hasDimension(%s,%s,%d,%d).\n", ce.getCardinality(), ce.getCardinality());
+				this.createAnonymiousDimension(ce.getFiller(), this.ii.hasRepresentation,
+						"hasDimension(%s,%s,%s,%d,%d).\n", ce.getCardinality(), ce.getCardinality());
 			} else {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
@@ -264,6 +265,8 @@ public class InfoStructureVisitor extends IceVisitor {
 					sb.append(this.iRIShortName(this.lastRepresentation.getIRI()));
 					sb.append(',');
 					sb.append(this.iRIShortName(c.getIRI()));
+					sb.append(",");
+					sb.append("todo"); // TODO
 					sb.append(",");
 					sb.append(ce.getCardinality());
 					sb.append(",");
@@ -296,8 +299,8 @@ public class InfoStructureVisitor extends IceVisitor {
 		}
 	}
 
-	private void createAnonymiousRelatedDimension(OWLClassExpression p_ce, OWLObjectProperty p_property,
-			String p_axiom, int min, int max) {
+	private void createAnonymiousDimension(OWLClassExpression p_ce, OWLObjectProperty p_property, String p_axiom,
+			int min, int max) {
 		if (p_ce instanceof OWLObjectIntersectionOf) {
 			OWLObjectIntersectionOf intersection = (OWLObjectIntersectionOf) p_ce;
 
@@ -318,16 +321,23 @@ public class InfoStructureVisitor extends IceVisitor {
 						unit = this.iRIShortName(ohv.getFiller().asOWLClass().getIRI());
 					}
 				} else {
-					System.out.println(exp.toString());
 					logDebug(exp.toString());
 				}
 			}
 
 			if (class1 != null && unit != null) {
-				sb.append(String.format(p_axiom, this.iRIShortName(this.lastRepresentation.getIRI()), unit, min, max));
+				// String anonymiousName =
+				// this.iRIShortName(this.lastRepresentation.getIRI()) + "_"
+				// + this.iRIShortName(class1.getIRI());
+				// System.out.println(anonymiousName);
+				// sb.append(String.format("hasRepresentation(%s,%s).",
+				// anonymiousName,
+				// this.iRIShortName(this.lastRepresentation.getIRI())));
+				//
 				// sb.append(String.format(p_axiom,
-				// this.iRIShortName(this.lastRepresentation.getIRI()),
-				// this.iRIShortName(class1.getIRI()), unit, min, max));
+				// this.lastRepresentation.getIRI(), anonymiousName, min, max));
+				sb.append(String.format(p_axiom, this.iRIShortName(this.lastRepresentation.getIRI()),
+						this.iRIShortName(class1.getIRI()), unit, min, max));
 			}
 		}
 

@@ -40,18 +40,18 @@ TEST(ASPRepComp, simple)
   EXPECT_EQ(true, cw->query("simpleRep(coords2D)"));
 
   EXPECT_EQ(true, cw->query("simRep(position,coords,coords2D)"));
-  EXPECT_EQ(true, cw->query("dimensionDeviation(simRep(position,coords,coords2D),z,miss)"));
-  EXPECT_EQ(true, cw->query("fix(simRep(position,coords,coords2D),z,remove)"));
+  EXPECT_EQ(true, cw->query("dimensionDeviation(simRep(position,coords,coords2D),z,floatRep,miss)"));
+  EXPECT_EQ(true, cw->query("fix(simRep(position,coords,coords2D),z,floatRep,remove)"));
   EXPECT_EQ(true, cw->query("autoIRO(position,coords,coords2D)"));
 
   EXPECT_EQ(true, cw->query("simRep(position,coords2D,coords)"));
-  EXPECT_EQ(true, cw->query("dimensionDeviation(simRep(position,coords2D,coords),z,empty)"));
-  EXPECT_EQ(true, cw->query("fix(simRep(position,coords2D,coords),z,default)"));
+  EXPECT_EQ(true, cw->query("dimensionDeviation(simRep(position,coords2D,coords),z,floatRep,empty)"));
+  EXPECT_EQ(true, cw->query("fix(simRep(position,coords2D,coords),z,floatRep,default)"));
   EXPECT_EQ(true, cw->query("autoIRO(position,coords2D,coords)"));
 
-  EXPECT_EQ(true, cw->query("match(simRep(position,coords2D,coords),x)"));
-  EXPECT_EQ(true, cw->query("match(simRep(position,coords2D,coords),y)"));
-  EXPECT_EQ(false, cw->query("match(simRep(position,coords2D,coords),z)"));
+  EXPECT_EQ(true, cw->query("match(simRep(position,coords2D,coords),x,floatRep)"));
+  EXPECT_EQ(true, cw->query("match(simRep(position,coords2D,coords),y,floatRep)"));
+  EXPECT_EQ(false, cw->query("match(simRep(position,coords2D,coords),z,floatRep)"));
 
   EXPECT_EQ(false, cw->query("autoIRO(position,relCoords,coords)"));
 

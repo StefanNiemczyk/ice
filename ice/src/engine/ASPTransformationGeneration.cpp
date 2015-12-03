@@ -172,159 +172,18 @@ void ASPTransformationGeneration::extractTransformations()
     // set input representation
     transformation->getInputs().push_back(rep1);
 
-    bool error = false;
     values.clear();
     values.push_back(Gringo::Value(scope));
     values.push_back(Gringo::Value(representation1));
     values.push_back(Gringo::Value(representation2));
     Gringo::Value simRep("simRep", values);
 
-    // extract matches
-    // match(simRep(SCOPE,REP1,REP2),SCOPE,REP)
-    values.clear();
-    values.push_back(simRep);
-    values.push_back("?");
-//    values.push_back("?");
-    // TODO
+    std::vector<std::string> path;
 
-    Gringo::Value matchQuery("match", values);
-    auto matchQueryResult = asp.queryAllTrue(&matchQuery);
+    bool resultExtraction = this->readOperations(asp, transformation, simRep, rep1, rep2, path);
 
-    for (auto match : *matchQueryResult)
-    {
-      auto matchingScope = *match.args()[1].name();
-//      auto matchingRep = *match.args()[2].name();
-
-      auto pathSource = rep1->accessPath( {matchingScope});
-
-      if (nullptr == pathSource)
-      {
-        _log->error(
-            "Unknown path '%v' to matching source dimension for transformation '%v', transformation can not be created",
-            matchingScope, transformation->getName());
-        error = true;
-
-        break;
-      }
-
-      auto pathTarget = rep2->accessPath( {matchingScope});
-
-      if (nullptr == pathTarget)
-      {
-        _log->error(
-            "Unknown path '%v' to matching target dimension for transformation '%v', transformation can not be created",
-            matchingScope, transformation->getName());
-        error = true;
-
-        break;
-      }
-
-      ice::TransformationOperation* o = new ice::TransformationOperation();
-      o->sourceIndex = 0;
-      o->sourceDimension = pathSource;
-      o->type = ice::TransformationOperationType::USE;
-      o->targetDimension = pathTarget;
-      transformation->getOperations().push_back(o);
-    }
-
-    if (error)
+    if (false == resultExtraction)
       continue;
-
-    std::vector<std::tuple<std::string, std::string>> diviations;
-
-    // extract default
-    diviations.clear();
-    this->extractDeviation(asp, diviations, simRep, "default");
-
-    for (auto div : diviations)
-    {
-      values.clear();
-      std::string dim = std::get<0>(div);
-      std::string rep = std::get<1>(div);
-      int index = 1;
-
-      values.push_back(Gringo::Value(dim));
-
-      if (rep != "")
-      {
-        // complex
-        // valueScopeDefault(SCOPE,REP,VALUE)
-        index = 2;
-        values.push_back(Gringo::Value(rep));
-      }
-
-      auto result = asp.queryAllTrue("valueScopeDefault", values);
-
-      if (result->size() != 1)
-      {
-        _log->error(
-            "Wrong size '%v' of default values for dimension '%v' of transformation '%v', transformation can not be created",
-            result->size(), dim, transformation->getName());
-        error = true;
-
-        break;
-      }
-
-      auto defaultValue = result->at(0);
-      auto pathTarget = rep2->accessPath({dim});
-
-      if (nullptr == pathTarget)
-      {
-        _log->error(
-            "Unknown path '%v' to matching target dimension for transformation '%v', transformation can not be created",
-            dim, transformation->getName());
-        error = true;
-
-        break;
-      }
-
-      BasicRepresentationType type = rep2->dimensions.at(pathTarget->at(0))->type;
-
-      if (type == BasicRepresentationType::NONE || type == BasicRepresentationType::UNSET)
-      {
-        _log->error(
-            "Bad basic representation type '%v' for dimension '%v' of transformation '%v', transformation can not be created",
-            type, dim, transformation->getName());
-        error = true;
-
-        break;
-      }
-
-      void* value = this->containerFactory->convertStringToBasic(type, *defaultValue.args()[1].name());
-
-      if (value == nullptr)
-      {
-        _log->error(
-            "Bad default value '%v' for dimension '%v' of transformation '%v', transformation can not be created",
-            *defaultValue.args()[1].name(), dim, transformation->getName());
-        error = true;
-
-        break;
-      }
-
-      ice::TransformationOperation* o = new ice::TransformationOperation();
-      o->type = ice::TransformationOperationType::DEFAULT;
-      o->value = value;
-      o->targetDimension = pathTarget;
-      transformation->getOperations().push_back(o);
-    }
-
-    if (error)
-      continue;
-
-    // extract remove
-    // nothing to do here, however the code was already written :D
-//    diviations.clear();
-//    this->extractDeviation(asp, diviations, simRep, "remove");
-//
-//    for (auto div : diviations)
-//    {
-//      //
-//    }
-
-    // TODO extract using IROs
-
-    // TODO extract using auto IRO
 
     _log->info("Created transformation '%v' from ontology", name);
     this->containerFactory->addTransformation(name, transformation);
@@ -333,12 +192,12 @@ void ASPTransformationGeneration::extractTransformations()
 }
 
 void ASPTransformationGeneration::extractDeviation(supplementary::ClingWrapper &asp,
-                                                   std::vector<std::tuple<std::string, std::string>> &deviations,
-                                                   Gringo::Value &simRep, std::string type)
+                                                   std::vector<std::string> &deviations, Gringo::Value &simRep,
+                                                   std::string type)
 {
-  // simple
   std::vector<Gringo::Value> values;
   values.push_back(simRep);
+  values.push_back("?");
   values.push_back("?");
   values.push_back(Gringo::Value(type));
 
@@ -347,25 +206,162 @@ void ASPTransformationGeneration::extractDeviation(supplementary::ClingWrapper &
 
   for (auto fix : *resultSimple)
   {
-    auto tup = std::make_tuple(*fix.args()[1].name(), "");
-    deviations.push_back(tup);
+    deviations.push_back(*fix.args()[1].name());
+  }
+}
+
+bool ASPTransformationGeneration::readOperations(supplementary::ClingWrapper &asp,
+                                                 std::shared_ptr<Transformation> transformation, Gringo::Value simRep,
+                                                 std::shared_ptr<Representation> rep1,
+                                                 std::shared_ptr<Representation> rep2, std::vector<std::string> &path)
+{
+  std::vector<Gringo::Value> values;
+
+  // extract matches
+  // match(simRep(SCOPE,REP1,REP2),DIM,REP)
+  values.push_back(simRep);
+  values.push_back("?");
+  values.push_back("?");
+
+  Gringo::Value matchQuery("match", values);
+  auto matchQueryResult = asp.queryAllTrue(&matchQuery);
+
+  for (auto match : *matchQueryResult)
+  {
+    auto matchingScope = *match.args()[1].name();
+
+    path.push_back(matchingScope);
+    auto pathSource = rep1->accessPath(path);
+    path.pop_back();
+
+    if (nullptr == pathSource)
+    {
+      _log->error(
+          "Unknown path '%v' to matching source dimension for transformation '%v', transformation can not be created",
+          matchingScope, transformation->getName());
+      return false;
+    }
+
+    path.push_back(matchingScope);
+    auto pathTarget = rep2->accessPath(path);
+    path.pop_back();
+
+    if (nullptr == pathTarget)
+    {
+      _log->error(
+          "Unknown path '%v' to matching target dimension for transformation '%v', transformation can not be created",
+          matchingScope, transformation->getName());
+      return false;
+    }
+
+    ice::TransformationOperation* o = new ice::TransformationOperation();
+    o->sourceIndex = 0;
+    o->sourceDimension = pathSource;
+    o->type = ice::TransformationOperationType::USE;
+    o->targetDimension = pathTarget;
+    transformation->getOperations().push_back(o);
   }
 
-  // complex
+  std::vector<std::string> diviations;
+
+  // extract default
+  diviations.clear();
+  this->extractDeviation(asp, diviations, simRep, "default");
+
+  for (auto div : diviations)
+  {
+    values.clear();
+
+    values.push_back(Gringo::Value(div));
+
+    auto result = asp.queryAllTrue("valueScopeDefault", values);
+
+    if (result->size() != 1)
+    {
+      _log->error(
+          "Wrong size '%v' of default values for dimension '%v' of transformation '%v', transformation can not be created",
+          result->size(), div, transformation->getName());
+      return false;
+    }
+
+    auto defaultValue = result->at(0);
+    path.push_back(div);
+    auto pathTarget = rep2->accessPath(path);
+    path.pop_back();
+
+    if (nullptr == pathTarget)
+    {
+      _log->error(
+          "Unknown path '%v' to matching target dimension for transformation '%v', transformation can not be created",
+          div, transformation->getName());
+      return false;
+    }
+
+    BasicRepresentationType type = rep2->dimensions.at(pathTarget->at(0))->type;
+
+    if (type == BasicRepresentationType::NONE || type == BasicRepresentationType::UNSET)
+    {
+      _log->error(
+          "Bad basic representation type '%v' for dimension '%v' of transformation '%v', transformation can not be created",
+          type, div, transformation->getName());
+      return false;
+    }
+
+    void* value = this->containerFactory->convertStringToBasic(type, *defaultValue.args()[1].name());
+
+    if (value == nullptr)
+    {
+      _log->error("Bad default value '%v' for dimension '%v' of transformation '%v', transformation can not be created",
+                  *defaultValue.args()[1].name(), div, transformation->getName());
+      return false;
+    }
+
+    ice::TransformationOperation* o = new ice::TransformationOperation();
+    o->type = ice::TransformationOperationType::DEFAULT;
+    o->value = value;
+    o->targetDimension = pathTarget;
+    transformation->getOperations().push_back(o);
+  }
+
+  // TODO extract using IROs
+
+
+  // useAutoIRO(simRep(SCOPE,REP1,REP2),SCOPE,REP_SOURCE,REP_TARGET)
   values.clear();
   values.push_back(simRep);
   values.push_back("?");
   values.push_back("?");
-  values.push_back(Gringo::Value(type));
+  values.push_back("?");
 
-  Gringo::Value complex("fix", values);
-  auto resultComplex = asp.queryAllTrue(&complex);
+  Gringo::Value autoIroQuery("useAutoIRO", values);
+  auto autoIROResult = asp.queryAllTrue(&autoIroQuery);
 
-  for (auto fix : *resultComplex)
+  for (auto autoIro : *autoIROResult)
   {
-    auto tup = std::make_tuple(*fix.args()[1].name(), *fix.args()[2].name());
-    deviations.push_back(tup);
+    std::string scope = *autoIro.args()[1].name();
+    std::string r1Str = *autoIro.args()[2].name();
+    std::string r2Str = *autoIro.args()[3].name();
+
+    _log->debug("Process used auto IRO for '%v' (scope), '%v' (represetnation1), '%v' (representation2)", scope, r1Str,
+                r2Str);
+
+    values.clear();
+    values.push_back(Gringo::Value(scope));
+    values.push_back(Gringo::Value(r1Str));
+    values.push_back(Gringo::Value(r2Str));
+    Gringo::Value simRep("simRep", values);
+
+    path.push_back(scope);
+
+    bool resultExtract = this->readOperations(asp, transformation, simRep, rep1, rep2, path);
+
+    if (false == resultExtract)
+      return false;
+
+    path.pop_back();
   }
+
+  return true;
 }
 
 void ASPTransformationGeneration::setOntology(std::shared_ptr<OntologyInterface> ontology)

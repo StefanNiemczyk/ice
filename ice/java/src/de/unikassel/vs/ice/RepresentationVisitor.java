@@ -220,7 +220,7 @@ public class RepresentationVisitor extends IceVisitor {
 	}
 
 	public void checkProperty(OWLPropertyExpression p_property, OWLClassExpression p_class) {
-		if (p_property == this.ii.hasDimension) {
+		if (p_property == this.ii.hasDimension || p_property == this.ii.hasRelatedDimension) {
 			if (p_class.isAnonymous()) {
 				if (p_class instanceof OWLObjectIntersectionOf) {
 					OWLObjectIntersectionOf intersection = (OWLObjectIntersectionOf) p_class;
