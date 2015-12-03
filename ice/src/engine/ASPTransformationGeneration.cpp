@@ -17,15 +17,14 @@
 namespace ice
 {
 
-ASPTransformationGeneration::ASPTransformationGeneration() :
-    groundingDirty(true)
+ASPTransformationGeneration::ASPTransformationGeneration()
 {
   _log = el::Loggers::getLogger("ASPTransformationGeneration");
   _log->verbose(1, "Constructor called");
 }
 
 ASPTransformationGeneration::ASPTransformationGeneration(std::weak_ptr<ICEngine> engine) :
-    engine(engine), groundingDirty(true)
+    engine(engine)
 {
   _log = el::Loggers::getLogger("ASPTransformationGeneration");
   _log->verbose(1, "Constructor called");
@@ -75,19 +74,11 @@ void ASPTransformationGeneration::readInfoStructureFromOntology()
       this->entities.push_back(item);
     }
   }
-
-  this->groundingDirty = true;
 }
 
 void ASPTransformationGeneration::extractTransformations()
 {
   _log->verbose(1, "Extract transformations");
-
-  if (this->groundingDirty == false)
-  {
-    // nothing to do here
-    return;
-  }
 
   std::string path = ros::package::getPath("ice") + "/asp/transformation/";
 
@@ -100,6 +91,8 @@ void ASPTransformationGeneration::extractTransformations()
 
   // Grounding ASP programm
   std::string programPart = "base";
+
+  this->readInfoStructureFromOntology();
 
   for (auto entity : this->entities)
   {
@@ -180,7 +173,7 @@ void ASPTransformationGeneration::extractTransformations()
 
     std::vector<std::string> path;
 
-    bool resultExtraction = this->readOperations(asp, transformation, simRep, rep1, rep2, path);
+    bool resultExtraction = this->extractOperations(asp, transformation, simRep, rep1, rep2, path);
 
     if (false == resultExtraction)
       continue;
@@ -210,7 +203,7 @@ void ASPTransformationGeneration::extractDeviation(supplementary::ClingWrapper &
   }
 }
 
-bool ASPTransformationGeneration::readOperations(supplementary::ClingWrapper &asp,
+bool ASPTransformationGeneration::extractOperations(supplementary::ClingWrapper &asp,
                                                  std::shared_ptr<Transformation> transformation, Gringo::Value simRep,
                                                  std::shared_ptr<Representation> rep1,
                                                  std::shared_ptr<Representation> rep2, std::vector<std::string> &path)
@@ -353,7 +346,7 @@ bool ASPTransformationGeneration::readOperations(supplementary::ClingWrapper &as
 
     path.push_back(scope);
 
-    bool resultExtract = this->readOperations(asp, transformation, simRep, rep1, rep2, path);
+    bool resultExtract = this->extractOperations(asp, transformation, simRep, rep1, rep2, path);
 
     if (false == resultExtract)
       return false;

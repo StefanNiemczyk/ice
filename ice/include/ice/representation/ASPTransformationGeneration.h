@@ -45,14 +45,14 @@ public:
 
   void init();
   void cleanUp();
-  void readInfoStructureFromOntology();
   void extractTransformations();
 
   void setOntology(std::shared_ptr<OntologyInterface> ontology);
   void setGContainerFactory(std::shared_ptr<GContainerFactory> factory);
 
 private:
-  bool readOperations(supplementary::ClingWrapper &asp, std::shared_ptr<Transformation> transformation,
+  void readInfoStructureFromOntology();
+  bool extractOperations(supplementary::ClingWrapper &asp, std::shared_ptr<Transformation> transformation,
                       Gringo::Value simRep, std::shared_ptr<Representation> rep1, std::shared_ptr<Representation> rep2, std::vector<std::string> &path);
   void extractDeviation(supplementary::ClingWrapper &asp, std::vector<std::string> &deviations,
                         Gringo::Value &simRep, std::string type);
@@ -62,7 +62,6 @@ private:
   std::shared_ptr<OntologyInterface> ontology;
   std::shared_ptr<GContainerFactory> containerFactory;
   std::vector<std::string> entities; /**< The entites as strings */
-  bool groundingDirty;
   el::Logger* _log; /**< Logger */
 };
 

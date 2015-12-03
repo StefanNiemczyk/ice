@@ -208,11 +208,23 @@ public class InfoStructureVisitor extends IceVisitor {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
 				for (OWLClass c : subs) {
+					OWLClass rep = this.getRepresentationForDimension(c);
+					String repStr = "unknown";
+
+					if (rep == null) {
+						this.logError(String.format("Representation for dimension '%s' could not be extrected",
+								this.iRIShortName(c.getIRI())));
+					} else {
+						repStr = this.iRIShortName(rep.getIRI());
+					}
+
 					sb.append("hasDimension(");
 					sb.append(this.iRIShortName(this.lastRepresentation.getIRI()));
 					sb.append(',');
 					sb.append(this.iRIShortName(c.getIRI()));
-					sb.append("todo,1,1).\n"); // TODO
+					sb.append(',');
+					sb.append(repStr);
+					sb.append(",1,1).\n");
 
 					c.accept(this);
 				}
@@ -225,12 +237,22 @@ public class InfoStructureVisitor extends IceVisitor {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
 				for (OWLClass c : subs) {
+					OWLClass rep = this.getRepresentationForDimension(c);
+					String repStr = "unknown";
+
+					if (rep == null) {
+						this.logError(String.format("Representation for dimension '%s' could not be extrected",
+								this.iRIShortName(c.getIRI())));
+					} else {
+						repStr = this.iRIShortName(rep.getIRI());
+					}
+
 					sb.append("hasRelatedDimension(");
 					sb.append(this.iRIShortName(this.lastRepresentation.getIRI()));
 					sb.append(',');
 					sb.append(this.iRIShortName(c.getIRI()));
 					sb.append(',');
-					sb.append("todo"); // TODO
+					sb.append(repStr);
 					sb.append(",1,1).\n");
 
 					c.accept(this);
@@ -239,6 +261,47 @@ public class InfoStructureVisitor extends IceVisitor {
 		} else {
 			logWarning("Unknown OWLObjectSomeValuesFrom " + ce);
 		}
+	}
+
+	OWLClass getRepresentationForDimension(OWLClass dimension) {
+		OWLClass rep = null;
+
+		for (OWLOntology ont : this.ontologies) {
+			for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(dimension)) {
+				OWLClassExpression exp = ax.getSuperClass();
+
+				OWLClassExpression next = null;
+
+				if (exp instanceof OWLObjectSomeValuesFrom) {
+					if (((OWLObjectSomeValuesFrom) exp).getProperty() != this.ii.hasRepresentation)
+						continue;
+					next = ((OWLObjectSomeValuesFrom) exp).getFiller();
+				} else if (exp instanceof OWLObjectExactCardinality) {
+					next = ((OWLObjectExactCardinality) exp).getFiller();
+					if (((OWLObjectExactCardinality) exp).getProperty() != this.ii.hasRepresentation)
+						continue;
+				} else {
+					continue;
+				}
+
+				if (next instanceof OWLObjectIntersectionOf) {
+					OWLObjectIntersectionOf intersection = (OWLObjectIntersectionOf) next;
+
+					TreeSet<OWLClassExpression> treeSet = new TreeSet<OWLClassExpression>(intersection.getOperands());
+					for (OWLClassExpression exp2 : treeSet) {
+						if (exp2 instanceof OWLClass) {
+							return (OWLClass) exp2;
+						} else {
+							logDebug(exp2.toString());
+						}
+					}
+				} else if (next instanceof OWLClass) {
+					return (OWLClass) next;
+				}
+			}
+		}
+
+		return rep;
 	}
 
 	@Override
@@ -261,12 +324,22 @@ public class InfoStructureVisitor extends IceVisitor {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
 				for (OWLClass c : subs) {
+					OWLClass rep = this.getRepresentationForDimension(c);
+					String repStr = "unknown";
+
+					if (rep == null) {
+						this.logError(String.format("Representation for dimension '%s' could not be extrected",
+								this.iRIShortName(c.getIRI())));
+					} else {
+						repStr = this.iRIShortName(rep.getIRI());
+					}
+
 					sb.append("hasDimension(");
 					sb.append(this.iRIShortName(this.lastRepresentation.getIRI()));
 					sb.append(',');
 					sb.append(this.iRIShortName(c.getIRI()));
 					sb.append(",");
-					sb.append("todo"); // TODO
+					sb.append(repStr);
 					sb.append(",");
 					sb.append(ce.getCardinality());
 					sb.append(",");

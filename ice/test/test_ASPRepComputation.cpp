@@ -92,7 +92,6 @@ TEST(ASPRepComp, ontology1)
   asp.setOntology(oi);
   asp.setGContainerFactory(factory);
 
-  asp.readInfoStructureFromOntology();// TODO
   asp.extractTransformations();
 
   // Test transformation
@@ -173,7 +172,6 @@ TEST(ASPRepComp, ontology2)
   asp.setOntology(oi);
   asp.setGContainerFactory(factory);
 
-  asp.readInfoStructureFromOntology();// TODO
   asp.extractTransformations();
 
   // Test transformation
