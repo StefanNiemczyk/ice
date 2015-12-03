@@ -58,7 +58,7 @@ TEST(ASPRepComp, simple)
   EXPECT_EQ(true, cw->query("simpleIro(coords2Wgs84,velocity,vel1,vel2)"));
 }
 
-TEST(ASPRepComp, ontology)
+TEST(ASPRepComp, ontology1)
 {
   std::string path = ros::package::getPath("ice");
   bool result;
@@ -95,6 +95,7 @@ TEST(ASPRepComp, ontology)
   asp.readInfoStructureFromOntology();// TODO
   asp.extractTransformations();
 
+  // Test transformation
   auto trans = factory->getTransformation("autoTrans_o2_Position-o2_CoordinatePositionRep-o0_Pos3D");
 
   ASSERT_TRUE(trans != false);
@@ -136,4 +137,122 @@ TEST(ASPRepComp, ontology)
   EXPECT_EQ(out->getValue<double>(outX), x);
   EXPECT_EQ(out->getValue<double>(outY), y);
   EXPECT_EQ(out->getValue<double>(outZ), z);
+}
+
+TEST(ASPRepComp, ontology2)
+{
+  std::string path = ros::package::getPath("ice");
+  bool result;
+
+  auto oi = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
+  oi->addIRIMapper(path + "/ontology/");
+
+  ASSERT_FALSE(oi->errorOccurred());
+
+  result = oi->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
+
+  ASSERT_FALSE(oi->errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi->loadOntologies();
+
+  ASSERT_FALSE(oi->errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi->isConsistent();
+
+  ASSERT_FALSE(oi->errorOccurred());
+  ASSERT_TRUE(result);
+
+  std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
+  factory->setOntologyInterface(oi);
+  factory->init();
+
+  ice::ASPTransformationGeneration asp;
+
+  asp.setOntology(oi);
+  asp.setGContainerFactory(factory);
+
+  asp.readInfoStructureFromOntology();// TODO
+  asp.extractTransformations();
+
+  // Test transformation
+  auto trans = factory->getTransformation("autoTrans_o0_TestScope1-o0_TestTransformation1-o0_TestTransformation2");
+
+  ASSERT_TRUE(trans != false);
+
+  auto repIn = factory->getRepresentation("o0_TestTransformation1");
+  auto repOut = factory->getRepresentation("o0_TestTransformation2");
+
+  ASSERT_TRUE(repIn != false);
+  ASSERT_TRUE(repOut != false);
+
+  auto inO = repIn->accessPath({"o2_Orientation"});
+  auto inP = repIn->accessPath({"o2_Position"});
+  auto inX = repIn->accessPath({"o2_Position", "o2_XCoordinate"});
+  auto inY = repIn->accessPath({"o2_Position", "o2_YCoordinate"});
+  auto inZ = repIn->accessPath({"o2_Position", "o2_ZCoordinate"});
+
+  auto inOa = repIn->accessPath({"o2_Orientation", "o2_Alpha"});
+  auto inOb = repIn->accessPath({"o2_Orientation", "o2_Beta"});
+  auto inOc = repIn->accessPath({"o2_Orientation", "o2_Gamma"});
+
+  ASSERT_TRUE(inO != nullptr);
+  ASSERT_TRUE(inP != nullptr);
+  ASSERT_TRUE(inX != nullptr);
+  ASSERT_TRUE(inY != nullptr);
+  ASSERT_TRUE(inZ != nullptr);
+
+  ASSERT_TRUE(inOa != nullptr);
+  ASSERT_TRUE(inOb != nullptr);
+  ASSERT_TRUE(inOc != nullptr);
+
+
+  auto outO = repIn->accessPath({"o2_Orientation"});
+  auto outP = repIn->accessPath({"o2_Position"});
+  auto outX = repIn->accessPath({"o2_Position", "o2_XCoordinate"});
+  auto outY = repIn->accessPath({"o2_Position", "o2_YCoordinate"});
+  auto outZ = repIn->accessPath({"o2_Position", "o2_ZCoordinate"});
+
+  auto outOa = repIn->accessPath({"o2_Orientation", "o2_Alpha"});
+  auto outOb = repIn->accessPath({"o2_Orientation", "o2_Beta"});
+  auto outOc = repIn->accessPath({"o2_Orientation", "o2_Gamma"});
+
+  ASSERT_TRUE(outO != nullptr);
+  ASSERT_TRUE(outP != nullptr);
+  ASSERT_TRUE(outX != nullptr);
+  ASSERT_TRUE(outY != nullptr);
+  ASSERT_TRUE(outZ != nullptr);
+
+  ASSERT_TRUE(outOa != nullptr);
+  ASSERT_TRUE(outOb != nullptr);
+  ASSERT_TRUE(outOc != nullptr);
+
+  auto in = factory->makeInstance(repIn);
+
+  double x = 4.44;
+  double y = 5.55;
+  double z = 6.66;
+
+  double a = 14.44;
+  double b = 15.55;
+  double c = 16.66;
+
+  in->set(inX, &x);
+  in->set(inY, &y);
+  in->set(inZ, &z);
+
+  in->set(inOa, &a);
+  in->set(inOb, &b);
+  in->set(inOc, &c);
+
+  auto out = trans->transform(&in);
+
+  EXPECT_EQ(out->getValue<double>(outX), x);
+  EXPECT_EQ(out->getValue<double>(outY), y);
+  EXPECT_EQ(out->getValue<double>(outZ), z);
+
+  EXPECT_EQ(out->getValue<double>(outOa), a);
+  EXPECT_EQ(out->getValue<double>(outOb), b);
+  EXPECT_EQ(out->getValue<double>(outOc), c);
 }
