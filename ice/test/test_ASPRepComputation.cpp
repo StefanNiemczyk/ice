@@ -95,7 +95,7 @@ TEST(ASPRepComp, ontology1)
   asp.extractTransformations();
 
   // Test transformation
-  auto trans = factory->getTransformation("autoTrans_o2_Position-o2_CoordinatePositionRep-o0_Pos3D");
+  auto trans = factory->getTransformation("autoTrans_o2_Position_o2_CoordinatePositionRep_o0_Pos3D");
 
   ASSERT_TRUE(trans != false);
 
@@ -175,7 +175,7 @@ TEST(ASPRepComp, ontology2)
   asp.extractTransformations();
 
   // Test transformation
-  auto trans = factory->getTransformation("autoTrans_o0_TestScope1-o0_TestTransformation1-o0_TestTransformation2");
+  auto trans = factory->getTransformation("autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2");
 
   ASSERT_TRUE(trans != false);
 
@@ -253,4 +253,20 @@ TEST(ASPRepComp, ontology2)
   EXPECT_EQ(out->getValue<double>(outOa), a);
   EXPECT_EQ(out->getValue<double>(outOb), b);
   EXPECT_EQ(out->getValue<double>(outOc), c);
+
+  auto aspStr = trans->getASPRepreentation("system");
+  for (auto s : *aspStr)
+  {
+    if (s == "iro(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,any,none).") {
+      // fine
+    } else if (s == "output(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,o0_TestScope1,o0_TestTransformation1,none).") {
+      // fine
+    } else if (s == "input(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,o0_TestScope1,o0_TestTransformation1,none,1,1) :- iro(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,any,none).") {
+      // fine
+    } else {
+      ASSERT_ANY_THROW("Unknown string " + s);
+    }
+  }
+
+
 }

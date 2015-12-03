@@ -165,3 +165,4 @@ sumFixCost(SIM_REP,SUM) :-
 
 
 
+
