@@ -1,6 +1,6 @@
 <transformations>
 
-	<transformation name="P3Dto2D">
+	<transformation name="P3Dto2D" scope="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position">
 		<input id="1" representation="http://vs.uni-kassel.de/IceTest#Pos3D" />
 
 		<output representation="http://vs.uni-kassel.de/IceTest#Pos2D" />
@@ -16,7 +16,7 @@
 	</transformation>
 
 
-	<transformation name="P2Dto3D">
+	<transformation name="P2Dto3D" scope="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position">
 		<input id="1" representation="http://vs.uni-kassel.de/IceTest#Pos2D" />
 
 		<output representation="http://vs.uni-kassel.de/IceTest#Pos3D" />
@@ -35,7 +35,7 @@
 	</transformation>
 
 
-	<transformation name="TestComplex1">
+	<transformation name="TestComplex1" scope="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position">
 		<input id="1" representation="http://vs.uni-kassel.de/IceTest#Pos3DRot" />
 
 		<output representation="http://vs.uni-kassel.de/IceTest#Pos3DRot" />
@@ -56,7 +56,7 @@
 		</operations>
 	</transformation>
 
-	<transformation name="FormulaTest1">
+	<transformation name="FormulaTest1" scope="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position">
 		<input id="1" representation="http://vs.uni-kassel.de/IceTest#Pos3D" />
 
 		<output representation="http://vs.uni-kassel.de/IceTest#Pos3D" />

@@ -159,7 +159,7 @@ void ASPTransformationGeneration::extractTransformations()
       continue;
     }
 
-    std::shared_ptr<Transformation> transformation = std::make_shared<Transformation>(this->containerFactory, name,
+    std::shared_ptr<Transformation> transformation = std::make_shared<Transformation>(this->containerFactory, name, scope,
                                                                                       rep2);
 
     // set input representation

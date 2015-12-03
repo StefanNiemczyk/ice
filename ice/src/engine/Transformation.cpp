@@ -15,9 +15,9 @@
 namespace ice
 {
 
-Transformation::Transformation(std::shared_ptr<ice::GContainerFactory> factory, std::string name,
+Transformation::Transformation(std::shared_ptr<ice::GContainerFactory> factory, std::string name, std::string scope,
                                std::shared_ptr<Representation> targetRepresentation) :
-    factory(factory), name(name), targetRepresentation(targetRepresentation)
+    factory(factory), name(name), scope(scope), targetRepresentation(targetRepresentation)
 {
 }
 
@@ -47,88 +47,90 @@ std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer
       {
         mu::Parser parser;
         void *in_raw = inputs[operation->sourceIndex]->get(operation->sourceDimension);
-	double in;
-	double out;
-	void *out_raw;
+        double in;
+        double out;
+        void *out_raw;
 
-        switch (operation->valueType) {
-        case BYTE:
-          in = (double)(*((char*)in_raw));
-          break;
-        case UNSIGNED_BYTE:
-          in = (double)(*((unsigned char*)in_raw));
-          break;
-        case INT:
-          in = (double)(*((int*)in_raw));
-          break;
-        case SHORT:
-          in = (double)(*((short*)in_raw));
-          break;
-        case LONG:
-          in = (double)(*((long*)in_raw));
-          break;
-        case UNSIGNED_INT:
-          in = (double)(*((unsigned int*)in_raw));
-          break;
-        case UNSIGNED_LONG:
-          in = (double)(*((unsigned long*)in_raw));
-          break;
-        case FLOAT:
-          in = (double)(*((float*)in_raw));
-          break;
-        case DOUBLE:
-          in = *((double*)in_raw);
-          break;
-        default:
-          std::cerr << "Error: Unsupported formula datatype!" << std::endl;
-          break;
-	}
+        switch (operation->valueType)
+        {
+          case BYTE:
+            in = (double)(*((char*)in_raw));
+            break;
+          case UNSIGNED_BYTE:
+            in = (double)(*((unsigned char*)in_raw));
+            break;
+          case INT:
+            in = (double)(*((int*)in_raw));
+            break;
+          case SHORT:
+            in = (double)(*((short*)in_raw));
+            break;
+          case LONG:
+            in = (double)(*((long*)in_raw));
+            break;
+          case UNSIGNED_INT:
+            in = (double)(*((unsigned int*)in_raw));
+            break;
+          case UNSIGNED_LONG:
+            in = (double)(*((unsigned long*)in_raw));
+            break;
+          case FLOAT:
+            in = (double)(*((float*)in_raw));
+            break;
+          case DOUBLE:
+            in = *((double*)in_raw);
+            break;
+          default:
+            std::cerr << "Error: Unsupported formula datatype!" << std::endl;
+            break;
+        }
 
         parser.DefineVar(operation->varname, &in);
         parser.SetExpr(operation->formula);
         out = parser.Eval();
 
-        switch (operation->valueType) {
-        case BYTE:
-          out_raw = (new char);
-          *((char*)out_raw) = (char)out;
-          break;
-        case UNSIGNED_BYTE:
-          out_raw = (new unsigned char);
-          *((unsigned char*)out_raw) = (unsigned char)out;
-         break;
-        case INT:
-          out_raw = (new int);
-          *((int*)out_raw) = (int)out;
-        break;
-        case SHORT:
-          out_raw = (new short);
-          *((short*)out_raw) = (short)out;
-        break;
-        case LONG:
-          out_raw = (new long);
-          *((long*)out_raw) = (long)out;
-          break;
-        case UNSIGNED_INT:
-          out_raw = (new unsigned int);
-          *((unsigned int*)out_raw) = (unsigned int)out;
-          break;
-        case UNSIGNED_LONG:
-          out_raw = (new unsigned long);
-          *((unsigned long*)out_raw) = (unsigned long)out;
-          break;
-        case FLOAT:
-          out_raw = (new float);
-          *((float*)out_raw) = (float)out;
-          break;
-        case DOUBLE:
-          out_raw = (new double);
-          *((double*)out_raw) = (double)out;
-          break;
-        default:
-          std::cerr << "Error: Unsupported formula datatype!" << std::endl;
-          break;
-	}
+        switch (operation->valueType)
+        {
+          case BYTE:
+            out_raw = (new char);
+            *((char*)out_raw) = (char)out;
+            break;
+          case UNSIGNED_BYTE:
+            out_raw = (new unsigned char);
+            *((unsigned char*)out_raw) = (unsigned char)out;
+            break;
+          case INT:
+            out_raw = (new int);
+            *((int*)out_raw) = (int)out;
+            break;
+          case SHORT:
+            out_raw = (new short);
+            *((short*)out_raw) = (short)out;
+            break;
+          case LONG:
+            out_raw = (new long);
+            *((long*)out_raw) = (long)out;
+            break;
+          case UNSIGNED_INT:
+            out_raw = (new unsigned int);
+            *((unsigned int*)out_raw) = (unsigned int)out;
+            break;
+          case UNSIGNED_LONG:
+            out_raw = (new unsigned long);
+            *((unsigned long*)out_raw) = (unsigned long)out;
+            break;
+          case FLOAT:
+            out_raw = (new float);
+            *((float*)out_raw) = (float)out;
+            break;
+          case DOUBLE:
+            out_raw = (new double);
+            *((double*)out_raw) = (double)out;
+            break;
+          default:
+            std::cerr << "Error: Unsupported formula datatype!" << std::endl;
+            break;
+        }
 
         target->set(operation->targetDimension, out_raw);
       }
@@ -164,7 +166,7 @@ std::vector<std::shared_ptr<Representation>>& Transformation::getInputs()
 
 void Transformation::print()
 {
-  std::cout << "Transformation: " << this->name << std::endl;
+  std::cout << "Transformation: " << this->name << " for scope " << this->scope << std::endl;
   std::cout << "Inputs: " << this->inputs.size() << std::endl;
 
   for (auto input : this->inputs)
@@ -184,13 +186,44 @@ void Transformation::print()
         break;
       case USE:
         std::cout << "   " << this->targetRepresentation->pathToString(op->targetDimension) << " Use from index "
-            << op->sourceIndex << ": " << this->inputs.at(op->sourceIndex)->pathToString(op->sourceDimension) << std::endl;
+            << op->sourceIndex << ": " << this->inputs.at(op->sourceIndex)->pathToString(op->sourceDimension)
+            << std::endl;
         break;
       case FORMULA:
         std::cout << "   " << this->targetRepresentation->pathToString(op->targetDimension) << " Formula " << std::endl;
         break;
     }
   }
+}
+
+std::unique_ptr<std::vector<std::string>> Transformation::getASPRepreentation(std::string system)
+{
+  // example
+//  iro(system1,allo2ego,any,any).
+//  input2(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).
+//  input(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).
+//  output(system1,allo2ego,position,egoCoords,any).
+//  metadataOutput(delay,system1,allo2ego,max,0,0).
+//  metadataOutput(accuracy,system1,allo2ego,avg,0,1).
+//  iroCost(system1,allo2ego,1).
+
+  auto vec = std::unique_ptr<std::vector<std::string>>(new std::vector<std::string>());
+  std::string iro = "iro(" + system + "," + this->name + ",any,none).";
+
+  vec->push_back(iro);
+
+  std::string output = "output(" + system + "," + this->name + "," + this->scope + "," + this->targetRepresentation->name + ",none).";
+  vec->push_back(output);
+
+  for (auto input : this->inputs)
+  {
+    std::string inStr = "input(" + system + "," + this->name + "," + this->scope + "," + input->name + ",none,1,1) :- " + iro;
+    vec->push_back(inStr);
+  }
+
+  // TODO metadata?
+
+  return std::move(vec);
 }
 
 } /* namespace ice */

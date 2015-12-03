@@ -52,7 +52,7 @@ TEST(RepresentationTransformationTest, useOperation)
   EXPECT_EQ(testValDouble, *((double* ) rep1Ind->get(dim11)));
   EXPECT_EQ(testValInt, *((int* ) rep1Ind->get(dim12)));
 
-  ice::Transformation trans(factory, "TestTransformation", rep2);
+  ice::Transformation trans(factory, "TestTransformation", "scope", rep2);
 
   ice::TransformationOperation* o;
   o = new ice::TransformationOperation();
@@ -114,7 +114,7 @@ TEST(RepresentationTransformationTest, defaultOperation)
   EXPECT_EQ(testValDouble, *((double* ) rep1Ind->get(dim11)));
   EXPECT_EQ(testValInt, *((int* ) rep1Ind->get(dim12)));
 
-  ice::Transformation trans(factory, "TestTransformation", rep2);
+  ice::Transformation trans(factory, "TestTransformation", "scope", rep2);
 
   ice::TransformationOperation* o;
   o = new ice::TransformationOperation();
@@ -177,7 +177,7 @@ TEST(RepresentationTransformationTest, formulaOperation)
   EXPECT_EQ(testValDouble, *((double* ) rep1Ind->get(dim11)));
   EXPECT_EQ(testValInt, *((int* ) rep1Ind->get(dim12)));
 
-  ice::Transformation trans(factory, "TestSquaredTransformation", rep2);
+  ice::Transformation trans(factory, "TestSquaredTransformation", "scope", rep2);
   ice::TransformationOperation* o;
 
   o = new ice::TransformationOperation();

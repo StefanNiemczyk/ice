@@ -305,7 +305,18 @@ std::shared_ptr<Transformation> GContainerFactory::fromXMLDesc(TransDesc* desc)
     return std::shared_ptr<Transformation>();
   }
 
-  std::shared_ptr<Transformation> trans = std::make_shared<Transformation>(this->shared_from_this(), desc->name, rep);
+  std::string scope = this->ontologyInterface->toShortIri(desc->scope);
+
+
+  if (scope == "")
+  {
+    _log->error("Invalid scope '%v' for transformation '%v', transformation can not be created", desc->scope,
+                desc->name);
+
+    return std::shared_ptr<Transformation>();
+  }
+
+  std::shared_ptr<Transformation> trans = std::make_shared<Transformation>(this->shared_from_this(), desc->name, scope, rep);
 
   // reading inputs
   std::map<int, std::shared_ptr<Representation>> inputs;

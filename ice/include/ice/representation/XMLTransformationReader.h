@@ -51,6 +51,7 @@ struct DimensionDesc {
 
 struct TransDesc {
   std::string name;
+  std::string scope;
   std::string output;
 
   std::vector<TransInput> inputs;

@@ -65,6 +65,7 @@ TransDesc* XMLTransformationReader::readTransformation(TiXmlElement* element)
 {
   const char *tagName = element->Value();
   const char *name = element->Attribute("name");
+  const char *scope = element->Attribute("scope");
 
   if (!name || strcmp("transformation", tagName) != 0 || !name)
   {
@@ -76,6 +77,7 @@ TransDesc* XMLTransformationReader::readTransformation(TiXmlElement* element)
   TransDesc* transformation = new TransDesc();
 
   transformation->name = name;
+  transformation->scope = scope;
 
   for (TiXmlElement* cElement = element->FirstChildElement(); cElement; cElement = cElement->NextSiblingElement())
   {

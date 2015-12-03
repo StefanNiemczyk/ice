@@ -99,7 +99,7 @@ struct TransformationOperation
 class Transformation
 {
 public:
-  Transformation(std::shared_ptr<GContainerFactory> factory, std::string name,
+  Transformation(std::shared_ptr<GContainerFactory> factory, std::string name, std::string scope,
                  std::shared_ptr<Representation> targetRepresentation);
   virtual ~Transformation();
 
@@ -110,9 +110,11 @@ public:
   std::vector<TransformationOperation*>& getOperations();
   std::vector<std::shared_ptr<Representation>>& getInputs();
   void print();
+  std::unique_ptr<std::vector<std::string>> getASPRepreentation(std::string system);
 
 private:
   const std::string name;
+  const std::string scope;
   std::shared_ptr<Representation> targetRepresentation;
   std::vector<std::shared_ptr<Representation>> inputs;
   std::vector<TransformationOperation*> operations;
