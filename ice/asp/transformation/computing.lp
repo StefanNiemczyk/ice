@@ -72,8 +72,6 @@ tryFix(simRep(SCOPE,REP1,REP2),MATCHING) :-
 	tryFix(simRep(SCOPE,REP1,REP2),_),
 	dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,REP_SOURCE,miss),
 	dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,REP_TARGET,empty),
-%	hasRepresentation(SCOPE,REP_SOURCE),
-%	hasRepresentation(SCOPE,REP_TARGET),
 	simpleIro(NODE,DIM,REP_SOURCE,REP_TARGET).
 
 fix(SIM_REP,DIM,REP_SOURCE,iro) :-

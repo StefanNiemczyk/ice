@@ -105,13 +105,13 @@ TEST(ASPRepComp, ontology1)
   ASSERT_TRUE(repIn != false);
   ASSERT_TRUE(repOut != false);
 
-  auto inX = repIn->accessPath({"o2_XCoordinate"});
-  auto inY = repIn->accessPath({"o2_YCoordinate"});
-  auto inZ = repIn->accessPath({"o2_ZCoordinate"});
+  auto inX = repIn->accessPath( {"o2_XCoordinate"});
+  auto inY = repIn->accessPath( {"o2_YCoordinate"});
+  auto inZ = repIn->accessPath( {"o2_ZCoordinate"});
 
-  auto outX = repOut->accessPath({"o2_XCoordinate"});
-  auto outY = repOut->accessPath({"o2_YCoordinate"});
-  auto outZ = repOut->accessPath({"o2_ZCoordinate"});
+  auto outX = repOut->accessPath( {"o2_XCoordinate"});
+  auto outY = repOut->accessPath( {"o2_YCoordinate"});
+  auto outZ = repOut->accessPath( {"o2_ZCoordinate"});
 
   ASSERT_TRUE(inX != nullptr);
   ASSERT_TRUE(inY != nullptr);
@@ -185,15 +185,15 @@ TEST(ASPRepComp, ontology2)
   ASSERT_TRUE(repIn != false);
   ASSERT_TRUE(repOut != false);
 
-  auto inO = repIn->accessPath({"o2_Orientation"});
-  auto inP = repIn->accessPath({"o2_Position"});
-  auto inX = repIn->accessPath({"o2_Position", "o2_XCoordinate"});
-  auto inY = repIn->accessPath({"o2_Position", "o2_YCoordinate"});
-  auto inZ = repIn->accessPath({"o2_Position", "o2_ZCoordinate"});
+  auto inO = repIn->accessPath( {"o2_Orientation"});
+  auto inP = repIn->accessPath( {"o2_Position"});
+  auto inX = repIn->accessPath( {"o2_Position", "o2_XCoordinate"});
+  auto inY = repIn->accessPath( {"o2_Position", "o2_YCoordinate"});
+  auto inZ = repIn->accessPath( {"o2_Position", "o2_ZCoordinate"});
 
-  auto inOa = repIn->accessPath({"o2_Orientation", "o2_Alpha"});
-  auto inOb = repIn->accessPath({"o2_Orientation", "o2_Beta"});
-  auto inOc = repIn->accessPath({"o2_Orientation", "o2_Gamma"});
+  auto inOa = repIn->accessPath( {"o2_Orientation", "o2_Alpha"});
+  auto inOb = repIn->accessPath( {"o2_Orientation", "o2_Beta"});
+  auto inOc = repIn->accessPath( {"o2_Orientation", "o2_Gamma"});
 
   ASSERT_TRUE(inO != nullptr);
   ASSERT_TRUE(inP != nullptr);
@@ -205,16 +205,15 @@ TEST(ASPRepComp, ontology2)
   ASSERT_TRUE(inOb != nullptr);
   ASSERT_TRUE(inOc != nullptr);
 
+  auto outO = repIn->accessPath( {"o2_Orientation"});
+  auto outP = repIn->accessPath( {"o2_Position"});
+  auto outX = repIn->accessPath( {"o2_Position", "o2_XCoordinate"});
+  auto outY = repIn->accessPath( {"o2_Position", "o2_YCoordinate"});
+  auto outZ = repIn->accessPath( {"o2_Position", "o2_ZCoordinate"});
 
-  auto outO = repIn->accessPath({"o2_Orientation"});
-  auto outP = repIn->accessPath({"o2_Position"});
-  auto outX = repIn->accessPath({"o2_Position", "o2_XCoordinate"});
-  auto outY = repIn->accessPath({"o2_Position", "o2_YCoordinate"});
-  auto outZ = repIn->accessPath({"o2_Position", "o2_ZCoordinate"});
-
-  auto outOa = repIn->accessPath({"o2_Orientation", "o2_Alpha"});
-  auto outOb = repIn->accessPath({"o2_Orientation", "o2_Beta"});
-  auto outOc = repIn->accessPath({"o2_Orientation", "o2_Gamma"});
+  auto outOa = repIn->accessPath( {"o2_Orientation", "o2_Alpha"});
+  auto outOb = repIn->accessPath( {"o2_Orientation", "o2_Beta"});
+  auto outOc = repIn->accessPath( {"o2_Orientation", "o2_Gamma"});
 
   ASSERT_TRUE(outO != nullptr);
   ASSERT_TRUE(outP != nullptr);
@@ -257,16 +256,24 @@ TEST(ASPRepComp, ontology2)
   auto aspStr = trans->getASPRepreentation("system");
   for (auto s : *aspStr)
   {
-    if (s == "iro(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,any,none).") {
+    if (s == "iro(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,any,none).")
+    {
       // fine
-    } else if (s == "output(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,o0_TestScope1,o0_TestTransformation1,none).") {
+    }
+    else if (s
+        == "output(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,o0_TestScope1,o0_TestTransformation1,none).")
+    {
       // fine
-    } else if (s == "input(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,o0_TestScope1,o0_TestTransformation1,none,1,1) :- iro(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,any,none).") {
+    }
+    else if (s
+        == "input(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,o0_TestScope1,o0_TestTransformation1,none,1,1) :- iro(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,any,none).")
+    {
       // fine
-    } else {
+    }
+    else
+    {
       ASSERT_ANY_THROW("Unknown string " + s);
     }
   }
-
 
 }
