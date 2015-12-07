@@ -77,4 +77,26 @@
 		</operations>
 	</transformation>
 
+	<transformation name="FormulaTest2" scope="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position">
+		<input id="1" representation="http://vs.uni-kassel.de/IceTest#Pos3D" />
+
+		<output representation="http://vs.uni-kassel.de/IceTest#Pos3D" />
+
+		<operations>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate">
+				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"/>
+			</dimension>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate">
+				<use id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"/>			
+			</dimension>
+			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate">
+				<formula id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"
+                                 formula="x*y">
+					<variable name="x" id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"/>
+					<variable name="y" id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"/>
+				</formula>
+			</dimension>
+		</operations>
+	</transformation>
+
 </transformations>

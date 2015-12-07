@@ -418,7 +418,25 @@ TEST(RepresentationTransformationTest, xmlReader)
       ASSERT_EQ(p3d2->getValue<double>(p3dY), val2*val2*val2);
       ASSERT_EQ(p3d2->getValue<double>(p3dZ), val3*val3*val3*val3);
     }
-    else
+    else if (trans->getName() == "FormulaTest2")
+    {
+      auto p3d1 = factory->makeInstance(p3dRep);
+
+      const double valX = 2.5;
+      const double valY = 6.5;
+      const double valZ = 1.5;
+
+      p3d1->set(p3dX, &valX);
+      p3d1->set(p3dY, &valY);
+      p3d1->set(p3dZ, &valZ);
+
+      auto p3d2 = trans->transform(&p3d1);
+
+      ASSERT_EQ(p3d2->getValue<double>(p3dX), valX);
+      ASSERT_EQ(p3d2->getValue<double>(p3dY), valY);
+      ASSERT_EQ(p3d2->getValue<double>(p3dZ), valX*valY);
+    }
+     else
     {
       ASSERT_FALSE(true);
     }

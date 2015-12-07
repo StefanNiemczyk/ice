@@ -160,10 +160,21 @@ bool XMLTransformationReader::readOperations(TiXmlElement* element, std::vector<
       else if (strcmp("formula", eName) == 0)
       {
         desc.type = XMLDimensionOperations::XML_FORMULA;
-        desc.sourceId = std::stoi(e->Attribute("id"));
-        desc.path = std::string(e->Attribute("path"));
         desc.formula = std::string(e->Attribute("formula"));
-        desc.varname = std::string(e->Attribute("varname"));
+
+	const auto fc = e->FirstChild();
+	if (fc != nullptr) { /* If there are multiple variables defined */
+          for (auto velem = fc; velem != nullptr; velem = velem->NextSiblingElement()) {
+            auto e = velem->ToElement();
+            desc.varmap[std::string(e->Attribute("name"))] =
+              std::make_pair(std::string(e->Attribute("path")),
+                             std::stoi(e->Attribute("id"))); 
+          }
+	} else {
+          desc.varmap[std::string(e->Attribute("varname"))] =
+            std::make_pair(std::string(e->Attribute("path")),
+                           std::stoi(e->Attribute("id"))); 
+	}
       }
       else if (strcmp("operations", eName) == 0)
       {

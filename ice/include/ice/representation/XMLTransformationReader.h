@@ -44,6 +44,7 @@ struct DimensionDesc {
   // formula
   std::string formula;
   std::string varname;
+  std::map <std::string, std::pair<std::string, int>> varmap;
 
   // compelex
   std::vector<DimensionDesc> dims;
