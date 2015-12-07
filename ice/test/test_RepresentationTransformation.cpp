@@ -145,7 +145,7 @@ TEST(RepresentationTransformationTest, defaultOperation)
 //  rep2Ind->print();
 }
 
-TEST(RepresentationTransformationTest, formulaOperation)
+TEST(RepresentationTransformationTest, formulaSingleVariableOperation)
 {
   std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
 
@@ -204,6 +204,61 @@ TEST(RepresentationTransformationTest, formulaOperation)
 
   EXPECT_EQ(testValDouble*testValDouble, rep2Ind->getValue<double>(dim22));
   EXPECT_EQ(testValInt*testValInt, rep2Ind->getValue<int>(dim21));
+
+}
+
+TEST(RepresentationTransformationTest, formulaMultiVariableOperation)
+{
+  std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
+
+  std::unique_ptr<std::vector<std::string>> lines(new std::vector<std::string>);
+  lines->push_back("Pos3D;X;doubleRep");
+  lines->push_back("Pos3D;Y;doubleRep");
+  lines->push_back("Pos3D;Z;doubleRep");
+
+  factory->fromCSVStrings(std::move(lines));
+
+  auto rep1 = factory->getRepresentation("Pos3D");
+
+  auto dimX = rep1->accessPath( {"X"});
+  auto dimY = rep1->accessPath( {"Y"});
+  auto dimZ = rep1->accessPath( {"Z"});
+
+  const double initialX = 4.0f;
+  const double initialY= 6.0f;
+  const double initialZ= 1.0f;
+  const double expectedZ = 24.0f; // X * Y
+
+  auto rep1Ind = factory->makeInstance(rep1);
+
+  rep1Ind->set(dimX, &initialX);
+  rep1Ind->set(dimY, &initialY);
+  rep1Ind->set(dimZ, &initialZ);
+
+  EXPECT_EQ(initialX, *((double* ) rep1Ind->get(dimX)));
+  EXPECT_EQ(initialY, *((double* ) rep1Ind->get(dimY)));
+  EXPECT_EQ(initialZ, *((double* ) rep1Ind->get(dimZ)));
+
+  ice::Transformation trans(factory, "TestCoordinateTransformation", "scope", rep1);
+  ice::TransformationOperation* o;
+
+  o = new ice::TransformationOperation();
+  o->type = ice::TransformationOperationType::FORMULA;
+  o->formula = "x*y";
+  o->varmap["x"] = std::make_pair(dimX, 0);
+  o->varmap["y"] = std::make_pair(dimY, 0);
+
+  /* should be ingored */
+  o->sourceIndex = 0;
+  o->sourceDimension = dimX;
+  o->valueType = ice::DOUBLE;
+
+  o->targetDimension = dimZ;
+  trans.getOperations().push_back(o);
+
+  rep1Ind = trans.transform(&rep1Ind);
+
+  EXPECT_EQ(expectedZ, *((double* ) rep1Ind->get(dimZ)));
 
 }
 
