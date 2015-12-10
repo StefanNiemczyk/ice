@@ -433,6 +433,7 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
           pathDim->at(i) = this->ontologyInterface->toShortIri(pathDim->at(i));
         }
 
+        // TODO: bug???
         auto pathSource = representation->accessPath(pathDim.get());
 
         if (nullptr == pathSource)
@@ -532,7 +533,7 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
             pathDim->at(i) = this->ontologyInterface->toShortIri(pathDim->at(i));
           }
   
-          auto pathSource = representation->accessPath(pathDim.get());
+          auto pathSource = repSource->accessPath(pathDim.get());
           if (nullptr == pathSource)
           {
             _log->error(

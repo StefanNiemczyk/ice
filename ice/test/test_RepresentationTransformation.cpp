@@ -300,6 +300,7 @@ TEST(RepresentationTransformationTest, xmlReader)
   auto p2dRep = factory->getRepresentation("o0_Pos2D");
   auto p3dRep = factory->getRepresentation("o0_Pos3D");
   auto p3dRotRep = factory->getRepresentation("o0_Pos3DRot");
+  auto rollPitchYawRep = factory->getRepresentation("o0_RollPitchYawRep");
 
   ASSERT_TRUE(p2dRep != false);
   ASSERT_TRUE(p3dRep != false);
@@ -320,6 +321,10 @@ TEST(RepresentationTransformationTest, xmlReader)
   auto p3dRotOriA = p3dRotRep->accessPath({"o2_Orientation", "o2_Alpha"});
   auto p3dRotOriB = p3dRotRep->accessPath({"o2_Orientation", "o2_Beta"});
   auto p3dRotOriC = p3dRotRep->accessPath({"o2_Orientation", "o2_Gamma"});
+
+//  auto roll = rollPitchYawRep->accessPath({"o2_Roll"});
+//  auto pitch = rollPitchYawRep->accessPath({"o2_Pitch"});
+//  auto yaw = rollPitchYawRep->accessPath({"o2_Yaw"});
 
   bool foundP2toP3 = false;
   bool foundP3toP2 = false;
@@ -436,7 +441,27 @@ TEST(RepresentationTransformationTest, xmlReader)
       ASSERT_EQ(p3d2->getValue<double>(p3dY), valY);
       ASSERT_EQ(p3d2->getValue<double>(p3dZ), valX*valY);
     }
-     else
+    else if (trans->getName() == "RawPitchYawToEuler")
+    {
+//      auto rollPitchYaw = factory->makeInstance(rollPitchYawRep);
+//
+//      const double valRoll = 0.6;
+//      const double valPitch = 0.3;
+//      const double valYaw = 0.7;
+//
+//      rollPitchYaw->set(roll, &valRoll);
+//      rollPitchYaw->set(pitch, &valPitch);
+//      rollPitchYaw->set(yaw, &valYaw);
+//
+//      auto eulerRep = trans->transform(&rollPitchYaw);
+//      std::cout << "Roll: " << rollPitchYaw->getValue<double>(roll) << std::endl;
+
+
+//      ASSERT_EQ(p3d2->getValue<double>(p3dX), valX);
+//      ASSERT_EQ(p3d2->getValue<double>(p3dY), valY);
+//      ASSERT_EQ(p3d2->getValue<double>(p3dZ), valX*valY);
+    }
+      else
     {
       ASSERT_FALSE(true);
     }

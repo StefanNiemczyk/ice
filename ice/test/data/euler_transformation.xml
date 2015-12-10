@@ -1,8 +1,8 @@
 <transformations>
 	<transformation name="RollPitchYawToEuler" scope="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RollPitchYawRep">
-		<input id="1" representation="http://vs.uni-kassel.de/IceTest#RawPitchYawRep" />
+		<input id="1" representation="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RollPitchYawRep" />
 
-		<output representation="http://vs.uni-kassel.de/IceTest#EulerAnglesRep" />
+		<output representation="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#EulerAnglesRep" />
 
 		<operations>
 			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Alpha">
@@ -26,7 +26,7 @@
 				</formula>
 			</dimension>
 			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Gamma">
-					<formula formula="
+				<formula formula="
 						(-sin(P)) * Y +
 						(cos(P)*sin(Y)) * P +
 						(cos(P)*cos(R)) * R">
