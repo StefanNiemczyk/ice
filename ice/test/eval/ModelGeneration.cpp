@@ -360,7 +360,7 @@ public:
 
     // Initializing OwlAPI
     ice::OntologyInterface ontology(path + "/java/lib/");
-    ontology.setLogging(false);
+    ontology.setLogLevel(ice::LogLevel::Disabled);
     ontology.addIRIMapper(path + "/ontology/");
     ontology.loadOntology(p_ontPath);
 
@@ -413,13 +413,7 @@ public:
 
     for (auto ontSystem : *ontSystems)
     {
-      std::string iri = ontSystem;
-      int index = iri.find_last_of("#");
-      std::string aspStr = (index != std::string::npos ? iri.substr(index+1, iri.length()) : ontSystem);
-      std::transform(aspStr.begin(),
-                     aspStr.begin()+1,
-                     aspStr.begin(),
-                      ::tolower);
+      std::string aspStr = ontology.toShortIri(ontSystem);
 
 
       auto external = asp.getExternal("system", {Gringo::Value(aspStr), "default"}, "system", {Gringo::Value(aspStr)}, true);
@@ -518,7 +512,7 @@ public:
       delete aspStrings;
       delete cppStrings;
 
-      delete ontSystem;
+    //  delete ontSystem;
     }
 
     endOntologyToASP = std::chrono::system_clock::now();

@@ -26,7 +26,7 @@ namespace ice
 {
 
 enum LogLevel { 
-	Error, Warning, Info, Debug
+	Disabled, Error, Warning, Info, Debug
 };
 
 class OntologyInterface

@@ -202,28 +202,28 @@ public:
         if (global)
         {
           ss.str("");
-          ss << "metadataStream(1,accuracy,stream(1,evalSystem,node(1,evalSystem,evalNode0_" << chainSize - 1
-              << "Ind,evalEntity,none),information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
-              << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
+          ss << "metadataStream(1,accuracy,stream(1,o0_EvalSystem,node(1,o0_EvalSystem,o0_EvalNode0_" << chainSize - 1
+              << "Ind,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope" << chainSize << "_" << chainSize - 1
+              << ",o0_EvalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
               << chainSize * nodesMax << ")";
           toCheck.push_back(ss.str());
 
           ss.str("");
-          ss << "metadataStream(1,delay,stream(1,evalSystem,node(1,evalSystem,evalNode0_" << chainSize - 1
-              << "Ind,evalEntity,none),information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
-              << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
+          ss << "metadataStream(1,delay,stream(1,o0_EvalSystem,node(1,o0_EvalSystem,o0_EvalNode0_" << chainSize - 1
+              << "Ind,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope" << chainSize << "_" << chainSize - 1
+              << ",o0_EvalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
               << (chainSize) << ")";
           toCheck.push_back(ss.str());
         }
 
         ss.str("");
-        ss << "selectedStream(1,evalSystem,node(1,evalSystem,evalNode0_" << chainSize - 1
-            << "Ind,evalEntity,none),information(evalEntity,evalScope" << chainSize << "_" << chainSize - 1
-            << ",evalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << ")";
+        ss << "selectedStream(1,o0_EvalSystem,node(1,o0_EvalSystem,o0_EvalNode0_" << chainSize - 1
+            << "Ind,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope" << chainSize << "_" << chainSize - 1
+            << ",o0_EvalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << ")";
         toCheck.push_back(ss.str());
 
         ss.str("");
-        ss << "node(1,evalSystem,evalNode0_" << chainSize - 1 << "Ind,evalEntity,none)";
+        ss << "node(1,o0_EvalSystem,o0_EvalNode0_" << chainSize - 1 << "Ind,o0_EvalEntity,none)";
         toCheck.push_back(ss.str());
 
   //      ss.str("");
@@ -501,23 +501,23 @@ public:
         if (global)
         {
       //    ss.str("");
-      //    ss << "metadataStream(1,accuracy,stream(1,evalSystem,evalNode0_" << reps - 1
-      //        << "Ind,evalSystem,information(evalEntity,evalScope,evalRepresentation" << reps-1 << ",none),2),10)";
+      //    ss << "metadataStream(1,accuracy,stream(1,o0_EvalSystem,o0_EvalNode0_" << reps - 1
+      //        << "Ind,o0_EvalSystem,information(o0_EvalEntity,o0_EvalScope,o0_EvalRepresentation" << reps-1 << ",none),2),10)";
       //    toCheck.push_back(ss.str());
 
 //          ss.str("");
-//          ss << "metadataStream(1,delay,stream(1,evalSystem,evalNode0_" << reps - 1
-//              << "Ind,evalSystem,information(evalEntity,evalScope,evalRepresentation" << reps-1 << ",none),2),5)";
+//          ss << "metadataStream(1,delay,stream(1,o0_EvalSystem,o0_EvalNode0_" << reps - 1
+//              << "Ind,o0_EvalSystem,information(o0_EvalEntity,o0_EvalScope,o0_EvalRepresentation" << reps-1 << ",none),2),5)";
 //          toCheck.push_back(ss.str());
         }
 
         ss.str("");
-        ss << "selectedStream(1,evalSystem,node(1,evalSystem,evalNode0_" << reps - 1 <<
-            "Ind,evalEntity,none),information(evalEntity,evalScope,evalRepresentation" << reps - 1 << ",none),2)";
+        ss << "selectedStream(1,o0_EvalSystem,node(1,o0_EvalSystem,o0_EvalNode0_" << reps - 1 <<
+            "Ind,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope,o0_EvalRepresentation" << reps - 1 << ",none),2)";
         toCheck.push_back(ss.str());
 
         ss.str("");
-        ss << "node(1,evalSystem,evalNode0_" << reps - 1 << "Ind,evalEntity,none)";
+        ss << "node(1,o0_EvalSystem,o0_EvalNode0_" << reps - 1 << "Ind,o0_EvalEntity,none)";
         toCheck.push_back(ss.str());
 
 //        ss.str("");
@@ -529,7 +529,7 @@ public:
           this->lambda(asp);
 //          asp->setModelCount(0);
     //        asp->setSaveProgress(200);
-    //      asp->add("base",{},"stream(1,evalSystem,evalNodeSourceInd,evalSystem,information(evalEntity,evalScope,evalRepresentation0,none)).");
+    //      asp->add("base",{},"stream(1,o0_EvalSystem,o0_EvalNodeSourceInd,o0_EvalSystem,information(o0_EvalEntity,o0_EvalScope,o0_EvalRepresentation0,none)).");
 //          asp->setPredefConfiguration(supplementary::PredefinedConfigurations::crafty);
         });
 
@@ -794,27 +794,27 @@ public:
           std::vector<std::string> toCheck;
 
       //    ss.str("");
-      //    ss << "metadataStream(1,accuracy,stream(1,evalSystem0,evalNode0Ind,evalSystem0," <<
-      //        "information(evalEntity,evalScope,reqRepresentation,none),3),10)";
+      //    ss << "metadataStream(1,accuracy,stream(1,o0_EvalSystem0,o0_EvalNode0Ind,o0_EvalSystem0," <<
+      //        "information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),3),10)";
       //    toCheck.push_back(ss.str());
 
           if (global)
           {
             ss.str("");
-            ss << "metadataStream(1,delay,stream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none)," <<
-                "information(evalEntity,evalScope,reqRepresentation,none),3)," << (inputsCount + 2 + 1) << ")";
+            ss << "metadataStream(1,delay,stream(1,o0_EvalSystem0,node(1,o0_EvalSystem0,o0_EvalNode0Ind,o0_EvalEntity,none)," <<
+                "information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),3)," << (inputsCount + 2 + 1) << ")";
             toCheck.push_back(ss.str());
           }
 
           for (int i=1; i <= inputsCount; ++i)
           {
             ss.str("");
-            ss << "stream(1,evalSystem0,node(1,evalSystem" << i << ",evalNode" << i << "SourceInd,evalEntity,none),information(evalEntity,evalScope,evalRepresentation,none),2)";
+            ss << "stream(1,o0_EvalSystem0,node(1,o0_EvalSystem" << i << ",o0_EvalNode" << i << "SourceInd,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope,o0_EvalRepresentation,none),2)";
             toCheck.push_back(ss.str());
          }
 
           ss.str("");
-          ss << "selectedStream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none),information(evalEntity,evalScope,reqRepresentation,none),3)";
+          ss << "selectedStream(1,o0_EvalSystem0,node(1,o0_EvalSystem0,o0_EvalNode0Ind,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),3)";
           toCheck.push_back(ss.str());
 
 //          ss.str("");
@@ -828,23 +828,23 @@ public:
             for (int i=1; i < systems; ++i)
             {
               ss.str("");
-              ss << "transfer(evalSystem" << i << ",evalSystem0).";
+              ss << "transfer(o0_EvalSystem" << i << ",o0_EvalSystem0).";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataProcessing(cost,evalSystem" << i << ",evalSystem0," << 2 << ").";
+              ss << "metadataProcessing(cost,o0_EvalSystem" << i << ",o0_EvalSystem0," << 2 << ").";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataOutput(delay,evalSystem" << i << ",evalSystem0," << 2 << ").";
+              ss << "metadataOutput(delay,o0_EvalSystem" << i << ",o0_EvalSystem0," << 2 << ").";
               asp->add("base",{},ss.str());
 
               ss.str("");
-              ss << "transfer(evalSystem0,evalSystem" << i << ").";
+              ss << "transfer(o0_EvalSystem0,o0_EvalSystem" << i << ").";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataProcessing(cost,evalSystem0,evalSystem" << i << "," << 2 << ").";
+              ss << "metadataProcessing(cost,o0_EvalSystem0,o0_EvalSystem" << i << "," << 2 << ").";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataOutput(delay,evalSystem0,evalSystem" << i << "," << 2 << ").";
+              ss << "metadataOutput(delay,o0_EvalSystem0,o0_EvalSystem" << i << "," << 2 << ").";
               asp->add("base",{},ss.str());
             }
 
@@ -1124,41 +1124,41 @@ public:
         std::vector<std::string> toCheck;
 
     //    ss.str("");
-    //    ss << "metadataStream(1,accuracy,stream(1,evalSystem0,evalNode0Ind,evalSystem0," <<
-    //        "information(evalEntity,evalScope,reqRepresentation,none),3),10)";
+    //    ss << "metadataStream(1,accuracy,stream(1,o0_EvalSystem0,o0_EvalNode0Ind,o0_EvalSystem0," <<
+    //        "information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),3),10)";
     //    toCheck.push_back(ss.str());
 
 //        if (global)
 //        {
 //          ss.str("");
-//          ss << "metadataStream(1,delay,stream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none)," <<
-//              "information(evalEntity,evalScope,reqRepresentation,none),3),8)";
+//          ss << "metadataStream(1,delay,stream(1,o0_EvalSystem0,node(1,o0_EvalSystem0,o0_EvalNode0Ind,o0_EvalEntity,none)," <<
+//              "information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),3),8)";
 //          toCheck.push_back(ss.str());
 //        }
         if (global)
         {
           ss.str("");
-          ss << "metadataStream(1,delay,stream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none)," <<
-              "information(evalEntity,evalScope,reqRepresentation,none),3)," << (inputsCount * 2 + 2) << ")";
+          ss << "metadataStream(1,delay,stream(1,o0_EvalSystem0,node(1,o0_EvalSystem0,o0_EvalNode0Ind,o0_EvalEntity,none)," <<
+              "information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),3)," << (inputsCount * 2 + 2) << ")";
           toCheck.push_back(ss.str());
         }
 
         for (int i=1; i < inputsCount; ++i)
         {
           ss.str("");
-          ss << "stream(1,evalSystem0,node(1,evalSystem" << i << ",evalNode" << i << "SourceInd,evalEntity,none),information(evalEntity,evalScope,evalRepresentation,none),2)";
+          ss << "stream(1,o0_EvalSystem0,node(1,o0_EvalSystem" << i << ",o0_EvalNode" << i << "SourceInd,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope,o0_EvalRepresentation,none),2)";
           toCheck.push_back(ss.str());
        }
 
 //        ss.str("");
-//        ss << "stream(1,evalSystem0,node(1,evalSystem1,evalNode1SourceInd,evalEntity,none),information(evalEntity,evalScope,evalRepresentation,none),2)";
+//        ss << "stream(1,o0_EvalSystem0,node(1,o0_EvalSystem1,o0_EvalNode1SourceInd,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope,o0_EvalRepresentation,none),2)";
 //        toCheck.push_back(ss.str());
 //        ss.str("");
-//        ss << "stream(1,evalSystem0,node(1,evalSystem2,evalNode2SourceInd,evalEntity,none),information(evalEntity,evalScope,evalRepresentation,none),2)";
+//        ss << "stream(1,o0_EvalSystem0,node(1,o0_EvalSystem2,o0_EvalNode2SourceInd,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope,o0_EvalRepresentation,none),2)";
 //        toCheck.push_back(ss.str());
 
         ss.str("");
-        ss << "selectedStream(1,evalSystem0,node(1,evalSystem0,evalNode0Ind,evalEntity,none),information(evalEntity,evalScope,reqRepresentation,none),3)";
+        ss << "selectedStream(1,o0_EvalSystem0,node(1,o0_EvalSystem0,o0_EvalNode0Ind,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),3)";
         toCheck.push_back(ss.str());
 
   //      ss.str("");
@@ -1177,29 +1177,29 @@ public:
                 continue;
 
               ss.str("");
-              ss << "transfer(evalSystem" << i << ",evalSystem" << j << ").";
+              ss << "transfer(o0_EvalSystem" << i << ",o0_EvalSystem" << j << ").";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataProcessing(cost,evalSystem" << i << ",evalSystem" << j << "," << 2 << ").";
+              ss << "metadataProcessing(cost,o0_EvalSystem" << i << ",o0_EvalSystem" << j << "," << 2 << ").";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataOutput(delay,evalSystem" << i << ",evalSystem" << j << "," << 2 << ").";
+              ss << "metadataOutput(delay,o0_EvalSystem" << i << ",o0_EvalSystem" << j << "," << 2 << ").";
               asp->add("base",{},ss.str());
 
               ss.str("");
-              ss << "transfer(evalSystem" << j << ",evalSystem" << i << ").";
+              ss << "transfer(o0_EvalSystem" << j << ",o0_EvalSystem" << i << ").";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataProcessing(cost,evalSystem" << j << ",evalSystem" << i << "," << 2 << ").";
+              ss << "metadataProcessing(cost,o0_EvalSystem" << j << ",o0_EvalSystem" << i << "," << 2 << ").";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataOutput(delay,evalSystem" << j << ",evalSystem" << i << "," << 2 << ").";
+              ss << "metadataOutput(delay,o0_EvalSystem" << j << ",o0_EvalSystem" << i << "," << 2 << ").";
               asp->add("base",{},ss.str());
 
             }
 
   //          ss.str("");
-  //          ss << "system(evalSystem" << i << ").";
+  //          ss << "system(o0_EvalSystem" << i << ").";
   //          asp->add("base",{},ss.str());
           }
 
@@ -1489,24 +1489,24 @@ public:
           if (global)
           {
             ss.str("");
-            ss << "metadataMap(1,delay,map(1,evalSystem0_0,mapNode(1,evalSystem0_0,evalNode0_0Ind,islandEntityType,none)," <<
-                "informationType(islandEntityType,evalScope,reqRepresentation,none),3),7)";
+            ss << "metadataMap(1,delay,map(1,o0_EvalSystem0_0,mapNode(1,o0_EvalSystem0_0,o0_EvalNode0_0Ind,o0_IslandEntityType,none)," <<
+                "informationType(o0_IslandEntityType,o0_EvalScope,o0_ReqRepresentation,none),3),7)";
             toCheck.push_back(ss.str());
 
 //            ss.str("");
-//            ss << "metadataMap(1,accuracy,map(1,evalSystem0_0,evalNode0_0Ind,evalSystem0_0," <<
-//                "informationType(islandEntityType,evalScope,reqRepresentation,none),3)," << systems << ")";
+//            ss << "metadataMap(1,accuracy,map(1,o0_EvalSystem0_0,o0_EvalNode0_0Ind,o0_EvalSystem0_0," <<
+//                "informationType(islandEntityType,o0_EvalScope,o0_ReqRepresentation,none),3)," << systems << ")";
 //            toCheck.push_back(ss.str());
           }
 
           for (int i=1; i < islands; ++i) {
             ss.str("");
-            ss << "stream(1,evalSystem0_0,node(1,evalSystem" << i << "_0,evalNode" << i << "_0SourceInd,islandEntity" << i << ",none),information(islandEntity" << i << ",evalScope,reqRepresentation,none),2)";
+            ss << "stream(1,o0_EvalSystem0_0,node(1,o0_EvalSystem" << i << "_0,o0_EvalNode" << i << "_0SourceInd,o0_IslandEntity" << i << ",none),information(o0_IslandEntity" << i << ",o0_EvalScope,o0_ReqRepresentation,none),2)";
             toCheck.push_back(ss.str());
           }
 
           ss.str("");
-          ss << "selectedMap(1,evalSystem0_0,mapNode(1,evalSystem0_0,evalNode0_0Ind,islandEntityType,none),informationType(islandEntityType,evalScope,reqRepresentation,none),3)";
+          ss << "selectedMap(1,o0_EvalSystem0_0,mapNode(1,o0_EvalSystem0_0,o0_EvalNode0_0Ind,o0_IslandEntityType,none),informationType(o0_IslandEntityType,o0_EvalScope,o0_ReqRepresentation,none),3)";
           toCheck.push_back(ss.str());
 
           auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, 10,
@@ -1514,33 +1514,33 @@ public:
             this->lambda(asp);
 
             ss.str("");
-            ss << "system(evalSystem0_0, island0).";
+            ss << "system(o0_EvalSystem0_0, island0).";
             asp->add("base",{},ss.str());
 
             for (int j=1; j < systems; ++j)
             {
               ss.str("");
-              ss << "transfer(evalSystem" << 0 << "_" << 0 << ",evalSystem" << 0 << "_" << j << ").";
+              ss << "transfer(o0_EvalSystem" << 0 << "_" << 0 << ",o0_EvalSystem" << 0 << "_" << j << ").";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataProcessing(cost,evalSystem" << 0 << "_" << 0 << ",evalSystem" << 0 << "_" << j << "," << 2 << ").";
+              ss << "metadataProcessing(cost,o0_EvalSystem" << 0 << "_" << 0 << ",o0_EvalSystem" << 0 << "_" << j << "," << 2 << ").";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataOutput(delay,evalSystem" << 0 << "_" << 0 << ",evalSystem" << 0 << "_" << j << "," << 2 << ").";
-              asp->add("base",{},ss.str());
-
-              ss.str("");
-              ss << "transfer(evalSystem" << 0 << "_" << j << ",evalSystem" << 0 << "_" << 0 << ").";
-              asp->add("base",{},ss.str());
-              ss.str("");
-              ss << "metadataProcessing(cost,evalSystem" << 0 << "_" << j << ",evalSystem" << 0 << "_" << 0 << "," << 2 << ").";
-              asp->add("base",{},ss.str());
-              ss.str("");
-              ss << "metadataOutput(delay,evalSystem" << 0 << "_" << j << ",evalSystem" << 0 << "_" << 0 << "," << 2 << ").";
+              ss << "metadataOutput(delay,o0_EvalSystem" << 0 << "_" << 0 << ",o0_EvalSystem" << 0 << "_" << j << "," << 2 << ").";
               asp->add("base",{},ss.str());
 
               ss.str("");
-              ss << "system(evalSystem" << 0 << "_" << j << ",island0).";
+              ss << "transfer(o0_EvalSystem" << 0 << "_" << j << ",o0_EvalSystem" << 0 << "_" << 0 << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataProcessing(cost,o0_EvalSystem" << 0 << "_" << j << ",o0_EvalSystem" << 0 << "_" << 0 << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+              ss.str("");
+              ss << "metadataOutput(delay,o0_EvalSystem" << 0 << "_" << j << ",o0_EvalSystem" << 0 << "_" << 0 << "," << 2 << ").";
+              asp->add("base",{},ss.str());
+
+              ss.str("");
+              ss << "system(o0_EvalSystem" << 0 << "_" << j << ",island0).";
               asp->add("base",{},ss.str());
             }
 
@@ -1557,29 +1557,29 @@ public:
               asp->add("base",{},ss.str());
 
               ss.str("");
-              ss << "connectToBridge(evalSystem" << 0 << "_" << 0 << ",island" << i << ").";
+              ss << "connectToBridge(o0_EvalSystem" << 0 << "_" << 0 << ",island" << i << ").";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataProcessing(cost,evalSystem" << 0 << "_" << 0 << ",island" << i << "," << 2 << ").";
+              ss << "metadataProcessing(cost,o0_EvalSystem" << 0 << "_" << 0 << ",island" << i << "," << 2 << ").";
               asp->add("base",{},ss.str());
               ss.str("");
-              ss << "metadataOutput(delay,evalSystem" << 0 << "_" << 0 << ",island" << i << "," << 2 << ").";
+              ss << "metadataOutput(delay,o0_EvalSystem" << 0 << "_" << 0 << ",island" << i << "," << 2 << ").";
               asp->add("base",{},ss.str());
 
               for (int j=0; j < systems; ++j)
               {
                 ss.str("");
-                ss << "connectToBridge(evalSystem" << i << "_" << j << ",island" << 0 << ").";
+                ss << "connectToBridge(o0_EvalSystem" << i << "_" << j << ",island" << 0 << ").";
                 asp->add("base",{},ss.str());
                 ss.str("");
-                ss << "metadataProcessing(cost,evalSystem" << i << "_" << j << ",island" << 0 << "," << 2 << ").";
+                ss << "metadataProcessing(cost,o0_EvalSystem" << i << "_" << j << ",island" << 0 << "," << 2 << ").";
                 asp->add("base",{},ss.str());
                 ss.str("");
-                ss << "metadataOutput(delay,evalSystem" << i << "_" << j << ",island" << 0 << "," << 2 << ").";
+                ss << "metadataOutput(delay,o0_EvalSystem" << i << "_" << j << ",island" << 0 << "," << 2 << ").";
                 asp->add("base",{},ss.str());
 
                 ss.str("");
-                ss << "system(evalSystem" << i << "_" << j << ",island" << i << ").";
+                ss << "system(o0_EvalSystem" << i << "_" << j << ",island" << i << ").";
                 asp->add("base",{},ss.str());
               }
             }

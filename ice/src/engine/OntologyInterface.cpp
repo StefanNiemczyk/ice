@@ -78,8 +78,8 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   if (this->checkError("Constructor", "Failed to find constructor for class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
 
-  this->javaInterface = this->env->NewGlobalRef(this->env->NewObject(this->javaOntologyInterface, cnstrctr,
-                                             this->env->NewStringUTF("testPath")));
+  this->javaInterface = this->env->NewObject(this->javaOntologyInterface, cnstrctr,
+                                             this->env->NewStringUTF("testPath"));
 
   if (this->checkError("Constructor", "Failed to instantiate class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
@@ -179,7 +179,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
 
 OntologyInterface::~OntologyInterface()
 {
-  this->env->DeleteGlobalRef(this->javaInterface);
+  this->env->DeleteLocalRef(this->javaInterface);
 //  jvm->DetachCurrentThread();
 }
 

@@ -5,6 +5,7 @@
  *      Author: sni
  */
 
+#include <chrono>
 #include <memory>
 #include <ros/package.h>
 
@@ -88,7 +89,15 @@ TEST(RepresentationTransformationTest, rollPitchYawToEulerAngles)
       rollPitchYaw->set(pitch, &valPitch);
       rollPitchYaw->set(yaw, &valYaw);
 
+      std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+
       auto euler = trans->transform(&rollPitchYaw);
+
+      std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+      std::cout << "Transformation took "
+                << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
+                << "ns.\n";
+
 
       ASSERT_NE(euler->getValue<double>(yaw), valYaw);
       ASSERT_NE(euler->getValue<double>(pitch), valPitch);
@@ -96,7 +105,7 @@ TEST(RepresentationTransformationTest, rollPitchYawToEulerAngles)
   
       foundRollPitchYawRep = true;
     }
-      else
+    else
     {
       ASSERT_FALSE(true);
     }

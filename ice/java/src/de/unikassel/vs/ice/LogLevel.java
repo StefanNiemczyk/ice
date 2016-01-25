@@ -1,7 +1,7 @@
 package de.unikassel.vs.ice;
 
 public enum LogLevel {
-	Error(0), Warn(1), Debug(2), Info(3);
+	Disabled(0), Error(1), Warn(2), Debug(3), Info(4);
 
 	private final int value;
 
