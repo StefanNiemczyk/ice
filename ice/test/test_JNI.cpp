@@ -120,12 +120,12 @@ TEST(JNITest, addInfoStructure)
   oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
   oi.loadOntologies();
 
-  result = oi.addValueScope("TestValueScope", "TestValueScope1");
+  result = oi.addValueScope("TestValueScope", "TestValueScope1", "DoubleRep");
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  result = oi.addValueScope("TestValueScope", "TestValueScope2");
+  result = oi.addValueScope("TestValueScope", "TestValueScope2", "DoubleRep");
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
@@ -156,16 +156,103 @@ TEST(JNITest, addInfoStructure)
 
   std::vector<std::string> toSearch;
 
-  EXPECT_TRUE(str.find("entityType(testEntity).") >= 0);
-  EXPECT_TRUE(str.find("scope(testScope).") >= 0);
-  EXPECT_TRUE(str.find("valueScope(testValueScope1).") >= 0);
-  EXPECT_TRUE(str.find("valueScope(testValueScope2).") >= 0);
-  EXPECT_TRUE(str.find("representation(testRep1).") >= 0);
+  EXPECT_TRUE(str.find("entityType(o0_TestEntity).") != std::string::npos);
+  EXPECT_TRUE(str.find("scope(o0_TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(o0_TestValueScope1).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(o0_TestValueScope2).") != std::string::npos);
+  EXPECT_TRUE(str.find("representation(o0_TestRep1).") != std::string::npos);
 
-  EXPECT_TRUE(str.find("hasScope(testEntity,testScope).") >= 0);
-  EXPECT_TRUE(str.find("hasRepresentation(testScope,testRep1).") >= 0);
-  EXPECT_TRUE(str.find("hasDimension(testRep1,testValueScope1).") >= 0);
-  EXPECT_TRUE(str.find("hasDimension(testRep1,testValueScope2).") >= 0);
+  EXPECT_TRUE(str.find("hasScope(o0_TestEntity,o0_TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasRepresentation(o0_TestScope,o0_TestRep1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_TestValueScope1,o0_DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_TestValueScope2,o0_DoubleRep,1,1).") != std::string::npos);
+}
+
+TEST(JNITest, addDimension)
+{
+  std::string path = ros::package::getPath("ice");
+  bool result;
+  std::vector<std::string> metadatas;
+  std::vector<int> metadataValues;
+  std::vector<int> metadataValues2;
+  std::vector<std::string> metadataGroundings;
+
+  ice::OntologyInterface oi(path + "/java/lib/");
+
+  oi.addIRIMapper(path + "/ontology/");
+  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.loadOntologies();
+
+  result = oi.addValueScope("TestValueScope", "TestValueScope1", "DoubleRep");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.addValueScope("TestValueScope", "TestValueScope2", "DoubleRep");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.addValueScope("TestValueScope", "TestValueScope3", "DoubleRep");
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  std::vector<std::string> vec;
+  vec.push_back("TestValueScope1");
+  vec.push_back("TestValueScope2");
+  result = oi.addRepresentation("TestRep", "TestRep1", vec);
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  std::vector<std::string> reps;
+  reps.push_back("TestRep1");
+  result = oi.addEntityScope("TestScope", reps);
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  std::vector<std::string> scopes;
+  scopes.push_back("TestScope");
+  result = oi.addEntityType("TestEntity", scopes);
+
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.addDimensionToRep("TestRep1", "EulerAnglesRep", "Orientation");
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.addDimensionToRep("TestRep1", "TestValueScope3");
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi.addDimensionToRep("TestRep1", "XCoordinate");
+  ASSERT_FALSE(oi.errorOccurred());
+  ASSERT_TRUE(result);
+
+  oi.saveOntology("/tmp/text.owl");
+
+  std::string str = oi.readInformationStructureAsASP();
+
+  std::vector<std::string> toSearch;
+
+  std::cout << str << std::endl;
+
+  EXPECT_TRUE(str.find("entityType(o0_TestEntity).") != std::string::npos);
+  EXPECT_TRUE(str.find("scope(o0_TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(o0_TestValueScope1).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(o0_TestValueScope2).") != std::string::npos);
+  EXPECT_TRUE(str.find("representation(o0_TestRep1).") != std::string::npos);
+
+  EXPECT_TRUE(str.find("hasScope(o0_TestEntity,o0_TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasRepresentation(o0_TestScope,o0_TestRep1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_TestValueScope1,o0_DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_TestValueScope2,o0_DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_Orientation,o0_EulerAnglesRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_TestValueScope3,o0_DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_XCoordinate,o0_DoubleRep,1,1).") != std::string::npos);
 }
 
 TEST(JNITest, addStreamClass)

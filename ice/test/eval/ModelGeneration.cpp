@@ -147,17 +147,19 @@ class ModelGeneration
 {
 private:
   std::string path;
+  bool testRepresentations;
 
 public:
-  ModelGeneration(std::string path)
+  ModelGeneration(std::string path, bool testRepresentations = false)
   {
     this->path = path;
+    this->testRepresentations = testRepresentations;
   }
 
   ModelGenerationSeriesResult testSeries(std::string p_ontPath, std::vector<std::string>* p_requiredModelElements,
                                          int p_count, bool warmUp, bool global, bool verbose, int maxHopCount = 3,
                                          int maxStepCount = 10,
-                                         std::function<void(supplementary::ClingWrapper *asp)> lambda = nullptr)
+                                         std::function<void(supplementary::ClingWrapper *asp)> lambda = nullptr, int models = 1)
   {
     ModelGenerationSeriesResult result;
     result.numberTotal = p_count;
@@ -183,7 +185,18 @@ public:
       std::cout << "Starting warm up " << std::flush;
       for (int i = 1; i < 101; ++i)
       {
-        this->test(p_ontPath, p_requiredModelElements, true, global, false, maxHopCount, maxStepCount);
+        std::string ontology;
+
+        if (this->testRepresentations)
+        {
+          ontology = p_ontPath + "0.owl";
+        }
+        else
+        {
+          ontology = p_ontPath;
+        }
+
+        this->test(ontology, p_requiredModelElements, true, global, false, maxHopCount, maxStepCount);
 
         if (i % 10 == 0)
         {
@@ -194,117 +207,131 @@ public:
       std::cout << " done." << std::endl;
     }
 
-    for (int i = 0; i < p_count; ++i)
+    for (int m = 0; m < models; ++m)
     {
-      std::cout << "Starting run " << (i + 1) << " ... ";
-      start = std::chrono::system_clock::now();
-
-      auto r = this->test(p_ontPath, p_requiredModelElements, false, global, verbose, maxHopCount, maxStepCount, lambda);
-
-      if (r.successful)
-        ++result.numberSuccessful;
-
-      testResults.push_back(r);
-
-      totalTimeVar.add(r.totalTime);
-      ontologyReadTimeVar.add(r.ontologyReadTime);
-      ontologyReasonerTimeVar.add(r.ontologyReasonerTime);
-      ontologyToASPTimeVar.add(r.ontologyToASPTime);
-      aspGroundingTimeVar.add(r.aspGroundingTime);
-      aspSolvingTimeVar.add(r.aspSolvingTime);
-      aspSatTimeVar.add(r.aspSatTime);
-      aspUnsatTimeVar.add(r.aspUnsatTime);
-      aspModelCountVar.add(r.aspModelCount);
-      aspAtomCountVar.add(r.aspAtomCount);
-      aspBodiesCountVar.add(r.aspBodiesCount);
-      aspAuxAtomCountVar.add(r.aspAuxAtomCount);
-
-      if (i == 0)
+      for (int i = 0; i < p_count; ++i)
       {
-        result.best = r;
-        result.worst = r;
-        result.avg = r;
+        std::cout << "Starting run " << (i + 1) << " ... ";
+        start = std::chrono::system_clock::now();
+
+        std::string ontology;
+
+        if (this->testRepresentations)
+        {
+          ontology = p_ontPath + std::to_string(m) + ".owl";
+        }
+        else
+        {
+          ontology = p_ontPath;
+        }
+
+        auto r = this->test(ontology, p_requiredModelElements, false, global, verbose, maxHopCount, maxStepCount, lambda);
+
+        if (r.successful)
+          ++result.numberSuccessful;
+
+        testResults.push_back(r);
+
+        totalTimeVar.add(r.totalTime);
+        ontologyReadTimeVar.add(r.ontologyReadTime);
+        ontologyReasonerTimeVar.add(r.ontologyReasonerTime);
+        ontologyToASPTimeVar.add(r.ontologyToASPTime);
+        aspGroundingTimeVar.add(r.aspGroundingTime);
+        aspSolvingTimeVar.add(r.aspSolvingTime);
+        aspSatTimeVar.add(r.aspSatTime);
+        aspUnsatTimeVar.add(r.aspUnsatTime);
+        aspModelCountVar.add(r.aspModelCount);
+        aspAtomCountVar.add(r.aspAtomCount);
+        aspBodiesCountVar.add(r.aspBodiesCount);
+        aspAuxAtomCountVar.add(r.aspAuxAtomCount);
+
+        if (i == 0 && m == 0)
+        {
+          result.best = r;
+          result.worst = r;
+          result.avg = r;
+        }
+        else
+        {
+          result.avg.totalTime += r.totalTime;
+          result.avg.ontologyReadTime += r.ontologyReadTime;
+          result.avg.ontologyReasonerTime += r.ontologyReasonerTime;
+          result.avg.ontologyToASPTime += r.ontologyToASPTime;
+          result.avg.aspGroundingTime += r.aspGroundingTime;
+          result.avg.aspSolvingTime += r.aspSolvingTime;
+          result.avg.aspSatTime += r.aspSatTime;
+          result.avg.aspUnsatTime += r.aspUnsatTime;
+          result.avg.aspModelCount += r.aspModelCount;
+          result.avg.aspAtomCount += r.aspAtomCount;
+          result.avg.aspBodiesCount += r.aspBodiesCount;
+          result.avg.aspAuxAtomCount += r.aspAuxAtomCount;
+
+          if (r.totalTime < result.best.totalTime)
+            result.best.totalTime = r.totalTime;
+          else if (r.totalTime > result.worst.totalTime)
+            result.worst.totalTime = r.totalTime;
+
+          if (r.ontologyReadTime < result.best.ontologyReadTime)
+            result.best.ontologyReadTime = r.ontologyReadTime;
+          else if (r.ontologyReadTime > result.worst.ontologyReadTime)
+            result.worst.ontologyReadTime = r.ontologyReadTime;
+
+          if (r.ontologyReasonerTime < result.best.ontologyReasonerTime)
+            result.best.ontologyReasonerTime = r.ontologyReasonerTime;
+          else if (r.ontologyReasonerTime > result.worst.ontologyReasonerTime)
+            result.worst.ontologyReasonerTime = r.ontologyReasonerTime;
+
+          if (r.ontologyToASPTime < result.best.ontologyToASPTime)
+            result.best.ontologyToASPTime = r.ontologyToASPTime;
+          else if (r.ontologyToASPTime > result.worst.ontologyToASPTime)
+            result.worst.ontologyToASPTime = r.ontologyToASPTime;
+
+          if (r.aspGroundingTime < result.best.aspGroundingTime)
+            result.best.aspGroundingTime = r.aspGroundingTime;
+          else if (r.aspGroundingTime > result.worst.aspGroundingTime)
+            result.worst.aspGroundingTime = r.aspGroundingTime;
+
+          if (r.aspSolvingTime < result.best.aspSolvingTime)
+            result.best.aspSolvingTime = r.aspSolvingTime;
+          else if (r.aspSolvingTime > result.worst.aspSolvingTime)
+            result.worst.aspSolvingTime = r.aspSolvingTime;
+
+          if (r.aspSatTime < result.best.aspSatTime)
+            result.best.aspSatTime = r.aspSatTime;
+          else if (r.aspSatTime > result.worst.aspSatTime)
+            result.worst.aspSatTime = r.aspSatTime;
+
+          if (r.aspUnsatTime < result.best.aspUnsatTime)
+            result.best.aspUnsatTime = r.aspUnsatTime;
+          else if (r.aspUnsatTime > result.worst.aspUnsatTime)
+            result.worst.aspUnsatTime = r.aspUnsatTime;
+
+          if (r.aspModelCount < result.best.aspModelCount)
+            result.best.aspModelCount = r.aspModelCount;
+          else if (r.aspModelCount > result.worst.aspModelCount)
+            result.worst.aspModelCount = r.aspModelCount;
+
+          if (r.aspAtomCount < result.best.aspAtomCount)
+            result.best.aspAtomCount = r.aspAtomCount;
+          else if (r.aspAtomCount > result.worst.aspAtomCount)
+            result.worst.aspAtomCount = r.aspAtomCount;
+
+          if (r.aspBodiesCount < result.best.aspBodiesCount)
+            result.best.aspBodiesCount = r.aspBodiesCount;
+          else if (r.aspBodiesCount > result.worst.aspBodiesCount)
+            result.worst.aspBodiesCount = r.aspBodiesCount;
+
+          if (r.aspAuxAtomCount < result.best.aspAuxAtomCount)
+            result.best.aspAuxAtomCount = r.aspAuxAtomCount;
+          else if (r.aspAuxAtomCount > result.worst.aspAuxAtomCount)
+            result.worst.aspAuxAtomCount = r.aspAuxAtomCount;
+        }
+
+        end = std::chrono::system_clock::now();
+        std::cout << "finished " << (r.successful ? "successful" : "unsuccessful") << " after: "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms, processing time: "
+            << r.totalTime << " ms" << std::endl;
       }
-      else
-      {
-        result.avg.totalTime += r.totalTime;
-        result.avg.ontologyReadTime += r.ontologyReadTime;
-        result.avg.ontologyReasonerTime += r.ontologyReasonerTime;
-        result.avg.ontologyToASPTime += r.ontologyToASPTime;
-        result.avg.aspGroundingTime += r.aspGroundingTime;
-        result.avg.aspSolvingTime += r.aspSolvingTime;
-        result.avg.aspSatTime += r.aspSatTime;
-        result.avg.aspUnsatTime += r.aspUnsatTime;
-        result.avg.aspModelCount += r.aspModelCount;
-        result.avg.aspAtomCount += r.aspAtomCount;
-        result.avg.aspBodiesCount += r.aspBodiesCount;
-        result.avg.aspAuxAtomCount += r.aspAuxAtomCount;
-
-        if (r.totalTime < result.best.totalTime)
-          result.best.totalTime = r.totalTime;
-        else if (r.totalTime > result.worst.totalTime)
-          result.worst.totalTime = r.totalTime;
-
-        if (r.ontologyReadTime < result.best.ontologyReadTime)
-          result.best.ontologyReadTime = r.ontologyReadTime;
-        else if (r.ontologyReadTime > result.worst.ontologyReadTime)
-          result.worst.ontologyReadTime = r.ontologyReadTime;
-
-        if (r.ontologyReasonerTime < result.best.ontologyReasonerTime)
-          result.best.ontologyReasonerTime = r.ontologyReasonerTime;
-        else if (r.ontologyReasonerTime > result.worst.ontologyReasonerTime)
-          result.worst.ontologyReasonerTime = r.ontologyReasonerTime;
-
-        if (r.ontologyToASPTime < result.best.ontologyToASPTime)
-          result.best.ontologyToASPTime = r.ontologyToASPTime;
-        else if (r.ontologyToASPTime > result.worst.ontologyToASPTime)
-          result.worst.ontologyToASPTime = r.ontologyToASPTime;
-
-        if (r.aspGroundingTime < result.best.aspGroundingTime)
-          result.best.aspGroundingTime = r.aspGroundingTime;
-        else if (r.aspGroundingTime > result.worst.aspGroundingTime)
-          result.worst.aspGroundingTime = r.aspGroundingTime;
-
-        if (r.aspSolvingTime < result.best.aspSolvingTime)
-          result.best.aspSolvingTime = r.aspSolvingTime;
-        else if (r.aspSolvingTime > result.worst.aspSolvingTime)
-          result.worst.aspSolvingTime = r.aspSolvingTime;
-
-        if (r.aspSatTime < result.best.aspSatTime)
-          result.best.aspSatTime = r.aspSatTime;
-        else if (r.aspSatTime > result.worst.aspSatTime)
-          result.worst.aspSatTime = r.aspSatTime;
-
-        if (r.aspUnsatTime < result.best.aspUnsatTime)
-          result.best.aspUnsatTime = r.aspUnsatTime;
-        else if (r.aspUnsatTime > result.worst.aspUnsatTime)
-          result.worst.aspUnsatTime = r.aspUnsatTime;
-
-        if (r.aspModelCount < result.best.aspModelCount)
-          result.best.aspModelCount = r.aspModelCount;
-        else if (r.aspModelCount > result.worst.aspModelCount)
-          result.worst.aspModelCount = r.aspModelCount;
-
-        if (r.aspAtomCount < result.best.aspAtomCount)
-          result.best.aspAtomCount = r.aspAtomCount;
-        else if (r.aspAtomCount > result.worst.aspAtomCount)
-          result.worst.aspAtomCount = r.aspAtomCount;
-
-        if (r.aspBodiesCount < result.best.aspBodiesCount)
-          result.best.aspBodiesCount = r.aspBodiesCount;
-        else if (r.aspBodiesCount > result.worst.aspBodiesCount)
-          result.worst.aspBodiesCount = r.aspBodiesCount;
-
-        if (r.aspAuxAtomCount < result.best.aspAuxAtomCount)
-          result.best.aspAuxAtomCount = r.aspAuxAtomCount;
-        else if (r.aspAuxAtomCount > result.worst.aspAuxAtomCount)
-          result.worst.aspAuxAtomCount = r.aspAuxAtomCount;
-      }
-
-      end = std::chrono::system_clock::now();
-      std::cout << "finished " << (r.successful ? "successful" : "unsuccessful") << " after: "
-          << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms, processing time: "
-          << r.totalTime << " ms" << std::endl;
     }
 
     result.totalTimeVar = totalTimeVar.getVariance();
@@ -320,18 +347,20 @@ public:
     result.aspBodiesCountVar = aspBodiesCountVar.getVariance();
     result.aspAuxAtomCountVar = aspAuxAtomCountVar.getVariance();
 
-    result.avg.totalTime /= p_count;
-    result.avg.ontologyReadTime /= p_count;
-    result.avg.ontologyReasonerTime /= p_count;
-    result.avg.ontologyToASPTime /= p_count;
-    result.avg.aspGroundingTime /= p_count;
-    result.avg.aspSolvingTime /= p_count;
-    result.avg.aspSatTime /= p_count;
-    result.avg.aspUnsatTime /= p_count;
-    result.avg.aspModelCount /= p_count;
-    result.avg.aspAtomCount /= p_count;
-    result.avg.aspBodiesCount /= p_count;
-    result.avg.aspAuxAtomCount /= p_count;
+    int runCount = models * p_count;
+
+    result.avg.totalTime /= runCount;
+    result.avg.ontologyReadTime /= runCount;
+    result.avg.ontologyReasonerTime /= runCount;
+    result.avg.ontologyToASPTime /= runCount;
+    result.avg.aspGroundingTime /= runCount;
+    result.avg.aspSolvingTime /= runCount;
+    result.avg.aspSatTime /= runCount;
+    result.avg.aspUnsatTime /= runCount;
+    result.avg.aspModelCount /= runCount;
+    result.avg.aspAtomCount /= runCount;
+    result.avg.aspBodiesCount /= runCount;
+    result.avg.aspAuxAtomCount /= runCount;
 
     return result;
   }
@@ -349,18 +378,27 @@ public:
 
     // Initializing ASP
     supplementary::ClingWrapper asp;
-    asp.addKnowledgeFile(path + "/asp/informationProcessing/processing.lp");
-    asp.addKnowledgeFile(path + "/asp/informationProcessing/searchBottomUp.lp");
-    if (global)
-      asp.addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
+
+    if (this->testRepresentations)
+    {
+      asp.addKnowledgeFile(path + "/asp/transformation/computing.lp");
+    }
     else
-      asp.addKnowledgeFile(path + "/asp/informationProcessing/localOptimization.lp");
+    {
+      asp.addKnowledgeFile(path + "/asp/informationProcessing/processing.lp");
+      asp.addKnowledgeFile(path + "/asp/informationProcessing/searchBottomUp.lp");
+      if (global)
+        asp.addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
+      else
+        asp.addKnowledgeFile(path + "/asp/informationProcessing/localOptimization.lp");
+    }
+
     asp.setNoWarnings(true);
     asp.init();
 
     // Initializing OwlAPI
     ice::OntologyInterface ontology(path + "/java/lib/");
-    ontology.setLogLevel(ice::LogLevel::Disabled);
+    ontology.setLogLevel(ice::LogLevel::Debug);
     ontology.addIRIMapper(path + "/ontology/");
     ontology.loadOntology(p_ontPath);
 
@@ -409,6 +447,8 @@ public:
       }
     }
 
+    if (false == this->testRepresentations)
+    {
     auto ontSystems = ontology.getSystems();
 
     for (auto ontSystem : *ontSystems)
@@ -513,6 +553,7 @@ public:
       delete cppStrings;
 
     //  delete ontSystem;
+    }
     }
 
     endOntologyToASP = std::chrono::system_clock::now();

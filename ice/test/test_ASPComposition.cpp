@@ -712,15 +712,6 @@ TEST(ClingWrap, nodeUsedTwiced)
   cw->add("base", {}, "hasScope(robot,scope1).");
   cw->add("base", {}, "hasRepresentation(scope1,rep1).");
 
-//  for (int i=0; i < 100; ++i)
-//  {
-//    std::stringstream ss;
-//
-//    ss << "value(" << i << ").";
-//    cw->add("base", {}, ss.str());
-//  }
-
-
   cw->ground("base", {});
 
   // entities

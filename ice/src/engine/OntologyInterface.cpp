@@ -48,8 +48,10 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
     std::string classPath(
         "-Djava.class.path=" + p_jarPath + "java_ontology_interface.jar:" + p_jarPath + "slf4j-simple-1.7.7.jar:"
             + p_jarPath + "HermiT.jar");
+    std::string heapSize("-Xms256m -Xmx512m");
 
     options[0].optionString = (char *)classPath.c_str();
+//    options[1].optionString = (char *)heapSize.c_str();
     vm_args.version = JNI_VERSION_1_6;
     vm_args.nOptions = 1;
     vm_args.options = options;
@@ -94,7 +96,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->saveOntologyMethod = this->env->GetMethodID(this->javaOntologyInterface, "saveOntology",
                                                     "(Ljava/lang/String;)Z");
   this->getOntologyIDsMethod = this->env->GetMethodID(this->javaOntologyInterface, "getOntologyIDs",
-                                                    "()[[Ljava/lang/String;");
+                                                      "()[[Ljava/lang/String;");
   this->initReasonerMethod = this->env->GetMethodID(this->javaOntologyInterface, "initReasoner", "(Z)Z");
   this->isConsistentMethod = this->env->GetMethodID(this->javaOntologyInterface, "isConsistent", "()Z");
   this->getSystemsMethod = this->env->GetMethodID(this->javaOntologyInterface, "getSystems", "()[Ljava/lang/String;");
@@ -111,19 +113,24 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->addEntityScopeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addEntityScope",
                                                       "(Ljava/lang/String;[Ljava/lang/String;)Z");
   this->addValueScopeMethod = this->env->GetMethodID(this->javaOntologyInterface, "addValueScope",
-                                                     "(Ljava/lang/String;Ljava/lang/String;)Z");
+                                                     "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
   this->addRepresentationMethod = this->env->GetMethodID(this->javaOntologyInterface, "addRepresentation",
                                                          "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Z");
+  this->addDimensionToRep2Method = this->env->GetMethodID(this->javaOntologyInterface, "addDimensionToRep",
+                                                         "(Ljava/lang/String;Ljava/lang/String;)Z");
+  this->addDimensionToRep3Method = this->env->GetMethodID(this->javaOntologyInterface, "addDimensionToRep",
+                                                         "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
   this->addNamedStreamMethod = this->env->GetMethodID(this->javaOntologyInterface, "addNamedStream",
                                                       "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
-  this->addNamedMapMethod = this->env->GetMethodID(this->javaOntologyInterface, "addNamedMap",
-                                                      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+  this->addNamedMapMethod = this->env->GetMethodID(
+      this->javaOntologyInterface, "addNamedMap",
+      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
   this->addRequiredStreamMethod = this->env->GetMethodID(
       this->javaOntologyInterface, "addRequiredStream",
       "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
   this->addRequiredMapMethod = this->env->GetMethodID(
-          this->javaOntologyInterface, "addRequiredMap",
-          "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+      this->javaOntologyInterface, "addRequiredMap",
+      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
   this->addSourceNodeClassMethod = this->env->GetMethodID(this->javaOntologyInterface, "addSourceNodeClass",
                                                           "(Ljava/lang/String;[Ljava/lang/String;[I[I)Z");
   this->addComputationNodeClassMethod = this->env->GetMethodID(
@@ -143,13 +150,12 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->removeOntologyIRIMethod = this->env->GetMethodID(this->javaOntologyInterface, "removeOntologyIRI",
                                                          "(Ljava/lang/String;)Z");
   this->getOntologyIriMappingMethod = this->env->GetMethodID(this->javaOntologyInterface, "getOntologyIriMapping",
-                                                         "()[Ljava/lang/String;");
+                                                             "()[Ljava/lang/String;");
   this->readInformationStructureAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface,
                                                                      "readInformationStructureAsASP",
                                                                      "()Ljava/lang/String;");
-  this->readRepresentationsAsCSVMethod = this->env->GetMethodID(this->javaOntologyInterface,
-                                                                     "readRepresentationsAsCSV",
-                                                                     "()Ljava/lang/String;");
+  this->readRepresentationsAsCSVMethod = this->env->GetMethodID(this->javaOntologyInterface, "readRepresentationsAsCSV",
+                                                                "()Ljava/lang/String;");
   this->readNodesAndIROsAsASPMethod = this->env->GetMethodID(this->javaOntologyInterface, "readNodesAndIROsAsASP",
                                                              "(Ljava/lang/String;)[[Ljava/lang/String;");
   this->addNodeIndividualMethod =
@@ -282,7 +288,7 @@ bool OntologyInterface::saveOntology(std::string const p_path)
   return result;
 }
 
-std::unique_ptr<std::vector<std::vector<std::string>>> OntologyInterface::getOntologyIDs()
+std::unique_ptr<std::vector<std::vector<std::string>>>OntologyInterface::getOntologyIDs()
 {
   std::unique_ptr<std::vector<std::vector<std::string>>> ids(new std::vector<std::vector<std::string>>(this->ontologyIds));
 
@@ -334,7 +340,8 @@ void OntologyInterface::readOntologyIDsFromOntology()
   env->DeleteLocalRef(result);
 }
 
-std::unique_ptr<std::vector<std::string>> OntologyInterface::compareOntologyIDs(std::vector<std::string>* ids, std::vector<std::string>* versions)
+std::unique_ptr<std::vector<std::string>> OntologyInterface::compareOntologyIDs(std::vector<std::string>* ids,
+                                                                                std::vector<std::string>* versions)
 {
   int size = ids->size();
   int sizeOwn = this->ontologyIds.at(0).size();
@@ -351,7 +358,7 @@ std::unique_ptr<std::vector<std::string>> OntologyInterface::compareOntologyIDs(
     {
       if (id == this->ontologyIds.at(0).at(j))
       {
-        if (versions->at(i) ==  this->ontologyIds.at(1).at(j))
+        if (versions->at(i) == this->ontologyIds.at(1).at(j))
         {
           found = true;
         }
@@ -406,7 +413,6 @@ std::unique_ptr<std::vector<std::string>> OntologyInterface::getSystems()
 
   return std::move(systems);
 }
-
 
 bool OntologyInterface::isSystemKnown(std::string const p_system)
 {
@@ -613,14 +619,15 @@ bool OntologyInterface::addEntityScope(std::string const p_entityScope, std::vec
   return result;
 }
 
-bool OntologyInterface::addValueScope(std::string const p_superValueScope, std::string const p_valueScope)
+bool OntologyInterface::addValueScope(std::string const p_superValueScope, std::string const p_valueScope, std::string const p_representation)
 {
   this->checkError("addValueScope", "Error exists, method addValueScope will not be executed");
 
   jstring superValueScope = env->NewStringUTF(p_superValueScope.c_str());
   jstring valueScope = env->NewStringUTF(p_valueScope.c_str());
+  jstring representation = env->NewStringUTF(p_representation.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addValueScopeMethod, superValueScope, valueScope);
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addValueScopeMethod, superValueScope, valueScope, representation);
 
   env->DeleteLocalRef(superValueScope);
   env->DeleteLocalRef(valueScope);
@@ -662,6 +669,52 @@ bool OntologyInterface::addRepresentation(std::string const p_superRepresentatio
   env->DeleteLocalRef(dimensions);
 
   if (this->checkError("addRepresentation", "Error occurred adding a representation " + p_representation))
+    return false;
+
+  this->informationDirty = true;
+
+  return result;
+}
+
+bool OntologyInterface::addDimensionToRep(std::string const p_representation, std::string const p_dimension,
+                                          std::string const p_entityScope)
+{
+  this->checkError("addDimensionToRep", "Error exists, method addDimensionToRep will not be executed");
+
+  jstring representation = env->NewStringUTF(p_representation.c_str());
+  jstring dimension = env->NewStringUTF(p_dimension.c_str());
+  jstring entityScope = env->NewStringUTF(p_entityScope.c_str());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addDimensionToRep3Method, representation, dimension,
+                                       entityScope);
+
+  env->DeleteLocalRef(representation);
+  env->DeleteLocalRef(dimension);
+  env->DeleteLocalRef(entityScope);
+
+  if (this->checkError("addDimensionToRep",
+                       "Error occurred adding a dimension " + p_dimension + " to representation " + p_representation))
+    return false;
+
+  this->informationDirty = true;
+
+  return result;
+}
+
+bool OntologyInterface::addDimensionToRep(std::string const p_representation, std::string const p_dimension)
+{
+  this->checkError("addDimensionToRep", "Error exists, method addDimensionToRep will not be executed");
+
+  jstring representation = env->NewStringUTF(p_representation.c_str());
+  jstring dimension = env->NewStringUTF(p_dimension.c_str());
+
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addDimensionToRep2Method, representation, dimension);
+
+  env->DeleteLocalRef(representation);
+  env->DeleteLocalRef(dimension);
+
+  if (this->checkError("addDimensionToRep",
+                       "Error occurred adding a dimension " + p_dimension + " to representation " + p_representation))
     return false;
 
   this->informationDirty = true;
@@ -749,9 +802,8 @@ bool OntologyInterface::addRequiredStream(std::string const p_namedStream, std::
   return result;
 }
 
-
 bool OntologyInterface::addRequiredMap(std::string const p_namedMap, std::string const p_namedMapClass,
-                                          std::string const p_system, std::string const p_relatedEntity)
+                                       std::string const p_system, std::string const p_relatedEntity)
 {
   this->checkError("addRequiredMap", "Error exists, method addRequiredMap will not be executed");
 
@@ -760,8 +812,8 @@ bool OntologyInterface::addRequiredMap(std::string const p_namedMap, std::string
   jstring system = env->NewStringUTF(p_system.c_str());
   jstring relatedEntity = env->NewStringUTF(p_relatedEntity.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addRequiredMapMethod, namedMap,
-                                       namedMapClass, system, relatedEntity);
+  bool result = env->CallBooleanMethod(this->javaInterface, this->addRequiredMapMethod, namedMap, namedMapClass, system,
+                                       relatedEntity);
 
   env->DeleteLocalRef(namedMap);
   env->DeleteLocalRef(namedMapClass);
@@ -1131,7 +1183,7 @@ std::string OntologyInterface::toShortIri(std::string p_longIri)
 
   int id = -1;
 
-  for (int i=0; i < this->ontologyIriMapping.size(); ++i)
+  for (int i = 0; i < this->ontologyIriMapping.size(); ++i)
   {
     if (this->ontologyIriMapping.at(i) == iri)
     {
@@ -1272,7 +1324,6 @@ std::unique_ptr<std::vector<std::string>> OntologyInterface::readRepresentations
 
   return std::move(lines);
 }
-
 
 std::unique_ptr<std::vector<std::vector<const char*>*>> OntologyInterface::readNodesAndIROsAsASP(
     std::string const p_system)
@@ -1485,7 +1536,7 @@ LogLevel OntologyInterface::getLogLevel()
   if (this->checkError("getLogLevel", "Error occurred at requesting log level"))
     return Error;
 
-  return (LogLevel) result;
+  return (LogLevel)result;
 }
 
 void OntologyInterface::setLogLevel(LogLevel ll)

@@ -28,6 +28,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.structural.StructuralReasoner;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.AutoIRIMapper;
 
@@ -320,10 +321,15 @@ public class IceOntologyInterface {
 			OWLClass rep = this.findOWLClass(this.ii.representation, representation);
 
 			if (rep == null) {
-				logWarning(String.format(
-						"Unknown representation class '%s' for entity scope '%s', entity scope not created.",
-						representation, p_entityScope));
-				return false;
+				// logWarning(String.format(
+				// "Unknown representation class '%s' for entity scope '%s', entity scope not created.",
+				// representation, p_entityScope));
+				// return false;
+
+				rep = this.dataFactory.getOWLClass(IRI.create(this.mainIRIPrefix + representation));
+				axiom = dataFactory.getOWLSubClassOfAxiom(rep, this.ii.compositeRepresentation);
+				addAxiomChange = new AddAxiom(this.mainOntology, axiom);
+				changes.add(addAxiomChange);
 			}
 
 			OWLClassExpression hasRepresentation = this.dataFactory.getOWLObjectSomeValuesFrom(
@@ -341,7 +347,8 @@ public class IceOntologyInterface {
 		return true;
 	}
 
-	public boolean addValueScope(final String p_superValueScope, final String p_valueScope) {
+	public boolean addValueScope(final String p_superValueScope, final String p_valueScope,
+			final String p_representation) {
 		IRI valueScopeIRI = IRI.create(this.mainIRIPrefix + p_valueScope);
 		if (this.mainOntology.containsClassInSignature(valueScopeIRI))
 			return false;
@@ -358,10 +365,26 @@ public class IceOntologyInterface {
 			changes.add(addAxiomChange);
 		}
 
+		// featch representation
+		OWLClass representation = this.findOWLClass(this.ii.representation, p_representation);
+
+		if (representation == null) {
+			logWarning(String.format(
+					"Unknown representation class '%s' for value scope scope '%s', entity scope not created.",
+					p_representation, p_valueScope));
+			return false;
+		}
+
 		// create value scope
 		OWLClass valueScope = this.dataFactory.getOWLClass(valueScopeIRI);
 		OWLSubClassOfAxiom axiom = dataFactory.getOWLSubClassOfAxiom(valueScope, superValueScope);
 		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, axiom);
+		changes.add(addAxiomChange);
+
+		OWLClassExpression hasRepresentation = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.hasRepresentation,
+				representation);
+		OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(valueScope, hasRepresentation);
+		addAxiomChange = new AddAxiom(this.mainOntology, ax);
 		changes.add(addAxiomChange);
 
 		// apply changes
@@ -413,7 +436,78 @@ public class IceOntologyInterface {
 			OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(rep, hasDimension);
 			addAxiomChange = new AddAxiom(this.mainOntology, ax);
 			changes.add(addAxiomChange);
+
 		}
+
+		// apply changes
+		for (OWLOntologyChange change : changes) {
+			this.manager.applyChange(change);
+		}
+
+		this.dirty = true;
+
+		return true;
+	}
+
+	public boolean addDimensionToRep(final String p_representation, final String p_dimension, final String p_entityScope) {
+		IRI representationIRI = IRI.create(this.mainIRIPrefix + p_representation);
+		if (false == this.mainOntology.containsClassInSignature(representationIRI))
+			return false;
+
+		OWLClass rep = this.findOWLClass(this.ii.representation, p_representation);
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+
+		OWLClass dim = this.findOWLClass(this.ii.representation, p_dimension);
+
+		if (dim == null) {
+			logWarning(String.format(
+					"Unknown dimension class '%s' for representation '%s', representation not created.", p_dimension,
+					p_representation));
+			return false;
+		}
+
+		OWLClass scope = this.findOWLClass(this.ii.entityScope, p_entityScope);
+
+		OWLClassExpression hasRepresentation = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.hasRepresentation,
+				dim);
+
+		OWLClassExpression anonymious = this.dataFactory.getOWLObjectIntersectionOf(scope, hasRepresentation);
+
+		OWLClassExpression hasDimension = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.hasDimension, anonymious);
+		OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(rep, hasDimension);
+		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, ax);
+		changes.add(addAxiomChange);
+
+		// apply changes
+		for (OWLOntologyChange change : changes) {
+			this.manager.applyChange(change);
+		}
+
+		this.dirty = true;
+
+		return true;
+	}
+
+	public boolean addDimensionToRep(final String p_representation, final String p_dimension) {
+		IRI representationIRI = IRI.create(this.mainIRIPrefix + p_representation);
+		if (false == this.mainOntology.containsClassInSignature(representationIRI))
+			return false;
+
+		OWLClass rep = this.findOWLClass(this.ii.representation, p_representation);
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+
+		OWLClass dim = this.findOWLClass(this.ii.valueScope, p_dimension);
+
+		if (dim == null) {
+			logWarning(String.format("Dimension class '%s' to add to representation '%s' not found.", p_dimension,
+					p_representation));
+			return false;
+		}
+
+		OWLClassExpression hasDimension = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.hasDimension, dim);
+		OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(rep, hasDimension);
+		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, ax);
+		changes.add(addAxiomChange);
 
 		// apply changes
 		for (OWLOntologyChange change : changes) {
@@ -1240,8 +1334,14 @@ public class IceOntologyInterface {
 	}
 
 	private OWLReasoner getReasoner() {
-		if (this.dirty || this.internalReasoner == null) {
+		if (this.internalReasoner == null) {
 			this.internalReasoner = this.reasonerFactory.createReasoner(this.mainOntology);
+			this.dirty = false;
+		} else if (this.dirty) {
+			// this.internalReasoner.dispose();
+			// this.internalReasoner =
+			// this.reasonerFactory.createReasoner(this.mainOntology);
+			((StructuralReasoner) this.internalReasoner).prepareReasoner();
 			this.dirty = false;
 		}
 

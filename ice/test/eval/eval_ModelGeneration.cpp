@@ -14,8 +14,8 @@ TEST(EvalModelGeneration, simpleEvalTests)
 //    asp->setRandomize("20,15");
   });
   //                                 global      verbose gnuplot         runs
-  scenarios2.representationScenario( true,       true,  true,          runs,      2, 12, 1);
-  scenarios2.chainScenario(          true,       true,  true,          runs,      2, 12, 1, 10, 10, 1);
+//  scenarios2.representationScenario( true,       true,  true,          runs,      2, 12, 1);
+//  scenarios2.chainScenario(          true,       true,  true,          runs,      2, 12, 1, 10, 10, 1);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 10, 10, 10);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 20, 20, 10);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 30, 30, 10);
@@ -36,4 +36,21 @@ TEST(EvalModelGeneration, simpleEvalTests)
 //  scenarios.systemsStarMashScenario( false,      false,  false,          runs,      false, 150, 150, 1, 5, 10, 1);
 //  scenarios.systemsFullMashScenario( false,      false,  false,          runs,      10, 20, 1);
 //  scenarios.chainScenario(           false,      false,  false,          runs,      10, 10, 1, 1, 10, 1);
+
+
+  runs = 1;
+  EvalScenarios scenariosT(path + "", [&] (supplementary::ClingWrapper *asp){
+    asp->setPredefConfiguration(supplementary::PredefinedConfigurations::trendy);
+  });
+
+  //std::vector<int> v = {10,200};
+  TConf conf;
+  conf.parallelGroupsMin = 1;
+  conf.parallelGroupsMax = 10;
+  conf.parallelGrounsStep = 1;
+  conf.levels = {3,10,100};
+  conf.inputsMin = 2;
+  conf.inputsMax = 2;
+  conf.skipLevel = false;
+  scenariosT.transformation(false, true, runs, 1, conf);
 }

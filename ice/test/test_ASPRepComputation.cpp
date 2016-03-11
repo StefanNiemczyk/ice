@@ -35,7 +35,7 @@ TEST(ASPRepComp, simple)
   cw->solve();
 //  cw->printLastModel();
 
-  EXPECT_EQ(true, cw->query("hasRelatedEntity(relCoords)"));
+  EXPECT_EQ(true, cw->query("-simpleRep(relCoords)"));
   EXPECT_EQ(true, cw->query("simpleRep(coords)"));
   EXPECT_EQ(true, cw->query("simpleRep(coords2D)"));
 

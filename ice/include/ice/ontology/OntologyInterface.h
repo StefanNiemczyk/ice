@@ -54,9 +54,11 @@ public:
   bool addEntityType(std::string const p_entityType, std::vector<std::string> p_entityScopes);
   bool addScopesToEntityType(std::string const p_entityType, std::vector<std::string> p_entityScopes);
   bool addEntityScope(std::string const p_entityScope, std::vector<std::string> p_representations);
-  bool addValueScope(std::string const p_superValueScope, std::string const p_valueScope);
+  bool addValueScope(std::string const p_superValueScope, std::string const p_valueScope, std::string const p_representation);
   bool addRepresentation(std::string const p_superRepresentation, std::string const p_representation,
                          std::vector<std::string> p_dimensions);
+  bool addDimensionToRep(std::string const p_representation, std::string p_dimensions, std::string const p_entityScope);
+  bool addDimensionToRep(std::string const p_representation, std::string p_dimensions);
   bool addNamedStream(std::string const p_stream, std::string const p_entityScope, std::string const p_representation);
   bool addNamedMap(std::string const p_map, std::string const p_entityType, std::string const p_entityScope, std::string const p_representation);
   bool addRequiredStream(std::string const p_namedStream, std::string const p_namedStreamClass, std::string const p_system, std::string const p_entity, std::string const p_entityRelated);
@@ -144,6 +146,8 @@ private:
   jmethodID addScopesToEntityTypeMethod; /**< Method id */
   jmethodID addValueScopeMethod; /**< Method id */
   jmethodID addRepresentationMethod; /**< Method id */
+  jmethodID addDimensionToRep2Method; /**< Method id */
+  jmethodID addDimensionToRep3Method; /**< Method id */
   jmethodID addNamedStreamMethod; /**< Method id */
   jmethodID addNamedMapMethod; /**< Method id */
   jmethodID addRequiredStreamMethod; /**< Method id */
