@@ -20,7 +20,7 @@ namespace ice
 
 serval_interface::serval_interface(std::string const host, int const port, std::string const authName,
                                    std::string const authPass) :
-    host(host), port(port), self(nullptr), timeout(5000)
+    host(host), port(port), timeout(5000)
 {
   this->auth = new cpr::Authentication {authName, authPass};
   this->address = "http://" + this->host + ":" + std::to_string(this->port);
@@ -359,10 +359,26 @@ std::unique_ptr<std::vector<serval_bundle>> serval_interface::getBundleList(std:
     return nullptr;
   }
 
+  // WORKAROUND to fix a bug in the restful api, if requesting a bundle list by a token the closing braces are missing
+  if (r.text.find("\n]\n}") == std::string::npos)
+  {
+    r.text += "\n]\n}\n";
+  }
+
   // Read json.
   pt::ptree tree;
   std::istringstream is(r.text);
-  pt::read_json(is, tree);
+
+  try
+  {
+    pt::read_json(is, tree);
+  }
+  catch (std::exception &e)
+  {
+    std::cout<< r.text << std::endl;                         // JSON text string
+    this->logError("JSON could not be parsed for get bundle list");
+    return nullptr;
+  }
   std::unique_ptr<std::vector<serval_bundle>> ids(new std::vector<serval_bundle>);
 
   for (pt::ptree::value_type &rows : tree.get_child("rows"))
@@ -374,26 +390,21 @@ std::unique_ptr<std::vector<serval_bundle>> serval_interface::getBundleList(std:
       switch (i)
       {
         case 1:
-          std::cout << i << std::endl;
           bundle.token = row.second.get_value<std::string>();
           break;
         case 2:
-          std::cout << i << std::endl;
           bundle._id = row.second.get_value<int>();
           break;
         case 3:
-          std::cout << i << std::endl;
           bundle.service = row.second.get_value<std::string>();
           break;
         case 4:
           bundle.id = row.second.get_value<std::string>();
           break;
         case 5:
-          std::cout << i << std::endl;
           bundle.date = row.second.get_value<long>();
           break;
         case 6:
-          std::cout << i << std::endl;
           bundle.inserttime = row.second.get_value<long>();
           break;
         case 7:
@@ -433,34 +444,159 @@ std::unique_ptr<std::vector<serval_bundle>> serval_interface::getBundleList(std:
   return std::move(ids);
 }
 
-bool serval_interface::addBundle(std::string pathToFile, std::string manifest, std::string bundleId, std::string author,
+
+std::unique_ptr<serval_bundle_manifest> serval_interface::getBundleManifest(std::string bundleId)
+{
+  std::string path = SERVAL_REST_RHIZOME_GET_BUNDLE;
+  path.replace(path.find("$BID"), 4, bundleId);
+
+  auto r = cpr::Get(cpr::Url {this->address + path}, *this->auth, cpr::Timeout{this->timeout});
+
+//  std::cout << this->address + path << std::endl;
+//  std::cout << r.error.message << std::endl;
+//  std::cout<< r.status_code << std::endl;                  // 200
+//  std::cout<< r.header["content-type"] << std::endl;       // application/json; charset=utf-8
+//  std::cout<< r.text << std::endl;                         // JSON text string
+
+  if (r.status_code != 200) // HTTP_OK
+  {
+    this->logError("Unexpected return code '" + std::to_string(r.status_code) + "' for get bundle manifest for bid '" + bundleId + "'");
+    return nullptr;
+  }
+
+  if (r.header["content-type"] != "rhizome-manifest/text")
+  {
+    this->logError("Unexpected return type '" + r.header["content-type"] + "' for get bundle manifest for bid '" + bundleId + "'");
+    return nullptr;
+  }
+
+  return std::move(this->parseManifest(r.text));
+}
+
+
+std::string serval_interface::getBundlePayload(std::string bundleId, bool decrypted)
+{
+  std::string path;
+
+  if (decrypted)
+    path = SERVAL_REST_RHIZOME_GET_BUNDLE_DECRIPTED;
+  else
+    path = SERVAL_REST_RHIZOME_GET_BUNDLE_RAW;
+  path.replace(path.find("$BID"), 4, bundleId);
+
+  auto r = cpr::Get(cpr::Url {this->address + path}, *this->auth, cpr::Timeout{this->timeout});
+
+//  std::cout<< r.status_code << std::endl;                  // 200
+//  std::cout<< r.header["content-type"] << std::endl;       // application/json; charset=utf-8
+//  std::cout<< r.text << std::endl;                         // JSON text string
+
+  if (r.status_code != 200) // HTTP_OK
+  {
+    this->logError("Unexpected return code '" + std::to_string(r.status_code) + "' for get bundle manifest for bid '" + bundleId + "'");
+    return "";
+  }
+
+  if (r.header["content-type"] != "application/octet-stream")
+  {
+    this->logError("Unexpected return type '" + r.header["content-type"] + "' for get bundle manifest for bid '" + bundleId + "'");
+    return "";
+  }
+
+  return r.text;
+}
+
+std::unique_ptr<serval_bundle_manifest> serval_interface::addBundle(std::string pathToFile, std::string manifest, std::string bundleId, std::string author,
                                  std::string secret)
 {
   auto form = cpr::Multipart { {"manifest", "", "rhizome/manifest"}, {"payload", cpr::File {pathToFile}}};
   auto r = cpr::Post(cpr::Url {this->address + SERVAL_REST_RHIZOME_POST_BUNDLE}, *this->auth, form, cpr::Timeout{this->timeout});
 
-  std::cout << pathToFile << std::endl;
-  std::cout << r.status_code << std::endl;                  // 200
-  std::cout << r.header["content-type"] << std::endl;       // application/json; charset=utf-8
-  std::cout << r.text << std::endl;                         // JSON text string
+//  std::cout << pathToFile << std::endl;
+//  std::cout << r.status_code << std::endl;                  // 200
+//  std::cout << r.header["content-type"] << std::endl;       // application/json; charset=utf-8
+//  std::cout << r.text << std::endl;                         // JSON text string
 
   if (r.status_code != 201) // HTTP_ADD
   {
-//      this->logError(
-//          "Unexpected return code '" + std::to_string(r.status_code) + "' for post message for sender/recipient '"
-//              + senderSid + "'/'" + recipientSid + "'");
-    return false;
+    this->logError(
+        "Unexpected return code '" + std::to_string(r.status_code) + "' for add rhizome file '" + pathToFile + "'");
+    return nullptr;
   }
 
-  if (r.header["content-type"] != "application/json")
+  if (r.header["content-type"] != "rhizome-manifest/text")
   {
-//      this->logError(
-//          "Unexpected return type '" + r.header["content-type"] + "' for post message for sender/recipient '" + senderSid
-//              + "'/'" + recipientSid + "'");
-    return false;
+    this->logError(
+        "Unexpected return type '" + r.header["content-type"] + "' for add rhizome file '" + pathToFile + "'");
+    return nullptr;
   }
 
-  return true;
+  return std::move(this->parseManifest(r.text));
+}
+
+std::unique_ptr<serval_bundle_manifest> serval_interface::appendBundle(std::string pathToFile, std::string manifest, std::string bundleId, std::string author,
+                                 std::string secret)
+{
+  auto form = cpr::Multipart { {"manifest", "", "rhizome/manifest"}, {"payload", cpr::File {pathToFile}}};
+  auto r = cpr::Post(cpr::Url {this->address + SERVAL_REST_RHIZOME_POST_APPEND_BUNDLE}, *this->auth, form, cpr::Timeout{this->timeout});
+
+//  std::cout << pathToFile << std::endl;
+//  std::cout << r.status_code << std::endl;                  // 200
+//  std::cout << r.header["content-type"] << std::endl;       // application/json; charset=utf-8
+//  std::cout << r.text << std::endl;                         // JSON text string
+
+  if (r.status_code != 201) // HTTP_ADD
+  {
+    this->logError(
+        "Unexpected return code '" + std::to_string(r.status_code) + "' for add rhizome file '" + pathToFile + "'");
+    return nullptr;
+  }
+
+  if (r.header["content-type"] != "rhizome-manifest/text")
+  {
+    this->logError(
+        "Unexpected return type '" + r.header["content-type"] + "' for add rhizome file '" + pathToFile + "'");
+    return nullptr;
+  }
+
+  return std::move(this->parseManifest(r.text));
+}
+
+std::unique_ptr<serval_bundle_manifest> serval_interface::parseManifest(std::string &source)
+{
+  std::unique_ptr<serval_bundle_manifest> manifest(new serval_bundle_manifest());
+
+  manifest->service = this->parse(source, "service");
+  manifest->version = std::stol(this->parse(source, "version"));
+  manifest->id = this->parse(source, "id");
+  manifest->date = std::stol(this->parse(source, "date"));
+  manifest->name = this->parse(source, "name");
+  manifest->filesize = std::stol(this->parse(source, "filesize"));
+  manifest->filehash = this->parse(source, "filehash");
+
+  std::string crypt = this->parse(source, "crypt");
+  if (crypt != "")
+    manifest->crypt =  std::stoi(crypt);
+  else
+    manifest->crypt = 0;
+  manifest->tail = this->parse(source, "tail");
+
+  return std::move(manifest);
+}
+
+std::string serval_interface::parse(std::string &source, std::string key)
+{
+  int index1, index2;
+  index1 =  source.find(key + "=");
+  if (index1 == std::string::npos)
+    return "";
+
+  index1 +=  + key.size() + 1;
+  index2 = source.find("\n", index1);
+
+  if (index2 == std::string::npos)
+    return "";
+
+  return source.substr(index1, index2-index1);
 }
 
 void serval_interface::logError(std::string msg)

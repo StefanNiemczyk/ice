@@ -28,8 +28,8 @@ const std::string SERVAL_REST_POST_MESSAGE = "/restful/meshms/$SENDERSID/$RECIPI
 const std::string SERVAL_REST_RHIZOME_GET_BUNDLE_LIST = "/restful/rhizome/bundlelist.json";
 const std::string SERVAL_REST_RHIZOME_GET_BUNDLE_LIST_BY_TOKEN = "/restful/rhizome/newsince/$TOKEN/bundlelist.json";
 const std::string SERVAL_REST_RHIZOME_GET_BUNDLE = "/restful/rhizome/$BID.rhm";
-const std::string SERVAL_REST_RHIZOME_BUNDLE_RAW = "/restful/rhizome/$BID/raw.bin";
-const std::string SERVAL_REST_RHIZOME_BUNDLE_DECRIPTED = "/restful/rhizome/$BID/decrypted.bin";
+const std::string SERVAL_REST_RHIZOME_GET_BUNDLE_RAW = "/restful/rhizome/$BID/raw.bin";
+const std::string SERVAL_REST_RHIZOME_GET_BUNDLE_DECRIPTED = "/restful/rhizome/$BID/decrypted.bin";
 const std::string SERVAL_REST_RHIZOME_POST_BUNDLE = "/restful/rhizome/insert";
 const std::string SERVAL_REST_RHIZOME_POST_APPEND_BUNDLE = "/restful/rhizome/append";
 
@@ -133,6 +133,33 @@ struct serval_bundle
   }
 };
 
+
+struct serval_bundle_manifest
+{
+  std::string service;
+  long version;
+  std::string id;
+  long date;
+  std::string name;
+  long filesize;
+  std::string filehash;
+  int crypt;
+  std::string tail;
+
+  std::string toString()
+  {
+    return "service: '" + service
+              + "', version: '" + std::to_string(version)
+              + "', id: '" + id
+              + "', date: '" + std::to_string(date)
+              + "', name: '" + name
+              + "', filesize: '" + std::to_string(filesize)
+              + "', filehash: '" + filehash
+              + "', crypt: '" + std::to_string(crypt)
+              + "', tail: '" + tail + "'";
+  }
+};
+
 class serval_interface
 {
 public:
@@ -151,10 +178,16 @@ public:
 
   // rhizome api
   std::unique_ptr<std::vector<serval_bundle>> getBundleList(std::string token = "");
-  bool addBundle(std::string pathToFile, std::string manifest = "", std::string bundleId = "",
+  std::unique_ptr<serval_bundle_manifest> getBundleManifest(std::string bundleId);
+  std::string getBundlePayload(std::string bundleId, bool decrypted = false);
+  std::unique_ptr<serval_bundle_manifest> addBundle(std::string pathToFile, std::string manifest = "", std::string bundleId = "",
+                 std::string author = "", std::string secret = "");
+  std::unique_ptr<serval_bundle_manifest> appendBundle(std::string pathToFile, std::string manifest = "", std::string bundleId = "",
                  std::string author = "", std::string secret = "");
 
 private:
+  std::unique_ptr<serval_bundle_manifest> parseManifest(std::string &source);
+  std::string parse(std::string &source, std::string key);
   void logError(std::string msg);
 
 private:
@@ -163,8 +196,6 @@ private:
   int timeout;
   cpr::Authentication *auth;
   std::string address;
-  serval_identity *self;
-
 };
 
 } /* namespace ice */
