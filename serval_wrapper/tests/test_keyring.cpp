@@ -25,4 +25,6 @@ TEST(JNITest, add_identity)
   auto id = si.addIdentity();
 
   ASSERT_TRUE(id != nullptr);
+
+  // add name
 }

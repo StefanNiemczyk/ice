@@ -19,6 +19,7 @@ namespace ice
 
 const std::string SERVAL_REST_GET_IDENTITIES = "/restful/keyring/identities.json";
 const std::string SERVAL_REST_ADD_IDENTITY = "/restful/keyring/add";
+const std::string SERVAL_REST_GET_IDENTITY_SET = "/restful/keyring/$SID/set";
 
 const std::string SERVAL_REST_GET_CONVERSATION_LIST = "/restful/meshms/$RECIPIENTSID/conversationlist.json";
 const std::string SERVAL_REST_GET_MESSAGE_LIST = "/restful/meshms/$SENDERSID/$RECIPIENTSID/messagelist.json";

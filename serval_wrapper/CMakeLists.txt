@@ -66,7 +66,7 @@ target_link_libraries(${PROJECT_NAME}
 #############
 
 catkin_add_gtest(${PROJECT_NAME}-test 
-#  tests/test_keyring.cpp
+  tests/test_keyring.cpp
 #  tests/test_meshms.cpp
   tests/test_rhizome.cpp
 
