@@ -20,7 +20,8 @@ find_package(TinyXML REQUIRED)
 ## Use c++ 11x std
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
-add_definitions(-DWITH_THREADS=1)
+#find_package(TBB REQUIRED)
+add_definitions(-DWITH_THREADS=0)
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
@@ -273,28 +274,28 @@ target_link_libraries(ice_node
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test 
-  test/eval/eval_ModelGeneration.cpp
-  test/eval/ModelGeneration.cpp
-  test/eval/EvalScenarios.cpp
+ # test/eval/eval_ModelGeneration.cpp
+ # test/eval/ModelGeneration.cpp
+ # test/eval/EvalScenarios.cpp
  # test/eval/eval_AccessSpeed.cpp
  
- # test/etc/TestTime.cpp
- # test/etc/EngineStuff.cpp
- # test/test_ASPCoordinator.cpp
- # test/test_JNI.cpp
- # test/test_ASPComposition.cpp
+  test/etc/TestTime.cpp
+  test/etc/EngineStuff.cpp
+  test/test_ASPCoordinator.cpp
+  test/test_JNI.cpp
+  test/test_ASPComposition.cpp
   test/test_ASPRepComputation.cpp
- # test/test_GContainer.cpp
- # test/test_RepresentationTransformation.cpp
- # test/test_EulerRepTransformation.cpp
- # test/test_serialize.cpp
- # test/test_RingBuffer.cpp
- # test/test_Buffer.cpp
- # test/test_EventHandler.cpp
- # test/test_Time.cpp
- # test/test_InformationStore.cpp
- # test/test_Node.cpp
- # test/test_NodeStore.cpp
+  test/test_GContainer.cpp
+  test/test_RepresentationTransformation.cpp
+  test/test_EulerRepTransformation.cpp
+  test/test_serialize.cpp
+  test/test_RingBuffer.cpp
+  test/test_Buffer.cpp
+  test/test_EventHandler.cpp
+  test/test_Time.cpp
+  test/test_InformationStore.cpp
+  test/test_Node.cpp
+  test/test_NodeStore.cpp
  
  ## should be fixed...  
  # test/test_XMLReader

@@ -1,0 +1,3 @@
+[submodule "serval_wrapper/cpr"]
+	path = serval_wrapper/cpr
+	url = git@github.com:whoshuu/cpr.git
