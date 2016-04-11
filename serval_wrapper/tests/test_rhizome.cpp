@@ -12,36 +12,28 @@
 #include "gtest/gtest.h"
 #include "serval_interface.h"
 
+#ifndef TEST_FILE_ROOT_PATH
+#error TEST_FILE_ROOT_PATH is not defined
+#endif
 
-TEST(JNITest, get_bundle_list)
+TEST(rhizome, get_bundle_list)
 {
   ice::serval_interface si("localhost", 4110, "peter", "venkman");
 
-  auto bundles = si.getBundleList();
+  auto bundles = si.rhizome.getBundleList();
   ASSERT_TRUE(bundles != nullptr);
-
-  for (auto &bundle : * bundles)
-  {
-    std::cout << bundle.toString() << std::endl;
-  }
 }
 
-TEST(JNITest, add_bundle)
+TEST(rhizome, add_bundle)
 {
-  char buff[ PATH_MAX ];
-  ssize_t count = readlink( "/proc/self/exe", buff, PATH_MAX );
-  std::string path( buff, (count > 0) ? count : 0 );
-
   ice::serval_interface si("localhost", 4110, "peter", "venkman");
 
-  auto manifest1 = si.addBundle("/home/sni/pjx/catkin_ws/src/ice/serval_wrapper/tests/data/test.txt");
+  std::string path = std::string(TEST_FILE_ROOT_PATH) + std::string("/tests/data/test.txt");
+  auto manifest1 = si.rhizome.addBundle(path);
   ASSERT_TRUE(manifest1 != nullptr);
-  std::cout << manifest1->toString() << std::endl;
 
-  auto manifest2 = si.getBundleManifest(manifest1->id);
+  auto manifest2 = si.rhizome.getBundleManifest(manifest1->id);
   ASSERT_TRUE(manifest2 != nullptr);
-
-  std::cout << manifest2->toString() << std::endl;
 
   ASSERT_EQ(manifest1->service, manifest2->service);
   ASSERT_EQ(manifest1->version, manifest2->version);
@@ -51,39 +43,33 @@ TEST(JNITest, add_bundle)
   ASSERT_EQ(manifest1->filesize, manifest2->filesize);
   ASSERT_EQ(manifest1->filehash, manifest2->filehash);
 
-  auto raw = si.getBundlePayload(manifest1->id, false);
+  auto raw = si.rhizome.getBundlePayload(manifest1->id, false);
   ASSERT_NE(raw, "");
 
-  auto decripted = si.getBundlePayload(manifest1->id, true);
+  auto decripted = si.rhizome.getBundlePayload(manifest1->id, true);
   ASSERT_NE(decripted, "");
 
   ASSERT_EQ(raw, decripted);
 
-  auto bundles = si.getBundleList();
+  auto bundles = si.rhizome.getBundleList();
   ASSERT_TRUE(bundles != nullptr);
   ASSERT_NE(bundles->size(), 0);
 
-  auto bundles2 = si.getBundleList(bundles->at(0).token);
+  auto bundles2 = si.rhizome.getBundleList(bundles->at(0).token);
   ASSERT_NE(bundles2, nullptr);
   ASSERT_EQ(bundles2->size(), 0);
 }
 
 TEST(JNITest, append_bundle)
 {
-  char buff[ PATH_MAX ];
-  ssize_t count = readlink( "/proc/self/exe", buff, PATH_MAX );
-  std::string path( buff, (count > 0) ? count : 0 );
-
   ice::serval_interface si("localhost", 4110, "peter", "venkman");
 
-  auto manifest1 = si.appendBundle("/home/sni/pjx/catkin_ws/src/ice/serval_wrapper/tests/data/test.txt");
+  std::string path = std::string(TEST_FILE_ROOT_PATH) + std::string("/tests/data/test.txt");
+  auto manifest1 = si.rhizome.appendBundle("/home/sni/pjx/catkin_ws/src/ice/serval_wrapper/tests/data/test.txt"); // TODO
   ASSERT_TRUE(manifest1 != nullptr);
-  std::cout << manifest1->toString() << std::endl;
 
-  auto manifest2 = si.getBundleManifest(manifest1->id);
+  auto manifest2 = si.rhizome.getBundleManifest(manifest1->id);
   ASSERT_TRUE(manifest2 != nullptr);
-
-  std::cout << manifest2->toString() << std::endl;
 
   ASSERT_EQ(manifest1->service, manifest2->service);
   ASSERT_EQ(manifest1->version, manifest2->version);
@@ -93,10 +79,10 @@ TEST(JNITest, append_bundle)
   ASSERT_EQ(manifest1->filesize, manifest2->filesize);
   ASSERT_EQ(manifest1->filehash, manifest2->filehash);
 
-  auto raw = si.getBundlePayload(manifest1->id, false);
+  auto raw = si.rhizome.getBundlePayload(manifest1->id, false);
   ASSERT_NE(raw, "");
 
-  auto decripted = si.getBundlePayload(manifest1->id, true);
+  auto decripted = si.rhizome.getBundlePayload(manifest1->id, true);
   ASSERT_NE(decripted, "");
 
   ASSERT_EQ(raw, decripted);

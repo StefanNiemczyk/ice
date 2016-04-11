@@ -14,25 +14,12 @@
 #include <vector>
 #include <cpr/cpr.h>
 
+#include "serval_wrapper/keyring.h"
+#include "serval_wrapper/meshms.h"
+#include "serval_wrapper/rhizome.h"
+
 namespace ice
 {
-
-const std::string SERVAL_REST_GET_IDENTITIES = "/restful/keyring/identities.json";
-const std::string SERVAL_REST_ADD_IDENTITY = "/restful/keyring/add";
-const std::string SERVAL_REST_GET_IDENTITY_SET = "/restful/keyring/$SID/set";
-
-const std::string SERVAL_REST_GET_CONVERSATION_LIST = "/restful/meshms/$RECIPIENTSID/conversationlist.json";
-const std::string SERVAL_REST_GET_MESSAGE_LIST = "/restful/meshms/$SENDERSID/$RECIPIENTSID/messagelist.json";
-const std::string SERVAL_REST_GET_MESSAGE_LIST_BY_TOKEN = "/restful/meshms/$SENDERSID/$RECIPIENTSID/newsince/$TOKEN/messagelist.json";
-const std::string SERVAL_REST_POST_MESSAGE = "/restful/meshms/$SENDERSID/$RECIPIENTSID/sendmessage";
-
-const std::string SERVAL_REST_RHIZOME_GET_BUNDLE_LIST = "/restful/rhizome/bundlelist.json";
-const std::string SERVAL_REST_RHIZOME_GET_BUNDLE_LIST_BY_TOKEN = "/restful/rhizome/newsince/$TOKEN/bundlelist.json";
-const std::string SERVAL_REST_RHIZOME_GET_BUNDLE = "/restful/rhizome/$BID.rhm";
-const std::string SERVAL_REST_RHIZOME_GET_BUNDLE_RAW = "/restful/rhizome/$BID/raw.bin";
-const std::string SERVAL_REST_RHIZOME_GET_BUNDLE_DECRIPTED = "/restful/rhizome/$BID/decrypted.bin";
-const std::string SERVAL_REST_RHIZOME_POST_BUNDLE = "/restful/rhizome/insert";
-const std::string SERVAL_REST_RHIZOME_POST_APPEND_BUNDLE = "/restful/rhizome/append";
 
 struct serval_identity
 {
@@ -134,7 +121,6 @@ struct serval_bundle
   }
 };
 
-
 struct serval_bundle_manifest
 {
   std::string service;
@@ -166,30 +152,15 @@ class serval_interface
 public:
   serval_interface(std::string const host, int const port, std::string const authName, std::string const authPass);
   virtual ~serval_interface();
-
-  // keyring api
-  std::unique_ptr<std::vector<serval_identity>> getIdentities();
-  std::unique_ptr<serval_identity> addIdentity(std::string password = "");
-
-  //meshms api
-  std::unique_ptr<std::vector<serval_conversation>> getConversationList(std::string recipientSid);
-  std::unique_ptr<serval_message_list> getMessageList(std::string recipientSid, std::string senderSid,
-                                                      std::string token = "");
-  bool postMessage(std::string recipientSid, std::string senderSid, std::string msg);
-
-  // rhizome api
-  std::unique_ptr<std::vector<serval_bundle>> getBundleList(std::string token = "");
-  std::unique_ptr<serval_bundle_manifest> getBundleManifest(std::string bundleId);
-  std::string getBundlePayload(std::string bundleId, bool decrypted = false);
-  std::unique_ptr<serval_bundle_manifest> addBundle(std::string pathToFile, std::string manifest = "", std::string bundleId = "",
-                 std::string author = "", std::string secret = "");
-  std::unique_ptr<serval_bundle_manifest> appendBundle(std::string pathToFile, std::string manifest = "", std::string bundleId = "",
-                 std::string author = "", std::string secret = "");
-
-private:
-  std::unique_ptr<serval_bundle_manifest> parseManifest(std::string &source);
-  std::string parse(std::string &source, std::string key);
   void logError(std::string msg);
+  int getTimeout();
+  std::string getAddress();
+  cpr::Authentication* getAuth();
+
+public:
+  serval_wrapper::keyring keyring;
+  serval_wrapper::meshms meshms;
+  serval_wrapper::rhizome rhizome;
 
 private:
   std::string const host;

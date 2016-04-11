@@ -4,27 +4,25 @@
 #include "gtest/gtest.h"
 #include "serval_interface.h"
 
-TEST(JNITest, get_identities)
+TEST(keyring, get_identities)
 {
   ice::serval_interface si("localhost", 4110, "peter", "venkman");
 
-  auto ids = si.getIdentities();
-
+  auto ids = si.keyring.getIdentities();
   ASSERT_TRUE(ids != nullptr);
-
-  for (auto &id : * ids)
-  {
-    std::cout << id.toString() << std::endl;
-  }
 }
 
-TEST(JNITest, add_identity)
+TEST(keyring, add_identity)
 {
   ice::serval_interface si("localhost", 4110, "peter", "venkman");
 
-  auto id = si.addIdentity();
-
+  auto id = si.keyring.addIdentity();
   ASSERT_TRUE(id != nullptr);
+
+  auto ids = si.keyring.getIdentities();
+  ASSERT_TRUE(ids != nullptr);
+
+  ASSERT_GT(ids->size(), 0);
 
   // add name
 }

@@ -53,6 +53,10 @@ include_directories(
 
 add_library(${PROJECT_NAME} 
   src/serval_interface.cpp
+  
+  src/serval_wrapper/keyring.cpp
+  src/serval_wrapper/meshms.cpp
+  src/serval_wrapper/rhizome.cpp
 )
 
 
@@ -64,6 +68,8 @@ target_link_libraries(${PROJECT_NAME}
 #############
 ## Testing ##
 #############
+
+add_definitions(-DTEST_FILE_ROOT_PATH="${PROJECT_SOURCE_DIR}")
 
 catkin_add_gtest(${PROJECT_NAME}-test 
   tests/test_keyring.cpp
