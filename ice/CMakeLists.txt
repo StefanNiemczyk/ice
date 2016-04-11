@@ -106,8 +106,8 @@ set(CMAKE_JAVA_INCLUDE_PATH
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-   INCLUDE_DIRS include
-   LIBRARIES ice
+   INCLUDE_DIRS include ${JNI_INCLUDE_DIRS}
+   LIBRARIES ice ${JNI_LIBRARIES}
    CATKIN_DEPENDS roscpp std_msgs ice_msgs cling_wrap
    DEPENDS TinyXML
 )

@@ -11,6 +11,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <iostream>
 #include <regex>
+#include <sstream>
 
 // Short alias for this namespace
 namespace pt = boost::property_tree;
@@ -25,6 +26,7 @@ serval_interface::serval_interface(std::string const host, int const port, std::
 {
   this->auth = new cpr::Authentication {authName, authPass};
   this->address = "http://" + this->host + ":" + std::to_string(this->port);
+  this->servalBin = "/home/sni/serval-dna/servald";
 }
 
 serval_interface::~serval_interface()
@@ -50,6 +52,28 @@ cpr::Authentication* serval_interface::getAuth()
 void serval_interface::logError(std::string msg)
 {
   std::cerr << "serval_interface Error: " << msg << std::endl;
+}
+
+std::string serval_interface::getServalBin()
+{
+  return this->servalBin;
+}
+
+int serval_interface::exec(const char* cmd, std::stringstream &output) {
+    std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) return -1;
+    char buffer[128];
+
+    while (!feof(pipe.get())) {
+        if (fgets(buffer, 128, pipe.get()) != NULL)
+          output << buffer;
+    }
+
+    output.seekg(0, std::ios::end);
+    int size = output.tellg();
+    output.seekg(0, std::ios::beg);
+
+    return size;
 }
 
 } /* namespace ice */

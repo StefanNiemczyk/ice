@@ -156,6 +156,8 @@ public:
   int getTimeout();
   std::string getAddress();
   cpr::Authentication* getAuth();
+  std::string getServalBin();
+  int exec(const char* cmd, std::stringstream &output);
 
 public:
   serval_wrapper::keyring keyring;
@@ -168,6 +170,7 @@ private:
   int timeout;
   cpr::Authentication *auth;
   std::string address;
+  std::string servalBin;
 };
 
 } /* namespace ice */

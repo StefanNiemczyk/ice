@@ -36,7 +36,7 @@ meshms::~meshms()
 std::unique_ptr<std::vector<serval_conversation>> meshms::getConversationList(std::string recipientSid)
 {
   std::string path = SERVAL_REST_GET_CONVERSATION_LIST;
-  path.replace(SERVAL_REST_GET_CONVERSATION_LIST.find("$RECIPIENTSID"), 13, recipientSid);
+  path.replace(path.find("$RECIPIENTSID"), 13, recipientSid);
 
   auto r = cpr::Get(cpr::Url {this->interface->getAddress() + path}, *this->interface->getAuth(),
                     cpr::Timeout{this->interface->getTimeout()});
