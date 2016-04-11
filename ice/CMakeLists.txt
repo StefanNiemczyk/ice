@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   ice_msgs
   cling_wrap
   cmake_modules
+  muparser
 )
 
 ## tiny xml package
@@ -137,7 +138,6 @@ add_jar(
 # include_directories(include)
 include_directories(
   include
-  include/muparser
   ${catkin_INCLUDE_DIRS}
   ${TinyXML_INCLUDE_DIRS}
   ${JNI_INCLUDE_DIRS}
@@ -204,16 +204,6 @@ add_library(${PROJECT_NAME}
   src/ros/RosInformationReceiver.cpp
   src/ros/RosMessageTransform.cpp
   src/ros/RosTimeFactory.cpp
-
-  src/muparser/muParserBase.cpp
-  src/muparser/muParserBytecode.cpp
-  src/muparser/muParserCallback.cpp
-  src/muparser/muParser.cpp
-  src/muparser/muParserDLL.cpp
-  src/muparser/muParserError.cpp
-  src/muparser/muParserInt.cpp
-  src/muparser/muParserTest.cpp
-  src/muparser/muParserTokenReader.cpp
 )
 
 ## Declare a cpp executable

@@ -1,3 +1,7 @@
 [submodule "serval_wrapper/cpr"]
 	path = serval_wrapper/cpr
 	url = git@github.com:whoshuu/cpr.git
+[submodule "muparser"]
+	path = muparser
+	url = https://github.com/carpe-noctem-cassel/muparser.git
+	branch = catkin-pkg
