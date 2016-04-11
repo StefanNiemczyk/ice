@@ -10,7 +10,7 @@
 #include "ice/representation/GContainer.h"
 #include "ice/representation/GContainerFactory.h"
 
-#include "muParser.h"
+#include <muParser.h>
 
 namespace ice
 {
