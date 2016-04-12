@@ -44,8 +44,6 @@ TEST(keyring, set_identity)
   ASSERT_EQ(updatedId->sid, id->sid);
   ASSERT_EQ(updatedId->did, "098766725");
   ASSERT_EQ(updatedId->name, "testname");
-
-  std::cout << updatedId->toString() << std::endl;
 }
 
 TEST(keyring, get_identities_cmd)

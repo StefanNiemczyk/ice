@@ -26,7 +26,7 @@ serval_interface::serval_interface(std::string const host, int const port, std::
 {
   this->auth = new cpr::Authentication {authName, authPass};
   this->address = "http://" + this->host + ":" + std::to_string(this->port);
-  this->servalBin = "/home/sni/serval-dna/servald";
+  this->servalBin = "/home/sni/pjx/serval/serval-dna/servald";
 }
 
 serval_interface::~serval_interface()

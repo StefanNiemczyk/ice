@@ -29,7 +29,6 @@ keyring::keyring(serval_interface* const interface) : interface(interface)
 
 keyring::~keyring()
 {
-  // TODO Auto-generated destructor stub
 }
 
 
@@ -38,9 +37,9 @@ std::unique_ptr<std::vector<serval_identity>> keyring::getIdentities()
   auto r = cpr::Get(cpr::Url {this->interface->getAddress() + SERVAL_REST_GET_IDENTITIES},
                     *this->interface->getAuth(), cpr::Timeout{this->interface->getTimeout()});
 
-  std::cout<< r.status_code << std::endl;                  // 200
-  std::cout<< r.header["content-type"] << std::endl;       // application/json; charset=utf-8
-  std::cout<< r.text << std::endl;                         // JSON text string
+//  std::cout<< r.status_code << std::endl;                  // 200
+//  std::cout<< r.header["content-type"] << std::endl;       // application/json; charset=utf-8
+//  std::cout<< r.text << std::endl;                         // JSON text string
 
   if (r.status_code != 200) // HTTP_OK
   {
