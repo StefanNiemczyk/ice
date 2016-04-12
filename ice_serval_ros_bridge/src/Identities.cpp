@@ -21,4 +21,11 @@ Identities::~Identities()
   // TODO Auto-generated destructor stub
 }
 
+
+
+Identity Identities::registerIdentity(std::string key, std::string value)
+{
+
+}
+
 } /* namespace ice */

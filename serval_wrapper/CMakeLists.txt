@@ -34,10 +34,10 @@ find_package(Boost REQUIRED COMPONENTS system)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES serval_wrapper
-#  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
+  INCLUDE_DIRS include ${CPR_INCLUDE_DIRS}
+  LIBRARIES ${PROJECT_NAME} 
+#  CATKIN_DEPENDS 
+  DEPENDS ${CPR_LIBRARIES}
 )
 
 ###########
@@ -73,7 +73,7 @@ add_definitions(-DTEST_FILE_ROOT_PATH="${PROJECT_SOURCE_DIR}")
 
 catkin_add_gtest(${PROJECT_NAME}-test 
   tests/test_keyring.cpp
-#  tests/test_meshms.cpp
+  tests/test_meshms.cpp
   tests/test_rhizome.cpp
 
   tests/test_main.cpp

@@ -18,7 +18,7 @@
 
 TEST(rhizome, get_bundle_list)
 {
-  ice::serval_interface si("localhost", 4110, "peter", "venkman");
+  ice::serval_interface si("/tmp/instance1", "localhost", 4110, "peter", "venkman");
 
   auto bundles = si.rhizome.getBundleList();
   ASSERT_TRUE(bundles != nullptr);
@@ -26,7 +26,7 @@ TEST(rhizome, get_bundle_list)
 
 TEST(rhizome, add_bundle)
 {
-  ice::serval_interface si("localhost", 4110, "peter", "venkman");
+  ice::serval_interface si("/tmp/instance1", "localhost", 4110, "peter", "venkman");
 
   std::string path = std::string(TEST_FILE_ROOT_PATH) + std::string("/tests/data/test.txt");
   auto manifest1 = si.rhizome.addBundle(path);
@@ -62,7 +62,7 @@ TEST(rhizome, add_bundle)
 
 TEST(JNITest, append_bundle)
 {
-  ice::serval_interface si("localhost", 4110, "peter", "venkman");
+  ice::serval_interface si("/tmp/instance1", "localhost", 4110, "peter", "venkman");
 
   std::string path = std::string(TEST_FILE_ROOT_PATH) + std::string("/tests/data/test.txt");
   auto manifest1 = si.rhizome.appendBundle("/home/sni/pjx/catkin_ws/src/ice/serval_wrapper/tests/data/test.txt"); // TODO

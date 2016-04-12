@@ -3,9 +3,10 @@ project(ice_serval_ros_bridge)
 
 
 find_package(catkin REQUIRED 
-  ice
   roscpp
   roslib
+  ice
+  serval_wrapper
 )
 
 ## Use c++ 11x std
@@ -37,9 +38,9 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES ice_serval_ros_bridge
-#  CATKIN_DEPENDS other_catkin_pkg
+  CATKIN_DEPENDS ice serval_wrapper
 #  DEPENDS system_lib
 )
 
@@ -52,27 +53,38 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )  
 
-add_executable(${PROJECT_NAME} 
-  src/IceServalBridgeNode.cpp
+add_library(${PROJECT_NAME}
   src/IceServalBridge.cpp
   src/Identities.cpp
+  src/Identity.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ice)
+add_dependencies(${PROJECT_NAME} serval_wrapper)
 
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
+
+
+add_executable(${PROJECT_NAME}_node
+  src/IceServalBridgeNode.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_ice_serval_ros_bridge.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+catkin_add_gtest(${PROJECT_NAME}-test 
+  tests/test_identity.cpp
+  tests/test_main.cpp)
+  
+if(TARGET ${PROJECT_NAME}-test)
+  target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

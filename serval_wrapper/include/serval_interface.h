@@ -82,8 +82,9 @@ struct serval_message_list
 
   std::string toString()
   {
-    return "read_offset: '" + std::to_string(read_offset) + "', latest_ack_offset: '"
-        + std::to_string(latest_ack_offset) + "', message count: '" + std::to_string(messages.size()) + "'";
+    return "read_offset: '" + std::to_string(read_offset)
+              + "', latest_ack_offset: '" + std::to_string(latest_ack_offset)
+              + "', message count: '" + std::to_string(messages.size()) + "'";
   }
 };
 
@@ -150,8 +151,11 @@ struct serval_bundle_manifest
 class serval_interface
 {
 public:
-  serval_interface(std::string const host, int const port, std::string const authName, std::string const authPass);
+  serval_interface(std::string configPath, std::string const host, int const port, std::string const authName, std::string const authPass);
   virtual ~serval_interface();
+  bool startDeamon();
+  bool stopDeamon();
+
   void logError(std::string msg);
   int getTimeout();
   std::string getAddress();

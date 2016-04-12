@@ -6,7 +6,7 @@
 
 TEST(keyring, get_identities)
 {
-  ice::serval_interface si("localhost", 4110, "peter", "venkman");
+  ice::serval_interface si("/tmp/instance1", "localhost", 4110, "peter", "venkman");
 
   auto ids = si.keyring.getIdentities();
   ASSERT_TRUE(ids != nullptr);
@@ -14,7 +14,7 @@ TEST(keyring, get_identities)
 
 TEST(keyring, add_identity)
 {
-  ice::serval_interface si("localhost", 4110, "peter", "venkman");
+  ice::serval_interface si("/tmp/instance1", "localhost", 4110, "peter", "venkman");
 
   auto id = si.keyring.addIdentity();
   ASSERT_TRUE(id != nullptr);
@@ -28,7 +28,7 @@ TEST(keyring, add_identity)
 
 TEST(keyring, set_identity)
 {
-  ice::serval_interface si("localhost", 4110, "peter", "venkman");
+  ice::serval_interface si("/tmp/instance1", "localhost", 4110, "peter", "venkman");
 
   auto id = si.keyring.addIdentity();
   ASSERT_TRUE(id != nullptr);
@@ -48,7 +48,7 @@ TEST(keyring, set_identity)
 
 TEST(keyring, get_identities_cmd)
 {
-  ice::serval_interface si("localhost", 4110, "peter", "venkman");
+  ice::serval_interface si("/tmp/instance1", "localhost", 4110, "peter", "venkman");
 
   auto list = si.keyring.getSelf();
   ASSERT_NE(list, nullptr);

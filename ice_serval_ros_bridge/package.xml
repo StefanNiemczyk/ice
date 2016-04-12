@@ -35,10 +35,12 @@
   <build_depend>message_generation</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>ice</build_depend>
+  <build_depend>serval_wrapper</build_depend>
   
   <run_depend>message_runtime</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>ice</run_depend>
+  <run_depend>serval_wrapper</run_depend>
   
   
   <test_depend>gtest</test_depend>
