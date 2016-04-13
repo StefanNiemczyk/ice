@@ -5,6 +5,8 @@
  *      Author: sni
  */
 
+#include <iostream>
+
 #include "Identity.h"
 
 namespace ice
@@ -30,14 +32,16 @@ Identity::~Identity()
 identity_match Identity::checkMatching(std::shared_ptr<Identity> &identity)
 {
   int matchCount = 0;
-  int mismatchCount = 0;
+  bool conflicting = false;
 
   for (auto &id : this->ids)
   {
     auto rid = identity->ids.find(id.first);
 
     if (rid == identity->ids.end())
+    {
       continue;
+    }
 
     if (rid->second == id.second)
     {
@@ -45,16 +49,18 @@ identity_match Identity::checkMatching(std::shared_ptr<Identity> &identity)
     }
     else
     {
-      ++mismatchCount;
+      conflicting = true;
     }
-
-    if (matchCount > 0 && mismatchCount > 0)
-      return identity_match::CONFLICTING;
   }
 
-  if (mismatchCount > 0)
+  if (matchCount == 0)
   {
     return identity_match::NO_MATCH;
+  }
+
+  if (conflicting)
+  {
+    return identity_match::CONFLICTING;
   }
 
   if (matchCount == this->ids.size() && matchCount == identity->ids.size())
