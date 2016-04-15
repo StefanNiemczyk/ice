@@ -54,9 +54,11 @@ include_directories(
 )  
 
 add_library(${PROJECT_NAME}
+  src/CommunicationInterface.cpp
   src/IceServalBridge.cpp
-  src/Identities.cpp
   src/Identity.cpp
+  src/IdentityDirectory.cpp
+  src/ServalCommunication.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ice)

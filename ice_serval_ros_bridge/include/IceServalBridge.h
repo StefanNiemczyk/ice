@@ -11,14 +11,13 @@
 #include <memory>
 #include <ros/ros.h>
 
-#include "Identities.h"
+#include "IdentityDirectory.h"
 #include "ice/ontology/OntologyInterface.h"
 
 
 namespace ice
 {
-class serval_interface;
-
+class CommunicationInterface;
 
 struct InitParams
 {
@@ -40,14 +39,15 @@ public:
   virtual ~ice_serval_bridge();
   void init();
 
-  Identities identities;
+public:
+  IdentityDirectory                                     identityDirectory;
 
 private:
-  ros::NodeHandle nh_;
-  ros::NodeHandle pnh_;
-  InitParams* params;
-  std::shared_ptr<OntologyInterface> ontologyInterface;
-  std::shared_ptr<serval_interface> servalInterface;
+  ros::NodeHandle                                       nh_;
+  ros::NodeHandle                                       pnh_;
+  InitParams*                                           params;
+  std::shared_ptr<OntologyInterface>                    ontologyInterface;
+  std::shared_ptr<CommunicationInterface>               communicationInterface;
 };
 
 } /* namespace ice */

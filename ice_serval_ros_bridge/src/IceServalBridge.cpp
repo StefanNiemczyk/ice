@@ -5,10 +5,12 @@
  *      Author: sni
  */
 
-#include <ros/package.h>
-#include <serval_interface.h>
-
 #include "IceServalBridge.h"
+
+#include <ros/package.h>
+
+#include "CommunicationInterface.h"
+#include "ServalCommunication.h"
 
 
 namespace ice
@@ -49,8 +51,9 @@ void ice_serval_bridge::init()
   this->ontologyInterface->addOntologyIRI(this->params->ontologyIri);
   this->ontologyInterface->loadOntologies();
 
-  // init serval
-  this->servalInterface = std::make_shared<serval_interface>(this->params->servalInstancePath,
+  // init communication
+  this->communicationInterface = std::make_shared<ServalCommunication>(this->identityDirectory,
+                                                             this->params->servalInstancePath,
                                                              this->params->servalHost,
                                                              this->params->servalPort,
                                                              this->params->servalUser,

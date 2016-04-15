@@ -28,9 +28,9 @@ struct serval_identity
   {
   }
 
-  const std::string sid;
-  const std::string did;
-  const std::string name;
+  std::string   const   sid;
+  std::string   const   did;
+  std::string   const   name;
 
   std::string toString()
   {
@@ -40,11 +40,12 @@ struct serval_identity
 
 struct serval_conversation
 {
-  std::string _id;
-  std::string my_sid;
-  std::string their_sid;bool read;
-  std::string last_message;
-  int read_offset;
+  std::string           _id;
+  std::string           my_sid;
+  std::string           their_sid;
+  bool                  read;
+  std::string           last_message;
+  int                   read_offset;
 
   std::string toString()
   {
@@ -56,14 +57,16 @@ struct serval_conversation
 
 struct serval_message
 {
-  std::string type;
-  std::string my_sid;
-  std::string their_sid;
-  int offset;
-  std::string token;
-  std::string text;bool delivered;bool read;
-  long timestamp;
-  std::string ack_offset;
+  std::string           type;
+  std::string           my_sid;
+  std::string           their_sid;
+  int                   offset;
+  std::string           token;
+  std::string           text;
+  bool                  delivered;
+  bool                  read;
+  long                  timestamp;
+  std::string           ack_offset;
 
   std::string toString()
   {
@@ -76,9 +79,9 @@ struct serval_message
 
 struct serval_message_list
 {
-  int read_offset;
-  int latest_ack_offset;
-  std::vector<serval_message> messages;
+  int                           read_offset;
+  int                           latest_ack_offset;
+  std::vector<serval_message>   messages;
 
   std::string toString()
   {
@@ -90,19 +93,19 @@ struct serval_message_list
 
 struct serval_bundle
 {
-  std::string token;
-  int _id;
-  std::string service;
-  std::string id;
-  long date;
-  long inserttime;
-  std::string author;
-  int fromhere;
-  long filesize;
-  std::string filehash;
-  std::string sender;
-  std::string recipient;
-  std::string name;
+  std::string           token;
+  int                   _id;
+  std::string           service;
+  std::string           id;
+  long                  date;
+  long                  inserttime;
+  std::string           author;
+  int                   fromhere;
+  long                  filesize;
+  std::string           filehash;
+  std::string           sender;
+  std::string           recipient;
+  std::string           name;
 
   std::string toString()
   {
@@ -124,15 +127,15 @@ struct serval_bundle
 
 struct serval_bundle_manifest
 {
-  std::string service;
-  long version;
-  std::string id;
-  long date;
-  std::string name;
-  long filesize;
-  std::string filehash;
-  int crypt;
-  std::string tail;
+  std::string           service;
+  long                  version;
+  std::string           id;
+  long                  date;
+  std::string           name;
+  long                  filesize;
+  std::string           filehash;
+  int                   crypt;
+  std::string           tail;
 
   std::string toString()
   {
@@ -164,17 +167,17 @@ public:
   int exec(const char* cmd, std::stringstream &output);
 
 public:
-  serval_wrapper::keyring keyring;
-  serval_wrapper::meshms meshms;
-  serval_wrapper::rhizome rhizome;
+  serval_wrapper::keyring               keyring;
+  serval_wrapper::meshms                meshms;
+  serval_wrapper::rhizome               rhizome;
 
 private:
-  std::string const host;
-  int const port;
-  int timeout;
-  cpr::Authentication *auth;
-  std::string address;
-  std::string servalBin;
+  std::string                   const   host;
+  int                           const   port;
+  int                                   timeout;
+  std::string                           address;
+  std::string                           servalBin;
+  cpr::Authentication                   *auth;
 };
 
 } /* namespace ice */
