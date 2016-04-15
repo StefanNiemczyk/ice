@@ -53,11 +53,13 @@ public:
   std::chrono::steady_clock::time_point getActiveTimestamp();
   void setActiveTimestamp(std::chrono::steady_clock::time_point = std::chrono::steady_clock::now());
 
-  void addMetadata(std::string &key, std::string &value);
-  bool getMetadata(std::string &key, std::string &outValue);
+  bool getId(std::string const &key, std::string &outValue);
 
-  void addConnectionQuality(std::string &key, double &value);
-  bool getConnectionQuality(std::string &key, double &outValue);
+  void addMetadata(std::string const &key, std::string &value);
+  bool getMetadata(std::string const &key, std::string &outValue);
+
+  void addConnectionQuality(std::string const &key, double &value);
+  bool getConnectionQuality(std::string const &key, double &outValue);
 
 private:
   bool                                                  iceIdentity;

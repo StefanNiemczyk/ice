@@ -37,6 +37,8 @@ public:
   std::shared_ptr<Identity> create(std::string const &key, std::string const &value);
   std::shared_ptr<Identity> create(const std::initializer_list<Id>& ids);
 
+  std::unique_ptr<std::vector<std::shared_ptr<Identity>>> activeIdentities();
+
 private:
   std::vector<std::shared_ptr<Identity>> identities;
 };

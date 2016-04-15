@@ -8,7 +8,9 @@
 #ifndef SERVALCOMMUNICATION_H_
 #define SERVALCOMMUNICATION_H_
 
+#include <mutex>
 #include <thread>
+#include <vector>
 
 #include "CommunicationInterface.h"
 
@@ -16,6 +18,12 @@ namespace ice
 {
 
 class serval_interface;
+
+struct Message
+{
+  std::shared_ptr<Identity> receiver;
+  std::string message;
+};
 
 class ServalCommunication : public CommunicationInterface
 {
@@ -32,15 +40,22 @@ public:
   void checkServal();
 
 private:
+  void pushMessage(Message message);
+
+private:
   serval_interface*             serval;
   std::thread                   worker;
   bool                          running;
+  std::string                   ownSid;
+  std::vector<Message>          messages;
 
   std::string           const   configPath;
   std::string           const   host;
   int                   const   port;
   std::string           const   authName;
   std::string           const   authPass;
+
+  std::mutex                    _mtx;
 };
 
 } /* namespace ice */

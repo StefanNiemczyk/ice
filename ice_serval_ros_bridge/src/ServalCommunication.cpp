@@ -10,6 +10,8 @@
 #include <chrono>
 #include <serval_interface.h>
 
+#include "Identity.h"
+
 namespace ice
 {
 
@@ -41,6 +43,7 @@ void ServalCommunication::init()
   }
 
   this->self = this->directory.lookup(IdentityDirectory::ID_SERVAL, id->at(0).sid);
+  this->self->getId(IdentityDirectory::ID_SERVAL, this->ownSid);
   this->running = true;
   this->worker = std::thread(&ServalCommunication::checkServal, this);
 }
@@ -67,6 +70,13 @@ bool ServalCommunication::requestIds(std::shared_ptr<Identity> const &identity)
   // TODO
 }
 
+void ServalCommunication::pushMessage(Message message)
+{
+  std::lock_guard<std::mutex> guard(this->_mtx);
+
+  this->messages.push_back(message);
+}
+
 void ServalCommunication::checkServal()
 {
   int counter = 0;
@@ -78,7 +88,6 @@ void ServalCommunication::checkServal()
     {
       auto sids = this->serval->keyring.getPeerIdentities();
 
-      // TODO update timestamp
       for (auto &sid : *sids)
       {
         auto identity = this->directory.lookup(IdentityDirectory::ID_SERVAL, sid.sid);
@@ -89,15 +98,44 @@ void ServalCommunication::checkServal()
           identity = this->directory.create(IdentityDirectory::ID_SERVAL, sid.sid);
           this->requestIds(identity);
         }
+
+        // update timestamp
+        identity->setActiveTimestamp();
       }
       counter = 0;
     }
 
     // check for new messages
-    // TODO
+    auto sids = this->directory.activeIdentities();
+    for (auto &sid : *sids)
+    {
+      std::string sidStr;
+
+      if (sid->getId(IdentityDirectory::ID_SERVAL, sidStr) == false)
+        continue;
+
+      auto message = this->serval->meshms.getMessageList(this->ownSid, sidStr);
+      // TODO
+    }
 
     // send messages
-    // TODO
+    {
+      std::lock_guard<std::mutex> guard(this->_mtx);
+
+      for (auto &msg : this->messages)
+      {
+        std::string sidStr;
+        if (msg.receiver->getId(IdentityDirectory::ID_SERVAL, sidStr) == false)
+        {
+          // TODO log
+          continue;
+        }
+
+        this->serval->meshms.postMessage(this->ownSid, sidStr, msg.message);
+      }
+
+      this->messages.clear();
+    }
 
     ++counter;
     // sleep

@@ -194,12 +194,24 @@ bool Identity::isTimeout()
   return ((now - this->timestamp) > this->timeoutDuration);
 }
 
-void Identity::addMetadata(std::string &key, std::string &value)
+bool Identity::getId(std::string const &key, std::string &outValue)
+{
+  auto cq = this->ids.find(key);
+
+  if (cq == this->metadata.end())
+    return false;
+
+  outValue = cq->second;
+
+  return true;
+}
+
+void Identity::addMetadata(std::string const &key, std::string &value)
 {
   this->metadata[key] = value;
 }
 
-bool Identity::getMetadata(std::string &key, std::string &outValue)
+bool Identity::getMetadata(std::string const &key, std::string &outValue)
 {
   auto cq = this->metadata.find(key);
 
@@ -211,12 +223,12 @@ bool Identity::getMetadata(std::string &key, std::string &outValue)
   return true;
 }
 
-void Identity::addConnectionQuality(std::string &key, double &value)
+void Identity::addConnectionQuality(std::string const &key, double &value)
 {
   this->connectionQuality[key] = value;
 }
 
-bool Identity::getConnectionQuality(std::string &key, double &outValue)
+bool Identity::getConnectionQuality(std::string const &key, double &outValue)
 {
   auto cq = this->connectionQuality.find(key);
 

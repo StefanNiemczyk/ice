@@ -77,6 +77,11 @@ std::shared_ptr<Identity> IdentityDirectory::lookup(const std::initializer_list<
   return this->create(ids);
 }
 
+std::shared_ptr<Identity> IdentityDirectory::lookup(std::string const &key, std::string const &value, bool create)
+{
+  return this->lookup({{key, value}}, create);
+}
+
 std::shared_ptr<Identity> IdentityDirectory::create(std::string const &key, std::string const &value)
 {
   return this->create({{key, value}});
@@ -91,9 +96,19 @@ std::shared_ptr<Identity> IdentityDirectory::create(const std::initializer_list<
   return newId;
 }
 
-std::shared_ptr<Identity> IdentityDirectory::lookup(std::string const &key, std::string const &value, bool create)
+std::unique_ptr<std::vector<std::shared_ptr<Identity>>> IdentityDirectory::activeIdentities()
 {
-  return this->lookup({{key, value}}, create);
+  std::unique_ptr<std::vector<std::shared_ptr<Identity>>> vec (new std::vector<std::shared_ptr<Identity>>);
+
+  for (auto &id : this->identities)
+  {
+    if (id->isTimeout() == false && id->isIceIdentity())
+    {
+      vec->push_back(id);
+    }
+  }
+
+  return vec;
 }
 
 } /* namespace ice */
