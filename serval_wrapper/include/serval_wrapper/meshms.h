@@ -31,10 +31,11 @@ public:
   meshms(serval_interface *interface);
   virtual ~meshms();
 
-  std::unique_ptr<std::vector<serval_conversation>> getConversationList(std::string recipientSid);
-  std::unique_ptr<serval_message_list> getMessageList(std::string recipientSid, std::string senderSid,
-                                                      std::string token = "");
-  bool postMessage(std::string recipientSid, std::string senderSid, std::string msg);
+  std::unique_ptr<std::vector<serval_conversation>> getConversationList(std::string const &recipientSid);
+  std::unique_ptr<serval_message_list> getMessageList(std::string const &recipientSid, std::string const &senderSid,
+                                                      std::string const token = "");
+  bool postMessage(std::string const &recipientSid, std::string const &senderSid, std::string const &msg);
+  bool markMessagesAsRead(std::string const &dialogPartner);
 
 private:
   serval_interface *interface;

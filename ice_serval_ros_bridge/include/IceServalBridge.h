@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <ros/ros.h>
+#include <easylogging++.h>
 
 #include "IdentityDirectory.h"
 #include "ice/ontology/OntologyInterface.h"
@@ -23,6 +24,7 @@ struct InitParams
 {
   std::string ontologyPath;
   std::string ontologyIri;
+  std::string ontologyIriSelf;
 
   std::string servalInstancePath;
   std::string servalHost;
@@ -31,23 +33,30 @@ struct InitParams
   std::string servalPassword;
 };
 
-class ice_serval_bridge
+class IceServalBridge
 {
 public:
-  ice_serval_bridge(ros::NodeHandle nh_, ros::NodeHandle pnh_);
-  ice_serval_bridge(ros::NodeHandle nh_, ros::NodeHandle pnh_, InitParams* params);
-  virtual ~ice_serval_bridge();
+  IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_);
+  IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_, InitParams* params);
+  virtual ~IceServalBridge();
   void init();
 
+  void discoveredIceIdentity(std::shared_ptr<Identity> const &identity);
+  void vanishedIceIdentity(std::shared_ptr<Identity> const &identity);
+
+private:
+  void readSystemsFromOntology();
+
 public:
-  IdentityDirectory                                     identityDirectory;
+  std::shared_ptr<IdentityDirectory>                    identityDirectory;
+  std::shared_ptr<OntologyInterface>                    ontologyInterface;
+  std::shared_ptr<CommunicationInterface>               communicationInterface;
 
 private:
   ros::NodeHandle                                       nh_;
   ros::NodeHandle                                       pnh_;
   InitParams*                                           params;
-  std::shared_ptr<OntologyInterface>                    ontologyInterface;
-  std::shared_ptr<CommunicationInterface>               communicationInterface;
+  el::Logger*                                           _log;                   /**< Logger */
 };
 
 } /* namespace ice */

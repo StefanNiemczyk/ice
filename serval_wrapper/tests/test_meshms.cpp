@@ -51,5 +51,30 @@ TEST(meshms, post_message)
 
   list = si1.meshms.getMessageList(sid1->sid, sid2->sid, token);
   ASSERT_TRUE(list != nullptr);
+  ASSERT_EQ(list->messages.size(), 2);
+}
+
+TEST(meshms, mark_read)
+{
+  auto list = si1.meshms.getMessageList(sid1->sid, sid2->sid);
+  ASSERT_TRUE(list != nullptr);
   ASSERT_EQ(list->messages.size(), 3);
+
+  for (auto &msg : list->messages)
+  {
+    ASSERT_FALSE(msg.read);
+  }
+
+  si1.meshms.markMessagesAsRead(sid2->sid);
+
+  list = si1.meshms.getMessageList(sid2->sid, sid1->sid);
+  ASSERT_TRUE(list != nullptr);
+
+  for (auto &msg : list->messages)
+  {
+    if (msg.type != "<")
+      continue;
+
+    ASSERT_FALSE(msg.read);
+  }
 }

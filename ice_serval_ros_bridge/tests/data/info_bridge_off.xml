@@ -1,0 +1,11 @@
+<ice_serval_bridge>
+	<offered>
+		<information>
+			<entity>off_entity</entity>
+			<entityType>off_entityType</entityType>
+			<scope>off_scope</scope>
+			<representation>off_representation</representation>
+			<relatedEntity>off_relatedEntity</relatedEntity>
+		</information>
+	</offered>
+</ice_serval_bridge>

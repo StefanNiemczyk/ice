@@ -117,6 +117,7 @@ TransDesc* XMLTransformationReader::readTransformation(TiXmlElement* element)
 
   return transformation;
 }
+
 bool XMLTransformationReader::readOperations(TiXmlElement* element, std::vector<DimensionDesc>& dimensions)
 {
   const char *tagName = element->Value();

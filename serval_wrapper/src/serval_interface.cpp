@@ -44,7 +44,8 @@ bool serval_interface::startDeamon()
 {
   std::stringstream ss;
 
-  this->exec(std::string(this->servalBin + " start").c_str(), ss);
+  std::string start = "start";
+  this->exec(start, ss);
 
   return ss.str().find("pid:") != std::string::npos;
 }
@@ -82,8 +83,8 @@ std::string serval_interface::getServalBin()
   return this->servalBin;
 }
 
-int serval_interface::exec(const char* cmd, std::stringstream &output) {
-    std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+int serval_interface::exec(std::string const &cmd, std::stringstream &output) {
+    std::shared_ptr<FILE> pipe(popen((this->getServalBin() + " " + cmd).c_str(), "r"), pclose);
     if (!pipe) return -1;
     char buffer[128];
 

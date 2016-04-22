@@ -190,7 +190,7 @@ std::unique_ptr<std::vector<serval_identity>> keyring::getSelf()
 
 std::unique_ptr<std::vector<serval_identity>> keyring::getIdentitiesCmdLine(std::string param)
 {
-  std::string command = this->interface->getServalBin() + " id " + param;
+  std::string command = "id " + param;
   std::stringstream ss;
   std::string line;
 

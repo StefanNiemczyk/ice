@@ -7,7 +7,11 @@ find_package(catkin REQUIRED
   roslib
   ice
   serval_wrapper
+  cmake_modules
 )
+
+## tiny xml package
+find_package(TinyXML REQUIRED)
 
 ## Use c++ 11x std
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -41,7 +45,7 @@ catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES ice_serval_ros_bridge
   CATKIN_DEPENDS ice serval_wrapper
-#  DEPENDS system_lib
+  DEPENDS TinyXML
 )
 
 ###########
@@ -51,6 +55,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${TinyXML_INCLUDE_DIRS}
 )  
 
 add_library(${PROJECT_NAME}
@@ -59,6 +64,7 @@ add_library(${PROJECT_NAME}
   src/Identity.cpp
   src/IdentityDirectory.cpp
   src/ServalCommunication.cpp
+  src/XMLInformationReader.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ice)
@@ -66,6 +72,7 @@ add_dependencies(${PROJECT_NAME} serval_wrapper)
 
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
+  ${TinyXML_LIBRARIES}
 )
 
 
@@ -81,7 +88,9 @@ target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test 
+#  tests/test_bridge.cpp
   tests/test_identity.cpp
+  tests/test_xml.cpp
   tests/test_main.cpp)
   
 if(TARGET ${PROJECT_NAME}-test)

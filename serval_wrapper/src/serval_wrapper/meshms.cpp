@@ -33,7 +33,7 @@ meshms::~meshms()
 
 }
 
-std::unique_ptr<std::vector<serval_conversation>> meshms::getConversationList(std::string recipientSid)
+std::unique_ptr<std::vector<serval_conversation>> meshms::getConversationList(std::string const &recipientSid)
 {
   std::string path = SERVAL_REST_GET_CONVERSATION_LIST;
   path.replace(path.find("$RECIPIENTSID"), 13, recipientSid);
@@ -104,12 +104,12 @@ std::unique_ptr<std::vector<serval_conversation>> meshms::getConversationList(st
   return std::move(convs);
 }
 
-std::unique_ptr<serval_message_list> meshms::getMessageList(std::string recipientSid, std::string senderSid,
-                                                                      std::string token)
+std::unique_ptr<serval_message_list> meshms::getMessageList(std::string const &recipientSid, std::string const &senderSid,
+                                                                      std::string const token)
 {
   std::string path;
 
-  if (path == "")
+  if (token == "")
   {
     path = SERVAL_REST_GET_MESSAGE_LIST;
     path.replace(path.find("$RECIPIENTSID"), 13, recipientSid);
@@ -126,7 +126,7 @@ std::unique_ptr<serval_message_list> meshms::getMessageList(std::string recipien
   auto r = cpr::Get(cpr::Url {this->interface->getAddress() + path}, *this->interface->getAuth(),
                     cpr::Timeout{this->interface->getTimeout()});
 
-//  std::cout << path << std::endl;
+//  std::cout << this->interface->getAddress() + path << std::endl;
 //  std::cout << r.status_code << std::endl;                  // 200
 //  std::cout << r.header["content-type"] << std::endl;       // application/json; charset=utf-8
 //  std::cout << r.text << std::endl;                         // JSON text string
@@ -147,66 +147,91 @@ std::unique_ptr<serval_message_list> meshms::getMessageList(std::string recipien
     return nullptr;
   }
 
-  // Read json.
-  pt::ptree tree;
-  std::istringstream is(r.text);
-  pt::read_json(is, tree);
-  std::unique_ptr<serval_message_list> list(new serval_message_list);
-  list->read_offset = tree.get<int>("read_offset");
-  list->latest_ack_offset = tree.get<int>("latest_ack_offset");
-
-  for (pt::ptree::value_type &rows : tree.get_child("rows"))
+  // WORKAROUND to fix a bug in the restful api, if requesting a bundle list by a token the closing braces are missing
+  if (r.text.find("\n]\n}") == std::string::npos)
   {
-    int i = 1;
-    serval_message msg;
-    for (pt::ptree::value_type &row : rows.second)
-    {
-      switch (i)
-      {
-        case 1:
-          msg.type = row.second.get_value<std::string>();
-          break;
-        case 2:
-          msg.my_sid = row.second.get_value<std::string>();
-          break;
-        case 3:
-          msg.their_sid = row.second.get_value<std::string>();
-          break;
-        case 4:
-          msg.offset = row.second.get_value<int>();
-          break;
-        case 5:
-          msg.token = row.second.get_value<std::string>();
-          break;
-        case 6:
-          msg.text = row.second.get_value<std::string>();
-          break;
-        case 7:
-          msg.delivered = row.second.get_value<bool>();
-          break;
-        case 8:
-          msg.read = row.second.get_value<bool>();
-          break;
-        case 9:
-          if (row.second.empty())
-            msg.timestamp = -1;
-          else
-            msg.timestamp = row.second.get_value<long>();
-          break;
-        case 10:
-          msg.ack_offset = row.second.get_value<std::string>();
-          break;
-      }
-
-      ++i;
-    }
-    list->messages.push_back(msg);
+    r.text += "]}";
   }
 
-  return std::move(list);
+  try {
+    // Read json.
+    pt::ptree tree;
+    std::istringstream is(r.text);
+    pt::read_json(is, tree);
+    std::unique_ptr<serval_message_list> list(new serval_message_list);
+
+    auto iter = tree.find("latest_ack_offset");
+    if (iter == tree.not_found())
+    {
+      list->read_offset = -1;
+    }
+    else
+    {
+      list->read_offset = iter->second.get_value<int>();
+    }
+
+    for (pt::ptree::value_type &rows : tree.get_child("rows"))
+    {
+      int i = 1;
+      serval_message msg;
+      for (pt::ptree::value_type &row : rows.second)
+      {
+        switch (i)
+        {
+          case 1:
+            msg.type = row.second.get_value<std::string>();
+            break;
+          case 2:
+            msg.my_sid = row.second.get_value<std::string>();
+            break;
+          case 3:
+            msg.their_sid = row.second.get_value<std::string>();
+            break;
+          case 4:
+            msg.offset = row.second.get_value<int>();
+            break;
+          case 5:
+            msg.token = row.second.get_value<std::string>();
+            break;
+          case 6:
+            msg.text = row.second.get_value<std::string>();
+            break;
+          case 7:
+            msg.delivered = row.second.get_value<bool>();
+            break;
+          case 8:
+            msg.read = row.second.get_value<bool>();
+            break;
+          case 9:
+            if (row.second.empty())
+              msg.timestamp = -1;
+            else
+              msg.timestamp = row.second.get_value<long>();
+            break;
+          case 10:
+            msg.ack_offset = row.second.get_value<std::string>();
+            break;
+        }
+
+        ++i;
+      }
+      list->messages.push_back(msg);
+    }
+
+    return std::move(list);
+  }
+  catch (std::exception &e)
+  {
+    this->interface->logError(
+        "Message list for sender/recipient '"
+            + senderSid + "'/'" + recipientSid + "' could not be parsed");
+    std::cout << e.what() << std::endl;
+    std::cout << r.text << std::endl;
+    return nullptr;
+  }
 }
 
-bool meshms::postMessage(std::string recipientSid, std::string senderSid, std::string msg)
+bool meshms::postMessage(std::string const &recipientSid, std::string const &senderSid, std::string const &msg)
 {
   std::string path = SERVAL_REST_POST_MESSAGE;
   path.replace(path.find("$RECIPIENTSID"), 13, recipientSid);
@@ -237,6 +262,19 @@ bool meshms::postMessage(std::string recipientSid, std::string senderSid, std::s
   }
 
   return true;
+}
+
+bool meshms::markMessagesAsRead(std::string const &dialogPartner)
+{
+   std::string command = "meshms read messages " + dialogPartner;
+   std::stringstream ss;
+   std::string line;
+
+   this->interface->exec(command.c_str(), ss);
+
+   // TODO check if successfull
+
+   return true;
 }
 
 }

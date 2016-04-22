@@ -68,6 +68,7 @@ struct ASPElement
   std::string name;
   std::string className;
   std::string configAsString;
+  std::string raw;
   std::map<std::string, std::string> config;
   ASPElementState state;
   ASPElementType type;

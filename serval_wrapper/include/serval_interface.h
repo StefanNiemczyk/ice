@@ -164,7 +164,7 @@ public:
   std::string getAddress();
   cpr::Authentication* getAuth();
   std::string getServalBin();
-  int exec(const char* cmd, std::stringstream &output);
+  int exec(std::string const &cmd, std::stringstream &output);
 
 public:
   serval_wrapper::keyring               keyring;
