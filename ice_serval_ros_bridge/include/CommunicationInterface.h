@@ -10,14 +10,17 @@
 
 #include <map>
 #include <memory>
+
+#include <ice/information/InformationSpecification.h>
 #include <easylogging++.h>
 
-#include "IdentityDirectory.h"
+#include "EntityDirectory.h"
 
 namespace ice
 {
 
-class Identity;
+class Entity;
+class IceServalBridge;
 
 enum IceCmd
 {
@@ -31,10 +34,10 @@ enum IceCmd
 
 struct Message
 {
-  std::shared_ptr<Identity> receiver;
+  std::shared_ptr<Entity> receiver;
   int command;
   std::map<std::string, std::string> map;
-  std::string message;
+  std::vector<InformationSpecification> infos;
 };
 
 class CommunicationInterface
@@ -45,20 +48,21 @@ public:
   virtual void init() = 0;
   virtual void cleanUp() = 0;
 
-  virtual void requestId(std::shared_ptr<Identity> const &identity, std::string const &id) = 0;
-  virtual void responseId(std::shared_ptr<Identity> const &identity, std::string const &id) = 0;
-  virtual void requestIds(std::shared_ptr<Identity> const &identity) = 0;
-  virtual void responseIds(std::shared_ptr<Identity> const &identity) = 0;
-  virtual void requestOfferedInformation(std::shared_ptr<Identity> const &identity) = 0;
-  virtual void responseOfferedInformation(std::shared_ptr<Identity> const &identity) = 0;
+  virtual void requestId(std::shared_ptr<Entity> const &identity, std::string const &id) = 0;
+  virtual void responseId(std::shared_ptr<Entity> const &identity, std::string const &id) = 0;
+  virtual void requestIds(std::shared_ptr<Entity> const &identity) = 0;
+  virtual void responseIds(std::shared_ptr<Entity> const &identity) = 0;
+  virtual void requestOfferedInformation(std::shared_ptr<Entity> const &identity) = 0;
+  virtual void responseOfferedInformation(std::shared_ptr<Entity> const &identity) = 0;
 
 protected:
-  virtual void handleMessage(std::shared_ptr<Identity> &identity, Message &message);
+  virtual void handleMessage(std::shared_ptr<Entity> &identity, Message &message);
 
 protected:
-  std::shared_ptr<Identity>                     self;
-  std::shared_ptr<IdentityDirectory>            directory;
-  el::Logger                                    *_log;
+  IceServalBridge                             *bridge;
+  std::shared_ptr<Entity>                     self;
+  std::shared_ptr<EntityDirectory>            directory;
+  el::Logger                                  *_log;
 };
 
 } /* namespace ice */

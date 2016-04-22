@@ -5,20 +5,20 @@
  *      Author: sni
  */
 
-#include "Identity.h"
+#include "Entity.h"
 
 #include <iostream>
 #include <sstream>
 
 #include <ice/ontology/OntologyInterface.h>
 
-#include "IdentityDirectory.h"
+#include "EntityDirectory.h"
 
 namespace ice
 {
 
-Identity::Identity(IdentityDirectory *directory, const std::initializer_list<Id>& ids)
-      : iceIdentity(false), directory(directory), available(false), _log(el::Loggers::getLogger("Identity"))
+Entity::Entity(EntityDirectory *directory, const std::initializer_list<Id>& ids)
+      : iceIdentity(false), directory(directory), available(false), _log(el::Loggers::getLogger("Entity"))
 {
   if (ids.size() == 0)
   {
@@ -32,17 +32,17 @@ Identity::Identity(IdentityDirectory *directory, const std::initializer_list<Id>
   timeoutDuration = std::chrono::milliseconds(2000);
 }
 
-Identity::~Identity()
+Entity::~Entity()
 {
   //
 }
 
-int Identity::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ontologyInterface)
+int Entity::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ontologyInterface)
 {
-  _log->debug("Extract asp information from ontology for identity '%s'", this->toString());
+  _log->debug("Extract asp information from ontology for entity '%s'", this->toString());
   std::string ownIri;
 
-  if (false == this->getId(IdentityDirectory::ID_ONTOLOGY, ownIri))
+  if (false == this->getId(EntityDirectory::ID_ONTOLOGY, ownIri))
     return -1;
 
   auto nodes = ontologyInterface->readNodesAndIROsAsASP(ownIri);
@@ -188,7 +188,7 @@ int Identity::initializeFromOntology(std::shared_ptr<OntologyInterface> const &o
   return count;
 }
 
-std::map<std::string, std::string> Identity::readConfiguration(std::string const config)
+std::map<std::string, std::string> Entity::readConfiguration(std::string const config)
 {
   std::map<std::string, std::string> configuration;
   std::stringstream ss(config);
@@ -209,7 +209,7 @@ std::map<std::string, std::string> Identity::readConfiguration(std::string const
   return configuration;
 }
 
-identity_match Identity::checkMatching(std::shared_ptr<Identity> &identity)
+entity_match Entity::checkMatching(std::shared_ptr<Entity> &identity)
 {
   int matchCount = 0;
   bool conflicting = false;
@@ -235,33 +235,33 @@ identity_match Identity::checkMatching(std::shared_ptr<Identity> &identity)
 
   if (matchCount == 0)
   {
-    return identity_match::NO_MATCH;
+    return entity_match::NO_MATCH;
   }
 
   if (conflicting)
   {
-    return identity_match::CONFLICTING;
+    return entity_match::CONFLICTING;
   }
 
   if (matchCount == this->ids.size() && matchCount == identity->ids.size())
   {
-    return identity_match::FULL_MATCH;
+    return entity_match::FULL_MATCH;
   }
 
   if (matchCount == this->ids.size())
   {
-    return identity_match::INCLUDED;
+    return entity_match::INCLUDED;
   }
 
   if (matchCount == identity->ids.size())
   {
-    return identity_match::INCLUDING;
+    return entity_match::INCLUDING;
   }
 
-  return identity_match::PARTIAL_MATCH;
+  return entity_match::PARTIAL_MATCH;
 }
 
-identity_match Identity::checkMatching(const std::initializer_list<Id>& ids)
+entity_match Entity::checkMatching(const std::initializer_list<Id>& ids)
 {
   int matchCount = 0;
   bool conflicting = false;
@@ -287,48 +287,48 @@ identity_match Identity::checkMatching(const std::initializer_list<Id>& ids)
 
   if (matchCount == 0)
   {
-    return identity_match::NO_MATCH;
+    return entity_match::NO_MATCH;
   }
 
   if (conflicting)
   {
-    return identity_match::CONFLICTING;
+    return entity_match::CONFLICTING;
   }
 
   if (matchCount == this->ids.size() && matchCount == ids.size())
   {
-    return identity_match::FULL_MATCH;
+    return entity_match::FULL_MATCH;
   }
 
   if (matchCount == this->ids.size())
   {
-    return identity_match::INCLUDED;
+    return entity_match::INCLUDED;
   }
 
   if (matchCount == ids.size())
   {
-    return identity_match::INCLUDING;
+    return entity_match::INCLUDING;
   }
 
-  return identity_match::PARTIAL_MATCH;
+  return entity_match::PARTIAL_MATCH;
 }
 
-identity_match Identity::checkMatching(std::string &key, std::string &value)
+entity_match Entity::checkMatching(std::string &key, std::string &value)
 {
   auto id = this->ids.find(key);
 
   if (id == this->ids.end())
   {
-    return identity_match::NO_MATCH;
+    return entity_match::NO_MATCH;
   }
 
   if (id->second == value)
-    return identity_match::FULL_MATCH;
+    return entity_match::FULL_MATCH;
 
-  return identity_match::CONFLICTING;
+  return entity_match::CONFLICTING;
 }
 
-void Identity::fuse(std::shared_ptr<Identity> &identity)
+void Entity::fuse(std::shared_ptr<Entity> &identity)
 {
   for (auto &id : identity->ids)
   {
@@ -337,7 +337,7 @@ void Identity::fuse(std::shared_ptr<Identity> &identity)
 }
 
 
-void Identity::fuse(const std::initializer_list<Id>& ids)
+void Entity::fuse(const std::initializer_list<Id>& ids)
 {
   for (auto &id : ids)
   {
@@ -345,7 +345,7 @@ void Identity::fuse(const std::initializer_list<Id>& ids)
   }
 }
 
-void Identity::fuse(std::map<std::string,std::string>& ids)
+void Entity::fuse(std::map<std::string,std::string>& ids)
 {
   for (auto &id : ids)
   {
@@ -353,7 +353,7 @@ void Identity::fuse(std::map<std::string,std::string>& ids)
   }
 }
 
-void Identity::pushIdsToMap(std::map<std::string,std::string> &map)
+void Entity::pushIdsToMap(std::map<std::string,std::string> &map)
 {
   for (auto &id : this->ids)
   {
@@ -361,43 +361,43 @@ void Identity::pushIdsToMap(std::map<std::string,std::string> &map)
   }
 }
 
-void Identity::checkIce()
+void Entity::checkIce()
 {
   if (this->iceIdentity)
     return;
 
-  this->iceIdentity = (this->ids.find(IdentityDirectory::ID_ONTOLOGY) != this->metadata.end());
+  this->iceIdentity = (this->ids.find(EntityDirectory::ID_ONTOLOGY) != this->metadata.end());
 
   if (this->iceIdentity && this->available)
     this->directory->callDiscoveredIceIdentityHooks(this->shared_from_this());
 }
 
-bool Identity::isIceIdentity()
+bool Entity::isIceIdentity()
 {
   return this->iceIdentity;
 }
 
-void Identity::setIceIdentity(bool value)
+void Entity::setIceIdentity(bool value)
 {
   this->iceIdentity = value;
 }
 
-std::chrono::steady_clock::time_point Identity::getActiveTimestamp()
+std::chrono::steady_clock::time_point Entity::getActiveTimestamp()
 {
   return this->timestamp;
 }
 
-void Identity::setActiveTimestamp(std::chrono::steady_clock::time_point value)
+void Entity::setActiveTimestamp(std::chrono::steady_clock::time_point value)
 {
   this->timestamp = value;
 }
 
-bool Identity::isAvailable()
+bool Entity::isAvailable()
 {
   return this->available;
 }
 
-void Identity::setAvailable(bool const &value)
+void Entity::setAvailable(bool const &value)
 {
   if (value)
   {
@@ -417,19 +417,19 @@ void Identity::setAvailable(bool const &value)
   this->available = value;
 }
 
-bool Identity::isTimeout()
+bool Entity::isTimeout()
 {
   auto now = std::chrono::steady_clock::now();
 
   return ((now - this->timestamp) > this->timeoutDuration);
 }
 
-void Identity::addId(std::string const &key, std::string const &value)
+void Entity::addId(std::string const &key, std::string const &value)
 {
   this->ids[key] = value;
 }
 
-bool Identity::getId(std::string const &key, std::string &outValue)
+bool Entity::getId(std::string const &key, std::string &outValue)
 {
   auto cq = this->ids.find(key);
 
@@ -441,12 +441,12 @@ bool Identity::getId(std::string const &key, std::string &outValue)
   return true;
 }
 
-void Identity::addMetadata(std::string const &key, std::string const &value)
+void Entity::addMetadata(std::string const &key, std::string const &value)
 {
   this->metadata[key] = value;
 }
 
-bool Identity::getMetadata(std::string const &key, std::string &outValue)
+bool Entity::getMetadata(std::string const &key, std::string &outValue)
 {
   auto cq = this->metadata.find(key);
 
@@ -458,12 +458,12 @@ bool Identity::getMetadata(std::string const &key, std::string &outValue)
   return true;
 }
 
-void Identity::addConnectionQuality(std::string const &key, double const &value)
+void Entity::addConnectionQuality(std::string const &key, double const &value)
 {
   this->connectionQuality[key] = value;
 }
 
-bool Identity::getConnectionQuality(std::string const &key, double &outValue)
+bool Entity::getConnectionQuality(std::string const &key, double &outValue)
 {
   auto cq = this->connectionQuality.find(key);
 
@@ -475,7 +475,7 @@ bool Identity::getConnectionQuality(std::string const &key, double &outValue)
   return true;
 }
 
-std::string Identity::toString()
+std::string Entity::toString()
 {
   std::stringstream ss;
   ss << "Identity(";
@@ -489,12 +489,27 @@ std::string Identity::toString()
   return ss.str();
 }
 
+std::vector<InformationSpecification>& Entity::getOfferedInformation()
+{
+  return this->offeredInformation;
+}
+
+void Entity::addOfferedInformation(std::vector<InformationSpecification> const &offeres)
+{
+  for (auto &info : offeres)
+  {
+    this->offeredInformation.push_back(info);
+  }
+
+  this->directory->callOfferedInformationHooks(this->shared_from_this());
+}
+
 
 // -----------------------------------------------------------------------------------
 // ----------------------------------- ASP Stuff -------------------------------------
 // -----------------------------------------------------------------------------------
 
-std::shared_ptr<ASPElement> Identity::getASPElementByName(ASPElementType type, std::string const name)
+std::shared_ptr<ASPElement> Entity::getASPElementByName(ASPElementType type, std::string const name)
 {
   switch (type)
   {
@@ -538,7 +553,7 @@ std::shared_ptr<ASPElement> Identity::getASPElementByName(ASPElementType type, s
   return nullptr;
 }
 
-std::shared_ptr<ASPElement> Identity::getASPElementByName(std::string const name)
+std::shared_ptr<ASPElement> Entity::getASPElementByName(std::string const name)
 {
   for (auto node : this->aspNodes)
   {
@@ -573,7 +588,7 @@ std::shared_ptr<ASPElement> Identity::getASPElementByName(std::string const name
   return nullptr;
 }
 
-void Identity::addASPElement(std::shared_ptr<ASPElement> node)
+void Entity::addASPElement(std::shared_ptr<ASPElement> node)
 {
   switch (node->type)
   {

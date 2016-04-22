@@ -9,7 +9,8 @@
 
 #include <iostream>
 
-#include "Identity.h"
+#include "Entity.h"
+#include "IceServalBridge.h"
 
 namespace ice
 {
@@ -25,8 +26,9 @@ CommunicationInterface::~CommunicationInterface()
   //
 }
 
-void CommunicationInterface::handleMessage(std::shared_ptr<Identity> &identity, Message &message)
+void CommunicationInterface::handleMessage(std::shared_ptr<Entity> &identity, Message &message)
 {
+  std::cout << "Received Message with id '%s' from %s" << std::to_string(message.command) << " "<< identity->toString() << std::endl;
   _log->info("Received Message with id '%s' from %s", std::to_string(message.command), identity->toString());
 
   switch (message.command)
@@ -46,6 +48,14 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Identity> &identity, 
 
     case (SCMD_ID_RESPONSE):
       // TODO
+      break;
+
+    case (SCMD_INFORMATION_REQUEST):
+      this->responseOfferedInformation(identity);
+      break;
+
+    case (SCMD_INFORMATION_RESPONSE):
+      identity->addOfferedInformation(message.infos);
       break;
 
     default:

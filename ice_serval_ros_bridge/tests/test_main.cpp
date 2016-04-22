@@ -3,10 +3,13 @@
 #include <ros/init.h>
 #include <exception>
 #include <iostream>
+#include "easylogging++.h"
+
+INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char **argv)
 {
-  //ros::init(argc, argv, "ice_engine_test");
+  ros::init(argc, argv, "ice_engine_test");
 //  try
 //  {
     ::testing::InitGoogleTest(&argc, argv);

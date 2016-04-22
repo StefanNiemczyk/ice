@@ -8,9 +8,11 @@
 #include "IceServalBridge.h"
 
 #include <ros/package.h>
+#include <ice/representation/GContainerFactory.h>
 
 #include "CommunicationInterface.h"
 #include "ServalCommunication.h"
+#include "XMLInformationReader.h"
 
 
 namespace ice
@@ -18,7 +20,8 @@ namespace ice
 
 IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_) : nh_(nh_), pnh_(pnh_)
 {
-  this->identityDirectory = std::make_shared<IdentityDirectory>();
+  _log = el::Loggers::getLogger("IceServalBridge");
+  this->identityDirectory = std::make_shared<EntityDirectory>();
   this->params = new InitParams();
 
   // loading params
@@ -30,8 +33,10 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_) : nh
   nh_.param("serval_port", this->params->servalPort, -1);
   nh_.param("serval_user", this->params->servalUser, std::string("UNSET"));
   nh_.param("serval_password", this->params->servalPassword, std::string("UNSET"));
+  nh_.param("xml_info_path", this->params->xmlInfoPath, std::string("UNSET"));
+  nh_.param("xml_transformation_path", this->params->xmlTransformationPath, std::string("UNSET"));
 
-  this->communicationInterface = std::make_shared<ServalCommunication>(this->identityDirectory,
+  this->communicationInterface = std::make_shared<ServalCommunication>(this,
                                                              this->params->servalInstancePath,
                                                              this->params->servalHost,
                                                              this->params->servalPort,
@@ -42,9 +47,10 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_) : nh
 IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_, InitParams* params) :
     nh_(nh_), pnh_(pnh_), params(params)
 {
-  this->identityDirectory = std::make_shared<IdentityDirectory>();
+  _log = el::Loggers::getLogger("IceServalBridge");
+  this->identityDirectory = std::make_shared<EntityDirectory>();
 
-  this->communicationInterface = std::make_shared<ServalCommunication>(this->identityDirectory,
+  this->communicationInterface = std::make_shared<ServalCommunication>(this,
                                                              this->params->servalInstancePath,
                                                              this->params->servalHost,
                                                              this->params->servalPort,
@@ -61,33 +67,54 @@ void IceServalBridge::init()
 {
   // register hooks
   this->identityDirectory->registerDiscoveredIceIdentityHook(
-      [this] (std::shared_ptr<Identity> const &identity) {this->discoveredIceIdentity(identity);});
+      [this] (std::shared_ptr<Entity> const &identity) {this->discoveredIceIdentity(identity);});
   this->identityDirectory->registerVanishedIceIdentityHooks(
-      [this] (std::shared_ptr<Identity> const &identity) {this->vanishedIceIdentity(identity);});
+      [this] (std::shared_ptr<Entity> const &identity) {this->vanishedIceIdentity(identity);});
 
   //set own iri
-  this->identityDirectory->self->addId(IdentityDirectory::ID_ONTOLOGY, this->params->ontologyIriSelf);
+  this->identityDirectory->self->addId(EntityDirectory::ID_ONTOLOGY, this->params->ontologyIriSelf);
 
   // init ontology
   std::string icePath = ros::package::getPath("ice");
   this->ontologyInterface = std::make_shared<OntologyInterface>(icePath + "/java/lib/");
-  this->ontologyInterface->addIRIMapper(icePath + "/ontology/");
   this->ontologyInterface->addIRIMapper(this->params->ontologyPath);
+  this->ontologyInterface->addIRIMapper(icePath + "/ontology/");
   this->ontologyInterface->addOntologyIRI(this->params->ontologyIri);
   this->ontologyInterface->loadOntologies();
 
-  // read known identities from ontology
+  // loading information offered and required
+  XMLInformationReader reader;
+  reader.readFile(this->params->xmlInfoPath);
+  this->offeredInfos = reader.getOffered();
+  this->requiredInfos = reader.getRequired();
+
+  // read known entities from ontology
 //  this->identityDirectory->initializeFromOntology(this->ontologyInterface);
 
   // init communication
   this->communicationInterface->init();
+
+  // init transformation stuff
+  // TODO
+
+  // init ros message generator
+  // TODO
+
+  //init gcontainer factory
+  this->gcontainerFactory = std::make_shared<GContainerFactory>();
+  this->gcontainerFactory->setOntologyInterface(this->ontologyInterface);
+  this->gcontainerFactory->init();
+
+  std::cout << "asdfkljsadkgjklsdajgl" << std::endl;
+  _log->error("Bridge for identity '%s' initialized", this->identityDirectory->self->toString());
 }
 
-void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Identity> const &identity)
+void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> const &identity)
 {
-  _log->info("Discovered: '%s'", identity->toString());
+  this->_log->info("Discovered: '%s'", identity->toString());
 
   // init ontology
+  this->ontologyInterface->attachCurrentThread();
   int result = identity->initializeFromOntology(this->ontologyInterface);
   // request offered information if no knowledge can be extracted from ontology
   if (result == 0)
@@ -99,10 +126,27 @@ void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Identity> const &ide
   // check if information are required
 }
 
-void IceServalBridge::vanishedIceIdentity(std::shared_ptr<Identity> const &identity)
+void IceServalBridge::vanishedIceIdentity(std::shared_ptr<Entity> const &identity)
 {
   _log->info("Vanished: '%s'", identity->toString());
 
+}
+
+void IceServalBridge::offeredInformation(std::shared_ptr<Entity> const &identity)
+{
+  _log->info("New offered information from: '%s'", identity->toString());
+
+  // TODO check match
+}
+
+std::vector<std::shared_ptr<OfferedInfo>>& IceServalBridge::getOfferedInfos()
+{
+  return this->offeredInfos;
+}
+
+std::vector<std::shared_ptr<RequiredInfo>>& IceServalBridge::getRequiredInfors()
+{
+  return this->requiredInfos;
 }
 
 } /* namespace ice */

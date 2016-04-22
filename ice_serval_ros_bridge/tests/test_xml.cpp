@@ -18,15 +18,17 @@ TEST(XML, read)
   auto infoOff = reader.getOffered()[0];
   auto infoReq = reader.getRequired()[0];
 
-  ASSERT_EQ("off_entity", infoOff->getEntity());
-  ASSERT_EQ("off_entityType", infoOff->getEntityType());
-  ASSERT_EQ("off_scope", infoOff->getScope());
-  ASSERT_EQ("off_representation", infoOff->getRepresentation());
-  ASSERT_EQ("off_relatedEntity", infoOff->getRelatedEntity());
+  ASSERT_EQ("off_entity", infoOff->infoSpec.getEntity());
+  ASSERT_EQ("off_entityType", infoOff->infoSpec.getEntityType());
+  ASSERT_EQ("off_scope", infoOff->infoSpec.getScope());
+  ASSERT_EQ("off_representation", infoOff->infoSpec.getRepresentation());
+  ASSERT_EQ("off_relatedEntity", infoOff->infoSpec.getRelatedEntity());
 
-  ASSERT_EQ("req_entity", infoReq->getEntity());
-  ASSERT_EQ("req_entityType", infoReq->getEntityType());
-  ASSERT_EQ("req_scope", infoReq->getScope());
-  ASSERT_EQ("req_representation", infoReq->getRepresentation());
-  ASSERT_EQ("req_relatedEntity", infoReq->getRelatedEntity());
+  ASSERT_EQ("req_entity", infoReq->infoSpec.getEntity());
+  ASSERT_EQ("req_entityType", infoReq->infoSpec.getEntityType());
+  ASSERT_EQ("req_scope", infoReq->infoSpec.getScope());
+  ASSERT_EQ("req_representation", infoReq->infoSpec.getRepresentation());
+  ASSERT_EQ("req_relatedEntity", infoReq->infoSpec.getRelatedEntity());
+  ASSERT_EQ("/topic", infoReq->topic);
+  ASSERT_EQ("/test/msg", infoReq->message);
 }

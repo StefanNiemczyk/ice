@@ -4,9 +4,6 @@
 #include <exception>
 #include <iostream>
 #include <fstream>
-#include "easylogging++.h"
-
-INITIALIZE_EASYLOGGINGPP
 
 void createConfig()
 {

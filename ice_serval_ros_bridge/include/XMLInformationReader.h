@@ -8,12 +8,14 @@
 #ifndef XMLINFORMATIONREADER_H_
 #define XMLINFORMATIONREADER_H_
 
-#include <easylogging++.h>
 #include <memory>
-#include <tinyxml.h>
 #include <vector>
 
+#include <easylogging++.h>
+#include <tinyxml.h>
 #include <ice/information/InformationSpecification.h>
+
+#include "IceServalBridge.h"
 
 namespace ice
 {
@@ -25,15 +27,16 @@ public:
   virtual ~XMLInformationReader();
 
   bool readFile(const std::string& fileName);
-  std::vector<std::shared_ptr<InformationSpecification>> getOffered();
-  std::vector<std::shared_ptr<InformationSpecification>> getRequired();
+  std::vector<std::shared_ptr<OfferedInfo>> getOffered();
+  std::vector<std::shared_ptr<RequiredInfo>> getRequired();
 
 private:
-  bool readInformation(TiXmlElement* element, std::vector<std::shared_ptr<InformationSpecification>> &infos);
+  bool readOffered(TiXmlElement* element);
+  bool readRequired(TiXmlElement* element);
 
 private:
-  std::vector<std::shared_ptr<InformationSpecification>> offered;
-  std::vector<std::shared_ptr<InformationSpecification>> required;
+  std::vector<std::shared_ptr<OfferedInfo>> offered;
+  std::vector<std::shared_ptr<RequiredInfo>> required;
   el::Logger* _log; /**< Logger */
 };
 

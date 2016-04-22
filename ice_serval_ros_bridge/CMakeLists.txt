@@ -8,6 +8,8 @@ find_package(catkin REQUIRED
   ice
   serval_wrapper
   cmake_modules
+  message_generation
+  geometry_msgs
 )
 
 ## tiny xml package
@@ -61,8 +63,8 @@ include_directories(
 add_library(${PROJECT_NAME}
   src/CommunicationInterface.cpp
   src/IceServalBridge.cpp
-  src/Identity.cpp
-  src/IdentityDirectory.cpp
+  src/Entity.cpp
+  src/EntityDirectory.cpp
   src/ServalCommunication.cpp
   src/XMLInformationReader.cpp
 )
@@ -88,10 +90,12 @@ target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test 
-#  tests/test_bridge.cpp
-  tests/test_identity.cpp
+  #tests/test_bridge.cpp
+  tests/test_entity.cpp
   tests/test_xml.cpp
-  tests/test_main.cpp)
+  tests/test_gmessagePublisher.cpp
+  tests/test_main.cpp
+  )
   
 if(TARGET ${PROJECT_NAME}-test)
   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})

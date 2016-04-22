@@ -147,6 +147,14 @@ std::unique_ptr<serval_message_list> meshms::getMessageList(std::string const &r
     return nullptr;
   }
 
+  if (r.text.length() < 5)
+  {
+    this->interface->logError(
+        "Return value to short '" + std::to_string(r.text.length()) + "' for get message list for sender/recipient '"
+            + senderSid + "'/'" + recipientSid + "'");
+    return nullptr;
+  }
+
   // WORKAROUND to fix a bug in the restful api, if requesting a bundle list by a token the closing braces are missing
   if (r.text.find("\n]\n}") == std::string::npos)
   {
@@ -154,6 +162,7 @@ std::unique_ptr<serval_message_list> meshms::getMessageList(std::string const &r
   }
 
   try {
+//    std::cout << r.text << std::endl;
     // Read json.
     pt::ptree tree;
     std::istringstream is(r.text);

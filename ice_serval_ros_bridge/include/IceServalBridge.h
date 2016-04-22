@@ -9,16 +9,42 @@
 #define ICE_SERVAL_BRIDGE_H_
 
 #include <memory>
+#include <vector>
+
 #include <ros/ros.h>
 #include <easylogging++.h>
+#include <ice/ontology/OntologyInterface.h>
+#include <ice/representation/GContainerFactory.h>
 
-#include "IdentityDirectory.h"
-#include "ice/ontology/OntologyInterface.h"
+#include "EntityDirectory.h"
 
 
 namespace ice
 {
 class CommunicationInterface;
+class RosGContainerPublisher;
+
+struct OfferedInfo
+{
+  OfferedInfo(ont::entity entity, ont::entityType entityType, ont::scope scope, ont::representation representation,
+          ont::entity relatedEntity) : infoSpec(entity, entityType, scope, representation, relatedEntity)
+  {
+  }
+
+  InformationSpecification infoSpec;
+};
+
+struct RequiredInfo
+{
+  RequiredInfo(ont::entity entity, ont::entityType entityType, ont::scope scope, ont::representation representation,
+               ont::entity relatedEntity) : infoSpec(entity, entityType, scope, representation, relatedEntity)
+  {
+
+  }
+  InformationSpecification infoSpec;
+  std::string topic;
+  std::string message;
+};
 
 struct InitParams
 {
@@ -31,6 +57,9 @@ struct InitParams
   int         servalPort;
   std::string servalUser;
   std::string servalPassword;
+
+  std::string xmlInfoPath;
+  std::string xmlTransformationPath;
 };
 
 class IceServalBridge
@@ -41,21 +70,29 @@ public:
   virtual ~IceServalBridge();
   void init();
 
-  void discoveredIceIdentity(std::shared_ptr<Identity> const &identity);
-  void vanishedIceIdentity(std::shared_ptr<Identity> const &identity);
+  void discoveredIceIdentity(std::shared_ptr<Entity> const &identity);
+  void vanishedIceIdentity(std::shared_ptr<Entity> const &identity);
+  void offeredInformation(std::shared_ptr<Entity> const &identity);
+
+  std::vector<std::shared_ptr<OfferedInfo>>& getOfferedInfos();
+  std::vector<std::shared_ptr<RequiredInfo>>& getRequiredInfors();
 
 private:
   void readSystemsFromOntology();
 
 public:
-  std::shared_ptr<IdentityDirectory>                    identityDirectory;
+  std::shared_ptr<EntityDirectory>                      identityDirectory;
   std::shared_ptr<OntologyInterface>                    ontologyInterface;
   std::shared_ptr<CommunicationInterface>               communicationInterface;
+  std::shared_ptr<GContainerFactory>                    gcontainerFactory;
+  std::shared_ptr<RosGContainerPublisher>               publisher;
 
 private:
   ros::NodeHandle                                       nh_;
   ros::NodeHandle                                       pnh_;
   InitParams*                                           params;
+  std::vector<std::shared_ptr<OfferedInfo>>             offeredInfos;
+  std::vector<std::shared_ptr<RequiredInfo>>            requiredInfos;
   el::Logger*                                           _log;                   /**< Logger */
 };
 

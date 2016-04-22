@@ -12,7 +12,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include "Identity.h"
+#include "Entity.h"
+#include "IceServalBridge.h"
 
 // Short alias for this namespace
 namespace pt = boost::property_tree;
@@ -20,13 +21,14 @@ namespace pt = boost::property_tree;
 namespace ice
 {
 
-ServalCommunication::ServalCommunication(std::shared_ptr<IdentityDirectory> &directory, std::string configPath, std::string const host,
+ServalCommunication::ServalCommunication(IceServalBridge *bridge, std::string configPath, std::string const host,
                                          int const port, std::string const authName, std::string const authPass) :
     CommunicationInterface(), configPath(configPath), host(host),
     port(port), authName(authName), authPass(authPass), serval(nullptr), running(false)
 {
   _log = el::Loggers::getLogger("CommunicationInterface");
-  this->directory = directory;
+  this->bridge = bridge;
+  this->directory = bridge->identityDirectory;
 }
 
 ServalCommunication::~ServalCommunication()
@@ -55,7 +57,7 @@ void ServalCommunication::init()
     }
 
     this->ownSid = id->at(0).sid;
-    this->self->addId(IdentityDirectory::ID_SERVAL, this->ownSid);
+    this->self->addId(EntityDirectory::ID_SERVAL, this->ownSid);
   }
 
   this->running = true;
@@ -73,18 +75,19 @@ void ServalCommunication::cleanUp()
   }
 }
 
-void ServalCommunication::requestId(std::shared_ptr<Identity> const &identity, std::string const &id)
+void ServalCommunication::requestId(std::shared_ptr<Entity> const &identity, std::string const &id)
 {
   // TODO
 }
 
-void ServalCommunication::responseId(std::shared_ptr<Identity> const &identity, std::string const &id)
+void ServalCommunication::responseId(std::shared_ptr<Entity> const &identity, std::string const &id)
 {
   // TODO
 }
 
-void ServalCommunication::requestIds(std::shared_ptr<Identity> const &identity)
+void ServalCommunication::requestIds(std::shared_ptr<Entity> const &identity)
 {
+  std::cout << "Requesting Ids from '%s'" << identity->toString() << std::endl;
   _log->info("Requesting Ids from '%s'", identity->toString());
   Message m;
   m.receiver = identity;
@@ -93,8 +96,9 @@ void ServalCommunication::requestIds(std::shared_ptr<Identity> const &identity)
   this->pushMessage(m);
 }
 
-void ServalCommunication::responseIds(std::shared_ptr<Identity> const &identity)
+void ServalCommunication::responseIds(std::shared_ptr<Entity> const &identity)
 {
+  std::cout << "Sending Ids to '%s'" << identity->toString() << std::endl;
   _log->info("Sending Ids to '%s'", identity->toString());
   Message m;
   m.receiver = identity;
@@ -105,8 +109,9 @@ void ServalCommunication::responseIds(std::shared_ptr<Identity> const &identity)
   this->pushMessage(m);
 }
 
-void ServalCommunication::requestOfferedInformation(std::shared_ptr<Identity> const &identity)
+void ServalCommunication::requestOfferedInformation(std::shared_ptr<Entity> const &identity)
 {
+  std::cout << "Sending required infros to '%s'" << identity->toString() << std::endl;
   _log->info("Requesting offered information from '%s'", identity->toString());
   Message m;
   m.receiver = identity;
@@ -115,9 +120,20 @@ void ServalCommunication::requestOfferedInformation(std::shared_ptr<Identity> co
   this->pushMessage(m);
 }
 
-void ServalCommunication::responseOfferedInformation(std::shared_ptr<Identity> const &identity)
+void ServalCommunication::responseOfferedInformation(std::shared_ptr<Entity> const &identity)
 {
+  std::cout << "Sending required infos to '%s'" << identity->toString() << std::endl;
+  _log->info("Sending required infos to '%s'", identity->toString());
+  Message m;
+  m.receiver = identity;
+  m.command = IceCmd::SCMD_INFORMATION_RESPONSE;
 
+  for (auto info : this->bridge->getOfferedInfos())
+  {
+    m.infos.push_back(info->infoSpec);
+  }
+
+  this->pushMessage(m);
 }
 
 std::shared_ptr<serval_interface> ServalCommunication::getServalInterface()
@@ -140,7 +156,7 @@ void ServalCommunication::pushMessage(Message &message)
 void ServalCommunication::checkServal()
 {
   int counter = 0;
-  std::vector<std::shared_ptr<Identity>> newNodes;
+  std::vector<std::shared_ptr<Entity>> newNodes;
 
   while (this->running)
   {
@@ -157,12 +173,12 @@ void ServalCommunication::checkServal()
 
       for (auto &sid : *peers)
       {
-        auto identity = this->directory->lookup(IdentityDirectory::ID_SERVAL, sid.sid);
+        auto identity = this->directory->lookup(EntityDirectory::ID_SERVAL, sid.sid);
 
         if (identity == nullptr)
         {
           // Create new instance and request ids
-          identity = this->directory->create(IdentityDirectory::ID_SERVAL, sid.sid);
+          identity = this->directory->create(EntityDirectory::ID_SERVAL, sid.sid);
           // At the beginning each discovered node is expected to be an ice node
           identity->setAvailable(true);
 
@@ -216,7 +232,7 @@ void ServalCommunication::checkServal()
         }
 
         std::string sidStr;
-        if (msg.receiver->getId(IdentityDirectory::ID_SERVAL, sidStr) == false)
+        if (msg.receiver->getId(EntityDirectory::ID_SERVAL, sidStr) == false)
         {
           _log->error("Message could not be send, receiver %s is missing a serval id", msg.receiver->toString());
           continue;
@@ -230,15 +246,15 @@ void ServalCommunication::checkServal()
 
     ++counter;
     // sleep
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 }
 
-void ServalCommunication::updateToken(std::shared_ptr<Identity> &identity)
+void ServalCommunication::updateToken(std::shared_ptr<Entity> &identity)
 {
   std::string sidStr;
 
-  if (identity->getId(IdentityDirectory::ID_SERVAL, sidStr) == false)
+  if (identity->getId(EntityDirectory::ID_SERVAL, sidStr) == false)
   {
     return;
   }
@@ -267,7 +283,7 @@ void ServalCommunication::updateToken(std::shared_ptr<Identity> &identity)
   identity->addMetadata("SERVAL_MESSAGE_OFFSET", std::to_string(offset));
 }
 
-int ServalCommunication::readMessages(std::shared_ptr<Identity> &identity, std::vector<Message> &outMessages)
+int ServalCommunication::readMessages(std::shared_ptr<Entity> &identity, std::vector<Message> &outMessages)
 {
   // token should not be used, response is much slower then requesting whole list
   std::string token = "";
@@ -280,13 +296,13 @@ int ServalCommunication::readMessages(std::shared_ptr<Identity> &identity, std::
 
   std::string sidStr;
 
-  if (identity->getId(IdentityDirectory::ID_SERVAL, sidStr) == false)
+  if (identity->getId(EntityDirectory::ID_SERVAL, sidStr) == false)
   {
     return 0;
   }
 
   auto msgs = this->serval->meshms.getMessageList(sidStr, this->ownSid, token);
-//  this->serval->meshms.markMessagesAsRead(sidStr);
+  this->serval->meshms.markMessagesAsRead(sidStr);
 
   int count = 0;
   std::string lastToken = "";
@@ -363,6 +379,28 @@ std::string ServalCommunication::serializeMessage(Message &message)
     tree.add_child("ids", ids);
   }
 
+  // serialize information
+  if (message.infos.size() > 0)
+  {
+    pt::ptree infos;
+    for (auto &infoSpec : message.infos)
+    {
+      pt::ptree entity, entityType, scope, rep, relatedEntity, info;
+      entity.put("", infoSpec.getEntity());
+      entityType.put("", infoSpec.getEntityType());
+      scope.put("", infoSpec.getScope());
+      rep.put("", infoSpec.getRepresentation());
+      relatedEntity.put("", infoSpec.getRelatedEntity());
+      info.push_back(std::make_pair("", entity));
+      info.push_back(std::make_pair("", entityType));
+      info.push_back(std::make_pair("", scope));
+      info.push_back(std::make_pair("", rep));
+      info.push_back(std::make_pair("", relatedEntity));
+      infos.push_back(std::make_pair("", info));
+    }
+    tree.add_child("offeredInfos", infos);
+  }
+
   pt::write_json(ss, tree, false);
 
   return ss.str();
@@ -384,7 +422,6 @@ bool ServalCommunication::deserializeMessage(std::string &message, Message &outM
     }
 
     outMessage.command = iter->second.get_value<int>();
-
 
     iter = tree.find("ids");
     if (iter != tree.not_found())
@@ -410,6 +447,46 @@ bool ServalCommunication::deserializeMessage(std::string &message, Message &outM
 
         if (key != "" && value != "")
           outMessage.map[key] = value;
+      }
+
+      return true; // id message finished
+    }
+
+    iter = tree.find("offeredInfos");
+    if (iter != tree.not_found())
+    {
+      for (pt::ptree::value_type &rows : tree.get_child("ids"))
+      {
+        int i = 1;
+        std::string entity, entityType, scope, rep, relatedEntity;
+        for (pt::ptree::value_type &row : rows.second)
+        {
+          switch (i)
+          {
+            case 1:
+              entity = row.second.get_value<std::string>();
+              break;
+            case 2:
+              entityType = row.second.get_value<std::string>();
+              break;
+            case 3:
+              scope = row.second.get_value<std::string>();
+              break;
+            case 4:
+              rep = row.second.get_value<std::string>();
+              break;
+            case 5:
+              relatedEntity = row.second.get_value<std::string>();
+              break;
+          }
+
+          ++i;
+        }
+
+        if (entity != "" && entityType != "" && scope != "" && rep != "")
+        {
+          outMessage.infos.push_back(InformationSpecification(entity, entityType, scope, rep, relatedEntity));
+        }
       }
 
       return true; // id message finished

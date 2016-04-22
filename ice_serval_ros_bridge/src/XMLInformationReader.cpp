@@ -64,14 +64,14 @@ bool XMLInformationReader::readFile(const std::string& fileName)
     {
       for (element = cElement->FirstChildElement("information"); element; element = element->NextSiblingElement())
       {
-        bool result = this->readInformation(element, this->offered);
+        bool result = this->readOffered(element);
       }
     }
     else if (strcmp("required", child) == 0)
     {
       for (element = cElement->FirstChildElement("information"); element; element = element->NextSiblingElement())
       {
-        bool result = this->readInformation(element, this->required);
+        bool result = this->readRequired(element);
       }
     }
     else
@@ -83,17 +83,17 @@ bool XMLInformationReader::readFile(const std::string& fileName)
   return true;
 }
 
-std::vector<std::shared_ptr<InformationSpecification>> XMLInformationReader::getOffered()
+std::vector<std::shared_ptr<OfferedInfo>> XMLInformationReader::getOffered()
 {
   return this->offered;
 }
 
-std::vector<std::shared_ptr<InformationSpecification>> XMLInformationReader::getRequired()
+std::vector<std::shared_ptr<RequiredInfo>> XMLInformationReader::getRequired()
 {
   return this->required;
 }
 
-bool XMLInformationReader::readInformation(TiXmlElement* element, std::vector<std::shared_ptr<InformationSpecification>> &infos)
+bool XMLInformationReader::readOffered(TiXmlElement* element)
 {
   const char *tagName = element->Value();
 //  const char *name = element->Attribute("name");
@@ -148,9 +148,79 @@ bool XMLInformationReader::readInformation(TiXmlElement* element, std::vector<st
   _log->debug("Extracted information description: entity '%s', entityType '%s', scope '%s', representation '%s', relatedEntity '%s'",
              entity, entityType, scope, representation, relatedEntity);
 
-  std::shared_ptr<InformationSpecification> spec = std::make_shared<InformationSpecification>(
-      entity, entityType, scope, representation, relatedEntity);
-  infos.push_back(spec);
+  std::shared_ptr<OfferedInfo> info = std::make_shared<OfferedInfo>(entity, entityType, scope, representation, relatedEntity);
+  this->offered.push_back(info);
+
+  return true;
+}
+
+bool XMLInformationReader::readRequired(TiXmlElement* element)
+{
+  const char *tagName = element->Value();
+//  const char *name = element->Attribute("name");
+
+  if (!tagName || strcmp("information", tagName) != 0)
+  {
+    _log->error("Invalid tag '%v' for information tag", tagName);
+
+    return false;
+  }
+
+  std::string entity, entityType, scope, representation, relatedEntity, topic, message;
+
+  for (TiXmlElement* cElement = element->FirstChildElement(); cElement; cElement = cElement->NextSiblingElement())
+  {
+
+    const char *child = cElement->Value();
+    if (!child)
+    {
+      _log->error("Invalid child '%v' of operations", child);
+      return nullptr;
+    }
+    else if (strcmp("entity", child) == 0)
+    {
+      entity = cElement->GetText();
+    }
+    else if (strcmp("entityType", child) == 0)
+    {
+      entityType = cElement->GetText();
+    }
+    else if (strcmp("scope", child) == 0)
+    {
+      scope = cElement->GetText();
+    }
+    else if (strcmp("representation", child) == 0)
+    {
+      representation = cElement->GetText();
+    }
+    else if (strcmp("relatedEntity", child) == 0)
+    {
+      relatedEntity = cElement->GetText();
+    }
+    else if (strcmp("topic", child) == 0)
+    {
+      topic = cElement->GetText();
+    }
+    else if (strcmp("message", child) == 0)
+    {
+      message = cElement->GetText();
+    }
+  }
+
+  if (entity == "" || entityType == "" || scope == "" || representation == "" || topic == "" || message == "")
+  {
+    _log->warn("Incomplete information description: entity '%s', entityType '%s', scope '%s', representation '%s', relatedEntity '%s', topic '%s', message '%s'",
+               entity, entityType, scope, representation, relatedEntity, topic, message);
+    return false;
+  }
+
+  _log->debug("Extracted information description: entity '%s', entityType '%s', scope '%s', representation '%s', relatedEntity '%s', topic '%s', message '%s'",
+             entity, entityType, scope, representation, relatedEntity), topic, message;
+
+  std::shared_ptr<RequiredInfo> info = std::make_shared<RequiredInfo>(entity, entityType, scope, representation, relatedEntity);
+  info->topic = topic;
+  info->message = message;
+  this->required.push_back(info);
 
   return true;
 }

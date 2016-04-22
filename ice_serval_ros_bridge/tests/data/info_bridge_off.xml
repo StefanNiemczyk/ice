@@ -1,11 +1,10 @@
 <ice_serval_bridge>
 	<offered>
 		<information>
-			<entity>off_entity</entity>
-			<entityType>off_entityType</entityType>
-			<scope>off_scope</scope>
-			<representation>off_representation</representation>
-			<relatedEntity>off_relatedEntity</relatedEntity>
+			<entity>http://vs.uni-kassel.de/IceServalBridgeTest#Zwerg</entity>
+			<entityType>http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot</entityType>
+			<scope>http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position</scope>
+			<representation>http://www.semanticweb.org/sni/ontologies/2013/7/Ice#WGS84Rep</representation>
 		</information>
 	</offered>
 </ice_serval_bridge>

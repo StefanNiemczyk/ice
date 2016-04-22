@@ -10,8 +10,8 @@
 
 #include <serval_interface.h>
 
-#include "Identity.h"
-#include "IdentityDirectory.h"
+#include "Entity.h"
+#include "EntityDirectory.h"
 #include "IceServalBridge.h"
 #include "ServalCommunication.h"
 
@@ -36,33 +36,33 @@ void createConfig(ice::InitParams const * const params)
 
 TEST(Bridge, discovery)
 {
-  int values = 0;
-  char **args;
-  ros::init(values, args, "ice_serval_bridge");
-
   ros::NodeHandle nh_("");
   ros::NodeHandle pnh_("~");
 
   ice::InitParams *params1 = new ice::InitParams();
   ice::InitParams *params2 = new ice::InitParams();
 
-  params1->ontologyIri = "http://vs.uni-kassel.de/IceTest";
-  params1->ontologyIriSelf = "http://vs.uni-kassel.de/IceTest#Mops";
-  params1->ontologyPath = "/tmp";
+  std::string path = ros::package::getPath("ice_serval_ros_bridge");
+
+  params1->ontologyIri = "http://vs.uni-kassel.de/IceServalBridgeTest";
+  params1->ontologyIriSelf = "http://vs.uni-kassel.de/IceServalBridgeTest#Mops";
+  params1->ontologyPath = path + "/tests/data/";
   params1->servalInstancePath = "/tmp/mops";
   params1->servalHost = "localhost";
   params1->servalPort = 4111;
   params1->servalUser = "peter";
   params1->servalPassword = "venkman";
+  params1->xmlInfoPath = path + "/tests/data/info_bridge_off.xml";
 
-  params2->ontologyIri = "http://vs.uni-kassel.de/IceTest";
-  params2->ontologyIriSelf = "http://vs.uni-kassel.de/IceTest#Zwerg";
-  params2->ontologyPath = "/tmp";
+  params2->ontologyIri = "http://vs.uni-kassel.de/IceServalBridgeTest";
+  params2->ontologyIriSelf = "http://vs.uni-kassel.de/IceServalBridgeTest#Zwerg";
+  params2->ontologyPath = path + "/tests/data/";
   params2->servalInstancePath = "/tmp/zwerg";
   params2->servalHost = "localhost";
   params2->servalPort = 4112;
   params2->servalUser = "peter";
   params2->servalPassword = "venkman";
+  params2->xmlInfoPath = path + "/tests/data/info_bridge_req.xml";
 
   createConfig(params1);
   createConfig(params2);
@@ -74,22 +74,22 @@ TEST(Bridge, discovery)
   zwerg.init();
 
   // sleep some time and let the discovery happen
-  sleep(20);
+  sleep(120);
 
   // Check if the robots has found each other
   std::string servalZwerg, servalMops;
-  ASSERT_TRUE(zwerg.identityDirectory->self->getId(ice::IdentityDirectory::ID_SERVAL, servalZwerg));
-  ASSERT_TRUE(mops.identityDirectory->self->getId(ice::IdentityDirectory::ID_SERVAL, servalMops));
+  ASSERT_TRUE(zwerg.identityDirectory->self->getId(ice::EntityDirectory::ID_SERVAL, servalZwerg));
+  ASSERT_TRUE(mops.identityDirectory->self->getId(ice::EntityDirectory::ID_SERVAL, servalMops));
 
-  auto idMopsByZwerg = zwerg.identityDirectory->lookup(ice::IdentityDirectory::ID_SERVAL, servalMops, false);
-  auto idZwergByMops = mops.identityDirectory->lookup(ice::IdentityDirectory::ID_SERVAL, servalZwerg, false);
+  auto idMopsByZwerg = zwerg.identityDirectory->lookup(ice::EntityDirectory::ID_SERVAL, servalMops, false);
+  auto idZwergByMops = mops.identityDirectory->lookup(ice::EntityDirectory::ID_SERVAL, servalZwerg, false);
 
   ASSERT_NE(nullptr, idZwergByMops);
   ASSERT_NE(nullptr, idMopsByZwerg);
 
   // check ontology ids
-  idMopsByZwerg = zwerg.identityDirectory->lookup(ice::IdentityDirectory::ID_ONTOLOGY, params1->ontologyIriSelf, false);
-  idZwergByMops = mops.identityDirectory->lookup(ice::IdentityDirectory::ID_ONTOLOGY, params2->ontologyIriSelf, false);
+  idMopsByZwerg = zwerg.identityDirectory->lookup(ice::EntityDirectory::ID_ONTOLOGY, params1->ontologyIriSelf, false);
+  idZwergByMops = mops.identityDirectory->lookup(ice::EntityDirectory::ID_ONTOLOGY, params2->ontologyIriSelf, false);
 
   ASSERT_NE(nullptr, idMopsByZwerg);
   ASSERT_NE(nullptr, idZwergByMops);

@@ -17,6 +17,8 @@
 			<scope>req_scope</scope>
 			<representation>req_representation</representation>
 			<relatedEntity>req_relatedEntity</relatedEntity>
+			<topic>/topic</topic>
+			<message>/test/msg</message>
 		</information>	
 	</required>
 

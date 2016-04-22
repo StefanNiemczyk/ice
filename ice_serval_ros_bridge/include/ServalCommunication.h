@@ -22,7 +22,7 @@ class serval_interface;
 class ServalCommunication : public CommunicationInterface
 {
 public:
-  ServalCommunication(std::shared_ptr<IdentityDirectory> &directory, std::string const configPath, std::string const host,
+  ServalCommunication(IceServalBridge *bridge, std::string const configPath, std::string const host,
                       int const port, std::string const authName, std::string const authPass);
   virtual ~ServalCommunication();
   virtual void init();
@@ -30,12 +30,12 @@ public:
 
   void checkServal();
 
-  virtual void requestId(std::shared_ptr<Identity> const &identity, std::string const &id);
-  virtual void responseId(std::shared_ptr<Identity> const &identity, std::string const &id);
-  virtual void requestIds(std::shared_ptr<Identity> const &identity);
-  virtual void responseIds(std::shared_ptr<Identity> const &identity);
-  virtual void requestOfferedInformation(std::shared_ptr<Identity> const &identity);
-  virtual void responseOfferedInformation(std::shared_ptr<Identity> const &identity);
+  virtual void requestId(std::shared_ptr<Entity> const &identity, std::string const &id);
+  virtual void responseId(std::shared_ptr<Entity> const &identity, std::string const &id);
+  virtual void requestIds(std::shared_ptr<Entity> const &identity);
+  virtual void responseIds(std::shared_ptr<Entity> const &identity);
+  virtual void requestOfferedInformation(std::shared_ptr<Entity> const &identity);
+  virtual void responseOfferedInformation(std::shared_ptr<Entity> const &identity);
 
   std::shared_ptr<serval_interface> getServalInterface();
 
@@ -43,8 +43,8 @@ public:
 
 private:
   void pushMessage(Message &message);
-  void updateToken(std::shared_ptr<Identity> &identity);
-  int readMessages(std::shared_ptr<Identity> &identity, std::vector<Message> &outMessages);
+  void updateToken(std::shared_ptr<Entity> &identity);
+  int readMessages(std::shared_ptr<Entity> &identity, std::vector<Message> &outMessages);
   std::string serializeMessage(Message &message);
   bool deserializeMessage(std::string &message, Message &outMessage);
 

@@ -14,15 +14,16 @@
 #include <memory>
 #include <easylogging++.h>
 
+#include <ice/information/InformationSpecification.h>
 #include <ice/model/aspModel/ASPSystem.h>
 
 namespace ice
 {
 
-class IdentityDirectory;
+class EntityDirectory;
 class OntologyInterface;
 
-enum identity_match {
+enum entity_match {
   FULL_MATCH,
   PARTIAL_MATCH,
   INCLUDED,
@@ -40,19 +41,19 @@ struct Id {
     std::string value;
 };
 
-class Identity : public std::enable_shared_from_this<Identity>
+class Entity : public std::enable_shared_from_this<Entity>
 {
 public:
-  Identity(IdentityDirectory *directory, const std::initializer_list<Id>& ids);
-  virtual ~Identity();
+  Entity(EntityDirectory *directory, const std::initializer_list<Id>& ids);
+  virtual ~Entity();
 
   int initializeFromOntology(std::shared_ptr<OntologyInterface> const &ontologyInterface);
   std::map<std::string, std::string> readConfiguration(std::string const config);
 
-  identity_match checkMatching(std::shared_ptr<Identity> &identity);
-  identity_match checkMatching(const std::initializer_list<Id>& ids);
-  identity_match checkMatching(std::string &key, std::string &value);
-  void fuse(std::shared_ptr<Identity> &identity);
+  entity_match checkMatching(std::shared_ptr<Entity> &identity);
+  entity_match checkMatching(const std::initializer_list<Id>& ids);
+  entity_match checkMatching(std::string &key, std::string &value);
+  void fuse(std::shared_ptr<Entity> &identity);
   void fuse(const std::initializer_list<Id>& ids);
   void fuse(std::map<std::string,std::string>& ids);
   void pushIdsToMap(std::map<std::string,std::string> &map);
@@ -79,13 +80,16 @@ public:
 
   std::string toString();
 
+  std::vector<InformationSpecification>& getOfferedInformation();
+  void addOfferedInformation(std::vector<InformationSpecification> const &offeres);
+
   // ASP Stuff
   std::shared_ptr<ASPElement> getASPElementByName(ASPElementType type, std::string const name);
   std::shared_ptr<ASPElement> getASPElementByName(std::string const name);
   void addASPElement(std::shared_ptr<ASPElement> node);
 
 private:
-  IdentityDirectory                                     *directory;
+  EntityDirectory                                       *directory;
   bool                                                  iceIdentity;
   bool                                                  available;
   std::chrono::steady_clock::time_point                 timestamp;
@@ -93,6 +97,7 @@ private:
   std::map<std::string, std::string>                    ids;
   std::map<std::string, std::string>                    metadata;
   std::map<std::string, double>                         connectionQuality;
+  std::vector<InformationSpecification>                 offeredInformation;
   el::Logger*                                           _log;                   /**< Logger */
 
 
