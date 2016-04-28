@@ -5,3 +5,6 @@
 	path = muparser
 	url = https://github.com/carpe-noctem-cassel/muparser.git
 	branch = catkin-pkg
+[submodule "serval/serval-dna"]
+	path = serval/serval-dna
+	url = https://github.com/umr-ds/serval-dna.git
