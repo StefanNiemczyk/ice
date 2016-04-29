@@ -873,6 +873,366 @@ public:
     system(ss.str().c_str());
   }
 
+  void fuseVictimsScenario(bool global, bool verbose, bool gnuplot, int runs, bool neutrality, int sourceSizeMin, int sourceSizeMax,
+                               int sourceSizeStep)
+  {
+    std::string path = ros::package::getPath("ice");
+    std::vector<std::string> inputs;
+    std::vector<int> inputsMin;
+    std::vector<int> inputsMax;
+    std::vector<std::string> inputsRelated;
+    std::vector<int> inputsRelatedMin;
+    std::vector<int> inputsRelatedMax;
+    std::vector<std::string> outputs;
+    std::vector<int> outputsMin;
+    std::vector<int> outputsMax;
+    std::vector<std::string> metadatas;
+    std::vector<int> metadataValues;
+    std::vector<int> metadataValues2;
+    std::vector<std::string> metadataGroundings;
+    std::stringstream ss;
+
+    ofstream file;
+
+    ss.str("");
+    ss << this->logPath << "/fuseVictimsScenario_" << (global ? "global" : "local") << "_"
+        << (neutrality ? "neutrality_" : "") << sourceSizeMin << "-" << sourceSizeMax << ".txt";
+    std::string pathStr = ss.str();
+    file.open(pathStr);
+
+    std::string entityType = "EvalEntityType";
+    std::string entity = "EvalEntity";
+    std::string superValueScope = "SuperEvalValueScope";
+    std::string superRepresentation = "SuperRepresentation";
+
+    for (int systems = sourceSizeMin + 1; systems <= sourceSizeMax+1; systems += sourceSizeStep)
+    {
+        inputs.clear();
+        inputsMin.clear();
+        inputsMax.clear();
+        outputs.clear();
+        outputsMin.clear();
+        outputsMax.clear();
+        metadatas.clear();
+        metadataValues.clear();
+        metadataValues2.clear();
+        metadataGroundings.clear();
+
+        std::cout << std::endl;
+        std::cout << "-----------------------------------------------------------------------------" << std::endl;
+        std::cout << "-----------------------------------------------------------------------------" << std::endl;
+        std::cout << "Starting eval " << systems << " systems and " << std::endl << std::endl;
+
+        ice::OntologyInterface oi(path + "/java/lib/");
+
+        oi.addIRIMapper(path + "/ontology/");
+        oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+        oi.loadOntologies();
+        oi.setLogLevel(ice::LogLevel::Debug);
+
+        // add information structure
+        std::vector<std::string> scopes;
+
+        ss.str("");
+        ss << "EvalScope";
+        std::string scope = ss.str();
+        ss.str("");
+        ss << "EvalValueScope";
+        std::string valueScope = ss.str();
+
+        oi.addValueScope(superValueScope, valueScope, "DoubleRep");
+
+        std::vector<std::string> reps;
+        ss.str("");
+        ss << "ReqRepresentation";
+        std::string representation = ss.str();
+
+        std::vector<std::string> vec;
+        vec.push_back(valueScope);
+        oi.addRepresentation(superRepresentation, representation, vec);
+        reps.push_back(representation);
+
+        ss.str("");
+        ss << "EvalRepresentation";
+        representation = ss.str();
+
+        oi.addRepresentation(superRepresentation, representation, vec);
+        reps.push_back(representation);
+
+        oi.addEntityScope(scope, reps);
+
+        scopes.push_back(scope);
+        oi.addEntityType(entityType, scopes);
+        oi.addIndividual(entity, entityType);
+
+        // Add source stream
+        ss.str("");
+        ss << "EvalSourceStream";
+        std::string stream = ss.str();
+
+        oi.addNamedStream(stream, scope, representation);
+
+        // Add eval node
+        outputs.push_back("EvalSourceStream");
+        outputsMin.push_back(1);
+        outputsMax.push_back(1);
+
+        std::string node = "EvalNodeSource";
+        oi.addSourceNodeClass(node, outputs, outputsMin, outputsMax);
+
+        // Add req stream
+        stream = "EvalStream";
+        //    reps.clear();
+        //    reps.push_back(representation);
+        //    oi.addEntityScope(scope, reps);
+
+        oi.addNamedStream(stream, scope, "ReqRepresentation");
+
+        for (int i = 0; i < systems; ++i)
+        {
+          ss.str("");
+          ss << "EvalNode" << i;
+          node = ss.str();
+          inputs.clear();
+          inputsMin.clear();
+          inputsMax.clear();
+          outputs.clear();
+          outputsMin.clear();
+          outputsMax.clear();
+          metadatas.clear();
+          metadataValues.clear();
+          metadataValues2.clear();
+          metadataGroundings.clear();
+
+          ss.str("");
+          ss << "EvalSystem" << i;
+          std::string system = ss.str();
+          oi.addSystem(system);
+
+          if (i == 0)
+          {
+            inputs.push_back("EvalSourceStream");
+            inputsMin.push_back(2);
+            inputsMax.push_back(5);
+            outputs.push_back("EvalStream");
+            outputsMin.push_back(1);
+            outputsMax.push_back(1);
+
+            oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
+
+            metadatas.push_back("Cost");
+            metadataValues.push_back(1);
+            metadataValues2.push_back(0);
+            metadataGroundings.push_back("NodeCostASPGrounding");
+            metadatas.push_back("Accuracy");
+            metadataValues.push_back(1);
+            metadataValues2.push_back(2);
+            metadataGroundings.push_back("NodeAccuracyMinASPGrounding");
+
+            oi.addNodeIndividual(node + "Ind", node, system, "", "", metadatas, metadataValues, metadataValues2, metadataGroundings);
+
+
+            inputs.clear();
+            inputsMin.clear();
+            inputsMax.clear();
+            outputs.clear();
+            outputsMin.clear();
+            outputsMax.clear();
+            metadatas.clear();
+            metadataValues.clear();
+            metadataValues2.clear();
+            metadataGroundings.clear();
+
+            node = "SmoothingEvalNode";
+
+            inputs.push_back("EvalStream");
+            inputsMin.push_back(1);
+            inputsMax.push_back(1);
+            outputs.push_back("EvalStream");
+            outputsMin.push_back(1);
+            outputsMax.push_back(1);
+
+            oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
+
+            metadatas.push_back("Cost");
+            metadataValues.push_back(1);
+            metadataValues2.push_back(0);
+            metadataGroundings.push_back("NodeCostASPGrounding");
+            metadatas.push_back("Accuracy");
+            metadataValues.push_back(5);
+            metadataValues2.push_back(0);
+            metadataGroundings.push_back("NodeAccuracyMinASPGrounding");
+
+            oi.addNodeIndividual(node + "Ind", node, system, "", "", metadatas, metadataValues, metadataValues2, metadataGroundings);
+
+          }
+          else
+          {
+            metadatas.push_back("Accuracy");
+            if (neutrality)
+            {
+              metadataValues.push_back(i < (5 + 1) ? i : (5 + 1));
+              metadataValues2.push_back(0);
+            }
+            else
+            {
+              metadataValues.push_back(i);
+              metadataValues2.push_back(0);
+            }
+            metadataGroundings.push_back("NodeAccuracyFixASPGrounding");
+            metadatas.push_back("Cost");
+            metadataValues.push_back(1);
+            metadataValues2.push_back(0);
+            metadataGroundings.push_back("NodeCostASPGrounding");
+
+            oi.addNodeIndividual(node + "SourceInd", "EvalNodeSource", system, entity, "", metadatas, metadataValues,
+                                 metadataValues2, metadataGroundings);
+          }
+
+          if (i == 0)
+          {
+            ss.str("");
+            ss << "Req" << stream << i;
+            oi.addRequiredStream(ss.str(), stream, system, entity, "");
+          }
+        }
+
+        ss.str("");
+        ss << "/tmp/fuseVictimsScenario_" << (global ? "global" : "local") << "_" << (neutrality ? "neutrality_" : "") << systems << ".owl";
+        std::string fileName = ss.str();
+        oi.saveOntology(fileName);
+
+        ModelGeneration mg(path);
+
+        std::vector<std::string> toCheck;
+
+        //    ss.str("");
+        //    ss << "metadataStream(1,accuracy,stream(1,o0_EvalSystem0,o0_EvalNode0Ind,o0_EvalSystem0," <<
+        //        "information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),3),10)";
+        //    toCheck.push_back(ss.str());
+
+        if (global)
+        {
+          ss.str("");
+          ss
+              << "metadataStream(1,accuracy,stream(1,o0_EvalSystem0,node(1,o0_EvalSystem0,o0_SmoothingEvalNodeInd,o0_EvalEntity,none),"
+               << "information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),4),"
+               << (min(systems-1,5)*2 + 5 + 1 + systems - min(systems-1,5)) << ")";
+          toCheck.push_back(ss.str());
+        }
+
+        for (int i = systems - min(5, systems-1); i < systems; ++i)
+        {
+          ss.str("");
+          ss << "stream(1,o0_EvalSystem0,node(1,o0_EvalSystem" << i << ",o0_EvalNode" << i
+              << "SourceInd,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope,o0_EvalRepresentation,none),2)";
+          toCheck.push_back(ss.str());
+        }
+
+        ss.str("");
+        ss << "selectedStream(1,o0_EvalSystem0,node(1,o0_EvalSystem0,o0_SmoothingEvalNodeInd,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),4)";
+        toCheck.push_back(ss.str());
+
+        //          ss.str("");
+        //          ss << "sumMetadata(1,cost," << inputsCount + 1 << ")";
+        //          toCheck.push_back(ss.str());
+
+        auto result = mg.testSeries(
+            fileName, &toCheck, runs, true, global, verbose, 3, 10, [&] (supplementary::ClingWrapper *asp)
+            {
+              this->lambda(asp);
+
+              for (int i=1; i < systems; ++i)
+              {
+                ss.str("");
+                ss << "transfer(o0_EvalSystem" << i << ",o0_EvalSystem0).";
+                asp->add("base",
+                    {},ss.str());
+                ss.str("");
+                ss << "metadataProcessing(cost,o0_EvalSystem" << i << ",o0_EvalSystem0," << 2 << ").";
+                asp->add("base",
+                    {},ss.str());
+                ss.str("");
+                ss << "metadataOutput(delay,o0_EvalSystem" << i << ",o0_EvalSystem0," << 2 << ").";
+                asp->add("base",
+                    {},ss.str());
+
+                ss.str("");
+                ss << "transfer(o0_EvalSystem0,o0_EvalSystem" << i << ").";
+                asp->add("base",
+                    {},ss.str());
+                ss.str("");
+                ss << "metadataProcessing(cost,o0_EvalSystem0,o0_EvalSystem" << i << "," << 2 << ").";
+                asp->add("base",
+                    {},ss.str());
+                ss.str("");
+                ss << "metadataOutput(delay,o0_EvalSystem0,o0_EvalSystem" << i << "," << 2 << ").";
+                asp->add("base",
+                    {},ss.str());
+              }
+
+              //     asp->setModelCount(0);
+            //            asp->setPredefConfiguration(supplementary::PredefinedConfigurations::crafty);
+            //      asp->setOptStrategie(3);
+          });
+
+        result.print();
+
+        // print to file
+        file << (systems-1) << "\t";
+//        file << inputsCount << "\t";
+        file << result.numberTotal << "\t";
+        file << result.numberSuccessful << "\t";
+        file << result.avg.totalTime << "\t" << result.totalTimeVar << "\t" << result.best.totalTime << "\t"
+            << result.worst.totalTime << "\t";
+        file << result.avg.ontologyReadTime << "\t" << result.ontologyReadTimeVar << "\t"
+            << result.best.ontologyReadTime << "\t" << result.worst.ontologyReadTime << "\t";
+        file << result.avg.ontologyReasonerTime << "\t" << result.ontologyReasonerTimeVar << "\t"
+            << result.best.ontologyReasonerTime << "\t" << result.worst.ontologyReasonerTime << "\t";
+        file << result.avg.ontologyToASPTime << "\t" << result.ontologyToASPTimeVar << "\t"
+            << result.best.ontologyToASPTime << "\t" << result.worst.ontologyToASPTime << "\t";
+        file << result.avg.aspGroundingTime << "\t" << result.aspGroundingTimeVar << "\t"
+            << result.best.aspGroundingTime << "\t" << result.worst.aspGroundingTime << "\t";
+        file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime
+            << "\t" << result.worst.aspSolvingTime << "\t";
+        file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime << "\t"
+            << result.worst.aspSatTime << "\t";
+        file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime << "\t"
+            << result.worst.aspUnsatTime << "\t";
+        file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount << "\t"
+            << result.worst.aspModelCount << "\t";
+        file << result.avg.aspAtomCount << "\t" << result.aspAtomCountVar << "\t" << result.best.aspAtomCount << "\t"
+            << result.worst.aspAtomCount << "\t";
+        file << result.avg.aspBodiesCount << "\t" << result.aspBodiesCountVar << "\t" << result.best.aspBodiesCount
+            << "\t" << result.worst.aspBodiesCount << "\t";
+        file << result.avg.aspAuxAtomCount << "\t" << result.aspAuxAtomCountVar << "\t" << result.best.aspAuxAtomCount
+            << "\t" << result.worst.aspAuxAtomCount << std::endl;
+
+        // gnuplot -persist -e "plot './results_systems50-500.txt' u 1:4 w l t 'sum', './results_systems50-500.txt' u 1:20 w l t 'grounding', './results_systems50-500.txt' u 1:(\$20 + \$24) w l t 'solving'"
+        file.flush();
+    }
+
+    file.close();
+
+    if (!gnuplot)
+      return;
+
+    ss.str("");
+//    if (inputSizeMin == inputSizeMax)
+//    {
+      ss << "gnuplot -persist -e \"set title '" << pathStr << "'; plot '" << pathStr << "' u 1:4 w l t 'sum', '"
+          << pathStr << "' u 1:20 w l t 'grounding', '" << pathStr << "' u 1:(\\$20 + \\$24) w l t 'solving'\"";
+//    }
+//    else
+//    {
+//      ss << "gnuplot -persist -e \"set title '" << pathStr << "'; splot '" << pathStr
+//          << "' using 1:2:5 with points t 'sum', '" << pathStr << "' using 1:2:21 with points t 'Grounding', '"
+//          << pathStr << "' using 1:2:(\\$21+\\$25) with points t 'Grounding + Solving'\"";
+//    }
+
+    system(ss.str().c_str());
+  }
+
   void systemsStarMashScenario(bool global, bool verbose, bool gnuplot, int runs, bool neutrality, int systemSizeMin,
                                int systemSizeMax, int systemSizeStep, int inputSizeMin, int inputSizeMax,
                                int inputSizeStep)

@@ -264,28 +264,28 @@ target_link_libraries(ice_node
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test 
- # test/eval/eval_ModelGeneration.cpp
- # test/eval/ModelGeneration.cpp
- # test/eval/EvalScenarios.cpp
+  test/eval/eval_ModelGeneration.cpp
+  test/eval/ModelGeneration.cpp
+  test/eval/EvalScenarios.cpp
  # test/eval/eval_AccessSpeed.cpp
  
-  test/etc/TestTime.cpp
-  test/etc/EngineStuff.cpp
-  test/test_ASPCoordinator.cpp
-  test/test_JNI.cpp
-  test/test_ASPComposition.cpp
-  test/test_ASPRepComputation.cpp
-  test/test_GContainer.cpp
-  test/test_RepresentationTransformation.cpp
-  test/test_EulerRepTransformation.cpp
-  test/test_serialize.cpp
-  test/test_RingBuffer.cpp
-  test/test_Buffer.cpp
-  test/test_EventHandler.cpp
-  test/test_Time.cpp
-  test/test_InformationStore.cpp
-  test/test_Node.cpp
-  test/test_NodeStore.cpp
+#  test/etc/TestTime.cpp
+#  test/etc/EngineStuff.cpp
+#  test/test_ASPCoordinator.cpp
+#  test/test_JNI.cpp
+#  test/test_ASPComposition.cpp
+#  test/test_ASPRepComputation.cpp
+#  test/test_GContainer.cpp
+#  test/test_RepresentationTransformation.cpp
+#  test/test_EulerRepTransformation.cpp
+#  test/test_serialize.cpp
+#  test/test_RingBuffer.cpp
+#  test/test_Buffer.cpp
+#  test/test_EventHandler.cpp
+#  test/test_Time.cpp
+#  test/test_InformationStore.cpp
+#  test/test_Node.cpp
+#  test/test_NodeStore.cpp
  
  ## should be fixed...  
  # test/test_XMLReader

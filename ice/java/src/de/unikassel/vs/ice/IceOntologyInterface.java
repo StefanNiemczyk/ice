@@ -799,8 +799,10 @@ public class IceOntologyInterface {
 			final int p_inputMapsMinSize[], final int p_inputMapsMaxSize[], final String p_outputMaps[],
 			final int p_outputMapsMinSize[], final int p_outputMapsMaxSize[]) {
 		IRI nodeIRI = IRI.create(this.mainIRIPrefix + p_node);
-		if (this.mainOntology.containsClassInSignature(nodeIRI))
+		if (this.mainOntology.containsClassInSignature(nodeIRI)) {
+			logWarning(String.format("Node with name '%s' already exists, will not be created.", p_node));
 			return false;
+		}
 
 		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 

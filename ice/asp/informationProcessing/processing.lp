@@ -145,25 +145,26 @@ connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,node(k,SOURCE,
 
 
 % computing meta inforamtion of a node
--maxStep(NODE,STEP) :-
-	connectToMap(NODE,stream(k,_,_,_,STEP)),
-	connectToMap(NODE,stream(k,_,_,_,STEP2)),
+-maxStepNode(NODE,STEP) :-
+	connectToNode(NODE,stream(k,_,_,_,STEP)),
+	connectToNode(NODE,stream(k,_,_,_,STEP2)),
 	STEP2 > STEP.
 
-maxStep(NODE,STEP) :-
-	connectToMap(NODE,stream(k,_,_,_,STEP)),
-	not -maxStep(NODE,STEP).
+maxStepNode(NODE,STEP) :-
+	connectToNode(NODE,stream(k,_,_,_,STEP)),
+	not -maxStepNode(NODE,STEP).
 
 nodeMeta(node(k,SYSTEM,NODE,ENTITY,ENTITY2),STEP_MAX,COUNT) :- 
 	nodeCount(node(k,SYSTEM,NODE,ENTITY,ENTITY2),MIN,MAX),
 	MIN != MAX,
-	maxStep(node(k,SYSTEM,NODE,ENTITY,ENTITY2),STEP_MAX),
+	maxStepNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2),STEP_MAX),
 	COUNT = #count{STREAM : connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), STREAM)},
 	COUNT < MAX + 1,
 	COUNT > MIN - 1.
 
 nodeMeta(node(k,SYSTEM,NODE,ENTITY,ENTITY2), STEP_MAX, COUNT) :- 
-	STEP_MAX = #max{STEP : connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(_,_,_,_,STEP))},
+	maxStepNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2),STEP_MAX),
+	%STEP_MAX = #max{STEP : connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(_,_,_,_,STEP))},
 	nodeCount(node(k,SYSTEM,NODE,ENTITY,ENTITY2),COUNT,COUNT),
 	STEP_MAX < maxStepCount,
 	STEP_MAX != #inf.
@@ -297,8 +298,20 @@ mapCount(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 0, 100) :-
 	mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2).
 
 -maxStep(NODE,STEP) :-
-	connectToMap(NODE,stream(k,_,_,_,STEP)) ; connectToMap(NODE,map(k,_,_,_,STEP)),
-	connectToMap(NODE,stream(k,_,_,_,STEP2)) ; connectToMap(NODE,map(k,_,_,_,STEP2)),
+	connectToMap(NODE,stream(k,_,_,_,STEP)),
+	connectToMap(NODE,stream(k,_,_,_,STEP2)),
+	STEP2 > STEP.
+-maxStep(NODE,STEP) :-
+	connectToMap(NODE,map(k,_,_,_,STEP)),
+	connectToMap(NODE,map(k,_,_,_,STEP2)),
+	STEP2 > STEP.
+-maxStep(NODE,STEP) :-
+	connectToMap(NODE,stream(k,_,_,_,STEP)),
+	connectToMap(NODE,map(k,_,_,_,STEP2)),
+	STEP2 > STEP.
+-maxStep(NODE,STEP) :-
+	connectToMap(NODE,map(k,_,_,_,STEP)),
+	connectToMap(NODE,stream(k,_,_,_,STEP2)),
 	STEP2 > STEP.
 
 maxStep(NODE,STEP) :-

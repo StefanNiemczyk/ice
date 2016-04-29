@@ -398,7 +398,7 @@ public:
 
     // Initializing OwlAPI
     ice::OntologyInterface ontology(path + "/java/lib/");
-    ontology.setLogLevel(ice::LogLevel::Debug);
+    ontology.setLogLevel(ice::LogLevel::Error);
     ontology.addIRIMapper(path + "/ontology/");
     ontology.loadOntology(p_ontPath);
 
