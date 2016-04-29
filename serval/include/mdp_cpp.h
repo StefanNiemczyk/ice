@@ -16,7 +16,9 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include <stdint.h>
+#include <stdint.h> /* for uint8_t, ... */
+#include <unistd.h> /* for ssize_t */
+
 /* servald constants.h */
 #include <constants.h>
 
