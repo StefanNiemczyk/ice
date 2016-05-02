@@ -40,3 +40,6 @@ ice/test/logs
 hs_err_pid*
 ice/java/lib/CMakeFiles/java_ontology_interface.dir/java_sources
 ice/java/lib/CMakeFiles/java_ontology_interface.dir/java_class_filelist
+
+# file gets copied out of serval-repofile gets copied out of sre
+serval/include/constants.h
