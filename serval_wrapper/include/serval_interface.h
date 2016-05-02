@@ -13,10 +13,12 @@
 #include <string>
 #include <vector>
 #include <cpr/cpr.h>
+#include <mdp_cpp.h>
 
 #include "serval_wrapper/keyring.h"
 #include "serval_wrapper/meshms.h"
 #include "serval_wrapper/rhizome.h"
+#include "serval_wrapper/MDPSocket.h"
 
 namespace ice
 {
@@ -154,6 +156,9 @@ struct serval_bundle_manifest
 class serval_interface
 {
 public:
+  static void sidToArray(std::string const &sid, uint8_t* out);
+
+public:
   serval_interface(std::string configPath, std::string const host, int const port, std::string const authName, std::string const authPass);
   virtual ~serval_interface();
   bool startDeamon();
@@ -165,6 +170,7 @@ public:
   cpr::Authentication* getAuth();
   std::string getServalBin();
   int exec(std::string const &cmd, std::stringstream &output);
+  std::shared_ptr<MDPSocket> createSocket(std::string const &recipientSid, int port, std::string const &senderSid = "");
 
 public:
   serval_wrapper::keyring               keyring;

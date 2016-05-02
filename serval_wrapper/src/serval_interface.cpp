@@ -19,6 +19,16 @@ namespace pt = boost::property_tree;
 namespace ice
 {
 
+void serval_interface::sidToArray(std::string const &sid, uint8_t* out)
+{
+  for (int i = 0; i < SID_SIZE; ++i)
+  {
+    std::string s = sid.substr(2*i, 2);
+    uint8_t x = std::stoul(s, nullptr, 16);
+    out[i] = x;
+  }
+}
+
 serval_interface::serval_interface(std::string configPath, std::string const host, int const port, std::string const authName,
                                    std::string const authPass) :
     host(host), port(port), timeout(5000), keyring(serval_wrapper::keyring(this)),
@@ -33,6 +43,8 @@ serval_interface::serval_interface(std::string configPath, std::string const hos
     this->servalBin = "${SERVAL_ROOT}/servald";
 
   this->startDeamon();
+
+  this->keyring.getSelf();
 }
 
 serval_interface::~serval_interface()
@@ -100,4 +112,28 @@ int serval_interface::exec(std::string const &cmd, std::stringstream &output) {
     return size;
 }
 
+
+std::shared_ptr<MDPSocket> serval_interface::createSocket(std::string const &recipientSid, int port, std::string const &senderSid)
+{
+  int sock;
+
+  if ((sock = mdp_socket()) < 0)
+  {
+        std::cerr << "error creating socket" << std::endl;
+        return nullptr;
+  }
+
+  std::string sid;
+
+  if (senderSid == "")
+  {
+    sid = this->keyring.getSelf()->at(0).sid;
+  }
+  else
+  {
+    sid = senderSid;
+  }
+
+  return std::make_shared<MDPSocket>(sock, port, recipientSid, sid);
+}
 } /* namespace ice */

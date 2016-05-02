@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(serval_wrapper)
 
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+  serval
+)
 
 ## Use c++ 11x std
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -37,7 +39,7 @@ catkin_package(
   INCLUDE_DIRS include ${CPR_INCLUDE_DIRS}
   LIBRARIES ${PROJECT_NAME} 
 #  CATKIN_DEPENDS 
-  DEPENDS ${CPR_LIBRARIES}
+  DEPENDS ${CPR_LIBRARIES} serval
 )
 
 ###########
@@ -57,6 +59,7 @@ add_library(${PROJECT_NAME}
   src/serval_wrapper/keyring.cpp
   src/serval_wrapper/meshms.cpp
   src/serval_wrapper/rhizome.cpp
+  src/serval_wrapper/MDPSocket.cpp
 )
 
 
@@ -72,9 +75,10 @@ target_link_libraries(${PROJECT_NAME}
 add_definitions(-DTEST_FILE_ROOT_PATH="${PROJECT_SOURCE_DIR}")
 
 catkin_add_gtest(${PROJECT_NAME}-test 
-  tests/test_keyring.cpp
-  tests/test_meshms.cpp
-  tests/test_rhizome.cpp
+ # tests/test_keyring.cpp
+ # tests/test_meshms.cpp
+ # tests/test_rhizome.cpp
+  tests/test_mdp.cpp
 
   tests/test_main.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tests

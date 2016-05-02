@@ -16,6 +16,9 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#ifndef MDP_CLIENT_H_
+#define MDP_CLIENT_H_
+
 #include <stdint.h> /* for uint8_t, ... */
 #include <unistd.h> /* for ssize_t */
 
@@ -91,3 +94,5 @@ int _mdp_bind(struct __sourceloc __whence, int socket, struct mdp_sockaddr *loca
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* MDP_CLIENT_H_ */

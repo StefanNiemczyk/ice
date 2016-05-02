@@ -4,6 +4,7 @@
 #include <exception>
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
 
 void createConfig()
 {
@@ -23,6 +24,7 @@ void createConfig()
 
 int main(int argc, char **argv)
 {
+    setenv("SERVALINSTANCE_PATH", "/tmp/instance1", 1);
     createConfig();
   //ros::init(argc, argv, "ice_engine_test");
 //  try
