@@ -12,6 +12,7 @@
 #include <iostream>
 #include <regex>
 #include <sstream>
+#include <stdlib.h>
 
 // Short alias for this namespace
 namespace pt = boost::property_tree;
@@ -29,9 +30,22 @@ void serval_interface::sidToArray(std::string const &sid, unsigned char* out)
   }
 }
 
+std::string serval_interface::arrayToSid(uint8_t* sid)
+{
+  std::stringstream ss;
+
+  ss << std::uppercase << std::hex;
+  for (int i = 0; i < SID_SIZE; ++i)
+  {
+    ss << std::setfill ('0') << std::setw(sizeof(uint8_t)*2) << (int)sid[i];
+  }
+
+  return ss.str();
+}
+
 serval_interface::serval_interface(std::string configPath, std::string const host, int const port, std::string const authName,
                                    std::string const authPass) :
-    host(host), port(port), timeout(5000), keyring(serval_wrapper::keyring(this)),
+    instancePath(configPath), host(host), port(port), timeout(5000), keyring(serval_wrapper::keyring(this)),
                     meshms(serval_wrapper::meshms(this)), rhizome(serval_wrapper::rhizome(this))
 {
   this->auth = new cpr::Authentication {authName, authPass};
@@ -117,6 +131,18 @@ std::shared_ptr<MDPSocket> serval_interface::createSocket(int port, std::string 
 {
   int sock;
 
+  // TODO log
+  std::cout << "Creating socket for sid " << senderSid << std::endl;
+
+  // override the SERVAL_INSTANCEPATH environment variable so enable the support of multiple serval instances in one process
+  char* instancePathEnv;
+  if (this->instancePath != "")
+  {
+    std::cout << "Updating environment variable 'SERVAL_INSTANCEPATH' to '" << this->instancePath << "' for sid " << senderSid << std::endl;
+    instancePathEnv = getenv("SERVAL_INSTANCEPATH");
+    setenv("SERVALINSTANCE_PATH", this->instancePath.c_str(), 1);
+  }
+
   if ((sock = mdp_socket()) < 0)
   {
         std::cerr << "error creating socket" << std::endl;
@@ -134,6 +160,22 @@ std::shared_ptr<MDPSocket> serval_interface::createSocket(int port, std::string 
     sid = senderSid;
   }
 
-  return std::make_shared<MDPSocket>(sock, port, sid);
+  // binding socket to port
+  struct mdp_sockaddr sockaddr;
+  sockaddr.port = port;
+  serval_interface::sidToArray(sid, sockaddr.sid.binary);
+  if (mdp_bind(sock, &sockaddr) != 0) {
+          std::cerr << "Error binding port '" << std::to_string(port) << "' for sid " << sid << std::endl;
+          return nullptr;
+  }
+
+  auto socket = std::make_shared<MDPSocket>(sock, port, sid);
+
+  if (this->instancePath != "")
+  {
+    setenv("SERVALINSTANCE_PATH", instancePathEnv, 1);
+  }
+
+  return socket;
 }
 } /* namespace ice */

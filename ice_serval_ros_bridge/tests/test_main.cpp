@@ -4,6 +4,7 @@
 #include <exception>
 #include <iostream>
 #include "easylogging++.h"
+#include "IceServalBridge.h"
 
 INITIALIZE_EASYLOGGINGPP
 

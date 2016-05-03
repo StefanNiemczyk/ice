@@ -157,6 +157,7 @@ class serval_interface
 {
 public:
   static void sidToArray(std::string const &sid, uint8_t* out);
+  static std::string arrayToSid(uint8_t* sid);
 
 public:
   serval_interface(std::string configPath, std::string const host, int const port, std::string const authName, std::string const authPass);
@@ -183,6 +184,7 @@ private:
   int                                   timeout;
   std::string                           address;
   std::string                           servalBin;
+  std::string                           instancePath;
   cpr::Authentication                   *auth;
 };
 

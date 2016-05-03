@@ -12,23 +12,6 @@ void onMsg(const geometry_msgs::Vector3::ConstPtr& msg)
   std::cout << msg << std::endl;
 }
 
-void createConfig(ice::InitParams const * const params)
-{
-  // create folder
-  mkdir(params->servalInstancePath.c_str(), 0700);
-
-  std::ofstream myfile;
-  myfile.open(params->servalInstancePath + "/serval.conf");
-  myfile << "interfaces.0.match=*\n";
-  myfile << "interfaces.0.socket_type=dgram\n";
-  myfile << "interfaces.0.type=ethernet\n";
-  myfile << "interfaces.0.port=4110\n";
-  myfile << "rhizome.http.port=" << params->servalPort << "\n";
-  myfile << "api.restful.users." << params->servalUser << ".password=" << params->servalPassword << "\n";
-  myfile.close();
-}
-
-
 TEST(GMessagePublisher, simpleTest)
 {
   ice::InitParams *params1 = new ice::InitParams();
@@ -45,7 +28,7 @@ TEST(GMessagePublisher, simpleTest)
   params1->servalPassword = "venkman";
   params1->xmlInfoPath = path + "/tests/data/info_bridge_off.xml";
 
-  createConfig(params1);
+  ice::IceServalBridge::createConfig(params1);
 
   ros::NodeHandle nh_("");
   ros::NodeHandle pnh_("~");

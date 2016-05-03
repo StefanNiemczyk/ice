@@ -17,23 +17,6 @@
 
 #include "gtest/gtest.h"
 
-void createConfig(ice::InitParams const * const params)
-{
-  // create folder
-  mkdir(params->servalInstancePath.c_str(), 0700);
-
-  std::ofstream myfile;
-  myfile.open(params->servalInstancePath + "/serval.conf");
-  myfile << "interfaces.0.match=*\n";
-  myfile << "interfaces.0.socket_type=dgram\n";
-  myfile << "interfaces.0.type=ethernet\n";
-  myfile << "interfaces.0.port=4110\n";
-  myfile << "rhizome.http.port=" << params->servalPort << "\n";
-  myfile << "api.restful.users." << params->servalUser << ".password=" << params->servalPassword << "\n";
-  myfile.close();
-}
-
-
 TEST(Bridge, discovery)
 {
   ros::NodeHandle nh_("");
@@ -64,8 +47,8 @@ TEST(Bridge, discovery)
   params2->servalPassword = "venkman";
   params2->xmlInfoPath = path + "/tests/data/info_bridge_req.xml";
 
-  createConfig(params1);
-  createConfig(params2);
+  ice::IceServalBridge::createConfig(params1);
+  ice::IceServalBridge::createConfig(params2);
 
   ice::IceServalBridge mops = ice::IceServalBridge(nh_, pnh_, params1);
   ice::IceServalBridge zwerg = ice::IceServalBridge(nh_, pnh_, params2);
@@ -74,7 +57,7 @@ TEST(Bridge, discovery)
   zwerg.init();
 
   // sleep some time and let the discovery happen
-  sleep(120);
+  sleep(5);
 
   // Check if the robots has found each other
   std::string servalZwerg, servalMops;

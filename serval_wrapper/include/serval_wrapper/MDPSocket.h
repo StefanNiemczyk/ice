@@ -23,17 +23,15 @@ public:
   MDPSocket(int socket, int port, std::string const &senderSid);
   virtual ~MDPSocket();
 
-  void send(unsigned char *recipientSid, uint8_t *payload, size_t size);
+  void send(uint8_t *recipientSid, uint8_t *payload, size_t size);
   void send(std::string const &recipientSid, uint8_t *payload, size_t size);
-  int receive(uint8_t *buffer, size_t size);
+  int receive(std::string &senderSid, uint8_t *buffer, size_t size);
   void close();
 
 private:
   int socket;
   int port;
-  std::string const &recipientSid;
-  std::string const &senderSid;
-  struct mdp_header header;
+  std::string const senderSid;
   bool closed;
   std::mutex _mtx;
 };

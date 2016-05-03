@@ -34,10 +34,12 @@ enum IceCmd
 
 struct Message
 {
-  std::shared_ptr<Entity> receiver;
+  std::shared_ptr<Entity> entity;
   int command;
-  std::map<std::string, std::string> map;
-  std::vector<InformationSpecification> infos;
+//  size_t payloadSize;
+  std::vector<uint8_t> payload;
+//  std::map<std::string, std::string> map;
+//  std::vector<InformationSpecification> infos;
 };
 
 class CommunicationInterface
@@ -45,23 +47,41 @@ class CommunicationInterface
 public:
   CommunicationInterface();
   virtual ~CommunicationInterface();
-  virtual void init() = 0;
-  virtual void cleanUp() = 0;
+  virtual void init();
+  virtual void cleanUp();
 
-  virtual void requestId(std::shared_ptr<Entity> const &identity, std::string const &id) = 0;
-  virtual void responseId(std::shared_ptr<Entity> const &identity, std::string const &id) = 0;
-  virtual void requestIds(std::shared_ptr<Entity> const &identity) = 0;
-  virtual void responseIds(std::shared_ptr<Entity> const &identity) = 0;
-  virtual void requestOfferedInformation(std::shared_ptr<Entity> const &identity) = 0;
-  virtual void responseOfferedInformation(std::shared_ptr<Entity> const &identity) = 0;
+  virtual void requestId(std::shared_ptr<Entity> const &identity, std::string const &id);
+  virtual void onRequestId(std::shared_ptr<Entity> const &identity, std::string const &id);
+  virtual void requestIds(std::shared_ptr<Entity> const &identity);
+  virtual void onRequestIds(std::shared_ptr<Entity> const &identity);
+  virtual void requestOfferedInformation(std::shared_ptr<Entity> const &identity);
+  virtual void onRequestOfferedInformation(std::shared_ptr<Entity> const &identity);
+
+  virtual void workerTask();
+
+  // methodes which need to be implemented by child class
+  virtual void discover() = 0;
+  virtual int readMessage(std::vector<Message> &outMessages) = 0;
+  virtual void sendMessage(Message &msg) = 0;
 
 protected:
-  virtual void handleMessage(std::shared_ptr<Entity> &identity, Message &message);
+  virtual void initInternal() = 0;
+  virtual void cleanUpInternal() = 0;
+  virtual void handleMessage(Message &message);
+
+private:
+  void pushMessage(Message &message);
 
 protected:
   IceServalBridge                             *bridge;
   std::shared_ptr<Entity>                     self;
   std::shared_ptr<EntityDirectory>            directory;
+
+  std::thread                                 worker;
+  bool                                        running;
+  std::vector<Message>                        messages;
+
+  std::mutex                                    _mtx;
   el::Logger                                  *_log;
 };
 

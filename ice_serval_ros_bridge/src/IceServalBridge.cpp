@@ -7,6 +7,8 @@
 
 #include "IceServalBridge.h"
 
+#include <fstream>
+
 #include <ros/package.h>
 #include <ice/representation/GContainerFactory.h>
 
@@ -17,6 +19,22 @@
 
 namespace ice
 {
+
+void IceServalBridge::createConfig(ice::InitParams const * const params)
+{
+  // create folder
+  mkdir(params->servalInstancePath.c_str(), 0700);
+
+  std::ofstream myfile;
+  myfile.open(params->servalInstancePath + "/serval.conf");
+  myfile << "interfaces.0.match=*\n";
+  myfile << "interfaces.0.socket_type=dgram\n";
+  myfile << "interfaces.0.type=ethernet\n";
+  myfile << "interfaces.0.port=4110\n";
+  myfile << "rhizome.http.port=" << params->servalPort << "\n";
+  myfile << "api.restful.users." << params->servalUser << ".password=" << params->servalPassword << "\n";
+  myfile.close();
+}
 
 IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_) : nh_(nh_), pnh_(pnh_)
 {
@@ -105,8 +123,7 @@ void IceServalBridge::init()
   this->gcontainerFactory->setOntologyInterface(this->ontologyInterface);
   this->gcontainerFactory->init();
 
-  std::cout << "asdfkljsadkgjklsdajgl" << std::endl;
-  _log->error("Bridge for identity '%s' initialized", this->identityDirectory->self->toString());
+  _log->info("Bridge for identity '%s' initialized", this->identityDirectory->self->toString());
 }
 
 void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> const &identity)

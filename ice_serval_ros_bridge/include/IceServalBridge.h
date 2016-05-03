@@ -65,6 +65,9 @@ struct InitParams
 class IceServalBridge
 {
 public:
+  static void createConfig(ice::InitParams const * const params);
+
+public:
   IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_);
   IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_, InitParams* params);
   virtual ~IceServalBridge();

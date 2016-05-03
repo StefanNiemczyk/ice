@@ -14,10 +14,13 @@
 
 #include "CommunicationInterface.h"
 
+#define SERVAL_PORT 8045
+
 namespace ice
 {
 
 class serval_interface;
+class MDPSocket;
 
 class ServalCommunication : public CommunicationInterface
 {
@@ -25,43 +28,31 @@ public:
   ServalCommunication(IceServalBridge *bridge, std::string const configPath, std::string const host,
                       int const port, std::string const authName, std::string const authPass);
   virtual ~ServalCommunication();
-  virtual void init();
-  virtual void cleanUp();
 
   void checkServal();
-
-  virtual void requestId(std::shared_ptr<Entity> const &identity, std::string const &id);
-  virtual void responseId(std::shared_ptr<Entity> const &identity, std::string const &id);
-  virtual void requestIds(std::shared_ptr<Entity> const &identity);
-  virtual void responseIds(std::shared_ptr<Entity> const &identity);
-  virtual void requestOfferedInformation(std::shared_ptr<Entity> const &identity);
-  virtual void responseOfferedInformation(std::shared_ptr<Entity> const &identity);
-
   std::shared_ptr<serval_interface> getServalInterface();
-
   void setOwnSid(std::string const &sid);
 
-private:
-  void pushMessage(Message &message);
-  void updateToken(std::shared_ptr<Entity> &identity);
-  int readMessages(std::shared_ptr<Entity> &identity, std::vector<Message> &outMessages);
-  std::string serializeMessage(Message &message);
-  bool deserializeMessage(std::string &message, Message &outMessage);
+protected:
+  void read();
+  virtual void initInternal();
+  virtual void cleanUpInternal();
+  virtual void discover();
+  virtual int readMessage(std::vector<Message> &outMessages);
+  virtual void sendMessage(Message &msg);
 
 private:
   std::shared_ptr<serval_interface>             serval;
+  std::string                                   ownSid;
+  std::shared_ptr<MDPSocket>                    socket;
   std::thread                                   worker;
   bool                                          running;
-  std::string                                   ownSid;
-  std::vector<Message>                          messages;
 
   std::string                           const   configPath;
   std::string                           const   host;
   int                                   const   port;
   std::string                           const   authName;
   std::string                           const   authPass;
-
-  std::mutex                                    _mtx;
 };
 
 } /* namespace ice */
