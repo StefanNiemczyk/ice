@@ -19,7 +19,7 @@ namespace pt = boost::property_tree;
 namespace ice
 {
 
-void serval_interface::sidToArray(std::string const &sid, uint8_t* out)
+void serval_interface::sidToArray(std::string const &sid, unsigned char* out)
 {
   for (int i = 0; i < SID_SIZE; ++i)
   {
@@ -113,7 +113,7 @@ int serval_interface::exec(std::string const &cmd, std::stringstream &output) {
 }
 
 
-std::shared_ptr<MDPSocket> serval_interface::createSocket(std::string const &recipientSid, int port, std::string const &senderSid)
+std::shared_ptr<MDPSocket> serval_interface::createSocket(int port, std::string const &senderSid)
 {
   int sock;
 
@@ -134,6 +134,6 @@ std::shared_ptr<MDPSocket> serval_interface::createSocket(std::string const &rec
     sid = senderSid;
   }
 
-  return std::make_shared<MDPSocket>(sock, port, recipientSid, sid);
+  return std::make_shared<MDPSocket>(sock, port, sid);
 }
 } /* namespace ice */

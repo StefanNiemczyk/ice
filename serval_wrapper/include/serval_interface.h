@@ -170,7 +170,7 @@ public:
   cpr::Authentication* getAuth();
   std::string getServalBin();
   int exec(std::string const &cmd, std::stringstream &output);
-  std::shared_ptr<MDPSocket> createSocket(std::string const &recipientSid, int port, std::string const &senderSid = "");
+  std::shared_ptr<MDPSocket> createSocket(int port, std::string const &senderSid = "");
 
 public:
   serval_wrapper::keyring               keyring;

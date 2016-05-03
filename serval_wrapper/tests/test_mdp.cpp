@@ -15,16 +15,16 @@ static std::unique_ptr<ice::serval_identity> sid2 = si.keyring.addIdentity();
 
 TEST(mdp, send_receive)
 {
-  auto sock1 = si.createSocket(sid2->sid, 8045, sid1->sid);
-  auto sock2 = si.createSocket(sid1->sid, 8045, sid2->sid);
+  auto sock1 = si.createSocket(8045, sid1->sid);
+  auto sock2 = si.createSocket(8045, sid2->sid);
 
-  sleep(5);
+//  sleep(5);
 
   uint8_t buff[10];
   uint8_t buff2[10];
   for(int i=0; i < 10; ++i) buff[i] = i;
 
-  sock1->send(buff, 10);
+  sock1->send(sid2->sid, buff, 10);
   int recCount = sock2->receive(buff2, 10);
 
   ASSERT_EQ(10, recCount);

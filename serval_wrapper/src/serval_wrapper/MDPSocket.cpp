@@ -14,13 +14,13 @@
 namespace ice
 {
 
-MDPSocket::MDPSocket(int socket, int port, std::string const &recipientSid, std::string const &senderSid)
+MDPSocket::MDPSocket(int socket, int port, std::string const &senderSid)
   : socket(socket), port(port), recipientSid(recipientSid), senderSid(senderSid), closed(false)
 {
   bzero(&this->header, sizeof(this->header));
 
   serval_interface::sidToArray(senderSid, this->header.local.sid.binary);
-  serval_interface::sidToArray(recipientSid, this->header.remote.sid.binary);
+//  serval_interface::sidToArray(recipientSid, this->header.remote.sid.binary);
   this->header.remote.port = port;
   this->header.qos = OQ_MESH_MANAGEMENT;
   this->header.ttl = PAYLOAD_TTL_DEFAULT;
@@ -40,8 +40,20 @@ MDPSocket::~MDPSocket()
   this->close();
 }
 
-void MDPSocket::send(uint8_t *payload, size_t size)
+void MDPSocket::send(unsigned char *recipientSid, uint8_t *payload, size_t size)
 {
+  std::lock_guard<std::mutex>(this->_mtx);
+
+  std::copy(recipientSid, recipientSid + 32, std::begin(this->header.remote.sid.binary));
+//  this->header.remote.sid.binary = recipientSid;
+  mdp_send(this->socket, &this->header, payload, size);
+}
+
+void  MDPSocket::send(std::string const &recipientSid, uint8_t *payload, size_t size)
+{
+  std::lock_guard<std::mutex>(this->_mtx);
+
+  serval_interface::sidToArray(recipientSid, this->header.remote.sid.binary);
   mdp_send(this->socket, &this->header, payload, size);
 }
 
