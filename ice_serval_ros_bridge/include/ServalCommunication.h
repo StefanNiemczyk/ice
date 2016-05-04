@@ -47,12 +47,14 @@ private:
   std::shared_ptr<MDPSocket>                    socket;
   std::thread                                   worker;
   bool                                          running;
+  bool                                          local;
 
   std::string                           const   configPath;
   std::string                           const   host;
   int                                   const   port;
   std::string                           const   authName;
   std::string                           const   authPass;
+  el::Logger                                    *_log;
 };
 
 } /* namespace ice */

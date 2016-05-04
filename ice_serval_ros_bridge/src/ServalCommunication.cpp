@@ -16,6 +16,8 @@
 #include "Entity.h"
 #include "IceServalBridge.h"
 
+#define LOCAL_TEST true
+
 // Short alias for this namespace
 namespace pt = boost::property_tree;
 
@@ -26,7 +28,7 @@ ServalCommunication::ServalCommunication(IceServalBridge *bridge, std::string co
                                          int const port, std::string const authName, std::string const authPass) :
     CommunicationInterface(), configPath(configPath), host(host), port(port), authName(authName), authPass(authPass), serval(nullptr)
 {
-  _log = el::Loggers::getLogger("CommunicationInterface");
+  _log = el::Loggers::getLogger("ServalCommunication");
   this->bridge = bridge;
   this->directory = bridge->identityDirectory;
 }
@@ -56,6 +58,10 @@ void ServalCommunication::initInternal()
   this->self = this->directory->self;
 
   // get own id
+#ifdef LOCAL_TEST
+  this->ownSid = this->serval->keyring.addIdentity()->sid;
+  this->self->addId(EntityDirectory::ID_SERVAL, this->ownSid);
+#else
   if (this->ownSid == "")
   {
     auto id = this->serval->keyring.getSelf();
@@ -68,14 +74,14 @@ void ServalCommunication::initInternal()
     this->ownSid = id->at(0).sid;
     this->self->addId(EntityDirectory::ID_SERVAL, this->ownSid);
   }
+#endif
 
   // create socket
   this->socket = this->serval->createSocket(SERVAL_PORT, this->ownSid);
 
   if (this->socket == nullptr)
   {
-    // TODO log error
-    std::cout << "MDP socket could not be bounded to port " << std::to_string(SERVAL_PORT) << std::endl;
+    throw (std::runtime_error("MDP socket could not be created"));
     return;
   }
 
@@ -110,9 +116,15 @@ void ServalCommunication::read()
     if (false == this->running)
       return;
 
-    if (recCount <= 0)
+    if (recCount == 0)
     {
-      _log->info("Received empty message");
+      _log->info("Received empty message from sid %s", sid);
+      continue;
+    }
+
+    if (recCount < 0)
+    {
+      _log->info("Received broken message from sid %s", sid);
       continue;
     }
 
@@ -131,9 +143,9 @@ void ServalCommunication::read()
 
     m.entity = entity;
     m.command = buffer[0];
-//    m.payloadSize = recCount - 1;
-    m.payload.resize(recCount - 1);
-    std::copy(m.payload.begin(), m.payload.end(), buffer);
+    m.payload.clear();
+    m.payload.reserve(recCount-1);
+    std::copy(buffer + 1, buffer + recCount, std::back_inserter(m.payload));
 
     this->handleMessage(m);
   }
@@ -141,7 +153,11 @@ void ServalCommunication::read()
 
 void ServalCommunication::discover()
 {
+#ifdef LOCAL_TEST
+  auto peers = this->serval->keyring.getSelf();
+#else
   auto peers = this->serval->keyring.getPeerIdentities();
+#endif
 
   for (auto &sid : *peers)
   {
@@ -180,7 +196,7 @@ void ServalCommunication::sendMessage(Message &msg)
   unsigned char buffer[size];
 
   buffer[0] = msg.command;
-  std::copy(buffer + 1, buffer + size, msg.payload.begin());
+  std::copy(msg.payload.begin(), msg.payload.end(), buffer + 1);
 
   this->socket->send(sid, buffer, size);
 }

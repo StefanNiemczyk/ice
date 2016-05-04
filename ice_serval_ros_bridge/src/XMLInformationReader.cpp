@@ -13,7 +13,6 @@ namespace ice
 XMLInformationReader::XMLInformationReader()
 {
   _log = el::Loggers::getLogger("XMLInformationReader");
-
 }
 
 XMLInformationReader::~XMLInformationReader()

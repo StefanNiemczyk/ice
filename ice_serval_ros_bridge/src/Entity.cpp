@@ -8,6 +8,7 @@
 #include "Entity.h"
 
 #include <iostream>
+#include <tuple>
 #include <sstream>
 
 #include <ice/ontology/OntologyInterface.h>
@@ -40,7 +41,7 @@ Entity::~Entity()
 int Entity::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ontologyInterface)
 {
   _log->debug("Extract asp information from ontology for entity '%s'", this->toString());
-  std::string ownIri;
+  std::string ownIri = "";
 
   if (false == this->getId(EntityDirectory::ID_ONTOLOGY, ownIri))
     return -1;
@@ -345,19 +346,19 @@ void Entity::fuse(const std::initializer_list<Id>& ids)
   }
 }
 
-void Entity::fuse(std::map<std::string,std::string>& ids)
+void Entity::fuse(std::vector<std::tuple<std::string, std::string>>& vector)
 {
-  for (auto &id : ids)
+  for (auto &id : vector)
   {
-    this->ids[id.first] = id.second;
+    this->ids[std::get<0>(id)] = std::get<1>(id);
   }
 }
 
-void Entity::pushIdsToMap(std::map<std::string,std::string> &map)
+void Entity::pushIds(std::vector<std::tuple<std::string, std::string>>& vector)
 {
   for (auto &id : this->ids)
   {
-    map[id.first] = id.second;
+    vector.push_back(std::make_tuple(id.first, id.second));
   }
 }
 
@@ -433,7 +434,7 @@ bool Entity::getId(std::string const &key, std::string &outValue)
 {
   auto cq = this->ids.find(key);
 
-  if (cq == this->metadata.end())
+  if (cq == this->ids.end())
     return false;
 
   outValue = cq->second;

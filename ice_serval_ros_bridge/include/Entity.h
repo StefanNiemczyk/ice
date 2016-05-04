@@ -55,8 +55,8 @@ public:
   entity_match checkMatching(std::string &key, std::string &value);
   void fuse(std::shared_ptr<Entity> &identity);
   void fuse(const std::initializer_list<Id>& ids);
-  void fuse(std::map<std::string,std::string>& ids);
-  void pushIdsToMap(std::map<std::string,std::string> &map);
+  void fuse(std::vector<std::tuple<std::string, std::string>>& ids);
+  void pushIds(std::vector<std::tuple<std::string, std::string>>& vector);
 
   void checkIce();
   bool isIceIdentity();

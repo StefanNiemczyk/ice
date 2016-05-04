@@ -28,8 +28,6 @@ TEST(GMessagePublisher, simpleTest)
   params1->servalPassword = "venkman";
   params1->xmlInfoPath = path + "/tests/data/info_bridge_off.xml";
 
-  ice::IceServalBridge::createConfig(params1);
-
   ros::NodeHandle nh_("");
   ros::NodeHandle pnh_("~");
 

@@ -24,22 +24,19 @@ class IceServalBridge;
 
 enum IceCmd
 {
-  SCMD_IDS_REQUEST  = 10,
-  SCMD_IDS_RESPONSE  = 11,
-  SCMD_ID_REQUEST  = 20,
-  SCMD_ID_RESPONSE  = 21,
-  SCMD_INFORMATION_REQUEST  = 30,
-  SCMD_INFORMATION_RESPONSE  = 31
+  SCMD_IDS_REQUEST                      = 10,
+  SCMD_IDS_RESPONSE                     = 11,
+  SCMD_ID_REQUEST                       = 20,
+  SCMD_ID_RESPONSE                      = 21,
+  SCMD_INFORMATION_REQUEST              = 30,
+  SCMD_INFORMATION_RESPONSE             = 31
 };
 
 struct Message
 {
-  std::shared_ptr<Entity> entity;
-  int command;
-//  size_t payloadSize;
-  std::vector<uint8_t> payload;
-//  std::map<std::string, std::string> map;
-//  std::vector<InformationSpecification> infos;
+  std::shared_ptr<Entity>       entity;
+  int                           command;
+  std::vector<uint8_t>          payload;
 };
 
 class CommunicationInterface
@@ -81,7 +78,9 @@ protected:
   bool                                        running;
   std::vector<Message>                        messages;
 
-  std::mutex                                    _mtx;
+  std::mutex                                  _mtx;
+
+private:
   el::Logger                                  *_log;
 };
 

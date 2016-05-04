@@ -17,6 +17,7 @@
 
 #include "gtest/gtest.h"
 
+
 TEST(Bridge, discovery)
 {
   ros::NodeHandle nh_("");
@@ -32,7 +33,7 @@ TEST(Bridge, discovery)
   params1->ontologyPath = path + "/tests/data/";
   params1->servalInstancePath = "/tmp/mops";
   params1->servalHost = "localhost";
-  params1->servalPort = 4111;
+  params1->servalPort = 4110;
   params1->servalUser = "peter";
   params1->servalPassword = "venkman";
   params1->xmlInfoPath = path + "/tests/data/info_bridge_off.xml";
@@ -40,24 +41,21 @@ TEST(Bridge, discovery)
   params2->ontologyIri = "http://vs.uni-kassel.de/IceServalBridgeTest";
   params2->ontologyIriSelf = "http://vs.uni-kassel.de/IceServalBridgeTest#Zwerg";
   params2->ontologyPath = path + "/tests/data/";
-  params2->servalInstancePath = "/tmp/zwerg";
+  params2->servalInstancePath = "/tmp/mops";
   params2->servalHost = "localhost";
-  params2->servalPort = 4112;
+  params2->servalPort = 4110;
   params2->servalUser = "peter";
   params2->servalPassword = "venkman";
   params2->xmlInfoPath = path + "/tests/data/info_bridge_req.xml";
 
-  ice::IceServalBridge::createConfig(params1);
-  ice::IceServalBridge::createConfig(params2);
-
   ice::IceServalBridge mops = ice::IceServalBridge(nh_, pnh_, params1);
   ice::IceServalBridge zwerg = ice::IceServalBridge(nh_, pnh_, params2);
 
-  mops.init();
   zwerg.init();
+  mops.init();
 
   // sleep some time and let the discovery happen
-  sleep(5);
+  sleep(2);
 
   // Check if the robots has found each other
   std::string servalZwerg, servalMops;

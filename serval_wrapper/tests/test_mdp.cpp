@@ -10,14 +10,13 @@
 #define PORT 8042
 
 static ice::serval_interface si1("/tmp/instance1", "localhost", 4110, "peter", "venkman");
-static ice::serval_interface si2("/tmp/instance2", "localhost", 4110, "peter", "venkman");
 static std::unique_ptr<ice::serval_identity> sid1 = si1.keyring.addIdentity();
-static std::unique_ptr<ice::serval_identity> sid2 = si2.keyring.addIdentity();
+static std::unique_ptr<ice::serval_identity> sid2 = si1.keyring.addIdentity();
 
 TEST(mdp, send_receive)
 {
   auto sock1 = si1.createSocket(8045, sid1->sid);
-  auto sock2 = si2.createSocket(8045, sid2->sid);
+  auto sock2 = si1.createSocket(8045, sid2->sid);
 
   ASSERT_NE(nullptr, sock1);
   ASSERT_NE(nullptr, sock2);

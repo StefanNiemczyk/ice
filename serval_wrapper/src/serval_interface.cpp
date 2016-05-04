@@ -143,12 +143,6 @@ std::shared_ptr<MDPSocket> serval_interface::createSocket(int port, std::string 
     setenv("SERVALINSTANCE_PATH", this->instancePath.c_str(), 1);
   }
 
-  if ((sock = mdp_socket()) < 0)
-  {
-        std::cerr << "error creating socket" << std::endl;
-        return nullptr;
-  }
-
   std::string sid;
 
   if (senderSid == "")
@@ -160,13 +154,20 @@ std::shared_ptr<MDPSocket> serval_interface::createSocket(int port, std::string 
     sid = senderSid;
   }
 
+  if ((sock = mdp_socket()) < 0)
+  {
+    std::cerr << "Error creating socket with port '" << std::to_string(port) << "' for sid " << sid << std::endl;
+    return nullptr;
+  }
+
   // binding socket to port
   struct mdp_sockaddr sockaddr;
   sockaddr.port = port;
   serval_interface::sidToArray(sid, sockaddr.sid.binary);
-  if (mdp_bind(sock, &sockaddr) != 0) {
-          std::cerr << "Error binding port '" << std::to_string(port) << "' for sid " << sid << std::endl;
-          return nullptr;
+  if (mdp_bind(sock, &sockaddr) != 0)
+  {
+    std::cerr << "Error binding socket to port '" << std::to_string(port) << "' for sid " << sid << std::endl;
+    return nullptr;
   }
 
   auto socket = std::make_shared<MDPSocket>(sock, port, sid);

@@ -8,6 +8,7 @@
 #include "serval_wrapper/MDPSocket.h"
 
 #include <iostream>
+#include <sys/time.h>
 
 #include "serval_interface.h"
 
@@ -59,10 +60,15 @@ void  MDPSocket::send(std::string const &recipientSid, uint8_t *payload, size_t 
   mdp_send(this->socket, &header, payload, size);
 }
 
-int MDPSocket::receive(std::string &senderSid, uint8_t *buffer, size_t size)
+int MDPSocket::receive(std::string &senderSid, uint8_t *buffer, size_t size, unsigned long timeoutMs)
 {
   struct mdp_header header;
-  int count = mdp_recv(this->socket, &header, buffer, size);
+  struct timeval tim;
+  gettimeofday(&tim, NULL);
+  uint64_t timeout = (tim.tv_sec * (uint64_t)1000) + (tim.tv_usec / 1000) + 1000;
+
+//  int count = mdp_recv(this->socket, &header, buffer, size);
+  int count = mdp_poll_recv(this->socket, timeoutMs, &header, buffer, size);
   senderSid = serval_interface::arrayToSid(header.remote.sid.binary);
 
   return count;

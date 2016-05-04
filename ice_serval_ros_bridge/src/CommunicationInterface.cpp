@@ -25,7 +25,7 @@ CommunicationInterface::CommunicationInterface()
 
 CommunicationInterface::~CommunicationInterface()
 {
-  if (this->running)
+  if (this->running && this->worker.joinable())
   {
     this->running = false;
     this->worker.join();
@@ -84,17 +84,17 @@ void CommunicationInterface::onRequestIds(std::shared_ptr<Entity> const &entity)
   m.entity = entity;
   m.command = IceCmd::SCMD_IDS_RESPONSE;
 
-  std::map<std::string, std::string> map;
-  this->self->pushIdsToMap(map);
+  std::vector<std::tuple<std::string, std::string>> vec;
+  this->self->pushIds(vec);
 
-  serialize(map, m.payload);
+  serialize(vec, m.payload);
 
   this->pushMessage(m);
 }
 
 void CommunicationInterface::requestOfferedInformation(std::shared_ptr<Entity> const &entity)
 {
-  std::cout << "Sending required infros to '%s'" << entity->toString() << std::endl;
+  std::cout << "Requesting offered information from '%s'" << entity->toString() << std::endl;
   _log->info("Requesting offered information from '%s'", entity->toString());
   Message m;
   m.entity = entity;
@@ -132,7 +132,7 @@ void CommunicationInterface::handleMessage(Message &message)
   std::cout << "Received Message with id '%s' from %s" << std::to_string(message.command) << " "<< message.entity->toString() << std::endl;
   _log->info("Received Message with id '%s' from %s", std::to_string(message.command), message.entity->toString());
 
-  std::map<std::string, std::string> map;
+  std::vector<std::tuple<std::string, std::string>> vector;
 
   switch (message.command)
   {
@@ -141,9 +141,8 @@ void CommunicationInterface::handleMessage(Message &message)
       break;
 
     case (SCMD_IDS_RESPONSE):
-      map = deserialize<std::map<std::string, std::string>>(message.payload);
-
-      message.entity->fuse(map);
+      vector = deserialize<std::vector<std::tuple<std::string, std::string>>>(message.payload);
+      message.entity->fuse(vector);
       message.entity->checkIce();
       break;
 
@@ -186,12 +185,12 @@ void CommunicationInterface::workerTask()
     }
 
     // check for new messages
-//    msgs.clear();
-//    int count = this->readMessage(msgs);
-//    for (auto &msg : msgs)
-//    {
-//      this->handleMessage(msg);
-//    }
+    msgs.clear();
+    int count = this->readMessage(msgs);
+    for (auto &msg : msgs)
+    {
+      this->handleMessage(msg);
+    }
 
     // send messages
     {

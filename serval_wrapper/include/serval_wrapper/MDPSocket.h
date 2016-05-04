@@ -25,7 +25,7 @@ public:
 
   void send(uint8_t *recipientSid, uint8_t *payload, size_t size);
   void send(std::string const &recipientSid, uint8_t *payload, size_t size);
-  int receive(std::string &senderSid, uint8_t *buffer, size_t size);
+  int receive(std::string &senderSid, uint8_t *buffer, size_t size, unsigned long timeoutMs = 1000);
   void close();
 
 private:

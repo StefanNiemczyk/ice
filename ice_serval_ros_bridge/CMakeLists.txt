@@ -93,7 +93,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
   tests/test_bridge.cpp
   tests/test_entity.cpp
   tests/test_xml.cpp
-  tests/test_gmessagePublisher.cpp
+ # tests/test_gmessagePublisher.cpp
   tests/test_main.cpp
   )
   
