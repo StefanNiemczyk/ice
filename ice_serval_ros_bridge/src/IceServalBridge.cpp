@@ -13,9 +13,9 @@
 #include <ice/representation/GContainerFactory.h>
 
 #include "CommunicationInterface.h"
+#include "RosGContainerPublisher.h"
 #include "ServalCommunication.h"
 #include "XMLInformationReader.h"
-
 
 namespace ice
 {
@@ -118,7 +118,7 @@ void IceServalBridge::init()
   // TODO
 
   // init ros message generator
-  // TODO
+  this->publisher = std::make_shared<RosGContainerPublisher>();
 
   //init gcontainer factory
   this->gcontainerFactory = std::make_shared<GContainerFactory>();

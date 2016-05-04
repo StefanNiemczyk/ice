@@ -17,12 +17,11 @@
 #include <ice/representation/GContainerFactory.h>
 
 #include "EntityDirectory.h"
-
+#include "RosGContainerPublisher.h"
 
 namespace ice
 {
 class CommunicationInterface;
-class RosGContainerPublisher;
 
 struct OfferedInfo
 {

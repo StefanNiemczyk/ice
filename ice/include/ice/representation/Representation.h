@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+#include "ice/representation/split.h"
+
 namespace ice
 {
 
@@ -29,6 +31,13 @@ struct Representation
   bool isBasic()
   {
     return (this->type != BasicRepresentationType::UNSET && this->type != BasicRepresentationType::NONE);
+  }
+
+  std::vector<int>* accessPath(std::string &dimensions)
+  {
+    auto d = split(dimensions.c_str(), ';');
+
+    return this->accessPath(d.get());
   }
 
   std::vector<int>* accessPath(std::initializer_list<std::string> dimensions)

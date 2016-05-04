@@ -2,6 +2,7 @@
 #define REPRESENTATION_INSTANCE_H
 
 #include <iostream>
+#include <tuple>
 #include <vector>
 
 #include "ice/representation/Representation.h"
@@ -36,6 +37,11 @@ public:
       return *((T*)this->get(indices));
     }
 
+  virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices)
+  {
+    return this->getPair(indices, 0);
+  }
+
   virtual void* get(std::vector<int> *indices)
   {
     return this->get(indices, 0);
@@ -54,11 +60,14 @@ public:
   }
 
   virtual void print(int level, std::string dimension = "") = 0;
+  virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices, int index) = 0;
   virtual void* get(std::vector<int> *indices, int index) = 0;
   virtual bool set(std::vector<int> *indices, int index, const void* value) = 0;
 
-protected:
+public:
   std::shared_ptr<Representation> representation;
+
+protected:
   el::Logger* _log;
 };
 
@@ -109,6 +118,23 @@ public:
       auto sub = this->subs.at(i);
       sub->print(level + 1, this->representation->dimensionNames.at(i));
     }
+  }
+
+  virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices, int index)
+  {
+    if (indices->size() <= index)
+    {
+      return std::pair<BasicRepresentationType, void*>(BasicRepresentationType::UNSET, nullptr);
+    }
+
+    if (this->subs.size() < indices->at(index))
+    {
+      _log->error("Index out of bounds in get value from CompositeGContainer '%v', index '%v'",
+                  this->representation->name, index);
+      return std::pair<BasicRepresentationType, void*>(BasicRepresentationType::UNSET, nullptr);
+    }
+
+    return this->subs.at(indices->at(index))->getPair(indices, index + 1);
   }
 
   virtual void* get(std::vector<int> *indices, int index)
@@ -173,6 +199,16 @@ public:
   }
 
   virtual GContainer* clone() = 0;
+
+  virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices, int index)
+  {
+    void* value = this->get(indices, index);
+
+    if (value == nullptr)
+      return std::pair<BasicRepresentationType, void*>(BasicRepresentationType::UNSET, nullptr);
+
+    return std::pair<BasicRepresentationType, void*>(this->type, value);
+  }
 
   virtual void* get(std::vector<int> *indices, int index) = 0;
   virtual bool set(std::vector<int> *indices, int index, const void* value) = 0;
