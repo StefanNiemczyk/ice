@@ -86,6 +86,8 @@ void IceServalBridge::init()
   // register hooks
   this->identityDirectory->registerDiscoveredIceIdentityHook(
       [this] (std::shared_ptr<Entity> const &identity) {this->discoveredIceIdentity(identity);});
+  this->identityDirectory->registerOfferedInformationHooks(
+      [this] (std::shared_ptr<Entity> const &identity) {this->offeredInformation(identity);});
   this->identityDirectory->registerVanishedIceIdentityHooks(
       [this] (std::shared_ptr<Entity> const &identity) {this->vanishedIceIdentity(identity);});
 
@@ -126,17 +128,18 @@ void IceServalBridge::init()
   _log->info("Bridge for identity '%s' initialized", this->identityDirectory->self->toString());
 }
 
-void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> const &identity)
+void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> const &entity)
 {
-  this->_log->info("Discovered: '%s'", identity->toString());
+  std::cout << "Discovered: '%s'" << entity->toString() << std::endl;
+  this->_log->info("Discovered: '%s'", entity->toString());
 
   // init ontology
   this->ontologyInterface->attachCurrentThread();
-  int result = identity->initializeFromOntology(this->ontologyInterface);
+  int result = entity->initializeFromOntology(this->ontologyInterface);
   // request offered information if no knowledge can be extracted from ontology
   if (result == 0)
   {
-    this->communicationInterface->requestOfferedInformation(identity);
+    this->communicationInterface->requestOfferedInformation(entity);
     return;
   }
 
@@ -151,6 +154,7 @@ void IceServalBridge::vanishedIceIdentity(std::shared_ptr<Entity> const &identit
 
 void IceServalBridge::offeredInformation(std::shared_ptr<Entity> const &identity)
 {
+  std::cout << "New offered information from: '%s'" << identity->toString() << std::endl;
   _log->info("New offered information from: '%s'", identity->toString());
 
   // TODO check match

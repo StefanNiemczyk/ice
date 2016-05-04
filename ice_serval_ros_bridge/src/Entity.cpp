@@ -495,6 +495,20 @@ std::vector<InformationSpecification>& Entity::getOfferedInformation()
   return this->offeredInformation;
 }
 
+void Entity::addOfferedInformation(std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>> const &offeres)
+{
+  for (auto &info : offeres)
+  {
+    this->offeredInformation.push_back(InformationSpecification(std::get<0>(info),
+                                                                std::get<1>(info),
+                                                                std::get<2>(info),
+                                                                std::get<3>(info),
+                                                                std::get<4>(info)));
+  }
+
+  this->directory->callOfferedInformationHooks(this->shared_from_this());
+}
+
 void Entity::addOfferedInformation(std::vector<InformationSpecification> const &offeres)
 {
   for (auto &info : offeres)

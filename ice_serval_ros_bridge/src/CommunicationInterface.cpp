@@ -132,7 +132,8 @@ void CommunicationInterface::handleMessage(Message &message)
   std::cout << "Received Message with id '%s' from %s" << std::to_string(message.command) << " "<< message.entity->toString() << std::endl;
   _log->info("Received Message with id '%s' from %s", std::to_string(message.command), message.entity->toString());
 
-  std::vector<std::tuple<std::string, std::string>> vector;
+  std::vector<std::tuple<std::string, std::string>> ids;
+  std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>> specs;
 
   switch (message.command)
   {
@@ -141,8 +142,8 @@ void CommunicationInterface::handleMessage(Message &message)
       break;
 
     case (SCMD_IDS_RESPONSE):
-      vector = deserialize<std::vector<std::tuple<std::string, std::string>>>(message.payload);
-      message.entity->fuse(vector);
+      ids = deserialize<std::vector<std::tuple<std::string, std::string>>>(message.payload);
+      message.entity->fuse(ids);
       message.entity->checkIce();
       break;
 
@@ -159,7 +160,9 @@ void CommunicationInterface::handleMessage(Message &message)
       break;
 
     case (SCMD_INFORMATION_RESPONSE):
-//      identity->onResponseOfferedInformation(message.infos);
+      specs = deserialize<std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>>>(message.payload);
+      message.entity->addOfferedInformation(specs);
+
       break;
 
     default:

@@ -81,6 +81,7 @@ public:
   std::string toString();
 
   std::vector<InformationSpecification>& getOfferedInformation();
+  void addOfferedInformation( std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>> const &offeres);
   void addOfferedInformation(std::vector<InformationSpecification> const &offeres);
 
   // ASP Stuff

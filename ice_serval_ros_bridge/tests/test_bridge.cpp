@@ -55,7 +55,7 @@ TEST(Bridge, discovery)
   mops.init();
 
   // sleep some time and let the discovery happen
-  sleep(2);
+  sleep(3);
 
   // Check if the robots has found each other
   std::string servalZwerg, servalMops;
@@ -74,4 +74,8 @@ TEST(Bridge, discovery)
 
   ASSERT_NE(nullptr, idMopsByZwerg);
   ASSERT_NE(nullptr, idZwergByMops);
+
+  // check number of found identities, 1 default, 1 self, 1 other = 3
+  ASSERT_EQ(3, mops.identityDirectory->count());
+  ASSERT_EQ(3, zwerg.identityDirectory->count());
 }
