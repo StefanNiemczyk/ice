@@ -139,12 +139,12 @@ bool XMLInformationReader::readOffered(TiXmlElement* element)
 
   if (entity == "" || entityType == "" || scope == "" || representation == "")
   {
-    _log->warn("Incomplete information description: entity '%s', entityType '%s', scope '%s', representation '%s', relatedEntity '%s'",
+    _log->warn("Incomplete information description: entity '%v', entityType '%v', scope '%v', representation '%v', relatedEntity '%v'",
                entity, entityType, scope, representation, relatedEntity);
     return false;
   }
 
-  _log->debug("Extracted information description: entity '%s', entityType '%s', scope '%s', representation '%s', relatedEntity '%s'",
+  _log->debug("Extracted information description: entity '%v', entityType '%v', scope '%v', representation '%v', relatedEntity '%v'",
              entity, entityType, scope, representation, relatedEntity);
 
   std::shared_ptr<OfferedInfo> info = std::make_shared<OfferedInfo>(entity, entityType, scope, representation, relatedEntity);
@@ -208,13 +208,13 @@ bool XMLInformationReader::readRequired(TiXmlElement* element)
 
   if (entity == "" || entityType == "" || scope == "" || representation == "" || topic == "" || message == "")
   {
-    _log->warn("Incomplete information description: entity '%s', entityType '%s', scope '%s', representation '%s', relatedEntity '%s', topic '%s', message '%s'",
+    _log->warn("Incomplete information description: entity '%v', entityType '%v', scope '%v', representation '%v', relatedEntity '%v', topic '%v', message '%v'",
                entity, entityType, scope, representation, relatedEntity, topic, message);
     return false;
   }
 
-  _log->debug("Extracted information description: entity '%s', entityType '%s', scope '%s', representation '%s', relatedEntity '%s', topic '%s', message '%s'",
-             entity, entityType, scope, representation, relatedEntity), topic, message;
+  _log->debug("Extracted information description: entity '%v', entityType '%v', scope '%v', representation '%v', relatedEntity '%v', topic '%v', message '%v'",
+             entity, entityType, scope, representation, relatedEntity, topic, message);
 
   std::shared_ptr<RequiredInfo> info = std::make_shared<RequiredInfo>(entity, entityType, scope, representation, relatedEntity);
   info->topic = topic;

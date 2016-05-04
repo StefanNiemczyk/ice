@@ -40,7 +40,7 @@ Entity::~Entity()
 
 int Entity::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ontologyInterface)
 {
-  _log->debug("Extract asp information from ontology for entity '%s'", this->toString());
+  _log->debug("Extract asp information from ontology for entity '%v'", this->toString());
   std::string ownIri = "";
 
   if (false == this->getId(EntityDirectory::ID_ONTOLOGY, ownIri))

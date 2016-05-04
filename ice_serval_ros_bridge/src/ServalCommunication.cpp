@@ -118,13 +118,13 @@ void ServalCommunication::read()
 
     if (recCount == 0)
     {
-      _log->info("Received empty message from sid %s", sid);
+      _log->info("Received empty message from sid %v", sid);
       continue;
     }
 
     if (recCount < 0)
     {
-      _log->info("Received broken message from sid %s", sid);
+      _log->info("Received broken message from sid %v", sid);
       continue;
     }
 
@@ -132,7 +132,7 @@ void ServalCommunication::read()
 
     if (entity == nullptr)
     {
-      this->_log->info("Received message from unknown serval node '%s'");
+      this->_log->info("Received message from unknown serval node '%v'");
 
       // Create new instance and request ids
       entity = this->directory->create(EntityDirectory::ID_SERVAL, sid);
@@ -171,8 +171,7 @@ void ServalCommunication::discover()
       entity->setAvailable(true);
       this->requestIds(entity);
 
-      std::cout << "New ID discovered: %s" << entity->toString() << std::endl;
-      _log->info("New ID discovered: %s", entity->toString());
+      _log->info("New ID discovered: %v", entity->toString());
     }
   }
 }
@@ -188,7 +187,7 @@ void ServalCommunication::sendMessage(Message &msg)
 
   if (false == msg.entity->getId(EntityDirectory::ID_SERVAL, sid))
   {
-    this->_log->error("Trying to send message with serval to none serval instance %s", msg.entity->toString());
+    this->_log->error("Trying to send message with serval to none serval instance %v", msg.entity->toString());
     return;
   }
 

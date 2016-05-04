@@ -67,8 +67,7 @@ void CommunicationInterface::onRequestId(std::shared_ptr<Entity> const &entity, 
 
 void CommunicationInterface::requestIds(std::shared_ptr<Entity> const &entity)
 {
-  std::cout << "Requesting Ids from '%s'" << entity->toString() << std::endl;
-  _log->info("Requesting Ids from '%s'", entity->toString());
+  _log->info("Requesting Ids from '%v'", entity->toString());
   Message m;
   m.entity = entity;
   m.command = IceCmd::SCMD_IDS_REQUEST;
@@ -78,8 +77,7 @@ void CommunicationInterface::requestIds(std::shared_ptr<Entity> const &entity)
 
 void CommunicationInterface::onRequestIds(std::shared_ptr<Entity> const &entity)
 {
-  std::cout << "Sending Ids to '%s'" << entity->toString() << std::endl;
-  _log->info("Sending Ids to '%s'", entity->toString());
+  _log->info("Sending Ids to '%v'", entity->toString());
   Message m;
   m.entity = entity;
   m.command = IceCmd::SCMD_IDS_RESPONSE;
@@ -94,8 +92,7 @@ void CommunicationInterface::onRequestIds(std::shared_ptr<Entity> const &entity)
 
 void CommunicationInterface::requestOfferedInformation(std::shared_ptr<Entity> const &entity)
 {
-  std::cout << "Requesting offered information from '%s'" << entity->toString() << std::endl;
-  _log->info("Requesting offered information from '%s'", entity->toString());
+  _log->info("Requesting offered information from '%v'", entity->toString());
   Message m;
   m.entity = entity;
   m.command = IceCmd::SCMD_INFORMATION_REQUEST;
@@ -105,8 +102,7 @@ void CommunicationInterface::requestOfferedInformation(std::shared_ptr<Entity> c
 
 void CommunicationInterface::onRequestOfferedInformation(std::shared_ptr<Entity> const &entity)
 {
-  std::cout << "Sending required infos to '%s'" << entity->toString() << std::endl;
-  _log->info("Sending required infos to '%s'", entity->toString());
+  _log->info("Sending required infos to '%v'", entity->toString());
   Message m;
   m.entity = entity;
   m.command = IceCmd::SCMD_INFORMATION_RESPONSE;
@@ -129,8 +125,7 @@ void CommunicationInterface::onRequestOfferedInformation(std::shared_ptr<Entity>
 
 void CommunicationInterface::handleMessage(Message &message)
 {
-  std::cout << "Received Message with id '%s' from %s" << std::to_string(message.command) << " "<< message.entity->toString() << std::endl;
-  _log->info("Received Message with id '%s' from %s", std::to_string(message.command), message.entity->toString());
+  _log->info("Received Message with id '%v' from %v", std::to_string(message.command), message.entity->toString());
 
   std::vector<std::tuple<std::string, std::string>> ids;
   std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>> specs;
@@ -166,7 +161,7 @@ void CommunicationInterface::handleMessage(Message &message)
       break;
 
     default:
-      _log->error("Unknown command '%s', message will be skipped", std::to_string(message.command));
+      _log->error("Unknown command '%v', message will be skipped", std::to_string(message.command));
       break;
   }
 }
