@@ -125,13 +125,12 @@ void IceServalBridge::init()
   this->gcontainerFactory->setOntologyInterface(this->ontologyInterface);
   this->gcontainerFactory->init();
 
-  _log->info("Bridge for identity '%s' initialized", this->identityDirectory->self->toString());
+  _log->info("Bridge for identity '%v' initialized", this->identityDirectory->self->toString());
 }
 
 void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> const &entity)
 {
-  std::cout << "Discovered: '%s'" << entity->toString() << std::endl;
-  this->_log->info("Discovered: '%s'", entity->toString());
+  this->_log->info("Discovered: '%v'", entity->toString());
 
   // init ontology
   this->ontologyInterface->attachCurrentThread();
@@ -148,14 +147,13 @@ void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> const &entit
 
 void IceServalBridge::vanishedIceIdentity(std::shared_ptr<Entity> const &identity)
 {
-  _log->info("Vanished: '%s'", identity->toString());
+  _log->info("Vanished: '%v'", identity->toString());
 
 }
 
 void IceServalBridge::offeredInformation(std::shared_ptr<Entity> const &identity)
 {
-  std::cout << "New offered information from: '%s'" << identity->toString() << std::endl;
-  _log->info("New offered information from: '%s'", identity->toString());
+  _log->info("New offered information from: '%v'", identity->toString());
 
   // TODO check match
 }
