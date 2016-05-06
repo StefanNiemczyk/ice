@@ -1,12 +1,12 @@
 /*
- * InformationStore.h
+ * StreamStore.h
  *
  *  Created on: May 19, 2014
  *      Author: sni
  */
 
-#ifndef INFORMATIONSTORE_H_
-#define INFORMATIONSTORE_H_
+#ifndef STREAMSTORE_H_
+#define STREAMSTORE_H_
 
 #include <map>
 #include <memory>
@@ -33,11 +33,11 @@ class OntologyInterface;
 
 namespace ice
 {
-//* InformationStore
+//* StreamStore
 /**
  * This class stores the information types used by the icengine.
  */
-class InformationStore : public std::enable_shared_from_this<InformationStore>
+class StreamStore : public std::enable_shared_from_this<StreamStore>
 {
 public:
   /*!
@@ -49,7 +49,7 @@ public:
    *
    * \param engine A weak pointer to the icengine.
    */
-  InformationStore(std::weak_ptr<ICEngine> engine);
+  StreamStore(std::weak_ptr<ICEngine> engine);
 
   /*!
    * \brief The constructor creates an store object and uses the eventHandler object to
@@ -62,7 +62,7 @@ public:
    * \param streamFactor Factor to create stream objects
    * \param ontology Interface to access the ontology
    */
-  InformationStore(std::shared_ptr<EventHandler> eventHandler, std::shared_ptr<StreamFactory> streamFactory,
+  StreamStore(std::shared_ptr<EventHandler> eventHandler, std::shared_ptr<StreamFactory> streamFactory,
                    std::shared_ptr<OntologyInterface> ontology);
 
   /*!
@@ -70,7 +70,7 @@ public:
    *
    * Default destructor
    */
-  virtual ~InformationStore();
+  virtual ~StreamStore();
 
   void init();
   void cleanUp();
@@ -200,7 +200,7 @@ private:
 //Implementing methods here
 
 template<typename T>
-  inline std::shared_ptr<ice::InformationStream<T>> ice::InformationStore::registerStream(
+  inline std::shared_ptr<ice::InformationStream<T>> ice::StreamStore::registerStream(
       std::shared_ptr<InformationSpecification> specification, const std::string name, const int streamSize,
       std::map<std::string, int> metadata, std::string provider, std::string sourceSystem)
   {
@@ -209,7 +209,7 @@ template<typename T>
     //stream already registered
     if (ptr)
     {
-      _log->warn("InformationStore: Duplicated Stream with '%v', '%v', '%v'",
+      _log->warn("Duplicated Stream with '%v', '%v', '%v'",
                     specification->toString(), provider, sourceSystem);
       return ptr;
     }
@@ -225,7 +225,7 @@ template<typename T>
   }
 
 template<typename T>
-  inline std::shared_ptr<ice::InformationStream<T>> ice::InformationStore::getStream(
+  inline std::shared_ptr<ice::InformationStream<T>> ice::StreamStore::getStream(
       InformationSpecification *specification, std::string provider, std::string sourceSystem)
   {
     std::shared_ptr<BaseInformationStream> stream;
@@ -244,4 +244,4 @@ template<typename T>
     return ptr;
   }
 
-#endif /* INFORMATIONSTORE_H_ */
+#endif /* STREAMSTORE_H_ */

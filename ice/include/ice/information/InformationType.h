@@ -21,7 +21,7 @@ namespace ice
 {
 
 //Forward declaration
-class InformationStore;
+class StreamStore;
 class BaseInformationStream;
 template<typename T>
   class InformationStream;
@@ -43,10 +43,10 @@ public:
    *
    * This constructor initialize the information type.
    *
-   * \param informationStore The information store.
+   * \param streamStore The information store.
    * \param specification The specification of the information.
    */
-  InformationType(std::weak_ptr<InformationStore> informationStore,
+  InformationType(std::weak_ptr<StreamStore> streamStore,
                   std::shared_ptr<InformationSpecification> specification);
 
   /*!
@@ -211,7 +211,7 @@ private:
   int registerStreamTemplateInStore(std::shared_ptr<InformationStreamTemplate> streamTemplate);
 
 private:
-  std::weak_ptr<InformationStore> informationStore; /**< The information store */
+  std::weak_ptr<StreamStore> streamStore; /**< The information store */
   std::shared_ptr<InformationSpecification> specification; /**< Specification of the information type */
   std::vector<std::shared_ptr<BaseInformationStream> > streams; /**< List of streams which contain information elements of this information type */
   std::vector<std::shared_ptr<InformationStreamTemplate>> templates; /**< List of stream templates */
@@ -224,7 +224,7 @@ private:
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationStream.h"
 #include "ice/information/InformationStreamTemplate.h"
-#include "ice/information/InformationStore.h"
+#include "ice/information/StreamStore.h"
 
 //Implementing methods here
 
@@ -242,7 +242,7 @@ template<typename T>
       return ptr;
     }
 
-    std::shared_ptr<InformationStore> store = this->informationStore.lock();
+    std::shared_ptr<StreamStore> store = this->streamStore.lock();
     auto stream = std::make_shared<InformationStream<T> >(name, this->shared_from_this(), this->getEventHandler(),
                                                           this->specification, streamSize, provider, description);
 
@@ -250,7 +250,7 @@ template<typename T>
 
     if (returnVel == 1)
     {
-      std::cout << "InformationStore: Duplicated Stream with name '" << stream->getName() << "'" << std::endl;
+      std::cout << "StreamStore: Duplicated Stream with name '" << stream->getName() << "'" << std::endl;
     }
 
     this->streams.push_back(stream);

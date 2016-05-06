@@ -39,7 +39,7 @@ ICEngine::~ICEngine()
   this->eventHandler->cleanUp();
   this->coordinator->cleanUp();
   this->communication->cleanUp();
-  this->informationStore->cleanUp();
+  this->streamStore->cleanUp();
 //  this->nodeStore;
   this->modelGenerator->cleanUp();
   this->updateStrategie->cleanUp();
@@ -61,7 +61,7 @@ void ICEngine::init()
 
   this->eventHandler = std::make_shared<EventHandler>(this->shared_from_this());
   this->communication = std::make_shared<RosCommunication>(this->shared_from_this());
-  this->informationStore = std::make_shared<InformationStore>(this->shared_from_this());
+  this->streamStore = std::make_shared<StreamStore>(this->shared_from_this());
   this->nodeStore = std::make_shared<NodeStore>(this->shared_from_this());
   this->coordinator = std::make_shared<Coordinator>(this->shared_from_this());
   this->modelGenerator = std::make_shared<ASPModelGenerator>(this->shared_from_this());
@@ -80,13 +80,13 @@ void ICEngine::init()
   this->coordinator->init();
   this->communication->init();
   this->modelGenerator->init();
-  this->informationStore->init();
+  this->streamStore->init();
   this->updateStrategie->init();
   this->gcontainerFactory->init();
   this->aspTransformationGenerator->init();
 
   // reading information structure from ontology
-  this->informationStore->readEntitiesFromOntology();
+  this->streamStore->readEntitiesFromOntology();
 
   this->initialized = true;
 }
@@ -114,9 +114,9 @@ std::shared_ptr<EventHandler> ICEngine::getEventHandler()
   return this->eventHandler;
 }
 
-std::shared_ptr<InformationStore> ICEngine::getInformationStore()
+std::shared_ptr<StreamStore> ICEngine::getStreamStore()
 {
-  return this->informationStore;
+  return this->streamStore;
 }
 
 std::shared_ptr<NodeStore> ICEngine::getNodeStore()
@@ -417,7 +417,7 @@ std::shared_ptr<InformationModel> ICEngine::getInformationModel()
   auto model = std::make_shared<InformationModel>();
 
   // adding stream descriptions and stream template descriptions
-  this->informationStore->addDescriptionsToInformationModel(model);
+  this->streamStore->addDescriptionsToInformationModel(model);
 
   // adding node descriptions
 //  this->nodeStore->addDescriptionsToInformationModel(model);

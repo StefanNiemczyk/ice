@@ -1,11 +1,11 @@
 /*
- * InformationStore.cpp
+ * StreamStore.cpp
  *
  *  Created on: May 19, 2014
  *      Author: sni
  */
 
-#include "ice/information/InformationStore.h"
+#include "ice/information/StreamStore.h"
 
 #include "ice/ICEngine.h"
 #include "ice/information/StreamFactory.h"
@@ -16,22 +16,22 @@
 namespace ice
 {
 
-InformationStore::InformationStore(std::weak_ptr<ICEngine> engine)
+StreamStore::StreamStore(std::weak_ptr<ICEngine> engine)
 {
-  this->_log = el::Loggers::getLogger("InformationStore");
+  this->_log = el::Loggers::getLogger("StreamStore");
   this->engine = engine;
 }
 
-InformationStore::InformationStore(std::shared_ptr<EventHandler> eventHandler, std::shared_ptr<StreamFactory> streamFactory,
+StreamStore::StreamStore(std::shared_ptr<EventHandler> eventHandler, std::shared_ptr<StreamFactory> streamFactory,
                                    std::shared_ptr<OntologyInterface> ontology)
 {
-  this->_log = el::Loggers::getLogger("InformationStore");
+  this->_log = el::Loggers::getLogger("StreamStore");
   this->eventHandler = eventHandler;
   this->streamFactory = streamFactory;
   this->ontology = ontology;
 }
 
-void InformationStore::init()
+void StreamStore::init()
 {
   if (false == this->engine.expired())
   {
@@ -45,7 +45,7 @@ void InformationStore::init()
 //  this->readEntitiesFromOntology();
 }
 
-void InformationStore::cleanUp()
+void StreamStore::cleanUp()
 {
   this->eventHandler.reset();
   this->streamFactory.reset();
@@ -59,12 +59,12 @@ void InformationStore::cleanUp()
   this->streams.clear();
 }
 
-InformationStore::~InformationStore()
+StreamStore::~StreamStore()
 {
   // TODO Auto-generated destructor stub
 }
 
-std::shared_ptr<BaseInformationStream> InformationStore::registerBaseStream(
+std::shared_ptr<BaseInformationStream> StreamStore::registerBaseStream(
     std::string dataType, std::shared_ptr<InformationSpecification> specification, const std::string name,
     const int streamSize, std::map<std::string, int> metadata, std::string provider, std::string sourceSystem)
 {
@@ -73,7 +73,7 @@ std::shared_ptr<BaseInformationStream> InformationStore::registerBaseStream(
   //stream already registered
   if (ptr)
   {
-    _log->warn("InformationStore: Duplicated Stream with '%v', '%v', '%v'",
+    _log->warn("Duplicated Stream with '%v', '%v', '%v'",
                   specification->toString(), provider, sourceSystem);
     return ptr;
   }
@@ -96,17 +96,17 @@ std::shared_ptr<BaseInformationStream> InformationStore::registerBaseStream(
   return stream;
 }
 
-std::shared_ptr<EventHandler> InformationStore::getEventHandler() const
+std::shared_ptr<EventHandler> StreamStore::getEventHandler() const
 {
   return this->eventHandler;
 }
 
-std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(InformationSpecification * specification)
+std::shared_ptr<BaseInformationStream> StreamStore::getBaseStream(InformationSpecification * specification)
 {
   return this->getBaseStream(specification, "", "");
 }
 
-std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(InformationSpecification *specification,
+std::shared_ptr<BaseInformationStream> StreamStore::getBaseStream(InformationSpecification *specification,
                                                                        std::string provider, std::string sourceSystem)
 {
   _log->debug("Get stream by '%v', '%v', '%v'", specification->toString(), provider,
@@ -141,7 +141,7 @@ std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(Informati
   return selectBestStream(&selected);
 }
 
-std::shared_ptr<BaseInformationStream> InformationStore::selectBestStream(
+std::shared_ptr<BaseInformationStream> StreamStore::selectBestStream(
     std::vector<std::shared_ptr<BaseInformationStream>> *streams)
 {
   if (streams->size() == 0)
@@ -159,14 +159,14 @@ std::shared_ptr<BaseInformationStream> InformationStore::selectBestStream(
   return best;
 }
 
-std::shared_ptr<BaseInformationStream> InformationStore::getBaseStream(
+std::shared_ptr<BaseInformationStream> StreamStore::getBaseStream(
     const std::shared_ptr<StreamDescription> streamDescription)
 {
   return this->getBaseStream(streamDescription->getInformationSpecification().get(), streamDescription->getProvider(),
                              streamDescription->getSourceSystem());
 }
 
-bool ice::InformationStore::addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel)
+bool ice::StreamStore::addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel)
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
   bool returnValue = false;
@@ -174,7 +174,7 @@ bool ice::InformationStore::addDescriptionsToInformationModel(std::shared_ptr<In
   return returnValue;
 }
 
-void InformationStore::cleanUpStreams()
+void StreamStore::cleanUpStreams()
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
   _log->verbose(1, "Start removing unused streams");
@@ -200,7 +200,7 @@ void InformationStore::cleanUpStreams()
   _log->info("Clean up information store: '%v' streams are removed", counter);
 }
 
-ont::entityType InformationStore::getEntityType(ont::entity entity)
+ont::entityType StreamStore::getEntityType(ont::entity entity)
 {
   auto it = this->entityTypeMap.find(entity);
   if (it != this->entityTypeMap.end())
@@ -209,7 +209,7 @@ ont::entityType InformationStore::getEntityType(ont::entity entity)
   return "";
 }
 
-void InformationStore::readEntitiesFromOntology()
+void StreamStore::readEntitiesFromOntology()
 {
   _log->verbose(1, "Read entities and types from ontology");
 

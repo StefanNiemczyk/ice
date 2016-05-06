@@ -174,7 +174,7 @@ add_library(${PROJECT_NAME}
   src/engine/BaseInformationStream.cpp
   src/engine/InformationSpecification.cpp
 #  src/engine/InformationStreamTemplate.cpp
-  src/engine/InformationStore.cpp
+  src/engine/StreamStore.cpp
 #  src/engine/InformationType.cpp
   src/engine/StreamFactory.cpp
   
@@ -283,7 +283,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/test_Buffer.cpp
   test/test_EventHandler.cpp
   test/test_Time.cpp
-  test/test_InformationStore.cpp
+  test/test_StreamStore.cpp
   test/test_Node.cpp
   test/test_NodeStore.cpp
  

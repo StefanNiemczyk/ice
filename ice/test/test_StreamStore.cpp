@@ -10,7 +10,7 @@
 #include "ice/information/InformationElement.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/information/InformationStream.h"
-#include "ice/information/InformationStore.h"
+#include "ice/information/StreamStore.h"
 #include "ice/information/InformationType.h"
 #include "ice/information/StreamDescription.h"
 #include "ice/processing/EventHandler.h"
@@ -87,11 +87,11 @@ public:
   }
 };
 
-class InformationStoreTests : public ::testing::Test
+class StreamStoreTests : public ::testing::Test
 {
 
 protected:
-  std::shared_ptr<ice::InformationStore> store;
+  std::shared_ptr<ice::StreamStore> store;
 //  std::shared_ptr<ice::InformationType> type;
   std::shared_ptr<ice::InformationStream<double> > stream1;
   std::shared_ptr<ice::InformationStream<int> > stream2;
@@ -106,7 +106,7 @@ protected:
   {
     start_time_ = time(NULL);
     auto eh = std::make_shared<ice::EventHandler>(1, 10);
-    store = std::make_shared<ice::InformationStore>(eh);
+    store = std::make_shared<ice::StreamStore>(eh, nullptr, nullptr);
 
    // auto uuid = boost::uuids::random_generator()();
     //ont::entity entity, ont::entityType, ont::scope scope, ont::representation representation
@@ -127,21 +127,21 @@ protected:
   }
 };
 
-std::string InformationStoreTests::TOPIC_1 = "test_topic_1";
-std::string InformationStoreTests::TOPIC_2 = "test_topic_2";
+std::string StreamStoreTests::TOPIC_1 = "test_topic_1";
+std::string StreamStoreTests::TOPIC_2 = "test_topic_2";
 
-TEST_F(InformationStoreTests, create_store)
+TEST_F(StreamStoreTests, create_store)
 {
   EXPECT_TRUE((store ? true : false));
 }
 
-TEST_F(InformationStoreTests, register_streams)
+TEST_F(StreamStoreTests, register_streams)
 {
   EXPECT_EQ(true, (stream1 ? true : false));
   EXPECT_EQ(true, (stream2 ? true : false));
 }
 
-TEST_F(InformationStoreTests, get_buffer)
+TEST_F(StreamStoreTests, get_buffer)
 {
   std::shared_ptr<ice::InformationStream<double> > stream1;
   std::shared_ptr<ice::InformationStream<int> > stream2;
@@ -153,7 +153,7 @@ TEST_F(InformationStoreTests, get_buffer)
   EXPECT_EQ(true, (stream2 ? true : false));
 }
 
-TEST_F(InformationStoreTests, add_information)
+TEST_F(StreamStoreTests, add_information)
 {
   for (int i = 0; i < 7; ++i)
   {
@@ -163,7 +163,7 @@ TEST_F(InformationStoreTests, add_information)
   }
 }
 
-TEST_F(InformationStoreTests, read_information)
+TEST_F(StreamStoreTests, read_information)
 {
   for (int i = 0; i < stream2->getStreamSize() + 5; ++i)
   {
@@ -186,7 +186,7 @@ TEST_F(InformationStoreTests, read_information)
   } while (information);
 }
 
-TEST_F(InformationStoreTests, async_event)
+TEST_F(StreamStoreTests, async_event)
 {
   std::shared_ptr<ice::InformationStream<int> > stream;
 
@@ -211,7 +211,7 @@ TEST_F(InformationStoreTests, async_event)
   EXPECT_NE(value + 4, listener2->value);
 }
 
-TEST_F(InformationStoreTests, sync_event)
+TEST_F(StreamStoreTests, sync_event)
 {
   std::shared_ptr<ice::InformationStream<int> > stream;
 
@@ -234,7 +234,7 @@ TEST_F(InformationStoreTests, sync_event)
   EXPECT_NE(value + 4, listener2->value);
 }
 
-TEST_F(InformationStoreTests, sync_async_event)
+TEST_F(StreamStoreTests, sync_async_event)
 {
   std::shared_ptr<ice::InformationStream<int> > stream;
 
@@ -259,7 +259,7 @@ TEST_F(InformationStoreTests, sync_async_event)
   EXPECT_NE(value + 4, listener2->value);
 }
 
-TEST_F(InformationStoreTests, sync_async_task)
+TEST_F(StreamStoreTests, sync_async_task)
 {
   std::shared_ptr<ice::InformationStream<int> > stream;
 
@@ -301,7 +301,7 @@ TEST_F(InformationStoreTests, sync_async_task)
   EXPECT_EQ(1, rt2);
 }
 
-TEST_F(InformationStoreTests, filtered_list)
+TEST_F(StreamStoreTests, filtered_list)
 {
   auto stream = stream2;
   auto vec = std::make_shared<std::vector<std::shared_ptr<ice::InformationElement<int>>> >();

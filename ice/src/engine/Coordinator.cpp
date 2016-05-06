@@ -19,7 +19,7 @@
 #include "ice/coordination/InformationModel.h"
 #include "ice/coordination/IntersectionInformationModel.h"
 #include "ice/coordination/ModelComperator.h"
-#include "ice/information/InformationStore.h"
+#include "ice/information/StreamStore.h"
 #include "ice/model/updateStrategie/UpdateStrategie.h"
 #include "ice/ontology/OntologyInterface.h"
 #include "ice/processing/NodeStore.h"
@@ -48,7 +48,7 @@ void Coordinator::init()
 
   auto e = engine.lock();
   this->communication = e->getCommunication();
-  this->informationStore = e->getInformationStore();
+  this->streamStore = e->getStreamStore();
   this->config = e->getConfig();
   this->timeFactory = e->getTimeFactory();
   this->engineIri = e->getIri();
@@ -84,7 +84,7 @@ void Coordinator::cleanUp()
     }
 
     this->communication.reset();
-    this->informationStore.reset();
+    this->streamStore.reset();
     this->config.reset();
     this->timeFactory.reset();
     this->nodeStore.reset();
@@ -467,7 +467,7 @@ int Coordinator::onStopCooperation(identifier engineId)
    engineState->getOffering()->state = CooperationState::NO_COOPERATION;
    engineState->clearOffering();
    this->nodeStore->cleanUpNodes();
-   this->informationStore->cleanUpStreams();
+   this->streamStore->cleanUpStreams();
 
    return 0;
 }

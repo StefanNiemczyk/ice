@@ -9,7 +9,7 @@
 
 #include "ice/ICEngine.h"
 #include "ice/information/InformationSpecification.h"
-#include "ice/information/InformationStore.h"
+#include "ice/information/StreamStore.h"
 #include "ice/communication/Communication.h"
 #include "ice/coordination/Coordinator.h"
 #include "ice/coordination/EngineState.h"

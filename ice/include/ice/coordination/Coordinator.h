@@ -30,7 +30,7 @@ class CooperationResponse;
 class EngineState;
 class ICEngine;
 class InformationModel;
-class InformationStore;
+class StreamStore;
 class IntersectionInformationModel;
 class NodeStore;
 class OntologyInterface;
@@ -241,7 +241,7 @@ private:
   std::shared_ptr<TimeFactory> timeFactory; /**< Time factory to create and compare time stamps */
   std::shared_ptr<Configuration> config; /**< Configuration object */
   std::shared_ptr<Communication> communication; /**< Communication interface to send messages */
-  std::shared_ptr<InformationStore> informationStore; /**< The information store */
+  std::shared_ptr<StreamStore> streamStore; /**< The stream store */
   std::shared_ptr<ProcessingModelGenerator> modelGenerator; /**< The model generator */
   std::shared_ptr<NodeStore> nodeStore; /**< The node store */
   std::vector<std::shared_ptr<EngineState>> engineStates; /**< List of known engines */

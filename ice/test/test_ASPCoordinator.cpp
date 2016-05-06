@@ -2,7 +2,7 @@
 
 #include "ice/ICEngine.h"
 #include "ice/information/InformationSpecification.h"
-#include "ice/information/InformationStore.h"
+#include "ice/information/StreamStore.h"
 #include "ice/model/aspModel/ASPModelGenerator.h"
 #include "ice/model/updateStrategie/UpdateStrategie.h"
 
@@ -24,9 +24,9 @@ TEST(ASPModelGenerator, simpleTest)
   auto spec1 = ice::InformationSpecification("o0_TestEntity1", "o0_TestEntity", "o0_TestScope1", "o0_TestRepresentation1");
   auto spec2 = ice::InformationSpecification("o0_TestEntity1", "o0_TestEntity", "o0_TestScope1", "o0_TestRepresentation2");
 
-  auto stream1 = engine->getInformationStore()->getStream<ice::Position>(&spec1, "o0_TestSourceNodeInd",
+  auto stream1 = engine->getStreamStore()->getStream<ice::Position>(&spec1, "o0_TestSourceNodeInd",
                                                                          "o0_TestSystem");
-  auto stream2 = engine->getInformationStore()->getStream<ice::Position>(&spec2, "o0_TestComputationalNodeInd",
+  auto stream2 = engine->getStreamStore()->getStream<ice::Position>(&spec2, "o0_TestComputationalNodeInd",
                                                                          "o0_TestSystem");
 
   ASSERT_TRUE((stream1 ? true : false));
@@ -73,12 +73,12 @@ TEST(ASPModelGenerator, twoSystemsSimple)
 
   // test processing system 1
   auto spec1 = ice::InformationSpecification("o0_TestEntity1", "o0_TestEntity", "o0_TestScope1", "o0_TestRepresentation1");
-  auto stream1 = engine->getInformationStore()->getStream<ice::Position>(&spec1, "o0_TestSourceNodeInd", "o0_TestCoordination1_SystemInd1");
+  auto stream1 = engine->getStreamStore()->getStream<ice::Position>(&spec1, "o0_TestSourceNodeInd", "o0_TestCoordination1_SystemInd1");
   ASSERT_TRUE((stream1 ? true : false));
 
   // test processing system 2
   auto spec2 = ice::InformationSpecification("o0_TestEntity1", "o0_TestEntity", "o0_TestScope1", "o0_TestRepresentation1");
-  auto stream2 = engine2->getInformationStore()->getStream<ice::Position>(&spec2, "o0_TestSourceNodeInd", "o0_TestCoordination1_SystemInd1");
+  auto stream2 = engine2->getStreamStore()->getStream<ice::Position>(&spec2, "o0_TestSourceNodeInd", "o0_TestCoordination1_SystemInd1");
   ASSERT_TRUE((stream2 ? true : false));
 
   // insert element in stream of system 2
@@ -131,17 +131,17 @@ TEST(ASPModelGenerator, twoSystemsComplex)
   auto spec2 = ice::InformationSpecification("o0_TestEntity1", "o0_TestEntity", "o0_TestScope1", "o0_TestRepresentation2");
 
   // test processing system 1
-  auto stream11 = engine->getInformationStore()->getStream<ice::Position>(&spec1, "o0_TestSourceNodeInd", "o0_TestCoordination2_SystemInd1");
+  auto stream11 = engine->getStreamStore()->getStream<ice::Position>(&spec1, "o0_TestSourceNodeInd", "o0_TestCoordination2_SystemInd1");
   ASSERT_TRUE((stream11 ? true : false));
 
-  auto stream12 = engine2->getInformationStore()->getStream<ice::Position>(&spec2, "o0_TestComputationalNodeInd", "o0_TestCoordination2_SystemInd2");
+  auto stream12 = engine2->getStreamStore()->getStream<ice::Position>(&spec2, "o0_TestComputationalNodeInd", "o0_TestCoordination2_SystemInd2");
   ASSERT_TRUE((stream12 ? true : false));
 
   // test processing system 2
-  auto stream21 = engine2->getInformationStore()->getStream<ice::Position>(&spec1, "o0_TestSourceNodeInd", "o0_TestCoordination2_SystemInd1");
+  auto stream21 = engine2->getStreamStore()->getStream<ice::Position>(&spec1, "o0_TestSourceNodeInd", "o0_TestCoordination2_SystemInd1");
   ASSERT_TRUE((stream21 ? true : false));
 
-  auto stream22 = engine2->getInformationStore()->getStream<ice::Position>(&spec2, "o0_TestComputationalNodeInd", "o0_TestCoordination2_SystemInd2");
+  auto stream22 = engine2->getStreamStore()->getStream<ice::Position>(&spec2, "o0_TestComputationalNodeInd", "o0_TestCoordination2_SystemInd2");
   ASSERT_TRUE((stream22 ? true : false));
 
   // insert element in stream of system 2

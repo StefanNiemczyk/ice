@@ -10,10 +10,10 @@
 namespace ice
 {
 
-InformationType::InformationType(std::weak_ptr<InformationStore> informationStore,
+InformationType::InformationType(std::weak_ptr<StreamStore> streamStore,
                                  std::shared_ptr<InformationSpecification> specification)
 {
-  this->informationStore = informationStore;
+  this->streamStore = streamStore;
   this->specification = specification;
 }
 
@@ -45,7 +45,7 @@ std::shared_ptr<BaseInformationStream> InformationType::registerStream(std::shar
 
   if (returnVel == 1)
   {
-    std::cout << "InformationStore: Duplicated Stream with name '" << stream->getName() << "'" << std::endl;
+    std::cout << "StreamStore: Duplicated Stream with name '" << stream->getName() << "'" << std::endl;
   }
 
   *notAdded = false;
@@ -61,7 +61,7 @@ std::shared_ptr<InformationSpecification> InformationType::getSpecification() co
 
 std::shared_ptr<EventHandler> InformationType::getEventHandler()
 {
-  std::shared_ptr<InformationStore> store = this->informationStore.lock();
+  std::shared_ptr<StreamStore> store = this->streamStore.lock();
   return store->getEventHandler();
 }
 
@@ -132,7 +132,7 @@ int InformationType::registerStreamTemplate(std::shared_ptr<InformationStreamTem
 
   if (returnVel == 1)
   {
-    std::cout << "InformationStore: Duplicated Stream with name '" << streamTemplate->getName() << "'" << std::endl;
+    std::cout << "StreamStore: Duplicated Stream with name '" << streamTemplate->getName() << "'" << std::endl;
   }
 
   this->templates.push_back(streamTemplate);
@@ -170,7 +170,7 @@ std::shared_ptr<BaseInformationStream> InformationType::createStreamFromTemplate
     // Check if exists
     std::string name = this->templates.at(0)->getName();
     name.replace(name.find("?provider"), 9, provider);
-    auto existing = this->informationStore.lock()->getBaseStream(name);
+    auto existing = this->streamStore.lock()->getBaseStream(name);
 
     if (existing)
       return existing;
@@ -181,7 +181,7 @@ std::shared_ptr<BaseInformationStream> InformationType::createStreamFromTemplate
 
     if (returnVel == 1)
     {
-      std::cout << "InformationStore: Duplicated Stream with name '" << stream->getName() << "'" << std::endl;
+      std::cout << "StreamStore: Duplicated Stream with name '" << stream->getName() << "'" << std::endl;
     }
 
     this->streams.push_back(stream);
@@ -204,7 +204,7 @@ std::shared_ptr<BaseInformationStream> InformationType::createStreamFromTemplate
 
     if (returnVel == 1)
     {
-      std::cout << "InformationStore: Duplicated Stream with name '" << stream->getName() << "'" << std::endl;
+      std::cout << "StreamStore: Duplicated Stream with name '" << stream->getName() << "'" << std::endl;
     }
 
     this->streams.push_back(stream);
@@ -218,13 +218,13 @@ std::shared_ptr<BaseInformationStream> InformationType::createStreamFromTemplate
 
 int InformationType::registerStreamInStore(std::shared_ptr<BaseInformationStream> stream)
 {
-  std::shared_ptr<InformationStore> store = this->informationStore.lock();
+  std::shared_ptr<StreamStore> store = this->streamStore.lock();
   return store->addStream(stream);
 }
 
 int InformationType::registerStreamTemplateInStore(std::shared_ptr<InformationStreamTemplate> streamTemplate)
 {
-  std::shared_ptr<InformationStore> store = this->informationStore.lock();
+  std::shared_ptr<StreamStore> store = this->streamStore.lock();
   return store->addStreamTemplate(streamTemplate);
 }
 

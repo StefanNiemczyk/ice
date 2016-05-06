@@ -25,7 +25,7 @@ class Communication;
 class Coordinator;
 class EngineState;
 class ICEngine;
-class InformationStore;
+class StreamStore;
 class ProcessingModelGenerator;
 class Node;
 class NodeStore;
@@ -74,7 +74,7 @@ protected:
   std::shared_ptr<EngineState> self; /**< Engine state of the own engine */
   std::weak_ptr<ICEngine> engine; /**< The main engine */
   std::shared_ptr<NodeStore> nodeStore; /**< The node store */
-  std::shared_ptr<InformationStore> informationStore; /**< The information store */
+  std::shared_ptr<StreamStore> streamStore; /**< The information store */
   std::shared_ptr<Coordinator> coordinator; /**< Coordinator of engines */
   std::shared_ptr<Communication> communication; /**< Communication interface */
   std::shared_ptr<OntologyInterface> ontology; /**< Shared pointer to access the ontology */

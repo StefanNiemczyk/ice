@@ -24,7 +24,7 @@ namespace ice
 class Communication;
 class Coordinator;
 class ICEngine;
-class InformationStore;
+class StreamStore;
 class NodeStore;
 class BaseInformationStream;
 class ASPSystem;

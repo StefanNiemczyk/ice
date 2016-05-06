@@ -28,7 +28,7 @@
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationStream.h"
 #include "ice/information/InformationStreamTemplate.h"
-#include "ice/information/InformationStore.h"
+#include "ice/information/StreamStore.h"
 #include "ice/information/InformationType.h"
 #include "ice/information/StreamFactory.h"
 #include "ice/model/ProcessingModelGenerator.h"
@@ -115,11 +115,11 @@ public:
   std::shared_ptr<EventHandler> getEventHandler();
 
   /*!
-   * \brief Returns the information store.
+   * \brief Returns the stream store.
    *
-   * Returns the information store.
+   * Returns the stream store.
    */
-  std::shared_ptr<InformationStore> getInformationStore();
+  std::shared_ptr<StreamStore> getStreamStore();
 
   /*!
    * \brief Returns the node store.
@@ -225,7 +225,7 @@ private:
   std::shared_ptr<TimeFactory> timeFactory; /**< time factory to create time stamps */
   std::shared_ptr<Configuration> config; /**< The configuration object */
   std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute asynchronous tasks */
-  std::shared_ptr<InformationStore> informationStore; /**< Information store */
+  std::shared_ptr<StreamStore> streamStore; /**< The Stream store */
   std::shared_ptr<NodeStore> nodeStore; /**< The node store */
   std::shared_ptr<Communication> communication; /**< The communication interface */
   std::shared_ptr<Coordinator> coordinator; /**< Coordinator object which coordinates the cooperation */

@@ -8,7 +8,7 @@
 #include "ice/model/updateStrategie/FastUpdateStrategie.h"
 
 #include "ice/information/BaseInformationStream.h"
-#include "ice/information/InformationStore.h"
+#include "ice/information/StreamStore.h"
 #include "ice/processing/Node.h"
 #include "ice/processing/NodeStore.h"
 
@@ -111,7 +111,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   }
 
   this->nodeStore->cleanUpNodes();
-  this->informationStore->cleanUpStreams();
+  this->streamStore->cleanUpStreams();
 
   // sending sub models
   for (auto subModel : *model->getSubModels())
