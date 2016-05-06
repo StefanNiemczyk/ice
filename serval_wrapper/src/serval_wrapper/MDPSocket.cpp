@@ -65,10 +65,10 @@ int MDPSocket::receive(std::string &senderSid, uint8_t *buffer, size_t size, uns
   struct mdp_header header;
   struct timeval tim;
   gettimeofday(&tim, NULL);
-  uint64_t timeout = (tim.tv_sec * (uint64_t)1000) + (tim.tv_usec / 1000) + 1000;
+  uint64_t timeout = (tim.tv_sec * (uint64_t)1000) + (tim.tv_usec / 1000) + timeoutMs;
 
-//  int count = mdp_recv(this->socket, &header, buffer, size);
-  int count = mdp_poll_recv(this->socket, timeoutMs, &header, buffer, size);
+  int count = mdp_recv(this->socket, &header, buffer, size);
+//  int count = mdp_poll_recv(this->socket, timeoutMs, &header, buffer, size);
   senderSid = serval_interface::arrayToSid(header.remote.sid.binary);
 
   return count;

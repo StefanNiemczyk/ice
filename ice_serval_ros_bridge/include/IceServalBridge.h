@@ -22,6 +22,8 @@
 namespace ice
 {
 class CommunicationInterface;
+class EventHandler;
+class InformationStore;
 
 struct OfferedInfo
 {
@@ -59,6 +61,7 @@ struct InitParams
 
   std::string xmlInfoPath;
   std::string xmlTransformationPath;
+  std::string xmlTemplateFile;
 };
 
 class IceServalBridge
@@ -83,9 +86,11 @@ private:
   void readSystemsFromOntology();
 
 public:
+  std::shared_ptr<EventHandler>                         eventHandler;
   std::shared_ptr<EntityDirectory>                      identityDirectory;
   std::shared_ptr<OntologyInterface>                    ontologyInterface;
   std::shared_ptr<CommunicationInterface>               communicationInterface;
+  std::shared_ptr<InformationStore>                     informationStore;
   std::shared_ptr<GContainerFactory>                    gcontainerFactory;
   std::shared_ptr<RosGContainerPublisher>               publisher;
 

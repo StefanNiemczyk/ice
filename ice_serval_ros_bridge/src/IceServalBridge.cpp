@@ -10,6 +10,8 @@
 #include <fstream>
 
 #include <ros/package.h>
+#include <ice/information/InformationStore.h>
+#include <ice/processing/EventHandler.h>
 #include <ice/representation/GContainerFactory.h>
 
 #include "CommunicationInterface.h"
@@ -51,8 +53,9 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_) : nh
   nh_.param("serval_port", this->params->servalPort, -1);
   nh_.param("serval_user", this->params->servalUser, std::string("UNSET"));
   nh_.param("serval_password", this->params->servalPassword, std::string("UNSET"));
-  nh_.param("xml_info_path", this->params->xmlInfoPath, std::string("UNSET"));
-  nh_.param("xml_transformation_path", this->params->xmlTransformationPath, std::string("UNSET"));
+  nh_.param("xml_info_file", this->params->xmlInfoPath, std::string("UNSET"));
+  nh_.param("xml_transformation_file", this->params->xmlTransformationPath, std::string("UNSET"));
+  nh_.param("xml_template_file", this->params->xmlTransformationPath, std::string("UNSET"));
 
   this->communicationInterface = std::make_shared<ServalCommunication>(this,
                                                              this->params->servalInstancePath,
@@ -83,7 +86,10 @@ IceServalBridge::~IceServalBridge()
 
 void IceServalBridge::init()
 {
-  // register hooks
+  // init event handler
+  this->eventHandler = std::make_shared<EventHandler>(2, 100);
+
+  // register hooks, workaround to enable the usage of class functions, TODO fix
   this->identityDirectory->registerDiscoveredIceIdentityHook(
       [this] (std::shared_ptr<Entity> const &identity) {this->discoveredIceIdentity(identity);});
   this->identityDirectory->registerOfferedInformationHooks(
@@ -114,11 +120,15 @@ void IceServalBridge::init()
   // init communication
   this->communicationInterface->init();
 
+  // init information store
+  this->informationStore = std::make_shared<InformationStore>(this->eventHandler, nullptr, this->ontologyInterface);
+
   // init transformation stuff
   // TODO
 
   // init ros message generator
-  this->publisher = std::make_shared<RosGContainerPublisher>();
+  this->publisher = std::make_shared<RosGContainerPublisher>(this->ontologyInterface, this->params->xmlTemplateFile);
+  this->publisher->init();
 
   //init gcontainer factory
   this->gcontainerFactory = std::make_shared<GContainerFactory>();

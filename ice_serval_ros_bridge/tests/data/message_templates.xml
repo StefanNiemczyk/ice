@@ -1,0 +1,13 @@
+<templates>
+	<template message="geometry_msgs/Vector3" representation="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#WGS84Rep">
+<![CDATA[x: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate}
+y: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate}
+z: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate}]]>
+	</template>
+	<template message="geometry_msgs/Vector3">
+<![CDATA[x: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate}
+y: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate}
+angle: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate}
+certainty: 0.9]]>
+	</template>
+</templates>

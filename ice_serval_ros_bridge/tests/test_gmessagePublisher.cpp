@@ -30,6 +30,7 @@ TEST(GMessagePublisher, simpleTest)
   params1->servalUser = "peter";
   params1->servalPassword = "venkman";
   params1->xmlInfoPath = path + "/tests/data/info_bridge_req.xml";
+  params1->xmlTemplateFile = path + "/tests/data/message_templates.xml";
 
   ros::NodeHandle nh_("");
   ros::NodeHandle pnh_("~");

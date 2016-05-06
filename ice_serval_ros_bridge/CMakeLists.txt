@@ -18,6 +18,9 @@ find_package(TinyXML REQUIRED)
 ## Use c++ 11x std
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
+#find_package(TBB REQUIRED)
+add_definitions(-DWITH_THREADS=0)
+
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -91,9 +94,9 @@ target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test 
-  #tests/test_bridge.cpp
-  #tests/test_entity.cpp
-  #tests/test_xml.cpp
+ # tests/test_bridge.cpp
+  tests/test_entity.cpp
+  tests/test_xml.cpp
   tests/test_gmessagePublisher.cpp
   tests/test_main.cpp
   )

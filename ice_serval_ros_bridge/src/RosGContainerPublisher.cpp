@@ -9,15 +9,17 @@
 
 #include <locale>
 
+#include <ice/ontology/OntologyInterface.h>
+
 #include "IceServalBridge.h"
 
 namespace ice
 {
 
-RosGContainerPublisher::RosGContainerPublisher()
+RosGContainerPublisher::RosGContainerPublisher(std::shared_ptr<OntologyInterface> ontology, std::string templateXMLFile)
+    : ontology(ontology), templateXMLFile(templateXMLFile)
 {
   _log = el::Loggers::getLogger("RosGContainerPublisher");
-  _log->info("Constructor");
 
   setlocale(LC_ALL, "C");// TODO
 }
@@ -26,10 +28,49 @@ RosGContainerPublisher::~RosGContainerPublisher()
 {
 }
 
+bool RosGContainerPublisher::init()
+{
+  this->readXMLFile(this->templateXMLFile);
+  return true;
+}
+
+bool RosGContainerPublisher::cleanUp()
+{
+
+  return true;
+}
+
+bool RosGContainerPublisher::findTemplate(std::string const &message, std::string const &representation, MessageTemplate &msgTemplate)
+{
+  bool found = false;
+
+  for (auto &tmp : this->messageTemplates)
+  {
+    if (tmp.message == message)
+    {
+      msgTemplate = tmp;
+      found = true;
+
+      if (tmp.representation == representation)
+      {
+        return true;
+      }
+    }
+  }
+
+  return found;
+}
+
 bool RosGContainerPublisher::publish(std::shared_ptr<RequiredInfo> const &reqInfo, std::shared_ptr<GContainer> &container)
 {
-  // todo gcontainer to message
-  std::string message = "x: {o2_XCoordinate}\ny: {o2_YCoordinate}\nz: {o2_ZCoordinate}";
+  MessageTemplate msgTemplate;
+
+  if (false == this->findTemplate(reqInfo->message, reqInfo->infoSpec.getRepresentation(), msgTemplate))
+  {
+    _log->error("No message template found for representation '%v'", reqInfo->message);
+    return false;
+  }
+  std::string message = msgTemplate.messageTemplate;
 
   bool result = this->transformToMessage(message, container);
 
@@ -130,6 +171,108 @@ bool RosGContainerPublisher::publish(std::string const &topic, std::string const
     output.seekg(0, std::ios::beg);
 
     return size;
+}
+
+bool RosGContainerPublisher::readXMLFile(const std::string& fileName)
+{
+  TiXmlDocument doc(fileName);
+  if (!doc.LoadFile())
+  {
+    _log->error("Could not load XML file '%v'", fileName);
+    return false;
+  }
+
+  TiXmlHandle hDoc(&doc);
+  TiXmlElement* element;
+  TiXmlHandle hRoot(0);
+
+  // find root element
+  {
+    element = hDoc.FirstChildElement().Element();
+    // should always have a valid root but handle gracefully if it does
+    if (!element || strcmp("templates", element->Value()) != 0)
+    {
+      _log->error("Root element should be 'templates' but is '%v' in file '%v'", element->Value(), fileName);
+      return false;
+    }
+
+    // save this for later
+    hRoot = TiXmlHandle(element);
+  }
+
+  for (TiXmlElement* cElement = hRoot.FirstChildElement().Element(); cElement; cElement = cElement->NextSiblingElement())
+  {
+    const char *child = cElement->Value();
+
+    if (!child)
+    {
+      _log->error("Invalid child '%v' of operations", child);
+      return nullptr;
+    }
+    else if (strcmp("template", child) == 0)
+    {
+      bool result = this->readTemplate(cElement);
+    }
+    else
+    {
+      _log->warn("Unknown child '%v', will be ignored", child);
+    }
+  }
+
+  return true;
+}
+
+bool RosGContainerPublisher::readTemplate(TiXmlElement* element)
+{
+  const char *tagName = element->Value();
+  const char *message = element->Attribute("message");
+  const char *representation = element->Attribute("representation");
+
+  if (!tagName || strcmp("template", tagName) != 0)
+  {
+    _log->error("Invalid tag '%v' for template tag", tagName);
+
+    return false;
+  }
+
+  if (representation == nullptr)
+    representation = "";
+
+  std::string msgTemplate = element->GetText();
+
+  if (message == "" || msgTemplate == "")
+  {
+    _log->warn("Incomplete template description: message '%v', representation '%v', messageTemplate '%v'",
+               message, representation, msgTemplate);
+    return false;
+  }
+
+  int index = msgTemplate.find("{");
+  int index2 = 0;
+  std::string longIri, shortIri;
+
+  while (index != std::string::npos)
+  {
+    index2 = msgTemplate.find("}");
+    longIri = msgTemplate.substr(index + 1, index2 - index - 1);
+
+    shortIri = this->ontology->toShortIri(longIri);
+
+    msgTemplate = msgTemplate.replace(index + 1, index2 - index - 1, shortIri);
+    index = msgTemplate.find("{", index + 1);
+  }
+
+  _log->debug("Extracted template description: message '%v', representation '%v', messageTemplate '%v'",
+             message, representation, msgTemplate);
+
+  MessageTemplate tmp;
+  tmp.message = message;
+  tmp.representation = representation;
+  tmp.messageTemplate = msgTemplate;
+
+  this->messageTemplates.push_back(tmp);
+
+  return true;
 }
 
 } /* namespace ice */

@@ -18,18 +18,29 @@ namespace ice
 
 InformationStore::InformationStore(std::weak_ptr<ICEngine> engine)
 {
-  this->engine = engine;
   this->_log = el::Loggers::getLogger("InformationStore");
+  this->engine = engine;
+}
+
+InformationStore::InformationStore(std::shared_ptr<EventHandler> eventHandler, std::shared_ptr<StreamFactory> streamFactory,
+                                   std::shared_ptr<OntologyInterface> ontology)
+{
+  this->_log = el::Loggers::getLogger("InformationStore");
+  this->eventHandler = eventHandler;
+  this->streamFactory = streamFactory;
+  this->ontology = ontology;
 }
 
 void InformationStore::init()
 {
-  auto engineObject = engine.lock();
+  if (false == this->engine.expired())
+  {
+    auto engineObject = engine.lock();
 
-  this->eventHandler = engineObject->getEventHandler();
-  this->config = engineObject->getConfig();
-  this->streamFactory = engineObject->getStreamFactory();
-  this->ontology = engineObject->getOntologyInterface();
+    this->eventHandler = engineObject->getEventHandler();
+    this->streamFactory = engineObject->getStreamFactory();
+    this->ontology = engineObject->getOntologyInterface();
+  }
 
 //  this->readEntitiesFromOntology();
 }
@@ -37,7 +48,6 @@ void InformationStore::init()
 void InformationStore::cleanUp()
 {
   this->eventHandler.reset();
-  this->config.reset();
   this->streamFactory.reset();
   this->ontology.reset();
 
@@ -47,12 +57,6 @@ void InformationStore::cleanUp()
   }
 
   this->streams.clear();
-}
-
-InformationStore::InformationStore(std::shared_ptr<EventHandler> eventHandler)
-{
-  this->eventHandler = eventHandler;
-  this->_log = el::Loggers::getLogger("InformationStore");
 }
 
 InformationStore::~InformationStore()
@@ -90,11 +94,6 @@ std::shared_ptr<BaseInformationStream> InformationStore::registerBaseStream(
                 provider, sourceSystem, type);
   }
   return stream;
-}
-
-std::shared_ptr<Configuration> InformationStore::getConfig() const
-{
-  return this->config;
 }
 
 std::shared_ptr<EventHandler> InformationStore::getEventHandler() const

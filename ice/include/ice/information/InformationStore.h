@@ -59,8 +59,11 @@ public:
    * listeners about new information elements.
    *
    * \param eventHandler Handler to deal with events executed asynchronously.
+   * \param streamFactor Factor to create stream objects
+   * \param ontology Interface to access the ontology
    */
-  InformationStore(std::shared_ptr<EventHandler> eventHandler);
+  InformationStore(std::shared_ptr<EventHandler> eventHandler, std::shared_ptr<StreamFactory> streamFactory,
+                   std::shared_ptr<OntologyInterface> ontology);
 
   /*!
    * \brief Default destructor
@@ -126,14 +129,6 @@ public:
   std::shared_ptr<EventHandler> getEventHandler() const;
 
   /*!
-   * \brief Adds a stream to the stream map.
-   *
-   * Adds a stream to the stream map. Returns 1 if a stream with this name already exists, else 0.
-   *
-   * \param stream The stream to add.
-   */
-//  int addStream(std::shared_ptr<BaseInformationStream> stream);
-  /*!
    * \brief Returns a BaseInformationStream for the given stream name.
    *
    * Returns a BaseInformationStream with the given stream name. NULL is returned if no stream exists.
@@ -186,7 +181,7 @@ private:
 
 private:
   std::weak_ptr<ICEngine> engine; /**< Weak pointer to the engine */
-  std::shared_ptr<Configuration> config; /**< The configuration object */
+//  std::shared_ptr<Configuration> config; /**< The configuration object */
   std::vector<std::shared_ptr<BaseInformationStream>> streams; /**< The information steams */
   std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute events asynchronously */
   std::shared_ptr<StreamFactory> streamFactory; /**< Stream factory to create streams */
