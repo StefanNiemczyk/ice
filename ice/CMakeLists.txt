@@ -174,9 +174,10 @@ add_library(${PROJECT_NAME}
   src/engine/BaseInformationStream.cpp
   src/engine/InformationSpecification.cpp
 #  src/engine/InformationStreamTemplate.cpp
-  src/engine/StreamStore.cpp
+  src/engine/InformationStore.cpp
 #  src/engine/InformationType.cpp
   src/engine/StreamFactory.cpp
+  src/engine/StreamStore.cpp
   
   src/engine/OntologyInterface.cpp
   

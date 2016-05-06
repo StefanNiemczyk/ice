@@ -121,7 +121,7 @@ void IceServalBridge::init()
   this->communicationInterface->init();
 
   // init information store
-  this->informationStore = std::make_shared<StreamStore>(this->eventHandler, nullptr, this->ontologyInterface);
+  this->informationStore = std::make_shared<InformationStore>(this->ontologyInterface);
 
   // init transformation stuff
   // TODO

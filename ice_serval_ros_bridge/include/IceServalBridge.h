@@ -23,7 +23,7 @@ namespace ice
 {
 class CommunicationInterface;
 class EventHandler;
-class StreamStore;
+class InformationStore;
 
 struct OfferedInfo
 {
@@ -90,7 +90,7 @@ public:
   std::shared_ptr<EntityDirectory>                      identityDirectory;
   std::shared_ptr<OntologyInterface>                    ontologyInterface;
   std::shared_ptr<CommunicationInterface>               communicationInterface;
-  std::shared_ptr<StreamStore>                     informationStore;
+  std::shared_ptr<InformationStore>                     informationStore;
   std::shared_ptr<GContainerFactory>                    gcontainerFactory;
   std::shared_ptr<RosGContainerPublisher>               publisher;
 
