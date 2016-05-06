@@ -147,10 +147,10 @@ std::unique_ptr<std::vector<std::shared_ptr<Entity>>> EntityDirectory::available
 
 void EntityDirectory::checkTimeout()
 {
-  for (auto &identity : this->entities)
+  for (auto &entity : this->entities)
   {
-    if(identity->isAvailable() && identity->isTimeout())
-        identity->setAvailable(false);
+    if(entity->isAvailable() && entity->isTimeout())
+        entity->setAvailable(false);
   }
 }
 

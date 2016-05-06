@@ -91,6 +91,54 @@ bool InformationSpecification::operator ==(const std::shared_ptr<InformationSpec
   return true;
 }
 
+bool InformationSpecification::checkRequest(InformationSpecification &request)
+{
+  if (request.getEntity() != "*" && request.getEntity() != this->getEntity())
+      return false;
+    if (request.getEntityType() != this->getEntityType())
+      return false;
+    if (request.getScope() != this->getScope())
+      return false;
+    if (request.getRepresentation() != this->getRepresentation())
+      return false;
+    if (request.getRelatedEntity() != this->getRelatedEntity())
+      return false;
+
+    return true;
+}
+
+bool InformationSpecification::checkRequest(InformationSpecification *request)
+{
+  if (request->getEntity() != "*" && request->getEntity() != this->getEntity())
+      return false;
+    if (request->getEntityType() != this->getEntityType())
+      return false;
+    if (request->getScope() != this->getScope())
+      return false;
+    if (request->getRepresentation() != this->getRepresentation())
+      return false;
+    if (request->getRelatedEntity() != this->getRelatedEntity())
+      return false;
+
+    return true;
+}
+
+bool InformationSpecification::checkRequest(std::shared_ptr<InformationSpecification> &request)
+{
+  if (request->getEntity() != "*" && request->getEntity() != this->getEntity())
+      return false;
+    if (request->getEntityType() != this->getEntityType())
+      return false;
+    if (request->getScope() != this->getScope())
+      return false;
+    if (request->getRepresentation() != this->getRepresentation())
+      return false;
+    if (request->getRelatedEntity() != this->getRelatedEntity())
+      return false;
+
+    return true;
+}
+
 std::string InformationSpecification::toString()
 {
   std::stringstream ss;

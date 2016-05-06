@@ -94,10 +94,10 @@ target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test 
- # tests/test_bridge.cpp
   tests/test_entity.cpp
   tests/test_xml.cpp
-  tests/test_gmessagePublisher.cpp
+  tests/test_bridge.cpp
+ # tests/test_gmessagePublisher.cpp
   tests/test_main.cpp
   )
   

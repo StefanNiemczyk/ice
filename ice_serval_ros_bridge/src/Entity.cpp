@@ -367,10 +367,12 @@ void Entity::checkIce()
   if (this->iceIdentity)
     return;
 
-  this->iceIdentity = (this->ids.find(EntityDirectory::ID_ONTOLOGY) != this->metadata.end());
+  this->iceIdentity = (this->ids.find(EntityDirectory::ID_ONTOLOGY) != this->ids.end());
 
   if (this->iceIdentity && this->available)
+  {
     this->directory->callDiscoveredIceIdentityHooks(this->shared_from_this());
+  }
 }
 
 bool Entity::isIceIdentity()
@@ -402,14 +404,14 @@ void Entity::setAvailable(bool const &value)
 {
   if (value)
   {
-    if (this->isIceIdentity() && false == this->available)
+    if (this->iceIdentity && false == this->available)
     {
       this->directory->callDiscoveredIceIdentityHooks(this->shared_from_this());
     }
   }
   else
   {
-    if (this->isIceIdentity())
+    if (this->iceIdentity)
     {
       this->directory->callVanishedIceIdentityHooks(this->shared_from_this());
     }

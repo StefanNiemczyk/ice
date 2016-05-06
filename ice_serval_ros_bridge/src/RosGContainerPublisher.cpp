@@ -65,7 +65,7 @@ bool RosGContainerPublisher::publish(std::shared_ptr<RequiredInfo> const &reqInf
 {
   MessageTemplate msgTemplate;
 
-  if (false == this->findTemplate(reqInfo->message, reqInfo->infoSpec.getRepresentation(), msgTemplate))
+  if (false == this->findTemplate(reqInfo->message, reqInfo->infoSpec->getRepresentation(), msgTemplate))
   {
     _log->error("No message template found for representation '%v'", reqInfo->message);
     return false;

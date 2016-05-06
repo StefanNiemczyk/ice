@@ -110,6 +110,12 @@ public:
    */
   bool operator==(std::shared_ptr<InformationSpecification> const rhs);
 
+  bool checkRequest(InformationSpecification &request);
+
+  bool checkRequest(InformationSpecification *request);
+
+  bool checkRequest(std::shared_ptr<InformationSpecification> &request);
+
   /*!
    * \brief Return the information specification as string.
    *

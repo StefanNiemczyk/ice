@@ -28,8 +28,10 @@ enum IceCmd
   SCMD_IDS_RESPONSE                     = 11,
   SCMD_ID_REQUEST                       = 20,
   SCMD_ID_RESPONSE                      = 21,
-  SCMD_INFORMATION_REQUEST              = 30,
-  SCMD_INFORMATION_RESPONSE             = 31
+  SCMD_OFFERS_REQUEST                   = 30,
+  SCMD_OFFERS_RESPONSE                  = 31,
+  SCMD_INFORMATION_REQUEST              = 40,
+  SCMD_INFORMATION_RESPONSE             = 41
 };
 
 struct Message
@@ -47,12 +49,16 @@ public:
   virtual void init();
   virtual void cleanUp();
 
-  virtual void requestId(std::shared_ptr<Entity> const &identity, std::string const &id);
-  virtual void onRequestId(std::shared_ptr<Entity> const &identity, std::string const &id);
-  virtual void requestIds(std::shared_ptr<Entity> const &identity);
-  virtual void onRequestIds(std::shared_ptr<Entity> const &identity);
-  virtual void requestOfferedInformation(std::shared_ptr<Entity> const &identity);
-  virtual void onRequestOfferedInformation(std::shared_ptr<Entity> const &identity);
+  virtual void requestId(std::shared_ptr<Entity> const &entity, std::string const &id);
+  virtual void onRequestId(std::shared_ptr<Entity> const &entity, std::string const &id);
+  virtual void requestIds(std::shared_ptr<Entity> const &entity);
+  virtual void onRequestIds(std::shared_ptr<Entity> const &entity);
+  virtual void requestOffers(std::shared_ptr<Entity> const &entity);
+  virtual void onRequestOffers(std::shared_ptr<Entity> const &entity);
+  virtual void requestInformation(std::shared_ptr<Entity> const &entity,
+                                  std::vector<std::shared_ptr<InformationSpecification>> const &requests);
+  virtual void onRequestInformation(std::shared_ptr<Entity> const &identity,
+                                    std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>> const &requests);
 
   virtual void workerTask();
 

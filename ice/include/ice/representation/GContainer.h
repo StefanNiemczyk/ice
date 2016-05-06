@@ -8,6 +8,7 @@
 #include "ice/representation/Representation.h"
 
 #include "easylogging++.h"
+#include "serialize.h"
 
 namespace ice
 {
@@ -52,6 +53,12 @@ public:
     return this->set(indices, 0, value);
   }
 
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes)
+  {
+    int index = 0;
+    this->fromByte(bytes, index);
+  }
+
   virtual GContainer* clone() = 0;
 
   void print()
@@ -63,6 +70,8 @@ public:
   virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices, int index) = 0;
   virtual void* get(std::vector<int> *indices, int index) = 0;
   virtual bool set(std::vector<int> *indices, int index, const void* value) = 0;
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out) = 0;
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) = 0;
 
 public:
   std::shared_ptr<Representation> representation;
@@ -180,6 +189,22 @@ public:
     return this->subs.at(indices->at(index))->set(indices, index + 1, value);
   }
 
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    for (auto &sub : this->subs)
+    {
+      sub->toByte(out);
+    }
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    for (auto &sub : this->subs)
+    {
+      sub->fromByte(bytes, index);
+    }
+  }
+
 private:
   std::vector<GContainer*> subs;
 };
@@ -267,6 +292,19 @@ public:
     return true;
   }
 
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<bool>(bytes[index]);
+    ++index;
+  }
+
   virtual void print(int level, std::string dimension)
   {
     std::cout << std::string(level, ' ') << dimension << " " << this->value << " (bool)" << std::endl;
@@ -323,6 +361,19 @@ public:
     this->value = *((int8_t*)value);
 
     return true;
+  }
+
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<int8_t>(bytes[index]);
+    ++index;
   }
 
   virtual void print(int level, std::string dimension)
@@ -383,6 +434,19 @@ public:
     return true;
   }
 
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<uint8_t>(bytes[index]);
+    ++index;
+  }
+
   virtual void print(int level, std::string dimension)
   {
     std::cout << std::string(level, ' ') << dimension << " " << this->value << " (unsigned byte)" << std::endl;
@@ -439,6 +503,19 @@ public:
     this->value = *((short*)value);
 
     return true;
+  }
+
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<short>(bytes[index]);
+    ++index;
   }
 
   virtual void print(int level, std::string dimension)
@@ -499,6 +576,19 @@ public:
     return true;
   }
 
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<int>(bytes[index]);
+    ++index;
+  }
+
   virtual void print(int level, std::string dimension)
   {
     std::cout << std::string(level, ' ') << dimension << " " << this->value << " (int)" << std::endl;
@@ -555,6 +645,19 @@ public:
     this->value = *((long*)value);
 
     return true;
+  }
+
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<long>(bytes[index]);
+    ++index;
   }
 
   virtual void print(int level, std::string dimension)
@@ -615,6 +718,19 @@ public:
     return true;
   }
 
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<unsigned short>(bytes[index]);
+    ++index;
+  }
+
   virtual void print(int level, std::string dimension)
   {
     std::cout << std::string(level, ' ') << dimension << " " << this->value << " (unsigned short)" << std::endl;
@@ -671,6 +787,19 @@ public:
     this->value = *((unsigned int*)value);
 
     return true;
+  }
+
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<unsigned int>(bytes[index]);
+    ++index;
   }
 
   virtual void print(int level, std::string dimension)
@@ -731,6 +860,19 @@ public:
     return true;
   }
 
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<unsigned long>(bytes[index]);
+    ++index;
+  }
+
   virtual void print(int level, std::string dimension)
   {
     std::cout << std::string(level, ' ') << dimension << " " << this->value << " (unsigned long)" << std::endl;
@@ -787,6 +929,19 @@ public:
     this->value = *((float*)value);
 
     return true;
+  }
+
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<float>(bytes[index]);
+    ++index;
   }
 
   virtual void print(int level, std::string dimension)
@@ -847,6 +1002,19 @@ public:
     return true;
   }
 
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<double>(bytes[index]);
+    ++index;
+  }
+
   virtual void print(int level, std::string dimension)
   {
     std::cout << std::string(level, ' ') << dimension << " " << this->value << " (double)" << std::endl;
@@ -902,6 +1070,19 @@ public:
     this->value = *((std::string*)value);
 
     return true;
+  }
+
+  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
+  {
+    std::vector<uint8_t> vec;
+    serialize(this->value, vec);
+    out.push_back(vec);
+  }
+
+  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
+  {
+    this->value = deserialize<std::string>(bytes[index]);
+    ++index;
   }
 
   virtual void print(int level, std::string dimension)

@@ -24,11 +24,11 @@ TEST(XML, read)
   ASSERT_EQ("off_representation", infoOff->infoSpec.getRepresentation());
   ASSERT_EQ("off_relatedEntity", infoOff->infoSpec.getRelatedEntity());
 
-  ASSERT_EQ("req_entity", infoReq->infoSpec.getEntity());
-  ASSERT_EQ("req_entityType", infoReq->infoSpec.getEntityType());
-  ASSERT_EQ("req_scope", infoReq->infoSpec.getScope());
-  ASSERT_EQ("req_representation", infoReq->infoSpec.getRepresentation());
-  ASSERT_EQ("req_relatedEntity", infoReq->infoSpec.getRelatedEntity());
+  ASSERT_EQ("req_entity", infoReq->infoSpec->getEntity());
+  ASSERT_EQ("req_entityType", infoReq->infoSpec->getEntityType());
+  ASSERT_EQ("req_scope", infoReq->infoSpec->getScope());
+  ASSERT_EQ("req_representation", infoReq->infoSpec->getRepresentation());
+  ASSERT_EQ("req_relatedEntity", infoReq->infoSpec->getRelatedEntity());
   ASSERT_EQ("/topic", infoReq->topic);
   ASSERT_EQ("/test/msg", infoReq->message);
 }

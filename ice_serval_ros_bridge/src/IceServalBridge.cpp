@@ -135,7 +135,8 @@ void IceServalBridge::init()
   this->gcontainerFactory->setOntologyInterface(this->ontologyInterface);
   this->gcontainerFactory->init();
 
-  _log->info("Bridge for identity '%v' initialized", this->identityDirectory->self->toString());
+  _log->info("Bridge for identity '%v' initialized, requests: '%v', offeres '%v'",
+             this->identityDirectory->self->toString(), this->requiredInfos.size(), this->offeredInfos.size());
 }
 
 void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> const &entity)
@@ -148,24 +149,37 @@ void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> const &entit
   // request offered information if no knowledge can be extracted from ontology
   if (result == 0)
   {
-    this->communicationInterface->requestOfferedInformation(entity);
+    this->communicationInterface->requestOffers(entity);
     return;
   }
 
   // check if information are required
 }
 
-void IceServalBridge::vanishedIceIdentity(std::shared_ptr<Entity> const &identity)
+void IceServalBridge::vanishedIceIdentity(std::shared_ptr<Entity> const &entity)
 {
-  _log->info("Vanished: '%v'", identity->toString());
+  _log->info("Vanished: '%v'", entity->toString());
 
 }
 
-void IceServalBridge::offeredInformation(std::shared_ptr<Entity> const &identity)
+void IceServalBridge::offeredInformation(std::shared_ptr<Entity> const &entity)
 {
-  _log->info("New offered information from: '%v'", identity->toString());
+  _log->info("New offered information from: '%v'", entity->toString());
+  std::vector<std::shared_ptr<InformationSpecification>> requests;
 
-  // TODO check match
+  for (auto &offer : entity->getOfferedInformation())
+  {
+    for (auto &req : this->requiredInfos)
+    {
+      if (offer.checkRequest(req->infoSpec))
+      {
+        requests.push_back(req->infoSpec);
+      }
+    }
+  }
+
+  if (requests.size() > 0)
+    this->communicationInterface->requestInformation(entity, requests);
 }
 
 std::vector<std::shared_ptr<OfferedInfo>>& IceServalBridge::getOfferedInfos()

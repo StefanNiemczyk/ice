@@ -38,11 +38,12 @@ struct OfferedInfo
 struct RequiredInfo
 {
   RequiredInfo(ont::entity entity, ont::entityType entityType, ont::scope scope, ont::representation representation,
-               ont::entity relatedEntity) : infoSpec(entity, entityType, scope, representation, relatedEntity)
+               ont::entity relatedEntity)
+        : infoSpec(std::make_shared<InformationSpecification>(entity, entityType, scope, representation, relatedEntity))
   {
 
   }
-  InformationSpecification infoSpec;
+  std::shared_ptr<InformationSpecification> infoSpec;
   std::string topic;
   std::string message;
 };
@@ -75,9 +76,9 @@ public:
   virtual ~IceServalBridge();
   void init();
 
-  void discoveredIceIdentity(std::shared_ptr<Entity> const &identity);
-  void vanishedIceIdentity(std::shared_ptr<Entity> const &identity);
-  void offeredInformation(std::shared_ptr<Entity> const &identity);
+  void discoveredIceIdentity(std::shared_ptr<Entity> const &entity);
+  void vanishedIceIdentity(std::shared_ptr<Entity> const &entity);
+  void offeredInformation(std::shared_ptr<Entity> const &entity);
 
   std::vector<std::shared_ptr<OfferedInfo>>& getOfferedInfos();
   std::vector<std::shared_ptr<RequiredInfo>>& getRequiredInfors();
