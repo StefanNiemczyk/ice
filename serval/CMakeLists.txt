@@ -48,6 +48,7 @@ add_library(serval STATIC
         serval-dna/xprintf.c
         serval-dna/whence.c
 	serval-dna/mdp_client.c
+	serval-dna/msp_client.c
 	serval-dna/instance.c
 	serval-dna/log_stderr.c
 	serval-dna/log_context.c
@@ -55,5 +56,3 @@ add_library(serval STATIC
 )
 
 add_custom_command(TARGET serval PRE_BUILD COMMAND cp "${PROJECT_SOURCE_DIR}/serval-dna/constants.h" "${PROJECT_SOURCE_DIR}/include")
-
-
