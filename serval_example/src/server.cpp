@@ -10,8 +10,9 @@
 
 #define MSP_MESSAGE_SIZE 32
 
-size_t outlen;
-uint8_t outbuf[MSP_MESSAGE_SIZE];
+char outbuf[MSP_MESSAGE_SIZE];
+int outlen;
+
 static int quit;
 
 size_t
@@ -29,19 +30,23 @@ io_handler(MSP_SOCKET sock, msp_state_t state,
 	}
 
 	if (ret == len && (state & MSP_STATE_SHUTDOWN_REMOTE)) {
+		msp_shutdown(sock);
 		std::cout << "received EOF" << std::endl;
 	}
 
-
+	
+	strcpy(outbuf, "ACK!");
+	outlen = strlen(outbuf);
+	/* respond to client */
 	if (outlen == 0) {
 		msp_shutdown(sock);
 	} else if (state & MSP_STATE_DATAOUT) {
-		ssize_t sent = msp_send(sock, outbuf, outlen);
-	    if (sent == -1)
-	        msp_shutdown(sock); // premature end
-	    else {
-		
-	    }
+		ssize_t sent = msp_send(sock, (uint8_t *)outbuf, outlen);
+		if (sent == -1) {
+			msp_shutdown(sock); // premature end
+		} else {
+			//TODO: ???
+		}
 	}
 
 	if (state & (MSP_STATE_CLOSED | MSP_STATE_ERROR)) {
@@ -67,7 +72,7 @@ listen_handler(MSP_SOCKET sock, msp_state_t state,
 		if (payload && len)
 			return io_handler(sock, state, payload, len, NULL);
 	}
-	//assert(len == 0);
+
 	return 0;
 }
 
@@ -88,6 +93,7 @@ main()
 	time_ms_t now;
 	time_ms_t next_time = 0;
 
+w
 	signal(SIGTERM, &cleanup);
 	signal(SIGINT, &cleanup);
 
@@ -95,7 +101,7 @@ main()
 	strcpy((char *)outbuf, "Hello World!");
 
 	if ((mdp_sock = mdp_socket()) < 0) {
-		std::cerr << "error creating socket" << std::endl;
+		std::cerr << "server: error creating mdp socket" << std::endl;
 		return -1;
 	}
 	msp_sock = msp_socket(mdp_sock, 0);
@@ -108,10 +114,11 @@ main()
 	msp_listen(msp_sock);
 
 	if (!msp_socket_is_open(msp_sock)) {
-		std::cerr << "error listening on msp socket" << std::endl;
+		std::cerr << "server: error listening on msp socket" << std::endl;
 		return -1;
 	}
 
+	std::cout << "server: starting server..." << std::endl;
 	quit = 0;
 	while (!quit) {
 		now = gettime_ms();
@@ -121,10 +128,11 @@ main()
 			msp_recv(mdp_sock);
 		}
 		msp_processing(&next_time);
-		std::cout << "processing..." << std::endl;
 	}
 
-	std::cout << "cleaning..." << std::endl;
+	std::cout << "server: cleanup..." << std::endl;
+
+	msp_shutdown(msp_sock);
 	msp_close_all(mdp_sock);
 	mdp_close(mdp_sock);
 	return 0;
