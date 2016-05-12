@@ -7,20 +7,20 @@
 
 #define PAYLOAD_SIZE 16
 #define PORT 8042
-
 #define MSP_MESSAGE_SIZE 32
+
+static int quit;
 
 char outbuf[MSP_MESSAGE_SIZE];
 int outlen;
-
-static int quit;
 
 size_t
 io_handler(MSP_SOCKET sock, msp_state_t state,
 		const uint8_t *payload, size_t len, void *context)
 {
 	int ret = 0;
-	if (payload != NULL && len > 0) {
+
+	if (payload && len) {
 		std::cout << "received payload with len:" << len << std::endl;
 
 		for (int i = 0; i < len; i++)
@@ -30,28 +30,26 @@ io_handler(MSP_SOCKET sock, msp_state_t state,
 	}
 
 	if (ret == len && (state & MSP_STATE_SHUTDOWN_REMOTE)) {
-		msp_shutdown(sock);
 		std::cout << "received EOF" << std::endl;
 	}
 
-	
-	strcpy(outbuf, "ACK!");
-	outlen = strlen(outbuf);
 	/* respond to client */
+	strcpy(outbuf, "Hello Client!");
+	outlen = strlen(outbuf);
+
 	if (outlen == 0) {
 		msp_shutdown(sock);
 	} else if (state & MSP_STATE_DATAOUT) {
 		ssize_t sent = msp_send(sock, (uint8_t *)outbuf, outlen);
-		if (sent == -1) {
-			msp_shutdown(sock); // premature end
-		} else {
-			//TODO: ???
-		}
+
+		/* if there was an error while sending? */
+		if (sent == -1)
+			msp_shutdown(sock);
 	}
 
-	if (state & (MSP_STATE_CLOSED | MSP_STATE_ERROR)) {
+	/* quit program on error */
+	if (state & (MSP_STATE_CLOSED | MSP_STATE_ERROR))
 		quit = 1;
-	}
 
 	return ret;
 }
@@ -90,12 +88,10 @@ main()
 	int mdp_sock;
 	MSP_SOCKET msp_sock;
 	struct mdp_sockaddr addr;
-	time_ms_t now;
+	struct sigaction act;
+	struct timeval timeout;
+ 	time_ms_t now;
 	time_ms_t next_time = 0;
-
-w
-	signal(SIGTERM, &cleanup);
-	signal(SIGINT, &cleanup);
 
 	/* sample message to reply to clients */
 	strcpy((char *)outbuf, "Hello World!");
@@ -110,14 +106,22 @@ w
 	addr.port = PORT;
 
 	msp_set_local(msp_sock, &addr);
-	msp_set_handler(msp_sock, io_handler, NULL);
+	msp_set_handler(msp_sock, listen_handler, NULL);
 	msp_listen(msp_sock);
-
 	if (!msp_socket_is_open(msp_sock)) {
 		std::cerr << "server: error listening on msp socket" << std::endl;
 		return -1;
 	}
 
+	/* cleanup on CTRL-C */
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = &cleanup;
+	if (sigaction(SIGINT, &act, NULL) < 0) {
+		fprintf(stderr, "error registering signal handler\n");
+		return -1;
+	}
+
+	/* main loop */
 	std::cout << "server: starting server..." << std::endl;
 	quit = 0;
 	while (!quit) {
@@ -131,9 +135,8 @@ w
 	}
 
 	std::cout << "server: cleanup..." << std::endl;
-
-	msp_shutdown(msp_sock);
 	msp_close_all(mdp_sock);
 	mdp_close(mdp_sock);
+
 	return 0;
 }

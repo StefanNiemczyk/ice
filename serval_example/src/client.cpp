@@ -1,18 +1,24 @@
 #include <iostream>
 #include <cstdio>
 #include <cstring>
+#include <signal.h>
 
 #include <msp_cpp.h>
 
 #define PAYLOAD_SIZE 16
 #define PORT 8042
+#define MSP_MESSAGE_SIZE 32
 
 static int quit;
+
+int outlen;
+char outbuf[MSP_MESSAGE_SIZE];
 
 size_t
 io_handler(MSP_SOCKET sock, msp_state_t state,
 		const uint8_t *payload, size_t len, void *context)
 {
+	/* msp_sock is a new(connection) socket */
 	int ret = 0;
 
 	/* process responses from server */
@@ -20,58 +26,77 @@ io_handler(MSP_SOCKET sock, msp_state_t state,
 		std::cout << "received payload with len:" << len << std::endl;
 		for (int i = 0; i < len; i++)
 			std::cout << payload[i];
-
 		std::cout << std::endl;
+
 		ret = len;
 	}
+
 	if (ret == len && (state & MSP_STATE_SHUTDOWN_REMOTE)) {
 		std::cout << "received EOF" << std::endl;
 	}
 
-	/*
-	if ( outlen == 0 &&  )
-		msp_shutdown(sock);
-	else if (state & MSP_STATE_DATA_OUT) {
-		ssize_t sent = msp_send(sock, outbuf, outlen);
-	    if (sent == -1)
-	        msp_shutdown(sock); // premature end
-	    else {
-		
-	    }
-	}*/
+	/* eventully send response to server */
+	outlen = 0; // lenght of that response
+	// eventually fill outbuf[];
 
-	if (state & (MSP_STATE_CLOSED | MSP_STATE_ERROR)) {
-		quit = 1;
+	if (outlen == 0) {
+		msp_shutdown(sock);
+	} else if (state & MSP_STATE_DATAOUT) {
+		ssize_t sent = msp_send(sock, (uint8_t *)outbuf, outlen);
+
+		/* if there was an error while sending? */
+		if (sent == -1)
+			msp_shutdown(sock);
 	}
+
+	/* quit program on error */
+	if (state & (MSP_STATE_CLOSED | MSP_STATE_ERROR))
+		quit = 1;
 
 	return ret;
 }
 
+extern "C" {
+int str_to_sid_t(sid_t *sid, const char *hex);
+}
+
+void
+cleanup(int signal)
+{
+	quit = 1;
+}
+
 int
-main()
+main(int argc, char *argv[])
 {
 	int mdp_sock;
 	MSP_SOCKET msp_sock;
+	sid_t sid;
 	struct mdp_sockaddr sockaddr;
 	struct timeval timeout;
+	struct sigaction act;
 	time_ms_t now;
 	time_ms_t next_time = 0;
+	char msg[] = "Hello Server!";
 
-	/* message to send to server */
-	char msg[60];
-	strcpy(msg, "Hello World");
+	/* read sid from command line parameter */
+	if (argc < 2) {
+		std::cerr << "usage: " << argv[0] << " SERVER_SID" << std::endl;
+		return -1;
+	}
+
+	if (str_to_sid_t(&sid, argv[1]) < 0) {
+		std::cerr << "error: invalid sid parameter" << std::endl;
+		return -1;
+	}
+	sockaddr.sid = sid;
+	sockaddr.port = PORT;
 
 	if ((mdp_sock = mdp_socket()) < 0) {
 		std::cerr << "client: error creating mdp socket" << std::endl;
 		return -1;
 	}
 	msp_sock = msp_socket(mdp_sock, 0);
-
-	/* TODO: How to get server sid? */
-	sid_t sid = {0x2D, 0xF7, 0xCB, 0x17, 0x09, 0x5B, 0xEC, 0xD4, 0x4A, 0x13, 0xA1, 0xA9, 0x6F, 0x9A, 0xE5, 0x95, 0xFF, 0x9D, 0x2D, 0xEB, 0x51, 0xE8, 0xA1, 0x72, 0x3C, 0x1A, 0xD6, 0x08, 0x82, 0x6A, 0xF4, 0x18};
-
-	sockaddr.sid = sid;
-	sockaddr.port = PORT;
 
 	msp_connect(msp_sock, &sockaddr);
 	if (!msp_socket_is_open(msp_sock)) {
@@ -81,7 +106,15 @@ main()
 
 	msp_set_handler(msp_sock, io_handler, NULL);
 
+	/* cleanup on CTRL-C */
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = &cleanup;
+	if (sigaction(SIGINT, &act, NULL) < 0) {
+		fprintf(stderr, "error registering signal handler\n");
+		return -1;
+	}
 	std::cerr << "client: starting client..." << std::endl;
+
 	quit = 0;
 	while (!quit) {
 		now = gettime_ms();
@@ -98,9 +131,8 @@ main()
 	}
 
 	std::cout << "client: cleanup..." << std::endl;
-
-	msp_shutdown(msp_sock);
 	msp_close_all(mdp_sock);
 	mdp_close(mdp_sock);
+
 	return 0;
 }
