@@ -76,9 +76,9 @@ public:
   virtual ~IceServalBridge();
   void init();
 
-  void discoveredIceIdentity(std::shared_ptr<Entity> const &entity);
-  void vanishedIceIdentity(std::shared_ptr<Entity> const &entity);
-  void offeredInformation(std::shared_ptr<Entity> const &entity);
+  void discoveredIceIdentity(std::shared_ptr<Entity> entity);
+  void vanishedIceIdentity(std::shared_ptr<Entity> entity);
+  void offeredInformation(std::shared_ptr<Entity> entity);
 
   std::vector<std::shared_ptr<OfferedInfo>>& getOfferedInfos();
   std::vector<std::shared_ptr<RequiredInfo>>& getRequiredInfors();

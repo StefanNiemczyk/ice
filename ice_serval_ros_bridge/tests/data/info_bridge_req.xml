@@ -4,7 +4,7 @@
 			<entity>*</entity>
 			<entityType>http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot</entityType>
 			<scope>http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position</scope>
-			<representation>http://www.semanticweb.org/sni/ontologies/2013/7/Ice#WGS84Rep</representation>
+			<representation>http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep</representation>
 			<topic>/test_bridge_topic</topic>
 			<message>geometry_msgs/Vector3</message>
 		</information>

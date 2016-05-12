@@ -23,9 +23,9 @@ std::unique_ptr<ice_msgs::Position> RosMessageTransform::transformC2MPosition(
   std::cout << "transformC2MPosition: " << info.x << ", " << info.y << ", " << info.z << std::endl;
 #endif
 
-  pos->x = info.x;
-  pos->y = info.y;
-  pos->z = info.z;
+  pos->x = info->x;
+  pos->y = info->y;
+  pos->z = info->z;
 
   return pos;
 }
@@ -51,7 +51,7 @@ std::unique_ptr<ice_msgs::Positions> RosMessageTransform::transformC2MPositions(
   auto infoList = informationElement->getInformation();
   std::unique_ptr<ice_msgs::Positions> positions(new ice_msgs::Positions());
 
-  for (auto infoPos : infoList)
+  for (auto infoPos : *infoList)
   {
     ice_msgs::Position pos;
 

@@ -25,7 +25,7 @@ class InformationElement;
 class InformationSpecification;
 class OntologyInterface;
 
-typedef InformationElement<std::shared_ptr<GContainer>> GElement;
+typedef InformationElement<GContainer> GElement;
 
 struct Information
 {

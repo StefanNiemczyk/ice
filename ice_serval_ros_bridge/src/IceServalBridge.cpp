@@ -90,12 +90,9 @@ void IceServalBridge::init()
   this->eventHandler = std::make_shared<EventHandler>(2, 100);
 
   // register hooks, workaround to enable the usage of class functions, TODO fix
-  this->identityDirectory->registerDiscoveredIceIdentityHook(
-      [this] (std::shared_ptr<Entity> const &identity) {this->discoveredIceIdentity(identity);});
-  this->identityDirectory->registerOfferedInformationHooks(
-      [this] (std::shared_ptr<Entity> const &identity) {this->offeredInformation(identity);});
-  this->identityDirectory->registerVanishedIceIdentityHooks(
-      [this] (std::shared_ptr<Entity> const &identity) {this->vanishedIceIdentity(identity);});
+  this->identityDirectory->disvoeredIceIdentity.registerCallback(this, &IceServalBridge::discoveredIceIdentity);
+  this->identityDirectory->vanishedIceIdentity.registerCallback(this, &IceServalBridge::vanishedIceIdentity);
+  this->identityDirectory->offeredInformation.registerCallback(this, &IceServalBridge::offeredInformation);
 
   //set own iri
   this->identityDirectory->self->addId(EntityDirectory::ID_ONTOLOGY, this->params->ontologyIriSelf);
@@ -122,6 +119,7 @@ void IceServalBridge::init()
 
   // init information store
   this->informationStore = std::make_shared<InformationStore>(this->ontologyInterface);
+  this->communicationInterface->setInformationStore(this->informationStore);
 
   // init transformation stuff
   // TODO
@@ -134,12 +132,13 @@ void IceServalBridge::init()
   this->gcontainerFactory = std::make_shared<GContainerFactory>();
   this->gcontainerFactory->setOntologyInterface(this->ontologyInterface);
   this->gcontainerFactory->init();
+  this->communicationInterface->setGContainerFactory(this->gcontainerFactory);
 
   _log->info("Bridge for identity '%v' initialized, requests: '%v', offeres '%v'",
              this->identityDirectory->self->toString(), this->requiredInfos.size(), this->offeredInfos.size());
 }
 
-void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> const &entity)
+void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> entity)
 {
   this->_log->info("Discovered: '%v'", entity->toString());
 
@@ -156,13 +155,13 @@ void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> const &entit
   // check if information are required
 }
 
-void IceServalBridge::vanishedIceIdentity(std::shared_ptr<Entity> const &entity)
+void IceServalBridge::vanishedIceIdentity(std::shared_ptr<Entity> entity)
 {
   _log->info("Vanished: '%v'", entity->toString());
 
 }
 
-void IceServalBridge::offeredInformation(std::shared_ptr<Entity> const &entity)
+void IceServalBridge::offeredInformation(std::shared_ptr<Entity> entity)
 {
   _log->info("New offered information from: '%v'", entity->toString());
   std::vector<std::shared_ptr<InformationSpecification>> requests;

@@ -21,6 +21,13 @@ namespace ice
 
 class Entity;
 class IceServalBridge;
+class GContainerFactory;
+class InformationStore;
+
+// typedefs for serialization
+typedef std::tuple<std::string, std::string, std::string, std::string, std::string> comInfoSpec;
+typedef std::tuple<std::string, std::string, std::string, std::string, std::string> comRequest;
+typedef std::tuple<comInfoSpec,std::vector<std::vector<uint8_t>>> comInfoElement;
 
 enum IceCmd
 {
@@ -57,10 +64,15 @@ public:
   virtual void onRequestOffers(std::shared_ptr<Entity> const &entity);
   virtual void requestInformation(std::shared_ptr<Entity> const &entity,
                                   std::vector<std::shared_ptr<InformationSpecification>> const &requests);
-  virtual void onRequestInformation(std::shared_ptr<Entity> const &identity,
-                                    std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>> const &requests);
+  virtual void onRequestInformation(std::shared_ptr<Entity> const &identity, std::vector<comRequest> const &requests);
+  virtual void onInformation(std::shared_ptr<Entity> const &identity, std::vector<comInfoElement> const &information);
 
   virtual void workerTask();
+
+  std::shared_ptr<GContainerFactory> getGContainerFactory();
+  void setGContainerFactory(std::shared_ptr<GContainerFactory> factory);
+  std::shared_ptr<InformationStore> getInformationStore();
+  void setInformationStore(std::shared_ptr<InformationStore> store);
 
   // methodes which need to be implemented by child class
   virtual void discover() = 0;
@@ -79,12 +91,14 @@ protected:
   IceServalBridge                             *bridge;
   std::shared_ptr<Entity>                     self;
   std::shared_ptr<EntityDirectory>            directory;
+  std::vector<Message>                        messages;
+  std::shared_ptr<GContainerFactory>          containerFactory;
+  std::shared_ptr<InformationStore>           informationStore;
 
   std::thread                                 worker;
   bool                                        running;
-  std::vector<Message>                        messages;
 
-  std::mutex                                  _mtx;
+  std::mutex                                  _messageMtx;
 
 private:
   el::Logger                                  *_log;

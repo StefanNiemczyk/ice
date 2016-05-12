@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <ice/processing/CallbackList.h>
 
 #include "Entity.h"
 
@@ -22,17 +23,6 @@ struct Id;
 
 typedef std::string serval_id;
 typedef std::string ontology_iri;
-
-// hooks to register for discovered or vanished entities
-using discoveredEntityHook = std::function<void(std::shared_ptr<Entity> const &)>;
-using vanishedEntityHook = std::function<void(std::shared_ptr<Entity> const &)>;
-
-// hooks to register for discovered or vanished communication entities
-using discoveredIceEntityHook = std::function<void(std::shared_ptr<Entity> const &)>;
-using vanishedIceEntityHook = std::function<void(std::shared_ptr<Entity> const &)>;
-
-// hooks to register for new offered information
-using offeredInformationHook = std::function<void(std::shared_ptr<Entity> const &)>;
 
 class EntityDirectory
 {
@@ -56,29 +46,17 @@ public:
   std::unique_ptr<std::vector<std::shared_ptr<Entity>>> availableIdentities();
   void checkTimeout();
 
-  void registerDiscoveredIceIdentityHook(discoveredIceEntityHook hook);
-  void unregisterDiscoveredIceIdentityHook(discoveredIceEntityHook hook);
-  void callDiscoveredIceIdentityHooks(std::shared_ptr<Entity> const identity);
-
-  void registerVanishedIceIdentityHooks(vanishedIceEntityHook hook);
-  void unregisterVanishedIceIdentityHooks(vanishedIceEntityHook hook);
-  void callVanishedIceIdentityHooks(std::shared_ptr<Entity> const identity);
-
-  void registerOfferedInformationHooks(offeredInformationHook hook);
-  void unregisterOfferedInformationHooks(offeredInformationHook hook);
-  void callOfferedInformationHooks(std::shared_ptr<Entity> const identity);
-
   int count();
   void print();
 
 public:
   std::shared_ptr<Entity> self;
+  CallbackList<std::shared_ptr<Entity>> disvoeredIceIdentity;
+  CallbackList<std::shared_ptr<Entity>> vanishedIceIdentity;
+  CallbackList<std::shared_ptr<Entity>> offeredInformation;
 
 private:
   std::vector<std::shared_ptr<Entity>> entities;
-  std::vector<discoveredIceEntityHook> discoveredIceIdentityHooks;
-  std::vector<vanishedIceEntityHook> vanishedIceIdentityHooks;
-  std::vector<offeredInformationHook> offeredInformationHooks;
 };
 
 } /* namespace ice */

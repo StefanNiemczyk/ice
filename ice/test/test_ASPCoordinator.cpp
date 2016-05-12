@@ -44,9 +44,9 @@ TEST(ASPModelGenerator, simpleTest)
   auto position2 = stream2->getLast();
 
   ASSERT_TRUE((position2 ? true : false));
-  EXPECT_EQ(2, position2->getInformation().x);
-  EXPECT_EQ(1, position2->getInformation().y);
-  EXPECT_EQ(0, position2->getInformation().z);
+  EXPECT_EQ(2, position2->getInformation()->x);
+  EXPECT_EQ(1, position2->getInformation()->y);
+  EXPECT_EQ(0, position2->getInformation()->z);
 }
 
 TEST(ASPModelGenerator, twoSystemsSimple)
@@ -100,9 +100,9 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   auto position2 = stream2->getLast();
 
   ASSERT_TRUE((position2 ? true : false));
-  EXPECT_EQ(x, position2->getInformation().x);
-  EXPECT_EQ(y, position2->getInformation().y);
-  EXPECT_EQ(z, position2->getInformation().z);
+  EXPECT_EQ(x, position2->getInformation()->x);
+  EXPECT_EQ(y, position2->getInformation()->y);
+  EXPECT_EQ(z, position2->getInformation()->z);
 }
 
 TEST(ASPModelGenerator, twoSystemsComplex)
@@ -163,7 +163,7 @@ TEST(ASPModelGenerator, twoSystemsComplex)
   auto position2 = stream12->getLast();
 
   ASSERT_TRUE((position2 ? true : false));
-  EXPECT_EQ(x - 1, position2->getInformation().x);
-  EXPECT_EQ(y - 1, position2->getInformation().y);
-  EXPECT_EQ(z - 1, position2->getInformation().z);
+  EXPECT_EQ(x - 1, position2->getInformation()->x);
+  EXPECT_EQ(y - 1, position2->getInformation()->y);
+  EXPECT_EQ(z - 1, position2->getInformation()->z);
 }

@@ -203,7 +203,15 @@ std::shared_ptr<Representation> GContainerFactory::getRepresentation(std::string
 
 std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::string repName)
 {
-  return this->makeInstance(this->getRepresentation(repName));
+  auto rep = this->getRepresentation(repName);
+
+  if (nullptr == rep)
+  {
+    _log->error("Unknown representation '%v', no container created", repName);
+    return std::shared_ptr<GContainer>();
+  }
+
+  return this->makeInstance(rep);
 }
 
 std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::shared_ptr<Representation> representation)

@@ -173,6 +173,8 @@ void ServalCommunication::discover()
 
       _log->info("New ID discovered: %v", entity->toString());
     }
+
+    entity->setActiveTimestamp();
   }
 }
 

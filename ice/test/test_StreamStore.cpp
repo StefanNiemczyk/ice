@@ -57,7 +57,7 @@ public:
   const int newEvent(std::shared_ptr<ice::InformationElement<int>> element,
                      std::shared_ptr<ice::InformationStream<int>> stream)
   {
-    value = element->getInformation();
+    value = *element->getInformation();
 
     return 0;
   }
@@ -81,7 +81,7 @@ public:
   const int newEvent(std::shared_ptr<ice::InformationElement<int> > element,
                      std::shared_ptr<ice::InformationStream<int> > stream)
   {
-    value = element->getInformation() + 3;
+    value = *element->getInformation() + 3;
 
     return 0;
   }
@@ -180,7 +180,7 @@ TEST_F(StreamStoreTests, read_information)
     information = stream2->getLast(i);
 
     if (information)
-      EXPECT_EQ((stream2->getStreamSize() - 1 + 5 - i), information->getInformation());
+      EXPECT_EQ((stream2->getStreamSize() - 1 + 5 - i), *information->getInformation());
 
     ++i;
   } while (information);
@@ -321,7 +321,7 @@ TEST_F(StreamStoreTests, filtered_list)
   int num = 500;
 
   count = stream->getFilteredList(vec, [&] (std::shared_ptr<ice::InformationElement<int>> element)
-  { return element->getInformation() < num;});
+  { return *element->getInformation() < num;});
   EXPECT_EQ(500, count);
 }
 

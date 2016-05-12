@@ -154,62 +154,6 @@ void EntityDirectory::checkTimeout()
   }
 }
 
-void EntityDirectory::registerDiscoveredIceIdentityHook(discoveredIceEntityHook hook)
-{
-  this->discoveredIceIdentityHooks.push_back(hook);
-}
-
-void EntityDirectory::unregisterDiscoveredIceIdentityHook(discoveredIceEntityHook hook)
-{
-//  this->discoveredIceIdentityHooks.erase(hook);
-}
-
-
-void EntityDirectory::callDiscoveredIceIdentityHooks(std::shared_ptr<Entity> const identity)
-{
-  for (auto &hook : this->discoveredIceIdentityHooks)
-  {
-    hook(identity);
-  }
-}
-
-void EntityDirectory::registerVanishedIceIdentityHooks(vanishedIceEntityHook hook)
-{
-  this->vanishedIceIdentityHooks.push_back(hook);
-}
-
-void EntityDirectory::unregisterVanishedIceIdentityHooks(vanishedIceEntityHook hook)
-{
-//  this->vanishedIceIdentityHooks.erase(hook);
-}
-
-
-void EntityDirectory::callVanishedIceIdentityHooks(std::shared_ptr<Entity> const identity)
-{
-  for (auto &hook : this->vanishedIceIdentityHooks)
-  {
-    hook(identity);
-  }
-}
-
-void EntityDirectory::registerOfferedInformationHooks(offeredInformationHook hook)
-{
-  this->offeredInformationHooks.push_back(hook);
-}
-
-void EntityDirectory::unregisterOfferedInformationHooks(offeredInformationHook hook)
-{
-  // TODO
-}
-
-void EntityDirectory::callOfferedInformationHooks(std::shared_ptr<Entity> const identity)
-{
-  for (auto &hook : this->offeredInformationHooks)
-  {
-    hook(identity);
-  }
-}
-
 int EntityDirectory::count()
 {
   return this->entities.size();

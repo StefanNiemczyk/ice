@@ -371,7 +371,7 @@ void Entity::checkIce()
 
   if (this->iceIdentity && this->available)
   {
-    this->directory->callDiscoveredIceIdentityHooks(this->shared_from_this());
+    this->directory->disvoeredIceIdentity.trigger(this->shared_from_this());
   }
 }
 
@@ -406,14 +406,14 @@ void Entity::setAvailable(bool const &value)
   {
     if (this->iceIdentity && false == this->available)
     {
-      this->directory->callDiscoveredIceIdentityHooks(this->shared_from_this());
+      this->directory->disvoeredIceIdentity.trigger(this->shared_from_this());
     }
   }
   else
   {
     if (this->iceIdentity)
     {
-      this->directory->callVanishedIceIdentityHooks(this->shared_from_this());
+      this->directory->vanishedIceIdentity.trigger(this->shared_from_this());
     }
   }
 
@@ -508,7 +508,7 @@ void Entity::addOfferedInformation(std::vector<std::tuple<std::string, std::stri
                                                                 std::get<4>(info)));
   }
 
-  this->directory->callOfferedInformationHooks(this->shared_from_this());
+  this->directory->offeredInformation.trigger(this->shared_from_this());
 }
 
 void Entity::addOfferedInformation(std::vector<InformationSpecification> const &offeres)
@@ -518,7 +518,7 @@ void Entity::addOfferedInformation(std::vector<InformationSpecification> const &
     this->offeredInformation.push_back(info);
   }
 
-  this->directory->callOfferedInformationHooks(this->shared_from_this());
+  this->directory->offeredInformation.trigger(this->shared_from_this());
 }
 
 

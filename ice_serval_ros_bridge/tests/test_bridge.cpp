@@ -9,6 +9,9 @@
 #include <ros/package.h>
 
 #include <serval_interface.h>
+#include <ice/information/InformationElement.h>
+#include <ice/information/InformationStore.h>
+#include <ice/representation/GContainer.h>
 
 #include "Entity.h"
 #include "EntityDirectory.h"
@@ -54,6 +57,44 @@ TEST(Bridge, discovery)
   zwerg.init();
   mops.init();
 
+  // store information in information store
+  std::string repStr = mops.ontologyInterface->toShortIri("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep");
+  auto rep = mops.gcontainerFactory->getRepresentation(repStr);
+
+  ASSERT_NE(nullptr, rep);
+
+  auto x = rep->accessPath({mops.ontologyInterface->toShortIri("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate")});
+  auto y = rep->accessPath({mops.ontologyInterface->toShortIri("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate")});
+  auto z = rep->accessPath({mops.ontologyInterface->toShortIri("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate")});
+
+  ASSERT_NE(nullptr, x);
+  ASSERT_NE(nullptr, y);
+  ASSERT_NE(nullptr, z);
+
+  auto instance = mops.gcontainerFactory->makeInstance(rep);
+
+  double xVal = 1.2;
+  double yVal = 2.0;
+  double zVal = 3.0;
+
+  instance->set(x, &xVal);
+  instance->set(y, &yVal);
+  instance->set(z, &zVal);
+
+  ASSERT_EQ(xVal, instance->getValue<double>(x));
+  ASSERT_EQ(yVal, instance->getValue<double>(y));
+  ASSERT_EQ(zVal, instance->getValue<double>(z));
+
+  auto spec = std::make_shared<ice::InformationSpecification>(
+      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Mops",
+      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot",
+      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position",
+      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep"
+      );
+  auto element = std::make_shared<ice::InformationElement<ice::GContainer>>(spec, instance);
+  mops.informationStore->addInformation(spec, element);
+
+
   // sleep some time and let the discovery happen
   sleep(3);
 
@@ -78,4 +119,7 @@ TEST(Bridge, discovery)
   // check number of found identities, 1 default, 1 self, 1 other = 3
   ASSERT_EQ(3, mops.identityDirectory->count());
   ASSERT_EQ(3, zwerg.identityDirectory->count());
+
+  // check information store
+  // TODO
 }

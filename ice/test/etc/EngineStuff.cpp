@@ -116,9 +116,9 @@ public:
     std::unique_ptr<ice::Position> posNew(new ice::Position());
     auto pos = infoEle->getInformation();
 
-    posNew->x = pos.x - 1;
-    posNew->y = pos.y - 1;
-    posNew->z = pos.z - 1;
+    posNew->x = pos->x - 1;
+    posNew->y = pos->y - 1;
+    posNew->z = pos->z - 1;
 
     this->outputStream->add(std::move(posNew));
 

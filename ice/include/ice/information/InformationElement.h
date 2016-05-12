@@ -37,7 +37,7 @@ template<typename T>
      * \param timeObservation observation time of the information.
      * \param timeProcessed time of the processing of the information.
      */
-    InformationElement(std::shared_ptr<InformationSpecification> specification, std::unique_ptr<T> information,
+    InformationElement(std::shared_ptr<InformationSpecification> specification, std::shared_ptr<T> information,
                        time timeValidity = NO_TIME, time timeObservation = NO_TIME, time timeProcessed = NO_TIME) :
         specification(specification), information(std::move(information))
     {
@@ -61,10 +61,15 @@ template<typename T>
      *
      * Returns the information stored in this container.
      */
-    const T getInformation() const
+    const std::shared_ptr<T> getInformation() const
     {
-      return *this->information;
+      return this->information;
     }
+
+//    const std::shared_ptr<T> getSharedInformation() const
+//    {
+//      return this->information;
+//    }
 
     /*!
      * \brief Returns true if the information is still valid, else false.
@@ -95,7 +100,7 @@ template<typename T>
     time timeObservation; /**< observation time of the information */
     time timeProcessed; /**< time of the processing of the information */
     std::shared_ptr<InformationSpecification> specification; /**< Specification of the information stored in this container */
-    const std::unique_ptr<T> information; /**< the stored information */
+    const std::shared_ptr<T> information; /**< the stored information */
   };
 
 } /* namespace ice */
