@@ -201,7 +201,8 @@ void CommunicationInterface::onInformation(std::shared_ptr<Entity> const &entity
                                                            std::get<3>(cSpec),
                                                            std::get<4>(cSpec));
 
-    auto container = this->containerFactory->makeInstance(std::get<3>(cSpec));
+    std::string shortIri = this->ontology->toShortIri(std::get<3>(cSpec));
+    auto container = this->containerFactory->makeInstance(shortIri);
 
     if (nullptr == container)
     {
@@ -339,6 +340,16 @@ std::shared_ptr<InformationStore> CommunicationInterface::getInformationStore()
 void CommunicationInterface::setInformationStore(std::shared_ptr<InformationStore> store)
 {
   this->informationStore = store;
+}
+
+std::shared_ptr<OntologyInterface> CommunicationInterface::getOntologyInterface()
+{
+  return this->ontology;
+}
+
+void CommunicationInterface::setOntologyInterface(std::shared_ptr<OntologyInterface> ontology)
+{
+  this->ontology = ontology;
 }
 
 } /* namespace ice */

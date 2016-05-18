@@ -95,7 +95,8 @@ TEST(ASPRepComp, ontology1)
   asp.extractTransformations();
 
   // Test transformation
-  auto trans = factory->getTransformation("autoTrans_o2_Position_o2_CoordinatePositionRep_o0_Pos3D");
+  std::string name = "autoTrans_o2_Position_o2_CoordinatePositionRep_o0_Pos3D";
+  auto trans = factory->getTransformationByName(name);
 
   ASSERT_TRUE(trans != false);
 
@@ -175,7 +176,8 @@ TEST(ASPRepComp, ontology2)
   asp.extractTransformations();
 
   // Test transformation
-  auto trans = factory->getTransformation("autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2");
+  std::string name = "autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2";
+  auto trans = factory->getTransformationByName(name);
 
   ASSERT_TRUE(trans != false);
 

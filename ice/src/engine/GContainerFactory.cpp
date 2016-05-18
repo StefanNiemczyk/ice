@@ -667,7 +667,7 @@ void GContainerFactory::printReps(std::shared_ptr<Representation> representation
 
 }
 
-bool GContainerFactory::addTransformation(std::string name, std::shared_ptr<Transformation> transformation)
+bool GContainerFactory::addTransformation(std::string &name, std::shared_ptr<Transformation> &transformation)
 {
   auto it = this->transformations.find(name);
 
@@ -679,12 +679,76 @@ bool GContainerFactory::addTransformation(std::string name, std::shared_ptr<Tran
   return true;
 }
 
-std::shared_ptr<Transformation> GContainerFactory::getTransformation(std::string name)
+std::shared_ptr<Transformation> GContainerFactory::getTransformation(std::string &sourceRep, std::string &targetRep)
+{
+  for (auto &trans : this->transformations)
+  {
+    if (trans.second->getTargetRepresentation()->name != targetRep)
+      continue;
+
+    auto &v = trans.second->getInputs();
+    if (v.size() == 1 && v[0]->name == sourceRep)
+      return trans.second;
+  }
+
+  return nullptr;
+}
+
+std::shared_ptr<Transformation> GContainerFactory::getTransformation(std::vector<std::string> &sourceReps, std::string &targetRep)
+{
+  for (auto &trans : this->transformations)
+  {
+    if (trans.second->getTargetRepresentation()->name != targetRep)
+      continue;
+
+    auto &v = trans.second->getInputs();
+    if (v.size() != sourceReps.size())
+      continue;
+
+    bool match = false;
+
+    for (auto &src : sourceReps)
+    {
+      match = false;
+      for (auto &in : v)
+      {
+        if (in->name == src)
+        {
+          match = true;
+          break;
+        }
+      }
+
+      if (false == match)
+      {
+        break;
+      }
+    }
+
+    if (match)
+      return trans.second;
+  }
+
+  return nullptr;
+}
+
+std::shared_ptr<Transformation> GContainerFactory::getTransformationTo(std::string &targetRep)
+{
+  for (auto &trans : this->transformations)
+  {
+    if (trans.second->getTargetRepresentation()->name == targetRep)
+      return trans.second;
+  }
+
+  return nullptr;
+}
+
+std::shared_ptr<Transformation> GContainerFactory::getTransformationByName(std::string &name)
 {
   auto it = this->transformations.find(name);
 
   if (this->transformations.end() == it)
-    return std::shared_ptr<Transformation>();
+    return nullptr;
 
   return it->second;
 }

@@ -104,6 +104,7 @@ void IceServalBridge::init()
   this->ontologyInterface->addIRIMapper(icePath + "/ontology/");
   this->ontologyInterface->addOntologyIRI(this->params->ontologyIri);
   this->ontologyInterface->loadOntologies();
+  this->communicationInterface->setOntologyInterface(this->ontologyInterface);
 
   // loading information offered and required
   XMLInformationReader reader;
@@ -134,7 +135,18 @@ void IceServalBridge::init()
   this->gcontainerFactory->init();
   this->communicationInterface->setGContainerFactory(this->gcontainerFactory);
 
-  _log->info("Bridge for identity '%v' initialized, requests: '%v', offeres '%v'",
+  // register hooks in information store
+
+  for (auto &req : this->requiredInfos)
+  {
+    auto lambda = [req,this](std::shared_ptr<InformationSpecification> &spec,
+            std::shared_ptr<InformationElement<GContainer>> &container){
+              this->publisher->publish(req, container->getInformation());
+          };
+    this->informationStore->registerCallback(req->infoSpec, lambda);
+  }
+
+  _log->info("Bridge for identity '%v' initialized, requests: '%v', offers '%v'",
              this->identityDirectory->self->toString(), this->requiredInfos.size(), this->offeredInfos.size());
 }
 

@@ -73,6 +73,8 @@ public:
   void setGContainerFactory(std::shared_ptr<GContainerFactory> factory);
   std::shared_ptr<InformationStore> getInformationStore();
   void setInformationStore(std::shared_ptr<InformationStore> store);
+  std::shared_ptr<OntologyInterface> getOntologyInterface();
+  void setOntologyInterface(std::shared_ptr<OntologyInterface> ontology);
 
   // methodes which need to be implemented by child class
   virtual void discover() = 0;
@@ -94,6 +96,7 @@ protected:
   std::vector<Message>                        messages;
   std::shared_ptr<GContainerFactory>          containerFactory;
   std::shared_ptr<InformationStore>           informationStore;
+  std::shared_ptr<OntologyInterface>          ontology;
 
   std::thread                                 worker;
   bool                                        running;

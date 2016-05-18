@@ -61,13 +61,13 @@ bool RosGContainerPublisher::findTemplate(std::string const &message, std::strin
   return found;
 }
 
-bool RosGContainerPublisher::publish(std::shared_ptr<RequiredInfo> const &reqInfo, std::shared_ptr<GContainer> &container)
+bool RosGContainerPublisher::publish(std::shared_ptr<RequiredInfo> const &reqInfo, const std::shared_ptr<GContainer> &container)
 {
   MessageTemplate msgTemplate;
 
   if (false == this->findTemplate(reqInfo->message, reqInfo->infoSpec->getRepresentation(), msgTemplate))
   {
-    _log->error("No message template found for representation '%v'", reqInfo->message);
+    _log->error("No template found for message '%v'", reqInfo->message);
     return false;
   }
   std::string message = msgTemplate.messageTemplate;
@@ -80,7 +80,7 @@ bool RosGContainerPublisher::publish(std::shared_ptr<RequiredInfo> const &reqInf
   return this->publish(reqInfo->topic, reqInfo->message, message);
 }
 
-bool RosGContainerPublisher::transformToMessage(std::string &message, std::shared_ptr<GContainer> &container)
+bool RosGContainerPublisher::transformToMessage(std::string &message, const std::shared_ptr<GContainer> &container)
 {
   int index = message.find("{");
   int index2 = 0;

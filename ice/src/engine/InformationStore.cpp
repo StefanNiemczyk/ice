@@ -42,6 +42,14 @@ void InformationStore::addInformation(std::shared_ptr<InformationSpecification> 
                     std::shared_ptr<GElement> info)
 {
   this->information[infoSpec] = info;
+
+  for (auto &callback : this->infoCallbacks)
+  {
+    if (callback.first->checkRequest(infoSpec))
+    {
+      callback.second(infoSpec, info);
+    }
+  }
 }
 
 int InformationStore::getInformation(std::shared_ptr<InformationSpecification> request,
@@ -59,6 +67,30 @@ int InformationStore::getInformation(std::shared_ptr<InformationSpecification> r
   }
 
   return count;
+}
+
+void InformationStore::registerCallback(std::shared_ptr<InformationSpecification> request,
+                                        InfoCallback callback)
+{
+  this->infoCallbacks.push_back(std::make_pair(request, callback));
+}
+
+bool InformationStore::unregisterCallback(std::shared_ptr<InformationSpecification> request,
+                                          InfoCallback callback)
+{
+  for (int i=0; i < this->infoCallbacks.size(); ++i)
+  {
+    auto &cb = this->infoCallbacks[i];
+
+    if (cb.first == request
+        && &cb.second == &callback)
+    {
+      this->infoCallbacks.erase(this->infoCallbacks.begin() + i);
+      return true;
+    }
+  }
+
+  return false;
 }
 
 } /* namespace ice */

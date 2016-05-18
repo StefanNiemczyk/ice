@@ -7,6 +7,7 @@
 
 #include <ros/ros.h>
 #include <ros/package.h>
+#include <geometry_msgs/Vector3.h>
 
 #include <serval_interface.h>
 #include <ice/information/InformationElement.h>
@@ -21,10 +22,18 @@
 #include "gtest/gtest.h"
 
 
+static geometry_msgs::Vector3::ConstPtr message;
+
+void onMsg(const geometry_msgs::Vector3::ConstPtr& msg)
+{
+  message = msg;
+}
+
 TEST(Bridge, discovery)
 {
   ros::NodeHandle nh_("");
   ros::NodeHandle pnh_("~");
+  auto subscriber = nh_.subscribe("test_bridge_topic", 100, &onMsg);
 
   ice::InitParams *params1 = new ice::InitParams();
   ice::InitParams *params2 = new ice::InitParams();
@@ -40,6 +49,7 @@ TEST(Bridge, discovery)
   params1->servalUser = "peter";
   params1->servalPassword = "venkman";
   params1->xmlInfoPath = path + "/tests/data/info_bridge_off.xml";
+  params1->xmlTemplateFile = path + "/tests/data/message_templates.xml";
 
   params2->ontologyIri = "http://vs.uni-kassel.de/IceServalBridgeTest";
   params2->ontologyIriSelf = "http://vs.uni-kassel.de/IceServalBridgeTest#Zwerg";
@@ -50,6 +60,7 @@ TEST(Bridge, discovery)
   params2->servalUser = "peter";
   params2->servalPassword = "venkman";
   params2->xmlInfoPath = path + "/tests/data/info_bridge_req.xml";
+  params2->xmlTemplateFile = path + "/tests/data/message_templates.xml";
 
   ice::IceServalBridge mops = ice::IceServalBridge(nh_, pnh_, params1);
   ice::IceServalBridge zwerg = ice::IceServalBridge(nh_, pnh_, params2);
@@ -91,6 +102,12 @@ TEST(Bridge, discovery)
       "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position",
       "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep"
       );
+  auto requ = std::make_shared<ice::InformationSpecification>(
+      "*",
+      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot",
+      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position",
+      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep"
+      );
   auto element = std::make_shared<ice::InformationElement<ice::GContainer>>(spec, instance);
   mops.informationStore->addInformation(spec, element);
 
@@ -121,5 +138,19 @@ TEST(Bridge, discovery)
   ASSERT_EQ(3, zwerg.identityDirectory->count());
 
   // check information store
-  // TODO
+  std::vector<std::shared_ptr<ice::GElement>> infos;
+  int count = zwerg.informationStore->getInformation(requ, infos);
+
+  ASSERT_EQ(1, count);
+  auto info = infos[0];
+
+  ASSERT_EQ(xVal, info->getInformation()->getValue<double>(x));
+  ASSERT_EQ(yVal, info->getInformation()->getValue<double>(y));
+  ASSERT_EQ(zVal, info->getInformation()->getValue<double>(z));
+  ros::spinOnce();
+
+  ASSERT_NE(nullptr, message);
+  ASSERT_EQ(xVal, message->x);
+  ASSERT_EQ(yVal, message->y);
+  ASSERT_EQ(zVal, message->z);
 }

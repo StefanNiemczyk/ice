@@ -38,8 +38,8 @@ public:
   bool cleanUp();
 
   bool findTemplate(std::string const &message, std::string const &representation, MessageTemplate &msgTemplate);
-  bool publish(std::shared_ptr<RequiredInfo> const &reqInfo, std::shared_ptr<GContainer> &container);
-  bool transformToMessage(std::string &message, std::shared_ptr<GContainer> &container);
+  bool publish(std::shared_ptr<RequiredInfo> const &reqInfo, const std::shared_ptr<GContainer> &container);
+  bool transformToMessage(std::string &message, const std::shared_ptr<GContainer> &container);
 
 private:
   bool publish(std::string const &topic, std::string const &messageName, std::string const &message);

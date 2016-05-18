@@ -151,7 +151,7 @@ void ASPTransformationGeneration::extractTransformations()
 
     std::string name = "autoTrans_" + scope + "_" + representation1 + "_" + representation2;
 
-    auto t = this->containerFactory->getTransformation(name);
+    auto t = this->containerFactory->getTransformationByName(name);
 
     if (t)
     {

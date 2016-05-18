@@ -24,6 +24,8 @@ namespace ice
 class CommunicationInterface;
 class EventHandler;
 class InformationStore;
+template <typename T>
+class InformationElement;
 
 struct OfferedInfo
 {

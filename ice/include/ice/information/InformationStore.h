@@ -18,7 +18,6 @@
 namespace ice
 {
 
-
 class GContainer;
 template<typename T>
 class InformationElement;
@@ -26,6 +25,7 @@ class InformationSpecification;
 class OntologyInterface;
 
 typedef InformationElement<GContainer> GElement;
+typedef std::function<void (std::shared_ptr<InformationSpecification>&, std::shared_ptr<GElement>&)> InfoCallback;
 
 struct Information
 {
@@ -47,11 +47,19 @@ public:
   int getInformation(std::shared_ptr<InformationSpecification> request,
                      std::vector<std::shared_ptr<GElement>> &outInfo);
 
+  void registerCallback(std::shared_ptr<InformationSpecification> request,
+                        InfoCallback callback);
+  bool unregisterCallback(std::shared_ptr<InformationSpecification> request,
+                          InfoCallback callback);
+
 private:
-  std::shared_ptr<OntologyInterface> ontology; /**< Interface to access the ontology */
-  std::map<std::shared_ptr<InformationSpecification>,std::shared_ptr<GElement>> information;
-  std::mutex _mtx; /**< Mutex */
-  el::Logger* _log; /**< Logger */
+  std::shared_ptr<OntologyInterface>                            ontology;       /**< Interface to access the ontology */
+  std::map<std::shared_ptr<InformationSpecification>,
+           std::shared_ptr<GElement>>                           information;    /**< Map to store information */
+  std::vector<std::pair<std::shared_ptr<InformationSpecification>,
+              InfoCallback>>                                    infoCallbacks;  /**< Vector to store callbacks */
+  std::mutex                                                    _mtx;           /**< Mutex */
+  el::Logger*                                                   _log;           /**< Logger */
 };
 
 } /* namespace ice */

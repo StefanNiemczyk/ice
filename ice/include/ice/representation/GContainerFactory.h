@@ -59,8 +59,11 @@ public:
 
   void printReps();
 
-  bool addTransformation(std::string name, std::shared_ptr<Transformation> transformation);
-  std::shared_ptr<Transformation> getTransformation(std::string name);
+  bool addTransformation(std::string &name, std::shared_ptr<Transformation> &transformation);
+  std::shared_ptr<Transformation> getTransformation(std::string &sourceRep, std::string &targetRep);
+  std::shared_ptr<Transformation> getTransformation(std::vector<std::string> &sourceReps, std::string &targetRep);
+  std::shared_ptr<Transformation> getTransformationTo(std::string &targetRep);
+  std::shared_ptr<Transformation> getTransformationByName(std::string &name);
 
 private:
   GContainer* makeGContainerInstance(std::shared_ptr<Representation> representation);
