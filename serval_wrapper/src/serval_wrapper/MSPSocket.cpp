@@ -4,7 +4,7 @@
 #include <sys/time.h>
 #include <sys/socket.h>
 
-#include "serval_interface.h"
+#include <serval_interface.h>
 
 namespace ice {
 
@@ -50,13 +50,14 @@ int MSPSocket::listen(MSP_HANDLER *handler)
 	msp_set_local(msp_sock, &addr);
 	msp_set_handler(msp_sock, handler, (void*) this);
 
-	msp_listen(msp_sock);
-
-	return 0;
+	return msp_listen(msp_sock);
 }
 
 int MSPSocket::write(uint8_t *payload, int len)
 {
+	if (closed)
+		return -1;
+
 	uint8_t *pl = new uint8_t[len];
 	memcpy((void*) pl, payload, len);
 	sendQ.push(std::pair<uint8_t*, int>(pl, len));
@@ -66,7 +67,7 @@ int MSPSocket::write(uint8_t *payload, int len)
 
 std::pair<uint8_t*, int> MSPSocket::read()
 {
-	if (recvQ.empty())
+	if (closed || recvQ.empty())
 		return std::pair<uint8_t*, int>(nullptr, 0);
 
 	std::pair<uint8_t*, int> p = recvQ.front();
@@ -77,11 +78,15 @@ std::pair<uint8_t*, int> MSPSocket::read()
 
 time_t MSPSocket::process(int timeout)
 {
+	if (closed)
+		return -1;
+
 	time_t next;
 	struct timeval timeout_val;
 	timeout_val.tv_sec = 0;
 	timeout_val.tv_usec = timeout;
 
+	// this blocks for timeout microseconds
 	setsockopt(mdp_sock, SOL_SOCKET, SO_RCVTIMEO, &timeout_val, sizeof(timeout_val));
 	msp_recv(mdp_sock);
 	msp_processing(&next);
@@ -127,10 +132,12 @@ size_t MSPSocket::io_handler(MSP_SOCKET sock, msp_state_t state, const uint8_t *
 
 	if (state & MSP_STATE_SHUTDOWN_REMOTE) {
 		// Remote party has closed the connection; no more messages will arrive.
+		s->close();
 	}
 
 	if (state & MSP_STATE_CLOSED) {
 		// Release all resources associated with this connection.
+		s->close();
 	}
 
 	return ret;
@@ -148,12 +155,11 @@ MSP_SOCKET MSPSocket::getMSPSocket()
 
 void MSPSocket::close()
 {
-	if (this->closed)
+	if (closed)
 		return;
-	this->closed = true;
+	closed = true;
 
 	msp_close_all(this->mdp_sock);
-	//mdp_close(this->msp_sock);
 }
 
 } /* namespace ice */

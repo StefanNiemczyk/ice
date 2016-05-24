@@ -1,8 +1,6 @@
 #include <iostream>
 #include <cstring>
 
-#include <mdp_cpp.h>
-
 #include "gtest/gtest.h"
 #include "serval_interface.h"
 
@@ -12,6 +10,7 @@
 static ice::serval_interface si1("/tmp/instance1", "localhost", 4110, "peter", "venkman");
 static std::unique_ptr<ice::serval_identity> serverSid = si1.keyring.addIdentity();
 static std::unique_ptr<ice::serval_identity> clientSid = si1.keyring.addIdentity();
+static std::unique_ptr<ice::serval_identity> client2Sid = si1.keyring.addIdentity();
 
 using ice::MSPSocket;
 
@@ -20,6 +19,7 @@ size_t io_handler(MSP_SOCKET sock, msp_state_t state, const uint8_t *payload, si
 {
 	MSPSocket *s = (MSPSocket *) context;
 	size_t ret = 0;
+	struct mdp_sockaddr addr;
 	char msg[] = "Server answered";
 
 	if (state & MSP_STATE_ERROR) {
@@ -28,7 +28,10 @@ size_t io_handler(MSP_SOCKET sock, msp_state_t state, const uint8_t *payload, si
 
 	// receive messages
 	if (payload && len) {
-		std::cout << "received server message" << std::endl;
+		msp_get_remote(sock, &addr);
+		std::cout << "server received message from" << std::endl;
+
+		std::cout << ice::serval_interface::arrayToSid(addr.sid.binary) << std::endl;
 	}
 
 	// send messages
@@ -61,6 +64,7 @@ size_t listen_handler(MSP_SOCKET sock, msp_state_t state, const uint8_t *payload
 	return 0;
 }
 
+
 TEST(msp, server_client)
 {
 	auto server = si1.createMSPSocket(PORT, serverSid->sid);
@@ -76,18 +80,18 @@ TEST(msp, server_client)
 	res = client->connect(serverSid->sid);
 	ASSERT_EQ(res, 0);
 
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 10; i++) {
 		client->write((uint8_t*) msg, strlen(msg));
-		client->process(10);
+
 		server->process(10);
+		client->process(10);
 	}
 
 	std::pair<uint8_t*, int> p = client->read();
-
-	if (p.first != nullptr) {
+	for(;p.first != nullptr;) {
+		p = client->read();
 		std::cout << "Read message from Server: " << (char *) p.first << std::endl;
 	}
-
 	ASSERT_EQ(res, 0);
 
 	server->close();
