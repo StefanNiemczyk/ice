@@ -9,9 +9,14 @@
 namespace ice {
 
 MSPSocket::MSPSocket(int mdp_sock, int port, std::string const &senderSid) :
-		mdp_sock(mdp_sock), port(port), senderSid(senderSid), closed(false)
+		mdp_sock(mdp_sock), port(port), senderSid(senderSid)
 {
 	msp_sock = msp_socket(mdp_sock, 0);
+}
+
+MSPSocket::MSPSocket(MSP_SOCKET sock)
+{
+	msp_sock = sock;
 }
 
 MSPSocket::~MSPSocket()
@@ -21,7 +26,6 @@ MSPSocket::~MSPSocket()
 
 int MSPSocket::connect(std::string recipientSid)
 {
-	std::lock_guard<std::mutex>(this->_mtx);
 	struct mdp_sockaddr addr;
 
 	bzero(&addr, sizeof(addr));
@@ -38,9 +42,8 @@ int MSPSocket::connect(std::string recipientSid)
 	return 0;
 }
 
-int MSPSocket::listen(MSP_HANDLER *handler)
+int MSPSocket::listen()
 {
-	std::lock_guard<std::mutex>(this->_mtx);
 	struct mdp_sockaddr addr;
 
 	bzero(&addr, sizeof(addr));
@@ -48,16 +51,13 @@ int MSPSocket::listen(MSP_HANDLER *handler)
 	serval_interface::sidToArray(this->senderSid, addr.sid.binary);
 
 	msp_set_local(msp_sock, &addr);
-	msp_set_handler(msp_sock, handler, (void*) this);
+	msp_set_handler(msp_sock, ice::MSPSocket::listen_handler, (void*) this);
 
 	return msp_listen(msp_sock);
 }
 
 int MSPSocket::write(uint8_t *payload, int len)
 {
-	if (closed)
-		return -1;
-
 	uint8_t *pl = new uint8_t[len];
 	memcpy((void*) pl, payload, len);
 	sendQ.push(std::pair<uint8_t*, int>(pl, len));
@@ -67,7 +67,7 @@ int MSPSocket::write(uint8_t *payload, int len)
 
 std::pair<uint8_t*, int> MSPSocket::read()
 {
-	if (closed || recvQ.empty())
+	if (recvQ.empty())
 		return std::pair<uint8_t*, int>(nullptr, 0);
 
 	std::pair<uint8_t*, int> p = recvQ.front();
@@ -76,17 +76,13 @@ std::pair<uint8_t*, int> MSPSocket::read()
 	return p;
 }
 
-time_t MSPSocket::process(int timeout)
+time_ms_t MSPSocket::process(time_ms_t timeout)
 {
-	if (closed)
-		return -1;
-
 	time_t next;
 	struct timeval timeout_val;
-	timeout_val.tv_sec = 0;
-	timeout_val.tv_usec = timeout;
 
-	// this blocks for timeout microseconds
+	// this blocks for timeout milliseconds
+	timeout_val = time_ms_to_timeval(timeout);
 	setsockopt(mdp_sock, SOL_SOCKET, SO_RCVTIMEO, &timeout_val, sizeof(timeout_val));
 	msp_recv(mdp_sock);
 	msp_processing(&next);
@@ -99,6 +95,19 @@ size_t MSPSocket::listen_handler(MSP_SOCKET sock, msp_state_t state, const uint8
 {
 	MSPSocket *s = (MSPSocket *) context;
 	size_t ret = 0;
+
+	std::cout << "listen handler called" << std::endl;
+
+	/* create new data MSP socket for incoming connection */
+	if (s->connectionSockets == nullptr)
+		s->connectionSockets = std::make_shared<std::vector<std::shared_ptr<MSPSocket>>>();
+
+	std::shared_ptr<MSPSocket> csock = std::make_shared<MSPSocket>(sock);
+	msp_set_handler(sock, ice::MSPSocket::io_handler, (void*) csock.get());
+	s->connectionSockets->push_back(csock);
+
+	if (len && payload)
+		return io_handler(sock, state, payload, len, (void*) csock.get());
 
 	return ret;
 }
@@ -119,7 +128,6 @@ size_t MSPSocket::io_handler(MSP_SOCKET sock, msp_state_t state, const uint8_t *
 		uint8_t *pl = new uint8_t[len];
 		memcpy((void*) pl, payload, len);
 		s->recvQ.push(std::pair<uint8_t*, int>(pl, len));
-
 		ret = len;
 	}
 
@@ -155,10 +163,10 @@ MSP_SOCKET MSPSocket::getMSPSocket()
 
 void MSPSocket::close()
 {
-	if (closed)
+	if (msp_socket_is_closed(msp_sock))
 		return;
-	closed = true;
 
+	// TODO: right function to call?
 	msp_close_all(this->mdp_sock);
 }
 
