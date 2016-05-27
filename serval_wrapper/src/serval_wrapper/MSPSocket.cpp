@@ -11,12 +11,13 @@ namespace ice {
 MSPSocket::MSPSocket(int mdp_sock, int port, std::string const &senderSid) :
 		mdp_sock(mdp_sock), port(port), senderSid(senderSid)
 {
-	msp_sock = msp_socket(mdp_sock, 0);
+	this->msp_sock = msp_socket(mdp_sock, 0);
 }
 
-MSPSocket::MSPSocket(MSP_SOCKET sock)
+MSPSocket::MSPSocket(MSP_SOCKET sock, MSPSocket *parent)
 {
-	msp_sock = sock;
+	this->msp_sock = sock;
+	this->parent = parent;
 }
 
 MSPSocket::~MSPSocket()
@@ -52,6 +53,8 @@ int MSPSocket::listen()
 
 	msp_set_local(msp_sock, &addr);
 	msp_set_handler(msp_sock, ice::MSPSocket::listen_handler, (void*) this);
+
+	this->connectionSockets = std::make_shared<std::set<MSPSocket*>>();
 
 	return msp_listen(msp_sock);
 }
@@ -96,18 +99,15 @@ size_t MSPSocket::listen_handler(MSP_SOCKET sock, msp_state_t state, const uint8
 	MSPSocket *s = (MSPSocket *) context;
 	size_t ret = 0;
 
-	std::cout << "listen handler called" << std::endl;
+	std::cout << "listen handler" << std::endl;
 
-	/* create new data MSP socket for incoming connection */
-	if (s->connectionSockets == nullptr)
-		s->connectionSockets = std::make_shared<std::vector<std::shared_ptr<MSPSocket>>>();
+	MSPSocket *csock = new MSPSocket(sock, s);
 
-	std::shared_ptr<MSPSocket> csock = std::make_shared<MSPSocket>(sock);
-	msp_set_handler(sock, ice::MSPSocket::io_handler, (void*) csock.get());
-	s->connectionSockets->push_back(csock);
+	msp_set_handler(sock, ice::MSPSocket::io_handler, (void*) csock);
+	s->connectionSockets->insert(csock);
 
 	if (len && payload)
-		return io_handler(sock, state, payload, len, (void*) csock.get());
+		return io_handler(sock, state, payload, len, (void*) csock);
 
 	return ret;
 }
@@ -117,6 +117,7 @@ size_t MSPSocket::io_handler(MSP_SOCKET sock, msp_state_t state, const uint8_t *
 {
 	MSPSocket *s = (MSPSocket *) context;
 	size_t ret = 0;
+	size_t sent = 0;
 
 	if (state & MSP_STATE_ERROR) {
 		msp_stop(sock);
@@ -135,20 +136,31 @@ size_t MSPSocket::io_handler(MSP_SOCKET sock, msp_state_t state, const uint8_t *
 	if (!s->sendQ.empty() && (state & MSP_STATE_DATAOUT)) {
 		std::pair<uint8_t*, int> buff = s->sendQ.back();
 		s->sendQ.pop();
-		msp_send(sock, buff.first, buff.second);
+		sent = msp_send(sock, buff.first, buff.second);
+		if (sent == -1)
+			msp_shutdown(sock);
 	}
 
 	if (state & MSP_STATE_SHUTDOWN_REMOTE) {
-		// Remote party has closed the connection; no more messages will arrive.
-		s->close();
+		std::cout << "io_handler SHUTDOWN REMOTE" << std::endl;
+		// cleanup handled below
 	}
 
 	if (state & MSP_STATE_CLOSED) {
 		// Release all resources associated with this connection.
-		s->close();
+		std::cout << "io_handler CLOSED" << std::endl;
+		MSPSocket *parent = s->getParent();
+		if (parent != nullptr) {
+			parent->connectionSockets->erase(s);
+			s->close();
+		}
 	}
 
 	return ret;
+}
+
+std::shared_ptr<std::set<MSPSocket*>> MSPSocket::accept() {
+	return connectionSockets;
 }
 
 int MSPSocket::getMDPSocket()
@@ -161,12 +173,21 @@ MSP_SOCKET MSPSocket::getMSPSocket()
 	return msp_sock;
 }
 
+MSPSocket *MSPSocket::getParent()
+{
+	return parent;
+}
+
+bool MSPSocket::isOpen()
+{
+	return msp_socket_is_open(msp_sock);
+}
+
 void MSPSocket::close()
 {
 	if (msp_socket_is_closed(msp_sock))
 		return;
 
-	// TODO: right function to call?
 	msp_close_all(this->mdp_sock);
 }
 

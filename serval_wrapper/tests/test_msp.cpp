@@ -20,25 +20,31 @@ TEST(msp, server_client)
 	auto client = si1.createMSPSocket(PORT, clientSid->sid);
 	int res;
 	char msg[] = "Hello World";
+	bool connected = false;
 
 	ASSERT_NE(nullptr, server);
 	ASSERT_NE(nullptr, client);
 
-	server->listen();
+	res = server->listen();
+	ASSERT_EQ(res, 0);
 
 	res = client->connect(serverSid->sid);
 	ASSERT_EQ(res, 0);
 
-	std::cout << "main loop" << std::endl;
-	fflush(stdout);
+	ASSERT_NE(server->accept(), nullptr);
 
-	client->write((uint8_t*) msg, strlen(msg));
-	ASSERT_NE(server->connectionSockets, nullptr);
-	for (shared_ptr<MSPSocket> sock : *server->connectionSockets) {
-		pair<uint8_t*, int> p =  sock->read();
-		if (p.first != nullptr) {
-			// handle client connection
-			cout << "server received message of length " << p.second << endl;
+	for (int i = 0; i < 100; i++) {
+		server->process(10);
+		client->process(10);
+
+		client->write((uint8_t*) msg, strlen(msg));
+
+		for (MSPSocket *sock : *server->accept()) {
+			pair<uint8_t*, int> p = sock->read();
+			if (p.first != nullptr) {
+				// handle client connection
+				cout << "server received message of length " << p.second << endl;
+			}
 		}
 	}
 

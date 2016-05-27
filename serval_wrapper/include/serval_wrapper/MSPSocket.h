@@ -5,6 +5,7 @@
 #include <string>
 #include <mutex>
 #include <queue>
+#include <set>
 #include <memory>
 
 #include <msp_cpp.h>
@@ -14,7 +15,7 @@ namespace ice {
 class MSPSocket {
 public:
 	MSPSocket(int mdp_socket, int port, std::string const &senderSid);
-	MSPSocket(MSP_SOCKET sock);
+	MSPSocket(MSP_SOCKET sock, MSPSocket *parent);
 	virtual ~MSPSocket();
 
 	// ================================================
@@ -29,37 +30,40 @@ public:
 
 	// returns time when it wants to be called again
 	time_ms_t process(time_ms_t timeout);
+
 	// ================================================
 	// Server/Listening Socket
 	// ================================================
 	// go into listening mode
 	int listen();
 
+	// returns set with every connection/server socket to iterate over
+	std::shared_ptr<std::set<MSPSocket*>> accept();
+
 	void close();
+
 	int getMDPSocket();
 	MSP_SOCKET getMSPSocket();
+	MSPSocket *getParent();
+	bool isOpen();
 
 	// buffers all messages until retrieved using read
 	std::queue<std::pair<uint8_t*, int>> recvQ;
 	std::queue<std::pair<uint8_t*, int>> sendQ;
 
-	std::shared_ptr<std::vector<std::shared_ptr<MSPSocket>>> connectionSockets = nullptr;
-
 private:
 	int mdp_sock;
-	MSP_SOCKET msp_sock;
-
 	int port;
+	MSP_SOCKET msp_sock;
 	std::string const senderSid;
+	MSPSocket *parent;
 
-	std::mutex _mtx;
+	std::shared_ptr<std::set<MSPSocket*>> connectionSockets = nullptr;
 
 	static size_t io_handler(MSP_SOCKET sock, msp_state_t state, const uint8_t *payload,
 	                size_t len, void *context);
-
 	static size_t listen_handler(MSP_SOCKET sock, msp_state_t state, const uint8_t *payload,
 	                size_t len, void *context);
-
 };
 
 } /* namespace ice */
