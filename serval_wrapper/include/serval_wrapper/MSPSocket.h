@@ -56,7 +56,7 @@ private:
 	int port;
 	MSP_SOCKET msp_sock;
 	std::string const senderSid;
-	MSPSocket *parent;
+	MSPSocket *parent = nullptr;
 
 	std::shared_ptr<std::set<MSPSocket*>> connectionSockets = nullptr;
 

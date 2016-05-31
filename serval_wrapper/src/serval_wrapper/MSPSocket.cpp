@@ -81,7 +81,7 @@ std::pair<uint8_t*, int> MSPSocket::read()
 
 time_ms_t MSPSocket::process(time_ms_t timeout)
 {
-	time_t next;
+	time_ms_t next;
 	struct timeval timeout_val;
 
 	// this blocks for timeout milliseconds
@@ -137,18 +137,19 @@ size_t MSPSocket::io_handler(MSP_SOCKET sock, msp_state_t state, const uint8_t *
 		std::pair<uint8_t*, int> buff = s->sendQ.back();
 		s->sendQ.pop();
 		sent = msp_send(sock, buff.first, buff.second);
-		if (sent == -1)
+		if (sent == -1) {
 			msp_shutdown(sock);
+			std::cout << "error while sending package" << std::endl;
+		}
 	}
 
 	if (state & MSP_STATE_SHUTDOWN_REMOTE) {
-		std::cout << "io_handler SHUTDOWN REMOTE" << std::endl;
+		msp_stop(sock);
 		// cleanup handled below
 	}
 
 	if (state & MSP_STATE_CLOSED) {
 		// Release all resources associated with this connection.
-		std::cout << "io_handler CLOSED" << std::endl;
 		MSPSocket *parent = s->getParent();
 		if (parent != nullptr) {
 			parent->connectionSockets->erase(s);
