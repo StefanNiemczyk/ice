@@ -19,6 +19,7 @@
 #include "serval_wrapper/meshms.h"
 #include "serval_wrapper/rhizome.h"
 #include "serval_wrapper/MDPSocket.h"
+#include "serval_wrapper/MSPSocket.h"
 
 namespace ice
 {
@@ -172,6 +173,7 @@ public:
   std::string getServalBin();
   int exec(std::string const &cmd, std::stringstream &output);
   std::shared_ptr<MDPSocket> createSocket(int port, std::string const &senderSid = "");
+  std::shared_ptr<MSPSocket> createMSPSocket(int port, std::string const &senderSid);
 
 public:
   serval_wrapper::keyring               keyring;

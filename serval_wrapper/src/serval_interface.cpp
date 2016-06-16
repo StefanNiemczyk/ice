@@ -56,7 +56,8 @@ serval_interface::serval_interface(std::string configPath, std::string const hos
   else
     this->servalBin = "${SERVAL_ROOT}/servald";
 
-  this->startDeamon();
+  if (!this->startDeamon())
+	  std::cerr << "Error starting deamon!" << std::endl;
 
   this->keyring.getSelf();
 }
@@ -179,4 +180,47 @@ std::shared_ptr<MDPSocket> serval_interface::createSocket(int port, std::string 
 
   return socket;
 }
+
+std::shared_ptr<MSPSocket> serval_interface::createMSPSocket(int port, std::string const &senderSid)
+{
+  int sock;
+
+  // TODO log
+  std::cout << "Creating MSP socket for sid " << senderSid << std::endl;
+
+  // override the SERVAL_INSTANCEPATH environment variable so enable the support of multiple serval instances in one process
+  char* instancePathEnv;
+  if (this->instancePath != "")
+  {
+    std::cout << "Updating environment variable 'SERVAL_INSTANCEPATH' to '" << this->instancePath << "' for sid " << senderSid << std::endl;
+    instancePathEnv = getenv("SERVAL_INSTANCEPATH");
+    setenv("SERVALINSTANCE_PATH", this->instancePath.c_str(), 1);
+  }
+
+  std::string sid;
+  if (senderSid == "")
+  {
+    sid = this->keyring.getSelf()->at(0).sid;
+  }
+  else
+  {
+    sid = senderSid;
+  }
+
+  if ((sock = mdp_socket()) < 0)
+  {
+    std::cerr << "Error creating socket with port '" << std::to_string(port) << "' for sid " << sid << std::endl;
+    return nullptr;
+  }
+
+  auto socket = std::make_shared<MSPSocket>(sock, port, sid);
+
+  if (this->instancePath != "")
+  {
+    setenv("SERVALINSTANCE_PATH", instancePathEnv, 1);
+  }
+
+  return socket;
+}
+
 } /* namespace ice */

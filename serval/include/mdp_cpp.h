@@ -91,6 +91,8 @@ int _mdp_bind(struct __sourceloc __whence, int socket, struct mdp_sockaddr *loca
 #define mdp_poll(s,t)     _mdp_poll(__WHENCE__, (s), (t))
 #define mdp_bind(s,a)     _mdp_bind(__WHENCE__, (s), (a))
 
+int overlay_mdp_getmyaddr(int mdp_sockfd, unsigned index, sid_t *sidp);
+
 #ifdef __cplusplus
 }
 #endif
