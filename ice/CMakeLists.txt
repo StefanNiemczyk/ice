@@ -218,8 +218,8 @@ add_dependencies(ice_node java_ontology_interface)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ice_node
-  ${catkin_LIBRARIES}
   ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
   ${TinyXML_LIBRARIES}
   ${JNI_LIBRARIES}
 )
