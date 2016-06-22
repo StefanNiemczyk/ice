@@ -4,1094 +4,1257 @@
 #include <iostream>
 #include <tuple>
 #include <vector>
+#include <memory>
 
-#include "ice/representation/Representation.h"
+#include <ice/representation/Representation.h>
 
-#include "easylogging++.h"
-#include "serialize.h"
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+#include <easylogging++.h>
+#include <serialize.h>
 
-namespace ice
-{
+using namespace rapidjson;
 
-class GContainer
-{
+namespace ice {
+
+class GContainer {
 public:
-  static el::Logger* getLogger()
-  {
-    static el::Logger* log = el::Loggers::getLogger("GContainer");
-    return log;
-  }
+	static el::Logger* getLogger() {
+		static el::Logger* log = el::Loggers::getLogger("GContainer");
+		return log;
+	}
 
-public:
-  GContainer(std::shared_ptr<Representation> rep)
-  {
-    _log = getLogger();
-    this->representation = rep;
-  }
-  virtual ~GContainer()
-  {
-  }
+	static std::string JSONStr(Document &d) {
+		StringBuffer buffer;
+		Writer<StringBuffer> writer(buffer);
 
-  template<typename T>
-    T getValue(std::vector<int> *indices)
-    {
-      return *((T*)this->get(indices));
-    }
+		d.Accept(writer);
 
-  virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices)
-  {
-    return this->getPair(indices, 0);
-  }
-
-  virtual void* get(std::vector<int> *indices)
-  {
-    return this->get(indices, 0);
-  }
-
-  virtual bool set(std::vector<int> *indices, const void* value)
-  {
-    return this->set(indices, 0, value);
-  }
-
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes)
-  {
-    int index = 0;
-    this->fromByte(bytes, index);
-  }
-
-  virtual GContainer* clone() = 0;
-
-  void print()
-  {
-    this->print(0);
-  }
-
-  virtual void print(int level, std::string dimension = "") = 0;
-  virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices, int index) = 0;
-  virtual void* get(std::vector<int> *indices, int index) = 0;
-  virtual bool set(std::vector<int> *indices, int index, const void* value) = 0;
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out) = 0;
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) = 0;
+		const char* output = buffer.GetString();
+		return std::string(output);
+	}
 
 public:
-  std::shared_ptr<Representation> representation;
+	GContainer(std::shared_ptr<Representation> rep) {
+		_log = getLogger();
+		this->representation = rep;
+	}
+	virtual ~GContainer() {
+	}
+
+	template<typename T>
+	T getValue(std::vector<int> *indices) {
+		return *((T*) this->get(indices));
+	}
+
+	virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices) {
+		return this->getPair(indices, 0);
+	}
+
+	virtual void* get(std::vector<int> *indices) {
+		return this->get(indices, 0);
+	}
+
+	virtual bool set(std::vector<int> *indices, const void* value) {
+		return this->set(indices, 0, value);
+	}
+
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes) {
+		int index = 0;
+		this->fromByte(bytes, index);
+	}
+
+	virtual GContainer* clone() = 0;
+
+	void print() {
+		this->print(0);
+	}
+
+	virtual void print(int level, std::string dimension = "") = 0;
+	virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices,
+			int index) = 0;
+	virtual void* get(std::vector<int> *indices, int index) = 0;
+	virtual bool set(std::vector<int> *indices, int index, const void* value) = 0;
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) = 0;
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) = 0;
+	virtual std::string toJSON() = 0;
+	virtual Value toJSONValue(Document &d) = 0;
+
+public:
+	std::shared_ptr<Representation> representation;
 
 protected:
-  el::Logger* _log;
+	el::Logger* _log;
+
 };
 
-class CompositeGContainer : public GContainer
-{
-  friend class GContainerFactory;
+class CompositeGContainer: public GContainer {
+	friend class GContainerFactory;
 
 public:
-  CompositeGContainer(std::shared_ptr<Representation> rep) :
-      GContainer(rep)
-  {
-    //
-  }
+	CompositeGContainer(std::shared_ptr<Representation> rep) :
+			GContainer(rep) {
+		//
+	}
 
-  virtual ~CompositeGContainer()
-  {
-    for (int i=0; i < this->subs.size(); ++i)
-    {
-      delete this->subs.at(i);
-    }
-  }
+	virtual ~CompositeGContainer() {
+		for (int i = 0; i < this->subs.size(); ++i) {
+			delete this->subs.at(i);
+		}
+	}
 
-  virtual GContainer* clone()
-  {
-    CompositeGContainer* instance = new CompositeGContainer(this->representation);
+	virtual GContainer* clone() {
+		CompositeGContainer* instance = new CompositeGContainer(this->representation);
 
-    for (int i = 0; i < this->subs.size(); ++i)
-    {
-      instance->subs.push_back(this->subs.at(i)->clone());
-    }
+		for (int i = 0; i < this->subs.size(); ++i) {
+			instance->subs.push_back(this->subs.at(i)->clone());
+		}
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    if (dimension != "")
-    {
-      std::cout << std::string(level, ' ') << dimension << " " << this->representation->name << std::endl;
-    }
-    else
-    {
-      std::cout << std::string(level, ' ') << this->representation->name << std::endl;
-    }
+	virtual void print(int level, std::string dimension) {
+		if (dimension != "") {
+			std::cout << std::string(level, ' ') << dimension << " "
+					<< this->representation->name << std::endl;
+		} else {
+			std::cout << std::string(level, ' ') << this->representation->name
+					<< std::endl;
+		}
 
-    for (int i = 0; i < this->subs.size(); ++i)
-    {
-      auto sub = this->subs.at(i);
-      sub->print(level + 1, this->representation->dimensionNames.at(i));
-    }
-  }
+		for (int i = 0; i < this->subs.size(); ++i) {
+			auto sub = this->subs.at(i);
+			sub->print(level + 1, this->representation->dimensionNames.at(i));
+		}
+	}
 
-  virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices, int index)
-  {
-    if (indices->size() <= index)
-    {
-      return std::pair<BasicRepresentationType, void*>(BasicRepresentationType::UNSET, nullptr);
-    }
+	virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices,
+			int index) {
+		if (indices->size() <= index) {
+			return std::pair<BasicRepresentationType, void*>(
+					BasicRepresentationType::UNSET, nullptr);
+		}
 
-    if (this->subs.size() < indices->at(index))
-    {
-      _log->error("Index out of bounds in get value from CompositeGContainer '%v', index '%v'",
-                  this->representation->name, index);
-      return std::pair<BasicRepresentationType, void*>(BasicRepresentationType::UNSET, nullptr);
-    }
+		if (this->subs.size() < indices->at(index)) {
+			_log->error(
+					"Index out of bounds in get value from CompositeGContainer '%v', index '%v'",
+					this->representation->name, index);
+			return std::pair<BasicRepresentationType, void*>(
+					BasicRepresentationType::UNSET, nullptr);
+		}
 
-    return this->subs.at(indices->at(index))->getPair(indices, index + 1);
-  }
+		return this->subs.at(indices->at(index))->getPair(indices, index + 1);
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() <= index)
-    {
-      return this->clone();
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() <= index) {
+			return this->clone();
+		}
 
-    if (this->subs.size() < indices->at(index))
-    {
-      _log->error("Index out of bounds in get value from CompositeGContainer '%v', index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+		if (this->subs.size() < indices->at(index)) {
+			_log->error(
+					"Index out of bounds in get value from CompositeGContainer '%v', index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return this->subs.at(indices->at(index))->get(indices, index + 1);
-  }
+		return this->subs.at(indices->at(index))->get(indices, index + 1);
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() <= index)
-    {
-      CompositeGContainer* cgc = (CompositeGContainer*) value;
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() <= index) {
+			CompositeGContainer* cgc = (CompositeGContainer*) value;
 
-      for (int i=0; i < subs.size(); ++i)
-      {
-        delete this->subs.at(i);
-      }
+			for (int i = 0; i < subs.size(); ++i) {
+				delete this->subs.at(i);
+			}
 // ugly
-      this->subs = cgc->subs;
+			this->subs = cgc->subs;
 
-      return true;
-    }
+			return true;
+		}
 
-    if (this->subs.size() < indices->at(index))
-    {
-      _log->error("Index out of bounds in get value from CompositeGContainer '%v', index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+		if (this->subs.size() < indices->at(index)) {
+			_log->error(
+					"Index out of bounds in get value from CompositeGContainer '%v', index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    return this->subs.at(indices->at(index))->set(indices, index + 1, value);
-  }
+		return this->subs.at(indices->at(index))->set(indices, index + 1, value);
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    for (auto &sub : this->subs)
-    {
-      sub->toByte(out);
-    }
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		for (auto &sub : this->subs) {
+			sub->toByte(out);
+		}
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    for (auto &sub : this->subs)
-    {
-      sub->fromByte(bytes, index);
-    }
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		for (auto &sub : this->subs) {
+			sub->fromByte(bytes, index);
+		}
+	}
+
+	virtual std::string toJSON() {
+		Document d;
+		Value k(representation->name.c_str(), d.GetAllocator()); // copy string name
+		Value v = toJSONValue(d);
+
+		d.SetObject();
+		d.AddMember(k, v, d.GetAllocator());
+
+		return JSONStr(d);
+	}
+
+	virtual Value toJSONValue(Document &d) {
+		Value v;
+		Value subv;
+		Value subk;
+		v.SetObject();
+
+		for (int i = 0; i < subs.size(); i++) {
+			auto sub = subs.at(i);
+			subk.SetString(representation->dimensionNames.at(i).c_str(),
+					d.GetAllocator());
+			subv = sub->toJSONValue(d);
+			v.AddMember(subk, subv, d.GetAllocator());
+		}
+
+		return v;
+	}
 
 private:
-  std::vector<GContainer*> subs;
+	std::vector<GContainer*> subs;
+
 };
 
-class BasicGContainer : public GContainer
-{
+class BasicGContainer: public GContainer {
 public:
-  BasicGContainer(std::shared_ptr<Representation> rep) :
-      GContainer(rep)
-  {
-    this->type = BasicRepresentationType::UNSET;
-  }
+	BasicGContainer(std::shared_ptr<Representation> rep) :
+			GContainer(rep) {
+		this->type = BasicRepresentationType::UNSET;
+	}
 
-  virtual ~BasicGContainer()
-  {
-    //
-  }
+	virtual ~BasicGContainer() {
+		//
+	}
 
-  virtual GContainer* clone() = 0;
+	virtual GContainer* clone() = 0;
 
-  virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices, int index)
-  {
-    void* value = this->get(indices, index);
+	virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices,
+			int index) {
+		void* value = this->get(indices, index);
 
-    if (value == nullptr)
-      return std::pair<BasicRepresentationType, void*>(BasicRepresentationType::UNSET, nullptr);
+		if (value == nullptr)
+			return std::pair<BasicRepresentationType, void*>(
+					BasicRepresentationType::UNSET, nullptr);
 
-    return std::pair<BasicRepresentationType, void*>(this->type, value);
-  }
+		return std::pair<BasicRepresentationType, void*>(this->type, value);
+	}
 
-  virtual void* get(std::vector<int> *indices, int index) = 0;
-  virtual bool set(std::vector<int> *indices, int index, const void* value) = 0;
-  virtual void print(int level, std::string dimension) = 0;
+	virtual void* get(std::vector<int> *indices, int index) = 0;
+	virtual bool set(std::vector<int> *indices, int index, const void* value) = 0;
+	virtual void print(int level, std::string dimension) = 0;
+
+
+
 
 protected:
-  BasicRepresentationType type;
+	BasicRepresentationType type;
+
+private:
 };
 
 //* BoolGContainer
 /**
  * Boolean representation
  */
-class BoolGContainer : public BasicGContainer
-{
+class BoolGContainer: public BasicGContainer {
 public:
-  BoolGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::BOOL;
-    this->value = false;
-  }
+	BoolGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::BOOL;
+		this->value = false;
+	}
 
-  virtual GContainer* clone()
-  {
-    BoolGContainer* instance = new BoolGContainer(this->representation);
+	virtual GContainer* clone() {
+		BoolGContainer* instance = new BoolGContainer(this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of BoolGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of BoolGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of BoolGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of BoolGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((bool*)value);
+		this->value = *((bool*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<bool>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<bool>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (bool)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value << " (bool)"
+				<< std::endl;
+	}
+
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV(value);
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
 
 private:
-  bool value;
+	bool value;
 };
 
 //* ByteGContainer
 /**
  * Byte representation
  */
-class ByteGContainer : public BasicGContainer
-{
+class ByteGContainer: public BasicGContainer {
 public:
-  ByteGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::BYTE;
-    this->value = 0;
-  }
+	ByteGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::BYTE;
+		this->value = 0;
+	}
 
-  virtual GContainer* clone()
-  {
-    ByteGContainer* instance = new ByteGContainer(this->representation);
+	virtual GContainer* clone() {
+		ByteGContainer* instance = new ByteGContainer(this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of ByteGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of ByteGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of ByteGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of ByteGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((int8_t*)value);
+		this->value = *((int8_t*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<int8_t>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<int8_t>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (byte)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value << " (byte)"
+				<< std::endl;
+	}
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV(value);
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
 
 private:
-  int8_t value;
+	int8_t value;
 };
 
 //* UnsignedByteGContainer
 /**
  * Unsigned byte representation
  */
-class UnsignedByteGContainer : public BasicGContainer
-{
+class UnsignedByteGContainer: public BasicGContainer {
 public:
-  UnsignedByteGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::UNSIGNED_BYTE;
-    this->value = 0;
-  }
+	UnsignedByteGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::UNSIGNED_BYTE;
+		this->value = 0;
+	}
 
-  virtual GContainer* clone()
-  {
-    UnsignedByteGContainer* instance = new UnsignedByteGContainer(this->representation);
+	virtual GContainer* clone() {
+		UnsignedByteGContainer* instance = new UnsignedByteGContainer(this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of UnsignedByteGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of UnsignedByteGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of UnsignedByteGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of UnsignedByteGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((uint8_t*)value);
+		this->value = *((uint8_t*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<uint8_t>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<uint8_t>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (unsigned byte)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value
+				<< " (unsigned byte)" << std::endl;
+	}
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV(value);
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
+
 
 private:
-  uint8_t value;
+	uint8_t value;
 };
 
 //* ShortGContainer
 /**
  * Short representation
  */
-class ShortGContainer : public BasicGContainer
-{
+class ShortGContainer: public BasicGContainer {
 public:
-  ShortGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::SHORT;
-    this->value = 0;
-  }
+	ShortGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::SHORT;
+		this->value = 0;
+	}
 
-  virtual GContainer* clone()
-  {
-    ShortGContainer* instance = new ShortGContainer(this->representation);
+	virtual GContainer* clone() {
+		ShortGContainer* instance = new ShortGContainer(this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of ShortGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of ShortGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of ShortGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of ShortGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((short*)value);
+		this->value = *((short*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<short>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<short>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (short)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value
+				<< " (short)" << std::endl;
+	}
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV(value);
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
 
 private:
-  short value;
+	short value;
 };
 
 //* IntGContainer
 /**
  * Integer representation
  */
-class IntGContainer : public BasicGContainer
-{
+class IntGContainer: public BasicGContainer {
 public:
-  IntGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::INT;
-    this->value = 0;
-  }
+	IntGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::INT;
+		this->value = 0;
+	}
 
-  virtual GContainer* clone()
-  {
-    IntGContainer* instance = new IntGContainer(this->representation);
+	virtual GContainer* clone() {
+		IntGContainer* instance = new IntGContainer(this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of IntGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of IntGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of IntGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of IntGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((int*)value);
+		this->value = *((int*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<int>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<int>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (int)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value << " (int)"
+				<< std::endl;
+	}
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV(value);
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
 
 private:
-  int value;
+	int value;
 };
 
 //* LongGContainer
 /**
  * Long representation
  */
-class LongGContainer : public BasicGContainer
-{
+class LongGContainer: public BasicGContainer {
 public:
-  LongGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::LONG;
-    this->value = 0;
-  }
+	LongGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::LONG;
+		this->value = 0;
+	}
 
-  virtual GContainer* clone()
-  {
-    LongGContainer* instance = new LongGContainer(this->representation);
+	virtual GContainer* clone() {
+		LongGContainer* instance = new LongGContainer(this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of LongGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of LongGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of LongGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of LongGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((long*)value);
+		this->value = *((long*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<long>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<long>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (long)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value << " (long)"
+				<< std::endl;
+	}
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV(value);
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
+
 
 private:
-  long value;
+	long value;
 };
 
 //* UnsignedShortGContainer
 /**
  * Unsigned short representation
  */
-class UnsignedShortGContainer : public BasicGContainer
-{
+class UnsignedShortGContainer: public BasicGContainer {
 public:
-  UnsignedShortGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::UNSIGNED_SHORT;
-    this->value = 0;
-  }
+	UnsignedShortGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::UNSIGNED_SHORT;
+		this->value = 0;
+	}
 
-  virtual GContainer* clone()
-  {
-    UnsignedShortGContainer* instance = new UnsignedShortGContainer(this->representation);
+	virtual GContainer* clone() {
+		UnsignedShortGContainer* instance = new UnsignedShortGContainer(
+				this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of UnsignedShortGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of UnsignedShortGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of UnsignedShortGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of UnsignedShortGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((unsigned short*)value);
+		this->value = *((unsigned short*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<unsigned short>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<unsigned short>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (unsigned short)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value
+				<< " (unsigned short)" << std::endl;
+	}
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV(value);
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
 
 private:
-  unsigned short value;
+	unsigned short value;
 };
 
 //* UnsignedIntGContainer
 /**
  * Unsigned integer representation
  */
-class UnsignedIntGContainer : public BasicGContainer
-{
+class UnsignedIntGContainer: public BasicGContainer {
 public:
-  UnsignedIntGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::UNSIGNED_INT;
-    this->value = 0;
-  }
+	UnsignedIntGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::UNSIGNED_INT;
+		this->value = 0;
+	}
 
-  virtual GContainer* clone()
-  {
-    UnsignedIntGContainer* instance = new UnsignedIntGContainer(this->representation);
+	virtual GContainer* clone() {
+		UnsignedIntGContainer* instance = new UnsignedIntGContainer(this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of UnsignedIntGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of UnsignedIntGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of UnsignedIntGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of UnsignedIntGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((unsigned int*)value);
+		this->value = *((unsigned int*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<unsigned int>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<unsigned int>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (unsigned int)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value
+				<< " (unsigned int)" << std::endl;
+	}
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV(value);
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
 
 private:
-  unsigned int value;
+	unsigned int value;
 };
 
 //* UnsignedLongGContainer
 /**
  * unsigned long representation
  */
-class UnsignedLongGContainer : public BasicGContainer
-{
+class UnsignedLongGContainer: public BasicGContainer {
 public:
-  UnsignedLongGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::UNSIGNED_LONG;
-    this->value = 0;
-  }
+	UnsignedLongGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::UNSIGNED_LONG;
+		this->value = 0;
+	}
 
-  virtual GContainer* clone()
-  {
-    UnsignedLongGContainer* instance = new UnsignedLongGContainer(this->representation);
+	virtual GContainer* clone() {
+		UnsignedLongGContainer* instance = new UnsignedLongGContainer(this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of UnsignedLongGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of UnsignedLongGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of UnsignedLongGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of UnsignedLongGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((unsigned long*)value);
+		this->value = *((unsigned long*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<unsigned long>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<unsigned long>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (unsigned long)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value
+				<< " (unsigned long)" << std::endl;
+	}
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV(value);
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
 
 private:
-  unsigned long value;
+	unsigned long value;
 };
 
 //* FloatGContainer
 /**
  * Float representation
  */
-class FloatGContainer : public BasicGContainer
-{
+class FloatGContainer: public BasicGContainer {
 public:
-  FloatGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::FLOAT;
-    this->value = 0;
-  }
+	FloatGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::FLOAT;
+		this->value = 0;
+	}
 
-  virtual GContainer* clone()
-  {
-    FloatGContainer* instance = new FloatGContainer(this->representation);
+	virtual GContainer* clone() {
+		FloatGContainer* instance = new FloatGContainer(this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of FloatGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of FloatGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of FloatGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of FloatGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((float*)value);
+		this->value = *((float*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<float>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<float>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (float)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value
+				<< " (float)" << std::endl;
+	}
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV(value);
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
 
 private:
-  float value;
+	float value;
 };
 
 //* DoubleGContainer
 /**
  * Double representation
  */
-class DoubleGContainer : public BasicGContainer
-{
+class DoubleGContainer: public BasicGContainer {
 public:
-  DoubleGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::DOUBLE;
-    this->value = 0;
-  }
+	DoubleGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::DOUBLE;
+		this->value = 0;
+	}
 
-  virtual GContainer* clone()
-  {
-    DoubleGContainer* instance = new DoubleGContainer(this->representation);
+	virtual GContainer* clone() {
+		DoubleGContainer* instance = new DoubleGContainer(this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of DoubleGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of DoubleGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of DoubleGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of DoubleGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((double*)value);
+		this->value = *((double*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<double>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<double>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (double)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value
+				<< " (double)" << std::endl;
+	}
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV(value);
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
 
 private:
-  double value;
+	double value;
 };
 
 //* StringGContainer
 /**
  * String representation
  */
-class StringGContainer : public BasicGContainer
-{
+class StringGContainer: public BasicGContainer {
 public:
-  StringGContainer(std::shared_ptr<Representation> rep) :
-      BasicGContainer(rep)
-  {
-    type = BasicRepresentationType::STRING;
-  }
+	StringGContainer(std::shared_ptr<Representation> rep) :
+			BasicGContainer(rep) {
+		type = BasicRepresentationType::STRING;
+	}
 
-  virtual GContainer* clone()
-  {
-    StringGContainer* instance = new StringGContainer(this->representation);
+	virtual GContainer* clone() {
+		StringGContainer* instance = new StringGContainer(this->representation);
 
-    instance->value = this->value;
+		instance->value = this->value;
 
-    return instance;
-  }
+		return instance;
+	}
 
-  virtual void* get(std::vector<int> *indices, int index)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Get value of StringGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return nullptr;
-    }
+	virtual void* get(std::vector<int> *indices, int index) {
+		if (indices->size() != index) {
+			_log->error(
+					"Get value of StringGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return nullptr;
+		}
 
-    return &this->value;
-  }
+		return &this->value;
+	}
 
-  virtual bool set(std::vector<int> *indices, int index, const void* value)
-  {
-    if (indices->size() != index)
-    {
-      _log->error("Set value of StringGContainer '%v' at not end of path, index '%v'",
-                  this->representation->name, index);
-      return false;
-    }
+	virtual bool set(std::vector<int> *indices, int index, const void* value) {
+		if (indices->size() != index) {
+			_log->error(
+					"Set value of StringGContainer '%v' at not end of path, index '%v'",
+					this->representation->name, index);
+			return false;
+		}
 
-    this->value = *((std::string*)value);
+		this->value = *((std::string*) value);
 
-    return true;
-  }
+		return true;
+	}
 
-  virtual void toByte(std::vector<std::vector<uint8_t>> &out)
-  {
-    std::vector<uint8_t> vec;
-    serialize(this->value, vec);
-    out.push_back(vec);
-  }
+	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
+		std::vector<uint8_t> vec;
+		serialize(this->value, vec);
+		out.push_back(vec);
+	}
 
-  virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index)
-  {
-    this->value = deserialize<std::string>(bytes[index]);
-    ++index;
-  }
+	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
+		this->value = deserialize<std::string>(bytes[index]);
+		++index;
+	}
 
-  virtual void print(int level, std::string dimension)
-  {
-    std::cout << std::string(level, ' ') << dimension << " " << this->value << " (string)" << std::endl;
-  }
+	virtual void print(int level, std::string dimension) {
+		std::cout << std::string(level, ' ') << dimension << " " << this->value
+				<< " (string)" << std::endl;
+	}
+	std::string toJSON() {
+		Document d;
+		Value v = toJSONValue(d);
+
+		return JSONStr(d);
+	}
+
+	virtual Value toJSONValue(Document &d) {
+		Value repK;
+		Value repV;
+		Value v;
+
+		repK.SetString(representation->name.c_str(), d.GetAllocator());
+		repV.SetString(value.c_str(), d.GetAllocator());
+
+		v.SetObject();
+		v.AddMember(repK, repV, d.GetAllocator());
+
+		return v;
+	}
 
 private:
-  std::string value;
+	std::string value;
 };
 
 }

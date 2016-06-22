@@ -15,6 +15,8 @@
 
 #include "ice/representation/Representation.h"
 
+#include <rapidjson/document.h>
+
 //Forward declaration
 namespace ice
 {
@@ -31,6 +33,8 @@ namespace el
 {
 class Logger;
 } /* namespace el */
+
+using rapidjson::Value;
 
 namespace ice
 {
@@ -53,6 +57,8 @@ public:
 
   std::shared_ptr<GContainer> makeInstance(std::string name);
   std::shared_ptr<GContainer> makeInstance(std::shared_ptr<Representation> representation);
+  std::shared_ptr<GContainer> fromJSON(std::string jsonStr);
+  std::shared_ptr<GContainer> fromJSONValue(Value v);
 
   std::shared_ptr<Transformation> fromXMLDesc(TransDesc* desc);
   void* convertStringToBasic(BasicRepresentationType type, std::string value);
