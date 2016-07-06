@@ -60,7 +60,7 @@ TEST(rhizome, add_bundle)
   ASSERT_EQ(bundles2->size(), 0);
 }
 
-TEST(JNITest, append_bundle)
+TEST(rhizome, append_bundle)
 {
   ice::serval_interface si("/tmp/instance1", "localhost", 4110, "peter", "venkman");
 

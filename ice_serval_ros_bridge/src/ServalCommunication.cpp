@@ -16,7 +16,7 @@
 #include "Entity.h"
 #include "IceServalBridge.h"
 
-#define LOCAL_TEST true
+#define LOCAL_TEST false
 
 // Short alias for this namespace
 namespace pt = boost::property_tree;

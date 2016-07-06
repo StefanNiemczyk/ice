@@ -76,10 +76,10 @@ target_link_libraries(${PROJECT_NAME}
 add_definitions(-DTEST_FILE_ROOT_PATH="${PROJECT_SOURCE_DIR}")
 
 catkin_add_gtest(${PROJECT_NAME}-test 
-#  tests/test_keyring.cpp
-#  tests/test_meshms.cpp
-#  tests/test_rhizome.cpp
-#  tests/test_mdp.cpp
+  tests/test_keyring.cpp
+  tests/test_meshms.cpp
+  tests/test_rhizome.cpp
+  tests/test_mdp.cpp
   tests/test_msp.cpp
 
   tests/test_main.cpp
