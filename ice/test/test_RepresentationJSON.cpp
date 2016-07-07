@@ -20,10 +20,9 @@
 
 namespace {
 
-TEST(RepresentationJSONTest, toJSON) {
-
-	std::shared_ptr<ice::GContainerFactory> factory =
-			std::make_shared<ice::GContainerFactory>();
+TEST(RepresentationJSONTest, toJSON)
+{
+	auto factory = std::make_shared<ice::GContainerFactory>();
 
 	std::unique_ptr<std::vector<std::string>> lines(new std::vector<std::string>);
 	lines->push_back("testRep1;dim1;doubleRep");
@@ -40,52 +39,43 @@ TEST(RepresentationJSONTest, toJSON) {
 
 	auto dim11 = rep1->accessPath( { "dim1" });
 	auto dim12 = rep1->accessPath( { "dim2" });
+	auto dim13 = rep1->accessPath( { "dim3" });
 	auto dim21 = rep2->accessPath( { "dim1" });
 	auto dim22 = rep2->accessPath( { "dim2" });
 
 	auto rep1GC = factory->makeInstance(rep1);
 	auto rep2GC = factory->makeInstance(rep2);
 
-	rep1GC->print();
-	rep2GC->print();
-
 	const double testDoubleVal = 4.2;
 	const int testIntVal = 10;
 	std::string testStr = "Hello World!";
 
-	rep1GC->set(rep1->accessPath( { "dim1" }), &testDoubleVal);
-	rep1GC->set(rep1->accessPath( { "dim2" }), &testIntVal);
-	rep1GC->set(rep1->accessPath( { "dim3" }), &testStr);
+	// filling containers
+	rep1GC->set(dim11, &testDoubleVal);
+	rep1GC->set(dim12, &testIntVal);
+	rep1GC->set(dim13, &testStr);
 
-	std::cout << "JSON: " << std::endl;
+	rep2GC->set(dim21, &testIntVal);
+	rep2GC->set(dim22, &testDoubleVal);
 
+	// creating json
 	std::string rep1JSON = rep1GC->toJSON();
 	std::string rep2JSON = rep2GC->toJSON();
 
-	std::cout << rep1JSON << std::endl;
-	std::cout << rep2JSON << std::endl;
+	// json 2 container
+	auto rep1GCfromJson = factory->fromJSON(rep1JSON);
+	auto rep2GCfromJson = factory->fromJSON(rep2JSON);
 
-	Document d;
-	d.Parse(rep1JSON.c_str());
+	EXPECT_EQ(testDoubleVal, rep1GCfromJson->getValue<double>(dim11));
+	EXPECT_EQ(testIntVal, rep1GCfromJson->getValue<int>(dim12));
+	EXPECT_EQ(testStr, rep1GCfromJson->getValue<std::string>(dim13));
 
-	static const char* kTypeNames[] = { "Null", "False", "True", "Object", "Array", "String",
-			"Number" };
-
-	for (Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr) {
-		printf("Type of member %s is %s\n", itr->name.GetString(),
-				kTypeNames[itr->value.GetType()]);
-
-		if (itr->value.IsObject()) {
-
-		}
-	}
-
-//	EXPECT_EQ(testValDouble, *((double* ) rep1Ind->get(dim11)));
-//	EXPECT_EQ(testValInt, *((int* ) rep1Ind->get(dim12)));
-
+	EXPECT_EQ(testIntVal, rep2GCfromJson->getValue<int>(dim21));
+	EXPECT_EQ(testDoubleVal, rep2GCfromJson->getValue<double>(dim22));
 }
 
-TEST(RepresentationJSONTest, ontologyJSONTest) {
+TEST(RepresentationJSONTest, ontologyJSONTest)
+{
 	// Given a valid empty ice ontology
 	std::string path = ros::package::getPath("ice");
 	bool result;
@@ -120,18 +110,22 @@ TEST(RepresentationJSONTest, ontologyJSONTest) {
 
 	auto movement = fac.makeInstance(rep);
 
-	std::cout << movement->toJSON() << std::endl;
-
 	const double testVal = 4.2f;
 	auto pos = rep->accessPath( { "o0_Translation" });
 
 	ASSERT_TRUE(pos != nullptr);
 
 	movement->set(pos, &testVal);
+	ASSERT_EQ(testVal, movement->getValue<double>(pos));
 
-	double val = movement->getValue<double>(pos);
 
-	ASSERT_EQ(testVal, val);
+	// creating json
+	std::string json = movement->toJSON();
+
+	// json 2 container
+	auto movementFromJson = fac.fromJSON(json);
+
+	ASSERT_EQ(testVal, movementFromJson->getValue<double>(pos));
 }
 
 }

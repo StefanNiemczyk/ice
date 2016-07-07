@@ -311,6 +311,10 @@ public:
 		return true;
 	}
 
+	virtual void setValue(bool v) {
+		value = v;
+	}
+
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
 		std::vector<uint8_t> vec;
 		serialize(this->value, vec);
@@ -395,6 +399,10 @@ public:
 		return true;
 	}
 
+	virtual void setValue(int8_t v) {
+		value = v;
+	}
+
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
 		std::vector<uint8_t> vec;
 		serialize(this->value, vec);
@@ -475,6 +483,10 @@ public:
 		this->value = *((uint8_t*) value);
 
 		return true;
+	}
+
+	virtual void setValue(uint8_t v) {
+		value = v;
 	}
 
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
@@ -560,6 +572,10 @@ public:
 		return true;
 	}
 
+	virtual void setValue(short v) {
+		value = v;
+	}
+
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
 		std::vector<uint8_t> vec;
 		serialize(this->value, vec);
@@ -642,6 +658,10 @@ public:
 		return true;
 	}
 
+	virtual void setValue(int v) {
+		value = v;
+	}
+
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
 		std::vector<uint8_t> vec;
 		serialize(this->value, vec);
@@ -722,6 +742,10 @@ public:
 		this->value = *((long*) value);
 
 		return true;
+	}
+
+	virtual void setValue(long v) {
+		value = v;
 	}
 
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
@@ -808,6 +832,10 @@ public:
 		return true;
 	}
 
+	virtual void setValue(unsigned short v) {
+		value = v;
+	}
+
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
 		std::vector<uint8_t> vec;
 		serialize(this->value, vec);
@@ -888,6 +916,10 @@ public:
 		this->value = *((unsigned int*) value);
 
 		return true;
+	}
+
+	virtual void setValue(unsigned int v) {
+		value = v;
 	}
 
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
@@ -972,6 +1004,10 @@ public:
 		return true;
 	}
 
+	virtual void setValue(unsigned long v) {
+		value = v;
+	}
+
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
 		std::vector<uint8_t> vec;
 		serialize(this->value, vec);
@@ -1052,6 +1088,10 @@ public:
 		this->value = *((float*) value);
 
 		return true;
+	}
+
+	virtual void setValue(float v) {
+		value = v;
 	}
 
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
@@ -1136,6 +1176,10 @@ public:
 		return true;
 	}
 
+	virtual void setValue(double v) {
+		value = v;
+	}
+
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
 		std::vector<uint8_t> vec;
 		serialize(this->value, vec);
@@ -1215,6 +1259,10 @@ public:
 		this->value = *((std::string*) value);
 
 		return true;
+	}
+
+	virtual void setValue(std::string v) {
+		value = v;
 	}
 
 	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {

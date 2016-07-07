@@ -11,6 +11,7 @@
 //#include <cstring>
 #include <iostream>
 #include <map>
+#include <stack>
 //#include <stddef.h>
 
 #include "ice/representation/GContainer.h"
@@ -204,55 +205,195 @@ std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::string repName)
 
 std::shared_ptr<GContainer> GContainerFactory::fromJSON(std::string jsonStr) {
 	Document d;
+	std::shared_ptr<GContainer> gc = nullptr;
+
 	d.Parse(jsonStr.c_str());
 
-	std::shared_ptr<GContainer> gc = nullptr;
+	// TODO: Check if root is object...
+	for (Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr) {
+		const Value &n = itr->name;
+		const Value &v = itr->value;
+
+		if (!n.IsString()) {
+			std::cerr << "fromJSON: key has to be string value" << std::endl;
+			return nullptr;
+		}
+
+		auto repStr = std::string(n.GetString());
+		std::shared_ptr<Representation> rep = getRepresentation(repStr);
+
+		if (rep == nullptr)
+		{
+			_log->error("Representation '%v' not found, no GContainer created", repStr);
+			return nullptr;
+		}
+
+		gc = makeInstance(rep);
+
+		std::vector<int> ap;
+
+		bool result = this->fromJSONValue(v, gc, gc->representation, &ap);
+
+		if (result)
+		{
+			return gc;
+		}
+		else
+		{
+			_log->error("Error while creating GContainer for Representation '%v', no GContainer created", repStr);
+			return nullptr;
+		}
+	}
 
 	/*
 	 * {"o0_DefaultMovementRep":{"o0_Translation":{"o0_DoubleRep":0.0},
 	 * "o0_Orientation":{"o0_Alpha":{"o0_DoubleRep":0.0},"o0_Beta":{"o0_DoubleRep":0.0},
 	 * "o0_Gamma":{"o0_DoubleRep":0.0}}}
 	 * */
-
-	for (Value::ConstMemberIterator it = d.MemberBegin(); it != d.MemberEnd(); it++) {
-		// TODO: Implement proper parsing
-//		Value v = static_cast<Value>(it->value);
-//		gc = fromJSONValue(v);
-	}
 
 	return gc;
 }
 
-std::shared_ptr<GContainer> GContainerFactory::fromJSONValue(Value v) {
-	std::shared_ptr<GContainer> gc = nullptr;
+bool GContainerFactory::fromJSONValue(const Value &value, std::shared_ptr<GContainer> gc,
+		std::shared_ptr<Representation> rep, std::vector<int>* ap)
+{
+	std::shared_ptr<Representation> dim;
+	std::string d;
 
-	/*
-	 * {"o0_DefaultMovementRep":{"o0_Translation":{"o0_DoubleRep":0.0},
-	 * "o0_Orientation":{"o0_Alpha":{"o0_DoubleRep":0.0},"o0_Beta":{"o0_DoubleRep":0.0},
-	 * "o0_Gamma":{"o0_DoubleRep":0.0}}}
-	 * */
+	for (int i = 0; i < rep->dimensions.size(); ++i)
+	{
+		d = rep->dimensionNames.at(i);
+		dim = rep->dimensions.at(i);
+		ap->push_back(i);
 
-//	Type t = v.GetType();
-//
-//	std::cout << "Type: " << t << std::endl;
-//
-//	switch (t) {
-//	case kObjectType:
-//		gc = make_shared<CompositeGContainer>();
-//		break;
-//	case kNumberType:
-//		gc = make_shared<DoubleGContainer>();
-//		break;
-//	case kStringType:
-//		gc = make_shared<StringGContainer>();
-//		break;
-//	default:
-//		std::cerr << "GContainferFactory::fromJSON: unhandled type" << std::endl;
-//		break;
-//
-//	}
+		auto it = value.FindMember(d.c_str());
+		if (it == value.MemberEnd())
+		{
+			_log->error("Value not found for dimension '%v'", d);
+			return false;
+		}
 
-	return nullptr;
+		// Found dimension
+		const Value &v = it->value;
+
+		if (false == v.IsObject())
+		{
+			_log->error("Value for name '%v' is not a object", it->name.GetString());
+			return false;
+		}
+
+		if (dim->isBasic()) {
+			const Value &bv = it->value.GetObject().MemberBegin()->value;
+
+			switch (dim->type) {
+			case BOOL:
+			{
+				if (bv.IsBool() == false)
+				{
+					_log->error("Wrong data type '%v' for bool container", bv.GetType());
+					return false;
+				}
+				bool b = bv.GetBool();
+				gc->set(ap, &b);
+				break;
+			}
+			case BYTE:
+			case SHORT:
+			case INT:
+			{
+				if (bv.IsInt() == false)
+				{
+					_log->error("Wrong data type '%v' for int container", bv.GetType());
+					return false;
+				}
+				int i = bv.GetInt();
+				gc->set(ap, &i);
+				break;
+			}
+			case LONG:
+			{
+				if (bv.IsInt64() == false)
+				{
+					_log->error("Wrong data type '%v' for int64 container", bv.GetType());
+					return false;
+				}
+				long val = bv.GetInt64();
+				gc->set(ap, &val);
+				break;
+			}
+			case UNSIGNED_BYTE:
+			case UNSIGNED_SHORT:
+			case UNSIGNED_INT:
+			{
+				if (bv.IsUint() == false)
+				{
+					_log->error("Wrong data type '%v' for unsigned int container", bv.GetType());
+					return false;
+				}
+				unsigned int val = bv.GetUint();
+				gc->set(ap, &val);
+				break;
+			}
+			case UNSIGNED_LONG:
+			{
+				if (bv.IsUint64() == false)
+				{
+					_log->error("Wrong data type '%v' for unsigned int64 container", bv.GetType());
+					return false;
+				}
+				unsigned long val = bv.GetUint64();
+				gc->set(ap, &val);
+				break;
+			}
+			case FLOAT:
+			{
+				if (bv.IsFloat() == false)
+				{
+					_log->error("Wrong data type '%v' for float container", bv.GetType());
+					return false;
+				}
+				float val = bv.GetFloat();
+				gc->set(ap, &val);
+				break;
+			}
+			case DOUBLE:
+			{
+				if (bv.IsDouble() == false)
+				{
+					_log->error("Wrong data type '%v' for double container", bv.GetType());
+					return false;
+				}
+				double val = bv.GetDouble();
+				gc->set(ap, &val);
+				break;
+			}
+			case STRING:
+			{
+				if (bv.IsString() == false)
+				{
+					_log->error("Wrong data type '%v' for string container", bv.GetType());
+					return false;
+				}
+				std::string val = bv.GetString();
+				gc->set(ap, &val);
+				break;
+			}
+			default:
+				_log->error("Unknown basic container type '%v'", dim->type);
+				return false;
+				break;
+			}
+		} else {
+			bool result = fromJSONValue(it->value, gc, dim, ap);
+
+			if (result == false)
+				return false;
+		}
+
+		ap->pop_back();
+	}
+
+	return true;
 }
 
 std::shared_ptr<GContainer> GContainerFactory::makeInstance(
