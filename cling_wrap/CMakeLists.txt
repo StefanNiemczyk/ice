@@ -79,7 +79,7 @@ catkin_package(
     libclasp STATIC ${libclasp_SOURCES}
   )
   
-  target_link_libraries(libclasp LINK_PUBLIC )
+  target_link_libraries(libclasp LINK_PUBLIC)
 
 ### BUIDLING CLINGO ###
 #  file(GLOB_RECURSE clingo_SOURCES "app/clingo/src/*.cc")
