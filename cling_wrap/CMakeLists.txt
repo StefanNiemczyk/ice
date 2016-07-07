@@ -74,13 +74,12 @@ catkin_package(
 
 ### BUIDLING LIBCLASP ###
   add_definitions(-DWITH_THREADS=0)
-  find_package(TBB REQUIRED)
   file(GLOB_RECURSE libclasp_SOURCES "libclasp/src/*.cpp")
   add_library(
     libclasp STATIC ${libclasp_SOURCES}
   )
   
-  target_link_libraries(libclasp LINK_PUBLIC ${TBB_LIBRARIES})
+  target_link_libraries(libclasp LINK_PUBLIC )
 
 ### BUIDLING CLINGO ###
 #  file(GLOB_RECURSE clingo_SOURCES "app/clingo/src/*.cc")
@@ -97,7 +96,7 @@ catkin_package(
     libcling_wrap STATIC ${libcling_wrap_SOURCES}
   )
   
-  target_link_libraries(libcling_wrap libgringo libprogram_opts libclasp ${TBB_LIBRARIES})
+  target_link_libraries(libcling_wrap libgringo libprogram_opts libclasp )
 
 #############
 ## Testing ##
