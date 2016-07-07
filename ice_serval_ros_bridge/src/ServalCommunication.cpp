@@ -65,7 +65,7 @@ void ServalCommunication::initInternal()
   if (this->ownSid == "")
   {
     auto id = this->serval->keyring.getSelf();
-    if (id->size() == 0)
+    if (id == nullptr || id->size() == 0)
     {
       // error case, own id could not be determined
       throw (std::runtime_error("Own serval id could not be determined"));

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <node pkg="ice_serval_ros_bridge" type="ice_serval_ros_bridge_node" name="ice_serval_ros_bridge_consumer" output="screen">
+    <param name="ontology_path" value="$(env ICE_ROOT)/ice_serval_ros_bridge/tests/data/"/>
+    <param name="ontology_iri" value="http://vs.uni-kassel.de/IceServalBridgeTest"/>
+    <param name="ontology_iri_self" value="http://vs.uni-kassel.de/IceServalBridgeTest#Zwerg"/>
+    <!-- <param name="serval_instance_path" value="$(env ICE_ROOT)/ice_serval_ros_bridge/tests/serval-confs/zwerg"/> -->
+    <param name="serval_instance_path" value="$(env SERVALINSTANCE_ROOT)/zwerg"/>
+    <param name="serval_host" value="localhost"/>
+    <param name="serval_port" value="4111"/>
+    <param name="serval_user" value="peter"/>
+    <param name="serval_password" value="venkman"/>
+    <param name="xml_info_file" value="$(env ICE_ROOT)/ice_serval_ros_bridge/tests/data/info_bridge_req.xml"/>
+    <param name="xml_template_file" value="$(env ICE_ROOT)/ice_serval_ros_bridge/tests/data/message_templates.xml"/>
+  </node>
+
+</launch>

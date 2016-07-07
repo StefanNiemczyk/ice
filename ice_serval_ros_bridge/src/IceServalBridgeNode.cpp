@@ -8,6 +8,7 @@
 
 #include <ros/ros.h>
 #include "easylogging++.h"
+#include "IceServalBridge.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -19,6 +20,10 @@ int main(int argc, char **argv)
   ros::NodeHandle nh_("");
   ros::NodeHandle pnh_("~");
 //  serval_ros_bridge::ImageToServal hd(nh_, pnh_);
+
+  ice::IceServalBridge node(nh_, pnh_);
+  std::cout << "muuuuuh" << std::endl;
+  node.init();
 
   ros::spin();
 

@@ -201,6 +201,7 @@ std::unique_ptr<std::vector<serval_identity>> keyring::getIdentitiesCmdLine(std:
   if (line != "1")
   {
     this->interface->logError("Could not load ids '" + param + "' via command line " + line + ss.str());
+    this->interface->logError("Command line: '" + command + "'");
     return nullptr;
   }
 

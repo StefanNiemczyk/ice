@@ -45,17 +45,31 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_) : nh
   this->params = new InitParams();
 
   // loading params
-  nh_.param("ontology_path", this->params->ontologyPath, std::string("UNSET"));
-  nh_.param("ontology_iri", this->params->ontologyIri, std::string("UNSET"));
-  nh_.param("ontology_iri_self", this->params->ontologyIriSelf, std::string("UNSET"));
-  nh_.param("serval_instance_path", this->params->servalInstancePath, std::string("UNSET"));
-  nh_.param("serval_host", this->params->servalHost, std::string("UNSET"));
-  nh_.param("serval_port", this->params->servalPort, -1);
-  nh_.param("serval_user", this->params->servalUser, std::string("UNSET"));
-  nh_.param("serval_password", this->params->servalPassword, std::string("UNSET"));
-  nh_.param("xml_info_file", this->params->xmlInfoPath, std::string("UNSET"));
-  nh_.param("xml_transformation_file", this->params->xmlTransformationPath, std::string("UNSET"));
-  nh_.param("xml_template_file", this->params->xmlTransformationPath, std::string("UNSET"));
+  pnh_.param("ontology_path", this->params->ontologyPath, std::string("UNSET"));
+  pnh_.param("ontology_iri", this->params->ontologyIri, std::string("UNSET"));
+  pnh_.param("ontology_iri_self", this->params->ontologyIriSelf, std::string("UNSET"));
+  pnh_.param("serval_instance_path", this->params->servalInstancePath, std::string("UNSET"));
+  pnh_.param("serval_host", this->params->servalHost, std::string("UNSET"));
+  pnh_.param("serval_port", this->params->servalPort, -1);
+  pnh_.param("serval_user", this->params->servalUser, std::string("UNSET"));
+  pnh_.param("serval_password", this->params->servalPassword, std::string("UNSET"));
+  pnh_.param("xml_info_file", this->params->xmlInfoPath, std::string("UNSET"));
+ // pnh_.param("xml_transformation_file", this->params->xmlTransformationPath, std::string("UNSET"));
+  pnh_.param("xml_template_file", this->params->xmlTransformationPath, std::string("UNSET"));
+
+  _log->info("-------------------------------------------------------");
+  _log->info("Parameters:");
+  _log->info("ontologyPath : %v", this->params->ontologyPath);
+  _log->info("ontologyIri : %v", this->params->ontologyIri);
+  _log->info("ontologyIriSelf : %v", this->params->ontologyIriSelf);
+  _log->info("servalInstancePath : %v", this->params->servalInstancePath);
+  _log->info("servalHost : %v", this->params->servalHost);
+  _log->info("servalPort : %v", this->params->servalPort);
+  _log->info("servalUser : %v", this->params->servalUser);
+  _log->info("servalPassword : %v", this->params->servalPassword);
+  _log->info("xmlInfoPath : %v", this->params->xmlInfoPath);
+  _log->info("xmlTransformationPath : %v", this->params->xmlTransformationPath);
+  _log->info("-------------------------------------------------------");
 
   this->communicationInterface = std::make_shared<ServalCommunication>(this,
                                                              this->params->servalInstancePath,
@@ -70,6 +84,20 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_, Init
 {
   _log = el::Loggers::getLogger("IceServalBridge");
   this->identityDirectory = std::make_shared<EntityDirectory>();
+
+  _log->info("-------------------------------------------------------");
+  _log->info("Parameters:");
+  _log->info("ontologyPath : %v", this->params->ontologyPath);
+  _log->info("ontologyIri : %v", this->params->ontologyIri);
+  _log->info("ontologyIriSelf : %v", this->params->ontologyIriSelf);
+  _log->info("servalInstancePath : %v", this->params->servalInstancePath);
+  _log->info("servalHost : %v", this->params->servalHost);
+  _log->info("servalPort : %v", this->params->servalPort);
+  _log->info("servalUser : %v", this->params->servalUser);
+  _log->info("servalPassword : %v", this->params->servalPassword);
+  _log->info("xmlInfoPath : %v", this->params->xmlInfoPath);
+  _log->info("xmlTransformationPath : %v", this->params->xmlTransformationPath);
+  _log->info("-------------------------------------------------------");
 
   this->communicationInterface = std::make_shared<ServalCommunication>(this,
                                                              this->params->servalInstancePath,
