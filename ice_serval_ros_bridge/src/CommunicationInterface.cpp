@@ -236,7 +236,9 @@ void CommunicationInterface::handleMessage(Message &message)
       break;
 
     case (SCMD_IDS_RESPONSE):
+        std::cout << "here" << std::endl;
       ids = deserialize<std::vector<std::tuple<std::string, std::string>>>(message.payload);
+      std::cout << "here2" << std::endl;
       message.entity->fuse(ids);
       message.entity->checkIce();
       break;
