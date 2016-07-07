@@ -113,7 +113,7 @@ TEST(Bridge, discovery)
 
 
   // sleep some time and let the discovery happen
-  sleep(3);
+  sleep(5);
 
   // Check if the robots has found each other
   std::string servalZwerg, servalMops;

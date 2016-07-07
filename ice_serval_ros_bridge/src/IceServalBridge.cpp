@@ -203,7 +203,7 @@ void IceServalBridge::vanishedIceIdentity(std::shared_ptr<Entity> entity)
 
 void IceServalBridge::offeredInformation(std::shared_ptr<Entity> entity)
 {
-  _log->info("New offered information from: '%v'", entity->toString());
+  _log->info("New offered information (%v) from: '%v'", entity->getOfferedInformation().size(), entity->toString());
   std::vector<std::shared_ptr<InformationSpecification>> requests;
 
   for (auto &offer : entity->getOfferedInformation())
@@ -218,7 +218,14 @@ void IceServalBridge::offeredInformation(std::shared_ptr<Entity> entity)
   }
 
   if (requests.size() > 0)
+  {
+    _log->info("Requesting '%v' information from: '%v'", requests.size(), entity->toString());
     this->communicationInterface->requestInformation(entity, requests);
+  }
+  else
+  {
+    _log->info("Requesting no information from: '%v'", entity->toString());
+  }
 }
 
 std::vector<std::shared_ptr<OfferedInfo>>& IceServalBridge::getOfferedInfos()

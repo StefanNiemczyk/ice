@@ -14,6 +14,11 @@
 #include <ice/information/InformationStore.h>
 #include <ice/representation/GContainer.h>
 
+#include "messages/Message.h"
+#include "messages/CommandMessage.h"
+#include "messages/IdMessage.h"
+#include "messages/OffersMessage.h"
+#include "messages/RequestMessage.h"
 #include "Entity.h"
 #include "IceServalBridge.h"
 #include "serialize.h"
@@ -52,7 +57,7 @@ void CommunicationInterface::cleanUp()
   this->cleanUpInternal();
 }
 
-void CommunicationInterface::pushMessage(Message &message)
+void CommunicationInterface::pushMessage(std::shared_ptr<Message> message)
 {
   std::lock_guard<std::mutex> guard(this->_messageMtx);
 
@@ -72,9 +77,8 @@ void CommunicationInterface::onRequestId(std::shared_ptr<Entity> const &entity, 
 void CommunicationInterface::requestIds(std::shared_ptr<Entity> const &entity)
 {
   _log->info("Requesting Ids from '%v'", entity->toString());
-  Message m;
-  m.entity = entity;
-  m.command = IceCmd::SCMD_IDS_REQUEST;
+  auto m = std::make_shared<CommandMessage>(IceCmd::SCMD_IDS_REQUEST);
+  m->setEntity(entity);
 
   this->pushMessage(m);
 }
@@ -82,14 +86,9 @@ void CommunicationInterface::requestIds(std::shared_ptr<Entity> const &entity)
 void CommunicationInterface::onRequestIds(std::shared_ptr<Entity> const &entity)
 {
   _log->info("Sending Ids to '%v'", entity->toString());
-  Message m;
-  m.entity = entity;
-  m.command = IceCmd::SCMD_IDS_RESPONSE;
-
-  std::vector<std::tuple<std::string, std::string>> vec;
-  this->self->pushIds(vec);
-
-  serialize(vec, m.payload);
+  auto m = std::make_shared<IdMessage>();
+  m->setEntity(entity);
+  this->self->pushIds(m->getIds());
 
   this->pushMessage(m);
 }
@@ -97,9 +96,8 @@ void CommunicationInterface::onRequestIds(std::shared_ptr<Entity> const &entity)
 void CommunicationInterface::requestOffers(std::shared_ptr<Entity> const &entity)
 {
   _log->info("Requesting offered information from '%v'", entity->toString());
-  Message m;
-  m.entity = entity;
-  m.command = IceCmd::SCMD_OFFERS_REQUEST;
+  auto m = std::make_shared<CommandMessage>(IceCmd::SCMD_OFFERS_REQUEST);
+  m->setEntity(entity);
 
   this->pushMessage(m);
 }
@@ -107,22 +105,14 @@ void CommunicationInterface::requestOffers(std::shared_ptr<Entity> const &entity
 void CommunicationInterface::onRequestOffers(std::shared_ptr<Entity> const &entity)
 {
   _log->info("Sending offered information to '%v'", entity->toString());
-  Message m;
-  m.entity = entity;
-  m.command = IceCmd::SCMD_OFFERS_RESPONSE;
+  auto m = std::make_shared<OffersMessage>();
+  m->setEntity(entity);
 
-  std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>> specs;
+  auto &vec = m->getOfferes();
   for (auto info : this->bridge->getOfferedInfos())
   {
-    std::tuple<std::string, std::string, std::string, std::string, std::string> t(info->infoSpec.getEntity(),
-                                                                                  info->infoSpec.getEntityType(),
-                                                                                  info->infoSpec.getScope(),
-                                                                                  info->infoSpec.getRepresentation(),
-                                                                                  info->infoSpec.getRelatedEntity());
-    specs.push_back(t);
+    vec.push_back(info->infoSpec);
   }
-
-  serialize(specs, m.payload);
 
   this->pushMessage(m);
 }
@@ -131,58 +121,54 @@ void CommunicationInterface::requestInformation(std::shared_ptr<Entity> const &e
                                 std::vector<std::shared_ptr<InformationSpecification>> const &requests)
 {
   _log->info("Requesting information from '%v'", entity->toString());
-  Message m;
-  m.entity = entity;
-  m.command = IceCmd::SCMD_INFORMATION_REQUEST;
-  std::vector<comRequest> specs;
+  auto m = std::make_shared<RequestMessage>();
+  m->setEntity(entity);
 
-  for (auto &request : requests)
+  auto &vec = m->getRequests();
+  for (auto info : requests)
   {
-    comRequest r(request->getEntity(), request->getEntityType(), request->getScope(),
-                 request->getRepresentation(), request->getRelatedEntity());
-
-    specs.push_back(r);
+    vec.push_back(info);
   }
-
-  serialize(specs, m.payload);
 
   this->pushMessage(m);
 }
 
-void CommunicationInterface::onRequestInformation(std::shared_ptr<Entity> const &entity, std::vector<comRequest> const &requests)
+void CommunicationInterface::onRequestInformation(std::shared_ptr<Entity> const &entity,
+                                                  std::vector<std::shared_ptr<InformationSpecification>> const &requests)
 {
   _log->info("Information request received from '%v'", entity->toString());
+  // TODO
 
-  std::vector<std::shared_ptr<InformationElement<GContainer>>> infos;
-  std::vector<comInfoElement> gcontainers;
-
-  for (int i=0; i < requests.size(); ++i)
-  {
-    infos.clear();
-    auto t = requests.at(i);
-    auto request = std::make_shared<InformationSpecification>(std::get<0>(t),
-                                                              std::get<1>(t),
-                                                              std::get<2>(t),
-                                                              std::get<3>(t),
-                                                              std::get<4>(t));
-
-    this->bridge->informationStore->getInformation(request, infos);
-
-    for (auto &info : infos)
-    {
-      std::vector<std::vector<uint8_t>> vec;
-      info->getInformation()->toByte(vec);
-      gcontainers.push_back(std::make_tuple(t, vec));
-    }
-  }
-
-  Message m;
-  m.entity = entity;
-  m.command = IceCmd::SCMD_INFORMATION_RESPONSE;
-
-  serialize(gcontainers, m.payload);
-
-  this->sendMessage(m);
+//  std::vector<std::shared_ptr<InformationElement<GContainer>>> infos;
+//  std::vector<comInfoElement> gcontainers;
+//
+//  for (int i=0; i < requests.size(); ++i)
+//  {
+//    infos.clear();
+//    auto t = requests.at(i);
+//    auto request = std::make_shared<InformationSpecification>(std::get<0>(t),
+//                                                              std::get<1>(t),
+//                                                              std::get<2>(t),
+//                                                              std::get<3>(t),
+//                                                              std::get<4>(t));
+//
+//    this->bridge->informationStore->getInformation(request, infos);
+//
+//    for (auto &info : infos)
+//    {
+//      std::vector<std::vector<uint8_t>> vec;
+//      info->getInformation()->toByte(vec);
+//      gcontainers.push_back(std::make_tuple(t, vec));
+//    }
+//  }
+//
+//  Message m;
+//  m.entity = entity;
+//  m.command = IceCmd::SCMD_INFORMATION_RESPONSE;
+//
+//  serialize(gcontainers, m.payload);
+//
+//  this->sendMessage(m);
 }
 
 void CommunicationInterface::onInformation(std::shared_ptr<Entity> const &entity,
@@ -218,34 +204,32 @@ void CommunicationInterface::onInformation(std::shared_ptr<Entity> const &entity
   }
 }
 
-void CommunicationInterface::handleMessage(Message &message)
+void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
 {
-  _log->info("Received Message with id '%v' from %v", std::to_string(message.command), message.entity->toString());
-  message.entity->setActiveTimestamp();
+  auto entity = message->getEntity();
+  _log->info("Received Message with id '%v' from %v", std::to_string(message->getId()), entity->toString());
+  entity->setActiveTimestamp();
 
   std::string                                           id;
-  std::vector<std::tuple<std::string, std::string>>     ids;
   std::vector<comInfoSpec>                              specs;
   std::vector<comRequest>                               requests;
   std::vector<comInfoElement>                           infos;
 
-  switch (message.command)
+  switch (message->getId())
   {
     case (SCMD_IDS_REQUEST):
-      this->onRequestIds(message.entity);
+      this->onRequestIds(entity);
       break;
 
     case (SCMD_IDS_RESPONSE):
-        std::cout << "here" << std::endl;
-      ids = deserialize<std::vector<std::tuple<std::string, std::string>>>(message.payload);
-      std::cout << "here2" << std::endl;
-      message.entity->fuse(ids);
-      message.entity->checkIce();
+    {
+      entity->fuse(std::static_pointer_cast<IdMessage>(message)->getIds());
+      entity->checkIce();
       break;
+    }
 
     case (SCMD_ID_REQUEST):
-      id = deserialize<std::string>(message.payload);
-      this->onRequestId(message.entity, id);
+        // TODO
       break;
 
     case (SCMD_ID_RESPONSE):
@@ -253,26 +237,24 @@ void CommunicationInterface::handleMessage(Message &message)
       break;
 
     case (SCMD_OFFERS_REQUEST):
-      this->onRequestOffers(message.entity);
+      this->onRequestOffers(entity);
       break;
 
     case (SCMD_OFFERS_RESPONSE):
-      specs = deserialize<std::vector<comInfoSpec>>(message.payload);
-      message.entity->addOfferedInformation(specs);
+        entity->addOfferedInformation(std::static_pointer_cast<OffersMessage>(message)->getOfferes());
       break;
 
     case (SCMD_INFORMATION_REQUEST):
-      requests = deserialize<std::vector<comRequest>>(message.payload);
-      this->onRequestInformation(message.entity, requests);
+        this->onRequestInformation(entity, std::static_pointer_cast<RequestMessage>(message)->getRequests());
     break;
 
     case (SCMD_INFORMATION_RESPONSE):
-      infos = deserialize<std::vector<comInfoElement>>(message.payload);
-      this->onInformation(message.entity, infos);
+//      infos = deserialize<std::vector<comInfoElement>>(message.payload);
+//      this->onInformation(message.entity, infos);
     break;
 
     default:
-      _log->error("Unknown command '%v', message will be skipped", std::to_string(message.command));
+      _log->error("Unknown command '%v', message will be skipped", std::to_string(message->getId()));
       break;
   }
 }
@@ -280,7 +262,7 @@ void CommunicationInterface::handleMessage(Message &message)
 void CommunicationInterface::workerTask()
 {
   int counter = 0;
-  std::vector<Message> msgs;
+  std::vector<std::shared_ptr<Message>> msgs;
 
   while (this->running)
   {

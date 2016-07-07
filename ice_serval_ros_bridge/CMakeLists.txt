@@ -71,6 +71,11 @@ add_library(${PROJECT_NAME}
   src/RosGContainerPublisher.cpp
   src/ServalCommunication.cpp
   src/XMLInformationReader.cpp
+  src/Message.cpp
+  src/CommandMessage.cpp
+  src/IdMessage.cpp
+  src/OffersMessage.cpp
+  src/RequestMessage.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ice)

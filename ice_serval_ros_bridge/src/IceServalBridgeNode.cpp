@@ -22,7 +22,6 @@ int main(int argc, char **argv)
 //  serval_ros_bridge::ImageToServal hd(nh_, pnh_);
 
   ice::IceServalBridge node(nh_, pnh_);
-  std::cout << "muuuuuh" << std::endl;
   node.init();
 
   ros::spin();

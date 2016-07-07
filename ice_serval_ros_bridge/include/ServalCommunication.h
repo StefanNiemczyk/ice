@@ -38,8 +38,8 @@ protected:
   virtual void initInternal();
   virtual void cleanUpInternal();
   virtual void discover();
-  virtual int readMessage(std::vector<Message> &outMessages);
-  virtual void sendMessage(Message &msg);
+  virtual int readMessage(std::vector<std::shared_ptr<Message>> &outMessages);
+  virtual void sendMessage(std::shared_ptr<Message> msg);
 
 private:
   std::shared_ptr<serval_interface>             serval;

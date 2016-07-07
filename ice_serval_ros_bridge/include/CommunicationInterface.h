@@ -14,6 +14,7 @@
 #include <ice/information/InformationSpecification.h>
 #include <easylogging++.h>
 
+#include "messages/Message.h"
 #include "EntityDirectory.h"
 
 namespace ice
@@ -28,25 +29,6 @@ class InformationStore;
 typedef std::tuple<std::string, std::string, std::string, std::string, std::string> comInfoSpec;
 typedef std::tuple<std::string, std::string, std::string, std::string, std::string> comRequest;
 typedef std::tuple<comInfoSpec,std::vector<std::vector<uint8_t>>> comInfoElement;
-
-enum IceCmd
-{
-  SCMD_IDS_REQUEST                      = 10,
-  SCMD_IDS_RESPONSE                     = 11,
-  SCMD_ID_REQUEST                       = 20,
-  SCMD_ID_RESPONSE                      = 21,
-  SCMD_OFFERS_REQUEST                   = 30,
-  SCMD_OFFERS_RESPONSE                  = 31,
-  SCMD_INFORMATION_REQUEST              = 40,
-  SCMD_INFORMATION_RESPONSE             = 41
-};
-
-struct Message
-{
-  std::shared_ptr<Entity>       entity;
-  int                           command;
-  std::vector<uint8_t>          payload;
-};
 
 class CommunicationInterface
 {
@@ -64,7 +46,8 @@ public:
   virtual void onRequestOffers(std::shared_ptr<Entity> const &entity);
   virtual void requestInformation(std::shared_ptr<Entity> const &entity,
                                   std::vector<std::shared_ptr<InformationSpecification>> const &requests);
-  virtual void onRequestInformation(std::shared_ptr<Entity> const &identity, std::vector<comRequest> const &requests);
+  virtual void onRequestInformation(std::shared_ptr<Entity> const &identity,
+                                    std::vector<std::shared_ptr<InformationSpecification>> const &requests);
   virtual void onInformation(std::shared_ptr<Entity> const &identity, std::vector<comInfoElement> const &information);
 
   virtual void workerTask();
@@ -78,22 +61,22 @@ public:
 
   // methodes which need to be implemented by child class
   virtual void discover() = 0;
-  virtual int readMessage(std::vector<Message> &outMessages) = 0;
-  virtual void sendMessage(Message &msg) = 0;
+  virtual int readMessage(std::vector<std::shared_ptr<Message>> &outMessages) = 0;
+  virtual void sendMessage(std::shared_ptr<Message> msg) = 0;
 
 protected:
   virtual void initInternal() = 0;
   virtual void cleanUpInternal() = 0;
-  virtual void handleMessage(Message &message);
+  virtual void handleMessage(std::shared_ptr<Message> message);
 
 private:
-  void pushMessage(Message &message);
+  void pushMessage(std::shared_ptr<Message> message);
 
 protected:
   IceServalBridge                             *bridge;
   std::shared_ptr<Entity>                     self;
   std::shared_ptr<EntityDirectory>            directory;
-  std::vector<Message>                        messages;
+  std::vector<std::shared_ptr<Message>>       messages;
   std::shared_ptr<GContainerFactory>          containerFactory;
   std::shared_ptr<InformationStore>           informationStore;
   std::shared_ptr<OntologyInterface>          ontology;

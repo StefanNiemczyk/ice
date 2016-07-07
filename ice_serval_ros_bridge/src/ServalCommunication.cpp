@@ -15,8 +15,9 @@
 
 #include "Entity.h"
 #include "IceServalBridge.h"
+#include "messages/Message.h"
 
-//#define LOCAL_TEST false
+#define LOCAL_TEST
 
 // Short alias for this namespace
 namespace pt = boost::property_tree;
@@ -105,7 +106,6 @@ void ServalCommunication::read()
 {
   uint8_t buffer[1024];
   std::string sid;
-  Message m;
 
   while (this->running)
   {
@@ -118,7 +118,7 @@ void ServalCommunication::read()
 
     if (recCount == 0)
     {
-      _log->info("Received empty message from sid %v", sid);
+      _log->debug("Received empty message from sid %v", sid);
       continue;
     }
 
@@ -132,7 +132,7 @@ void ServalCommunication::read()
 
     if (entity == nullptr)
     {
-      this->_log->info("Received message from unknown serval node '%v'");
+      this->_log->info("Received message from unknown serval node '%v'", sid);
 
       // Create new instance and request ids
       entity = this->directory->create(EntityDirectory::ID_SERVAL, sid);
@@ -140,14 +140,31 @@ void ServalCommunication::read()
       entity->setAvailable(true);
       this->requestIds(entity);
     }
+    else if (sid == this->ownSid)
+    {
+      // own message, will not be processed
+      this->_log->debug("Received own message, will be skipped");
+      continue;
+    }
 
-    m.entity = entity;
-    m.command = buffer[0];
-    m.payload.clear();
-    m.payload.reserve(recCount-1);
-    std::copy(buffer + 1, buffer + recCount, std::back_inserter(m.payload));
+    std::string json(buffer, buffer+recCount);
 
-    this->handleMessage(m);
+    auto message = Message::parse(json);
+
+    if (message == nullptr)
+    {
+      this->_log->info("Received unknown or broken message from serval node '%v'", sid);
+
+      continue;
+    }
+
+    message->setEntity(entity);
+//    m.command = buffer[0];
+//    m.payload.clear();
+//    m.payload.reserve(recCount-1);
+//    std::copy(buffer + 1, buffer + recCount, std::back_inserter(m.payload));
+
+    this->handleMessage(message);
   }
 }
 
@@ -178,26 +195,26 @@ void ServalCommunication::discover()
   }
 }
 
-int ServalCommunication::readMessage(std::vector<Message> &outMessages)
+int ServalCommunication::readMessage(std::vector<std::shared_ptr<Message>> &outMessages)
 {
   return 0; // reading messages is done in own thread
 }
 
-void ServalCommunication::sendMessage(Message &msg)
+void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
 {
   std::string sid;
 
-  if (false == msg.entity->getId(EntityDirectory::ID_SERVAL, sid))
+  if (false == msg->getEntity()->getId(EntityDirectory::ID_SERVAL, sid))
   {
-    this->_log->error("Trying to send message with serval to none serval instance %v", msg.entity->toString());
+    this->_log->error("Trying to send message with serval to none serval instance %v", msg->getEntity()->toString());
     return;
   }
 
-  int size = msg.payload.size() + 1;
+  std::string json = msg->toJson();
+  int size = json.size();
   unsigned char buffer[size];
 
-  buffer[0] = msg.command;
-  std::copy(msg.payload.begin(), msg.payload.end(), buffer + 1);
+  std::copy(json.begin(), json.end(), buffer);
 
   this->socket->send(sid, buffer, size);
 }
