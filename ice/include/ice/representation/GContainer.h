@@ -771,8 +771,10 @@ public:
 	}
 	virtual Value toJSONValue(Document &d) {
 		Value repK;
-		Value repV(value);
+		Value repV;
 		Value v;
+
+		repV.SetInt64(value);
 
 		repK.SetString(representation->name.c_str(), d.GetAllocator());
 

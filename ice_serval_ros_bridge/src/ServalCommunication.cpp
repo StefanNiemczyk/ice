@@ -60,7 +60,15 @@ void ServalCommunication::initInternal()
 
   // get own id
 #ifdef LOCAL_TEST
-  this->ownSid = this->serval->keyring.addIdentity()->sid;
+  auto oid = this->serval->keyring.addIdentity();
+
+  if (oid == nullptr)
+  {
+    // error case, own id could not be determined
+    throw (std::runtime_error("Own serval id could not be determined"));
+  }
+
+  this->ownSid = oid->sid;
   this->self->addId(EntityDirectory::ID_SERVAL, this->ownSid);
 #else
   if (this->ownSid == "")
