@@ -24,7 +24,7 @@
 
 static geometry_msgs::Vector3::ConstPtr message;
 
-void onMsg(const geometry_msgs::Vector3::ConstPtr& msg)
+void onMsgTestBridge(const geometry_msgs::Vector3::ConstPtr& msg)
 {
   message = msg;
 }
@@ -33,7 +33,7 @@ TEST(Bridge, discovery)
 {
   ros::NodeHandle nh_("");
   ros::NodeHandle pnh_("~");
-  auto subscriber = nh_.subscribe("test_bridge_topic", 100, &onMsg);
+  auto subscriber = nh_.subscribe("test_bridge_topic", 100, &onMsgTestBridge);
 
   ice::InitParams *params1 = new ice::InitParams();
   ice::InitParams *params2 = new ice::InitParams();
@@ -69,14 +69,14 @@ TEST(Bridge, discovery)
   mops.init();
 
   // store information in information store
-  std::string repStr = mops.ontologyInterface->toShortIri("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep");
+  std::string repStr = "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep";
   auto rep = mops.gcontainerFactory->getRepresentation(repStr);
 
   ASSERT_NE(nullptr, rep);
 
-  auto x = rep->accessPath({mops.ontologyInterface->toShortIri("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate")});
-  auto y = rep->accessPath({mops.ontologyInterface->toShortIri("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate")});
-  auto z = rep->accessPath({mops.ontologyInterface->toShortIri("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate")});
+  auto x = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
+  auto y = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
+  auto z = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
 
   ASSERT_NE(nullptr, x);
   ASSERT_NE(nullptr, y);
@@ -108,8 +108,8 @@ TEST(Bridge, discovery)
       "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position",
       "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep"
       );
-  auto element = std::make_shared<ice::InformationElement<ice::GContainer>>(spec, instance);
-  mops.informationStore->addInformation(spec, element);
+
+  mops.informationStore->addInformation(spec, instance);
 
 
   // sleep some time and let the discovery happen
@@ -138,11 +138,12 @@ TEST(Bridge, discovery)
   ASSERT_EQ(3, zwerg.identityDirectory->count());
 
   // check information store
-  std::vector<std::shared_ptr<ice::GElement>> infos;
+  std::vector<std::shared_ptr<ice::InformationElement<ice::GContainer>>> infos;
   int count = zwerg.informationStore->getInformation(requ, infos);
 
   ASSERT_EQ(1, count);
   auto info = infos[0];
+  ASSERT_NE(nullptr, info);
 
   ASSERT_EQ(xVal, info->getInformation()->getValue<double>(x));
   ASSERT_EQ(yVal, info->getInformation()->getValue<double>(y));

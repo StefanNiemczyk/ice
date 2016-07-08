@@ -149,7 +149,7 @@ void ServalCommunication::read()
 
     std::string json(buffer, buffer+recCount);
 
-    auto message = Message::parse(json);
+    auto message = Message::parse(json, this->bridge);
 
     if (message == nullptr)
     {

@@ -1505,7 +1505,8 @@ public class IceOntologyInterface {
 		// System.out.println(index + "   " + values[1] + "   " + values[0] +
 		// "   " + (IRI_MAPPING.size()));
 
-		return "o" + index + "_" + values[1];
+		// return "o" + index + "_" + values[1];
+		return p_iri.toString();
 	}
 
 	public String[] getOntologyIriMapping() {

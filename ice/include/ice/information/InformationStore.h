@@ -24,14 +24,7 @@ class InformationElement;
 class InformationSpecification;
 class OntologyInterface;
 
-typedef InformationElement<GContainer> GElement;
-typedef std::function<void (std::shared_ptr<InformationSpecification>&, std::shared_ptr<GElement>&)> InfoCallback;
-
-struct Information
-{
-  std::shared_ptr<InformationSpecification> infoSpec;
-  std::shared_ptr<InformationElement<GContainer>> info;
-};
+typedef std::function<void (std::shared_ptr<InformationSpecification>&, std::shared_ptr<InformationElement<GContainer>>&)> InfoCallback;
 
 class InformationStore
 {
@@ -43,9 +36,10 @@ public:
   bool cleanUp();
 
   void addInformation(std::shared_ptr<InformationSpecification> infoSpec,
-                      std::shared_ptr<GElement> info);
+                      std::shared_ptr<GContainer> info);
+  void addInformation(std::shared_ptr<InformationElement<GContainer>> &info);
   int getInformation(std::shared_ptr<InformationSpecification> request,
-                     std::vector<std::shared_ptr<GElement>> &outInfo);
+                     std::vector<std::shared_ptr<InformationElement<GContainer>>> &outInfo);
 
   void registerCallback(std::shared_ptr<InformationSpecification> request,
                         InfoCallback callback);
@@ -55,7 +49,7 @@ public:
 private:
   std::shared_ptr<OntologyInterface>                            ontology;       /**< Interface to access the ontology */
   std::map<std::shared_ptr<InformationSpecification>,
-           std::shared_ptr<GElement>>                           information;    /**< Map to store information */
+           std::shared_ptr<InformationElement<GContainer>>>     information;    /**< Map to store information */
   std::vector<std::pair<std::shared_ptr<InformationSpecification>,
               InfoCallback>>                                    infoCallbacks;  /**< Vector to store callbacks */
   std::mutex                                                    _mtx;           /**< Mutex */

@@ -256,9 +256,7 @@ bool RosGContainerPublisher::readTemplate(TiXmlElement* element)
     index2 = msgTemplate.find("}");
     longIri = msgTemplate.substr(index + 1, index2 - index - 1);
 
-    shortIri = this->ontology->toShortIri(longIri);
-
-    msgTemplate = msgTemplate.replace(index + 1, index2 - index - 1, shortIri);
+    msgTemplate = msgTemplate.replace(index + 1, index2 - index - 1, longIri);
     index = msgTemplate.find("{", index + 1);
   }
 

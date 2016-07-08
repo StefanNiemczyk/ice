@@ -21,14 +21,12 @@ namespace ice
 {
 
 class Entity;
-class IceServalBridge;
+class GContainer;
 class GContainerFactory;
+class IceServalBridge;
+template<typename T>
+class InformationElement;
 class InformationStore;
-
-// typedefs for serialization
-typedef std::tuple<std::string, std::string, std::string, std::string, std::string> comInfoSpec;
-typedef std::tuple<std::string, std::string, std::string, std::string, std::string> comRequest;
-typedef std::tuple<comInfoSpec,std::vector<std::vector<uint8_t>>> comInfoElement;
 
 class CommunicationInterface
 {
@@ -48,7 +46,7 @@ public:
                                   std::vector<std::shared_ptr<InformationSpecification>> const &requests);
   virtual void onRequestInformation(std::shared_ptr<Entity> const &identity,
                                     std::vector<std::shared_ptr<InformationSpecification>> const &requests);
-  virtual void onInformation(std::shared_ptr<Entity> const &identity, std::vector<comInfoElement> const &information);
+  virtual void onInformation(std::shared_ptr<Entity> const &identity, std::vector<std::shared_ptr<InformationElement<GContainer>>> &information);
 
   virtual void workerTask();
 

@@ -55,7 +55,7 @@ rapidjson::Value OffersMessage::payloadToJson(rapidjson::Document &document)
   return value;
 }
 
-bool OffersMessage::parsePayload(rapidjson::Value& value)
+bool OffersMessage::parsePayload(rapidjson::Value& value, IceServalBridge* bridge)
 {
   if (false == value.IsArray())
   {

@@ -14,13 +14,17 @@
 
 #include "messages/CommandMessage.h"
 #include "messages/IdMessage.h"
+#include "messages/InformationMessage.h"
 #include "messages/OffersMessage.h"
 #include "messages/RequestMessage.h"
 #include "Entity.h"
 
 namespace ice
 {
-std::shared_ptr<Message> Message::parse(std::string &jsonString)
+
+el::Logger* Message::_logFactory = el::Loggers::getLogger("Message");
+
+std::shared_ptr<Message> Message::parse(std::string &jsonString, IceServalBridge* bridge)
 {
   std::cout << jsonString << std::endl;
   rapidjson::Document document;
@@ -32,21 +36,20 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString)
 
   if (false == id->value.IsInt())
   {
-
+    _logFactory->error("Message could not be parsed, ID is missig in JSON '%v'", jsonString.c_str());
     return nullptr;
   }
 
   int command = id->value.GetInt();
-  // check if command message
-  if (command % 2 == 0)
-  {
-    return std::make_shared<CommandMessage>(command);
-  }
-
   std::shared_ptr<Message> message;
 
   switch(command)
   {
+    case(SCMD_IDS_REQUEST):
+    case(SCMD_ID_REQUEST):
+    case(SCMD_OFFERS_REQUEST):
+        return std::make_shared<CommandMessage>(command);
+        break;
     case(SCMD_IDS_RESPONSE):
         message = std::make_shared<IdMessage>();
         break;
@@ -56,29 +59,26 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString)
     case(SCMD_INFORMATION_REQUEST):
         message = std::make_shared<RequestMessage>();
         break;
+    case(SCMD_INFORMATION_RESPONSE):
+        message = std::make_shared<InformationMessage>();
+        break;
 
     default:
-      // TODO
+      _logFactory->error("Message could not be parsed, unknown ID '%v'", command);
+      return nullptr;
       break;
   }
 
-  if (message == nullptr)
+  if (false == message->parsePayload(payload->value, bridge))
   {
-    // TODO
-    return nullptr;
-  }
-
-  if (false == message->parsePayload(payload->value))
-  {
-    // TODO
+    _logFactory->error("Message could not be parsed, Error while parsing payload for Message ID '%v'", command);
     return nullptr;
   }
 
   return message;
 }
 
-Message::Message(int id, bool payload) :
-    id(id), payload(payload)
+Message::Message(int id, bool payload) : id(id), payload(payload), _log(nullptr)
 {
 
 }

@@ -38,22 +38,29 @@ bool InformationStore::cleanUp()
   return true;
 }
 
-void InformationStore::addInformation(std::shared_ptr<InformationSpecification> infoSpec,
-                    std::shared_ptr<GElement> info)
+void InformationStore::addInformation(std::shared_ptr<InformationSpecification> specification,
+                    std::shared_ptr<GContainer> information)
 {
-  this->information[infoSpec] = info;
+  auto info = std::make_shared<InformationElement<GContainer>>(specification, information);
+  this->addInformation(info);
+}
+
+void InformationStore::addInformation(std::shared_ptr<InformationElement<GContainer>> &info)
+{
+  auto spec = info->getSpecification();
+  this->information[spec] = info;
 
   for (auto &callback : this->infoCallbacks)
   {
-    if (callback.first->checkRequest(infoSpec))
+    if (spec->checkRequest(callback.first))
     {
-      callback.second(infoSpec, info);
+      callback.second(spec, info);
     }
   }
 }
 
 int InformationStore::getInformation(std::shared_ptr<InformationSpecification> request,
-                   std::vector<std::shared_ptr<GElement>> &outInfo)
+                   std::vector<std::shared_ptr<InformationElement<GContainer>>> &outInfo)
 {
   int count = 0;
 

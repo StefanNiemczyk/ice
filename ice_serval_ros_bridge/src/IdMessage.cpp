@@ -43,7 +43,7 @@ rapidjson::Value IdMessage::payloadToJson(rapidjson::Document &document)
   return value;
 }
 
-bool IdMessage::parsePayload(rapidjson::Value& value)
+bool IdMessage::parsePayload(rapidjson::Value& value, IceServalBridge* bridge)
 {
   if (false == value.IsObject())
   {

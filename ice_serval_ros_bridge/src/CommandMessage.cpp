@@ -26,7 +26,7 @@ rapidjson::Value CommandMessage::payloadToJson(rapidjson::Document &document)
   return rapidjson::Value("");
 }
 
-bool CommandMessage::parsePayload(rapidjson::Value& value)
+bool CommandMessage::parsePayload(rapidjson::Value& value, IceServalBridge* bridge)
 {
   return true;
 }

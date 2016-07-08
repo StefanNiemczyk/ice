@@ -17,6 +17,7 @@
 namespace ice
 {
 class Entity;
+class IceServalBridge;
 }
 
 namespace ice
@@ -37,7 +38,9 @@ enum IceCmd
 class Message
 {
 public:
-  static std::shared_ptr<Message> parse(std::string &jsonString);
+  static std::shared_ptr<Message> parse(std::string &jsonString, IceServalBridge* bridge);
+private:
+  static el::Logger*            _logFactory;
 
 public:
   Message(int id, bool payload);
@@ -51,7 +54,7 @@ public:
 
 protected:
   virtual rapidjson::Value payloadToJson(rapidjson::Document &document) = 0;
-  virtual bool parsePayload(rapidjson::Value& value) = 0;
+  virtual bool parsePayload(rapidjson::Value& value, IceServalBridge* bridge) = 0;
 
 protected:
   const int                     id;

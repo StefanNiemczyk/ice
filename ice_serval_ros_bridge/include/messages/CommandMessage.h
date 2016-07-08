@@ -21,7 +21,7 @@ public:
 
 protected:
   virtual rapidjson::Value payloadToJson(rapidjson::Document &document);
-  virtual bool parsePayload(rapidjson::Value& value);
+  virtual bool parsePayload(rapidjson::Value& value, IceServalBridge* bridge);
 };
 
 } /* namespace ice */

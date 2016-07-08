@@ -17,6 +17,7 @@
 #include "messages/Message.h"
 #include "messages/CommandMessage.h"
 #include "messages/IdMessage.h"
+#include "messages/InformationMessage.h"
 #include "messages/OffersMessage.h"
 #include "messages/RequestMessage.h"
 #include "Entity.h"
@@ -137,70 +138,25 @@ void CommunicationInterface::onRequestInformation(std::shared_ptr<Entity> const 
                                                   std::vector<std::shared_ptr<InformationSpecification>> const &requests)
 {
   _log->info("Information request received from '%v'", entity->toString());
-  // TODO
+  auto m = std::make_shared<InformationMessage>();
+  m->setEntity(entity);
 
-//  std::vector<std::shared_ptr<InformationElement<GContainer>>> infos;
-//  std::vector<comInfoElement> gcontainers;
-//
-//  for (int i=0; i < requests.size(); ++i)
-//  {
-//    infos.clear();
-//    auto t = requests.at(i);
-//    auto request = std::make_shared<InformationSpecification>(std::get<0>(t),
-//                                                              std::get<1>(t),
-//                                                              std::get<2>(t),
-//                                                              std::get<3>(t),
-//                                                              std::get<4>(t));
-//
-//    this->bridge->informationStore->getInformation(request, infos);
-//
-//    for (auto &info : infos)
-//    {
-//      std::vector<std::vector<uint8_t>> vec;
-//      info->getInformation()->toByte(vec);
-//      gcontainers.push_back(std::make_tuple(t, vec));
-//    }
-//  }
-//
-//  Message m;
-//  m.entity = entity;
-//  m.command = IceCmd::SCMD_INFORMATION_RESPONSE;
-//
-//  serialize(gcontainers, m.payload);
-//
-//  this->sendMessage(m);
+  for (auto &request : requests)
+  {
+    this->bridge->informationStore->getInformation(request, m->getInformations());
+  }
+
+  this->sendMessage(m);
 }
 
 void CommunicationInterface::onInformation(std::shared_ptr<Entity> const &entity,
-                                                   std::vector<comInfoElement> const &information)
+                                           std::vector<std::shared_ptr<InformationElement<GContainer>>> &information)
 {
   _log->info("Information received from '%v'", entity->toString());
 
   for (auto &info : information)
   {
-    comInfoSpec cSpec = std::get<0>(info);
-    auto bytes = std::get<1>(info);
-
-    auto spec = std::make_shared<InformationSpecification>(std::get<0>(cSpec),
-                                                           std::get<1>(cSpec),
-                                                           std::get<2>(cSpec),
-                                                           std::get<3>(cSpec),
-                                                           std::get<4>(cSpec));
-
-    std::string shortIri = this->ontology->toShortIri(std::get<3>(cSpec));
-    auto container = this->containerFactory->makeInstance(shortIri);
-
-    if (nullptr == container)
-    {
-      _log->error("GContainer for representation '%v' could not be created, information will be skipped", std::get<3>(cSpec));
-      continue;
-    }
-
-    container->fromByte(bytes);
-
-    auto e = std::make_shared<InformationElement<GContainer>>(spec, container);
-
-    this->informationStore->addInformation(spec, e);
+    this->informationStore->addInformation(info);
   }
 }
 
@@ -209,11 +165,6 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
   auto entity = message->getEntity();
   _log->info("Received Message with id '%v' from %v", std::to_string(message->getId()), entity->toString());
   entity->setActiveTimestamp();
-
-  std::string                                           id;
-  std::vector<comInfoSpec>                              specs;
-  std::vector<comRequest>                               requests;
-  std::vector<comInfoElement>                           infos;
 
   switch (message->getId())
   {
@@ -249,8 +200,7 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
     break;
 
     case (SCMD_INFORMATION_RESPONSE):
-//      infos = deserialize<std::vector<comInfoElement>>(message.payload);
-//      this->onInformation(message.entity, infos);
+        this->onInformation(entity, std::static_pointer_cast<InformationMessage>(message)->getInformations());
     break;
 
     default:

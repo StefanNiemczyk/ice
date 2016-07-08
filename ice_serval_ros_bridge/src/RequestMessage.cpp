@@ -56,8 +56,10 @@ rapidjson::Value RequestMessage::payloadToJson(rapidjson::Document &document)
   return value;
 }
 
-bool RequestMessage::parsePayload(rapidjson::Value& value)
+bool RequestMessage::parsePayload(rapidjson::Value& value, IceServalBridge* bridge)
 {
+  this->requests.clear();
+
   if (false == value.IsArray())
   {
     _log->error("Payload could not be parsed: Is not an array");

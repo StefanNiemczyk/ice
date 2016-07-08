@@ -25,7 +25,7 @@ public:
 
 protected:
   virtual rapidjson::Value payloadToJson(rapidjson::Document &document);
-  virtual bool parsePayload(rapidjson::Value& value);
+  virtual bool parsePayload(rapidjson::Value& value, IceServalBridge* bridge);
 
 private:
   std::vector<std::tuple<std::string, std::string>> ids;

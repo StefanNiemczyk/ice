@@ -9,6 +9,8 @@
 
 #include "ice/information/InformationSpecification.h"
 
+#include "iostream"
+
 namespace ice
 {
 
@@ -126,15 +128,30 @@ bool InformationSpecification::checkRequest(InformationSpecification *request)
 bool InformationSpecification::checkRequest(std::shared_ptr<InformationSpecification> &request)
 {
   if (request->getEntity() != "*" && request->getEntity() != this->getEntity())
-      return false;
-    if (request->getEntityType() != this->getEntityType())
-      return false;
-    if (request->getScope() != this->getScope())
-      return false;
-    if (request->getRepresentation() != this->getRepresentation())
-      return false;
-    if (request->getRelatedEntity() != this->getRelatedEntity())
-      return false;
+  {
+    std::cout << "r1" << std::endl;
+    return false;
+  }
+  if (request->getEntityType() != this->getEntityType())
+  {
+    std::cout << "r2" << std::endl;
+    return false;
+  }
+  if (request->getScope() != this->getScope())
+  {
+    std::cout << "r3" << std::endl;
+    return false;
+  }
+  if (request->getRepresentation() != this->getRepresentation())
+  {
+    std::cout << "r4" << std::endl;
+    return false;
+  }
+  if (request->getRelatedEntity() != this->getRelatedEntity())
+  {
+    std::cout << "r5" << std::endl;
+    return false;
+  }
 
     return true;
 }

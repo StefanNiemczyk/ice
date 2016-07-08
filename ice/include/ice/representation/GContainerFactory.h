@@ -58,8 +58,8 @@ public:
   std::shared_ptr<GContainer> makeInstance(std::string name);
   std::shared_ptr<GContainer> makeInstance(std::shared_ptr<Representation> representation);
   std::shared_ptr<GContainer> fromJSON(std::string jsonStr);
-  bool fromJSONValue(const Value &value, std::shared_ptr<GContainer> gc,
-			std::shared_ptr<Representation> rep, std::vector<int>* ap);
+  std::shared_ptr<GContainer> fromJSON(Value& jsonValue);
+  std::shared_ptr<GContainer> fromJSON(Value& name, Value& value);
 
   std::shared_ptr<Transformation> fromXMLDesc(TransDesc* desc);
   void* convertStringToBasic(BasicRepresentationType type, std::string value);
@@ -84,6 +84,8 @@ private:
   BasicRepresentationType getBasicRep(std::string rep);
   std::shared_ptr<Representation> addOrGet(std::string name,
                                            std::map<std::string, std::shared_ptr<Representation>> *tmpMap);
+  bool fromJSONValue(const Value &value, std::shared_ptr<GContainer> gc,
+                        std::shared_ptr<Representation> rep, std::vector<int>* ap);
 
 private:
   el::Logger* _log;
