@@ -6,8 +6,8 @@
     <param name="ontology_path" value="$(env ICE_ROOT)/ice_serval_ros_bridge/tests/data/"/>
     <param name="ontology_iri" value="http://vs.uni-kassel.de/IceServalBridgeTest"/>
     <param name="ontology_iri_self" value="http://vs.uni-kassel.de/IceServalBridgeTest#Zwerg"/>
-    <!-- <param name="serval_instance_path" value=""/> -->
-    <param name="serval_instance_path" value="$(env SERVALINSTANCE_ROOT)/zwerg"/>
+    <param name="serval_instance_path" value=""/>
+    <!-- <param name="serval_instance_path" value="$(env SERVALINSTANCE_ROOT)/zwerg"/> -->
     <param name="serval_host" value="localhost"/>
     <param name="serval_port" value="4111"/>
     <param name="serval_user" value="peter"/>

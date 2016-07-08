@@ -146,6 +146,14 @@ void CommunicationInterface::onRequestInformation(std::shared_ptr<Entity> const 
     this->bridge->informationStore->getInformation(request, m->getInformations());
   }
 
+  int count = m->getInformations().size();
+  if (count == 0)
+  {
+    _log->warn("No information found for request from '%v'", entity->toString());
+    return;
+  }
+
+  _log->info("Sending '%v' information to '%v'", count, entity->toString());
   this->sendMessage(m);
 }
 

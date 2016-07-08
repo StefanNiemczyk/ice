@@ -17,7 +17,7 @@
 #include "IceServalBridge.h"
 #include "messages/Message.h"
 
-#define LOCAL_TEST
+//#define LOCAL_TEST
 
 // Short alias for this namespace
 namespace pt = boost::property_tree;
