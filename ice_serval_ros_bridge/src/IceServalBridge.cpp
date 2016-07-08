@@ -13,6 +13,7 @@
 #include <ice/information/InformationStore.h>
 #include <ice/processing/EventHandler.h>
 #include <ice/representation/GContainerFactory.h>
+#include <rapidjson/filereadstream.h>
 
 #include "CommunicationInterface.h"
 #include "RosGContainerPublisher.h"
@@ -21,6 +22,10 @@
 
 namespace ice
 {
+
+// --------------------------------------------------------------------------------------------
+// ---------------------------------------- Static --------------------------------------------
+// --------------------------------------------------------------------------------------------
 
 void IceServalBridge::createConfig(ice::InitParams const * const params)
 {
@@ -38,6 +43,11 @@ void IceServalBridge::createConfig(ice::InitParams const * const params)
   myfile.close();
 }
 
+
+// --------------------------------------------------------------------------------------------
+// ---------------------------------------- Member --------------------------------------------
+// --------------------------------------------------------------------------------------------
+
 IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_) : nh_(nh_), pnh_(pnh_)
 {
   _log = el::Loggers::getLogger("IceServalBridge");
@@ -53,22 +63,25 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_) : nh
   pnh_.param("serval_port", this->params->servalPort, -1);
   pnh_.param("serval_user", this->params->servalUser, std::string("UNSET"));
   pnh_.param("serval_password", this->params->servalPassword, std::string("UNSET"));
+  pnh_.param("serval_local", this->params->servalLocal, false);
   pnh_.param("xml_info_file", this->params->xmlInfoPath, std::string("UNSET"));
- // pnh_.param("xml_transformation_file", this->params->xmlTransformationPath, std::string("UNSET"));
-  pnh_.param("xml_template_file", this->params->xmlTransformationPath, std::string("UNSET"));
+  pnh_.param("json_information_file", this->params->jsonInformationPath, std::string("UNSET"));
+  pnh_.param("xml_template_file", this->params->xmlTemplateFile, std::string("UNSET"));
 
   _log->info("-------------------------------------------------------");
   _log->info("Parameters:");
-  _log->info("ontologyPath : %v", this->params->ontologyPath);
-  _log->info("ontologyIri : %v", this->params->ontologyIri);
-  _log->info("ontologyIriSelf : %v", this->params->ontologyIriSelf);
-  _log->info("servalInstancePath : %v", this->params->servalInstancePath);
-  _log->info("servalHost : %v", this->params->servalHost);
-  _log->info("servalPort : %v", this->params->servalPort);
-  _log->info("servalUser : %v", this->params->servalUser);
-  _log->info("servalPassword : %v", this->params->servalPassword);
-  _log->info("xmlInfoPath : %v", this->params->xmlInfoPath);
-  _log->info("xmlTransformationPath : %v", this->params->xmlTransformationPath);
+  _log->info("ontologyPath          : %v", this->params->ontologyPath);
+  _log->info("ontologyIri           : %v", this->params->ontologyIri);
+  _log->info("ontologyIriSelf       : %v", this->params->ontologyIriSelf);
+  _log->info("servalInstancePath    : %v", this->params->servalInstancePath);
+  _log->info("servalHost            : %v", this->params->servalHost);
+  _log->info("servalPort            : %v", this->params->servalPort);
+  _log->info("servalUser            : %v", this->params->servalUser);
+  _log->info("servalPassword        : %v", this->params->servalPassword);
+  _log->info("servaLocal            : %v", this->params->servalLocal);
+  _log->info("xmlInfoPath           : %v", this->params->xmlInfoPath);
+  _log->info("jsonInformationPath   : %v", this->params->jsonInformationPath);
+  _log->info("xmlTemplatePath       : %v", this->params->xmlTemplateFile);
   _log->info("-------------------------------------------------------");
 
   this->communicationInterface = std::make_shared<ServalCommunication>(this,
@@ -87,16 +100,18 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_, Init
 
   _log->info("-------------------------------------------------------");
   _log->info("Parameters:");
-  _log->info("ontologyPath : %v", this->params->ontologyPath);
-  _log->info("ontologyIri : %v", this->params->ontologyIri);
-  _log->info("ontologyIriSelf : %v", this->params->ontologyIriSelf);
-  _log->info("servalInstancePath : %v", this->params->servalInstancePath);
-  _log->info("servalHost : %v", this->params->servalHost);
-  _log->info("servalPort : %v", this->params->servalPort);
-  _log->info("servalUser : %v", this->params->servalUser);
-  _log->info("servalPassword : %v", this->params->servalPassword);
-  _log->info("xmlInfoPath : %v", this->params->xmlInfoPath);
-  _log->info("xmlTransformationPath : %v", this->params->xmlTransformationPath);
+  _log->info("ontologyPath          : %v", this->params->ontologyPath);
+  _log->info("ontologyIri           : %v", this->params->ontologyIri);
+  _log->info("ontologyIriSelf       : %v", this->params->ontologyIriSelf);
+  _log->info("servalInstancePath    : %v", this->params->servalInstancePath);
+  _log->info("servalHost            : %v", this->params->servalHost);
+  _log->info("servalPort            : %v", this->params->servalPort);
+  _log->info("servalUser            : %v", this->params->servalUser);
+  _log->info("servalPassword        : %v", this->params->servalPassword);
+  _log->info("servaLocal            : %v", this->params->servalLocal);
+  _log->info("xmlInfoPath           : %v", this->params->xmlInfoPath);
+  _log->info("jsonInformationPath   : %v", this->params->jsonInformationPath);
+  _log->info("xmlTemplatePath       : %v", this->params->xmlTemplateFile);
   _log->info("-------------------------------------------------------");
 
   this->communicationInterface = std::make_shared<ServalCommunication>(this,
@@ -104,7 +119,8 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_, Init
                                                              this->params->servalHost,
                                                              this->params->servalPort,
                                                              this->params->servalUser,
-                                                             this->params->servalPassword);
+                                                             this->params->servalPassword,
+                                                             this->params->servalLocal);
 }
 
 IceServalBridge::~IceServalBridge()
@@ -117,7 +133,7 @@ void IceServalBridge::init()
   // init event handler
   this->eventHandler = std::make_shared<EventHandler>(2, 100);
 
-  // register hooks, workaround to enable the usage of class functions, TODO fix
+  // register hooks
   this->identityDirectory->disvoeredIceIdentity.registerCallback(this, &IceServalBridge::discoveredIceIdentity);
   this->identityDirectory->vanishedIceIdentity.registerCallback(this, &IceServalBridge::vanishedIceIdentity);
   this->identityDirectory->offeredInformation.registerCallback(this, &IceServalBridge::offeredInformation);
@@ -146,9 +162,19 @@ void IceServalBridge::init()
   // init communication
   this->communicationInterface->init();
 
+  //init gcontainer factory
+  this->gcontainerFactory = std::make_shared<GContainerFactory>();
+  this->gcontainerFactory->setOntologyInterface(this->ontologyInterface);
+  this->gcontainerFactory->init();
+  this->communicationInterface->setGContainerFactory(this->gcontainerFactory);
+
   // init information store
   this->informationStore = std::make_shared<InformationStore>(this->ontologyInterface);
   this->communicationInterface->setInformationStore(this->informationStore);
+  if (this->params->jsonInformationPath != "")
+  {
+    this->json2Information(this->params->jsonInformationPath);
+  }
 
   // init transformation stuff
   // TODO
@@ -156,12 +182,6 @@ void IceServalBridge::init()
   // init ros message generator
   this->publisher = std::make_shared<RosGContainerPublisher>(this->ontologyInterface, this->params->xmlTemplateFile);
   this->publisher->init();
-
-  //init gcontainer factory
-  this->gcontainerFactory = std::make_shared<GContainerFactory>();
-  this->gcontainerFactory->setOntologyInterface(this->ontologyInterface);
-  this->gcontainerFactory->init();
-  this->communicationInterface->setGContainerFactory(this->gcontainerFactory);
 
   // register hooks in information store
 
@@ -236,6 +256,129 @@ std::vector<std::shared_ptr<OfferedInfo>>& IceServalBridge::getOfferedInfos()
 std::vector<std::shared_ptr<RequiredInfo>>& IceServalBridge::getRequiredInfors()
 {
   return this->requiredInfos;
+}
+
+
+
+bool IceServalBridge::json2Information(std::string const &filePath)
+{
+  rapidjson::Document document;
+
+  FILE* fp = fopen(filePath.c_str(), "r");
+
+  if (fp == nullptr)
+  {
+    _log->error("Information could not be parsed: File '%v' does not exist", filePath);
+    return false;
+  }
+
+  char readBuffer[65536];
+  rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+
+  document.ParseStream(is);
+
+  fclose(fp);
+
+  if (false == document.IsArray())
+   {
+     _log->error("Information could not be parsed: Is not an array, '%v'", document.GetType());
+     return false;
+   }
+
+   std::string entity, entityType, scope, rep, relatedEntity;
+    int count = 0;
+    bool ok = true;
+
+    for (auto it = document.Begin(); it != document.End(); ++it)
+    {
+      if (false == it->IsObject())
+      {
+        _log->error("Information could not be parsed: InformationElement is not an object");
+        continue;
+      }
+
+      auto spec = it->FindMember("spec");
+      auto info = it->FindMember("info");
+
+      if (spec == it->MemberEnd())
+      {
+        _log->error("Information could not be parsed: Specification missing");
+        continue;
+      }
+
+      if (false == spec->value.IsArray())
+      {
+        _log->error("Information could not be parsed: Specification is not an array");
+        continue;
+      }
+
+      count = 0;
+      ok = true;
+
+      for (auto it2 = spec->value.Begin(); it2 != spec->value.End(); ++it2)
+      {
+        if (false == it2->IsString())
+        {
+          _log->error("Information could not be parsed: Field is not a string");
+          ok = false;
+        }
+
+        switch(count)
+        {
+          case 0:
+            entity = it2->GetString();
+            break;
+          case 1:
+            entityType = it2->GetString();
+            break;
+          case 2:
+            scope = it2->GetString();
+            break;
+          case 3:
+            rep = it2->GetString();
+            break;
+          case 4:
+            relatedEntity = it2->GetString();
+            break;
+        }
+
+        ++count;
+      }
+
+      if (false == ok)
+      {
+        continue;
+      }
+
+      if (count != 5)
+      {
+        _log->error("Payload could not be parsed: Wrong number of fields for offer");
+        continue;
+      }
+
+      auto specification = std::make_shared<InformationSpecification>(entity, entityType, scope, rep, relatedEntity);
+
+
+
+      if (info == it->MemberEnd())
+      {
+        _log->error("Information could not be parsed: Specification not");
+        continue;
+      }
+
+      auto information = this->gcontainerFactory->fromJSON(info->value);
+
+      if (information == nullptr)
+      {
+        _log->error("Information could not be parsed: Error while extracting information");
+        continue;
+      }
+
+      auto informationElement = std::make_shared<InformationElement<GContainer>>(specification, information);
+      this->informationStore->addInformation(informationElement);
+    }
+
+    return true;
 }
 
 } /* namespace ice */

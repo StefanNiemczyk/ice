@@ -1,0 +1,32 @@
+[
+	{
+		"spec":["http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Mops",
+		"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot",
+		"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position",
+		"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep",""],
+		"info":
+		{
+			"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep":
+			{
+				"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate":{"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep":1.2},
+				"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate":{"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep":2.0},
+				"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate":{"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep":3.0}
+			}
+		}
+	},
+	{
+		"spec":["http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Mops",
+		"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot",
+		"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position",
+		"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep",""],
+		"info":
+		{
+			"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep":
+			{
+				"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate":{"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep":1.2},
+				"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate":{"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep":2.0},
+				"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate":{"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep":3.0}
+			}
+		}
+	}
+]

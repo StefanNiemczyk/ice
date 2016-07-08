@@ -17,8 +17,6 @@
 #include "IceServalBridge.h"
 #include "messages/Message.h"
 
-//#define LOCAL_TEST
-
 // Short alias for this namespace
 namespace pt = boost::property_tree;
 
@@ -26,8 +24,8 @@ namespace ice
 {
 
 ServalCommunication::ServalCommunication(IceServalBridge *bridge, std::string configPath, std::string const host,
-                                         int const port, std::string const authName, std::string const authPass) :
-    CommunicationInterface(), configPath(configPath), host(host), port(port), authName(authName), authPass(authPass), serval(nullptr)
+                                         int const port, std::string const authName, std::string const authPass, bool const local) :
+    CommunicationInterface(), configPath(configPath), host(host), port(port), authName(authName), authPass(authPass), serval(nullptr), local(local)
 {
   _log = el::Loggers::getLogger("ServalCommunication");
   this->bridge = bridge;
@@ -59,31 +57,34 @@ void ServalCommunication::initInternal()
   this->self = this->directory->self;
 
   // get own id
-#ifdef LOCAL_TEST
-  auto oid = this->serval->keyring.addIdentity();
-
-  if (oid == nullptr)
+  if (local)
   {
-    // error case, own id could not be determined
-    throw (std::runtime_error("Own serval id could not be determined"));
-  }
+    auto oid = this->serval->keyring.addIdentity();
 
-  this->ownSid = oid->sid;
-  this->self->addId(EntityDirectory::ID_SERVAL, this->ownSid);
-#else
-  if (this->ownSid == "")
-  {
-    auto id = this->serval->keyring.getSelf();
-    if (id == nullptr || id->size() == 0)
+    if (oid == nullptr)
     {
       // error case, own id could not be determined
-      throw (std::runtime_error("Own serval id could not be determined"));
+      throw(std::runtime_error("Own serval id could not be determined"));
     }
 
-    this->ownSid = id->at(0).sid;
+    this->ownSid = oid->sid;
     this->self->addId(EntityDirectory::ID_SERVAL, this->ownSid);
   }
-#endif
+  else
+  {
+    if (this->ownSid == "")
+    {
+      auto id = this->serval->keyring.getSelf();
+      if (id == nullptr || id->size() == 0)
+      {
+        // error case, own id could not be determined
+        throw(std::runtime_error("Own serval id could not be determined"));
+      }
+
+      this->ownSid = id->at(0).sid;
+      this->self->addId(EntityDirectory::ID_SERVAL, this->ownSid);
+    }
+  }
 
   // create socket
   this->socket = this->serval->createSocket(SERVAL_PORT, this->ownSid);
@@ -112,14 +113,14 @@ void ServalCommunication::cleanUpInternal()
 
 void ServalCommunication::read()
 {
-  uint8_t buffer[1024];
+  uint8_t buffer[4096];
   std::string sid;
 
   while (this->running)
   {
     int count;
 
-    int recCount = this->socket->receive(sid, buffer, 1024);
+    int recCount = this->socket->receive(sid, buffer, 4096);
 
     if (false == this->running)
       return;
@@ -178,11 +179,15 @@ void ServalCommunication::read()
 
 void ServalCommunication::discover()
 {
-#ifdef LOCAL_TEST
-  auto peers = this->serval->keyring.getSelf();
-#else
-  auto peers = this->serval->keyring.getPeerIdentities();
-#endif
+  std::unique_ptr<std::vector<serval_identity>> peers;
+  if (this->local)
+  {
+    peers = this->serval->keyring.getSelf();
+  }
+  else
+  {
+    peers = this->serval->keyring.getPeerIdentities();
+  }
 
   for (auto &sid : *peers)
   {
@@ -220,8 +225,14 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
 
   std::string json = msg->toJson();
   int size = json.size();
-  unsigned char buffer[size];
 
+  if (size > 1024)
+  {
+    this->_log->error("Message could not be send to instance '%v', to large '%v' byte", msg->getEntity()->toString(), size);
+    return;
+  }
+
+  unsigned char buffer[size];
   std::copy(json.begin(), json.end(), buffer);
 
   this->socket->send(sid, buffer, size);

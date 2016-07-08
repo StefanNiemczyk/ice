@@ -13,6 +13,7 @@
 
 #include <ros/ros.h>
 #include <easylogging++.h>
+#include <rapidjson/document.h>
 #include <ice/ontology/OntologyInterface.h>
 #include <ice/representation/GContainerFactory.h>
 
@@ -26,6 +27,7 @@ class EventHandler;
 class InformationStore;
 template <typename T>
 class InformationElement;
+class GContainer;
 
 struct OfferedInfo
 {
@@ -61,9 +63,10 @@ struct InitParams
   int         servalPort;
   std::string servalUser;
   std::string servalPassword;
+  bool        servalLocal;
 
   std::string xmlInfoPath;
-  std::string xmlTransformationPath;
+  std::string jsonInformationPath;
   std::string xmlTemplateFile;
 };
 
@@ -87,6 +90,7 @@ public:
 
 private:
   void readSystemsFromOntology();
+  bool json2Information(std::string const &filePath);
 
 public:
   std::shared_ptr<EventHandler>                         eventHandler;

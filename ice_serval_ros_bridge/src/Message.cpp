@@ -31,6 +31,12 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, IceServalBridge
 
   document.Parse(jsonString.c_str());
 
+  if (document.GetType() == 0)
+  {
+    _logFactory->error("Message could not be parsed, Json is broken '%v'", jsonString.c_str());
+    return nullptr;
+  }
+
   auto id = document.FindMember("id");
   auto payload = document.FindMember("pl");
 

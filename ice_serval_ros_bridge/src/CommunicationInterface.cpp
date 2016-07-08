@@ -138,23 +138,29 @@ void CommunicationInterface::onRequestInformation(std::shared_ptr<Entity> const 
                                                   std::vector<std::shared_ptr<InformationSpecification>> const &requests)
 {
   _log->info("Information request received from '%v'", entity->toString());
-  auto m = std::make_shared<InformationMessage>();
-  m->setEntity(entity);
+  std::vector<std::shared_ptr<InformationElement<GContainer>>> infos;
 
   for (auto &request : requests)
   {
-    this->bridge->informationStore->getInformation(request, m->getInformations());
+    this->bridge->informationStore->getInformation(request,infos);
   }
 
-  int count = m->getInformations().size();
+  int count = infos.size();
   if (count == 0)
   {
     _log->warn("No information found for request from '%v'", entity->toString());
     return;
   }
 
+
   _log->info("Sending '%v' information to '%v'", count, entity->toString());
-  this->sendMessage(m);
+  for (auto &info : infos)
+  {
+    auto m = std::make_shared<InformationMessage>();
+    m->setEntity(entity);
+    m->getInformations().push_back(info);
+    this->sendMessage(m);
+  }
 }
 
 void CommunicationInterface::onInformation(std::shared_ptr<Entity> const &entity,

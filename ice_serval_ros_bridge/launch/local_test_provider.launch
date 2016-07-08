@@ -6,12 +6,12 @@
     <param name="ontology_path" value="$(env ICE_ROOT)/ice_serval_ros_bridge/tests/data/"/>
     <param name="ontology_iri" value="http://vs.uni-kassel.de/IceServalBridgeTest"/>
     <param name="ontology_iri_self" value="http://vs.uni-kassel.de/IceServalBridgeTest#Mops"/>
-    <param name="serval_instance_path" value=""/> 
+    <param name="serval_instance_path" value="$(env SERVALINSTANCE_ROOT)/mops"/>
     <param name="serval_host" value="localhost"/>
     <param name="serval_port" value="4110"/>
     <param name="serval_user" value="peter"/>
     <param name="serval_password" value="venkman"/>
-    <param name="serval_local" value="false"/>
+    <param name="serval_local" value="true"/>
     <param name="xml_info_file" value="$(env ICE_ROOT)/ice_serval_ros_bridge/tests/data/info_bridge_off.xml"/>
     <param name="json_information_file" value="$(env ICE_ROOT)/ice_serval_ros_bridge/tests/data/information2.json"/>
     <param name="xml_template_file" value="$(env ICE_ROOT)/ice_serval_ros_bridge/tests/data/message_templates.xml"/>
