@@ -55,8 +55,8 @@ private:
   void readOntology();
   std::shared_ptr<ASPSystem> getASPSystemByIRI(std::string p_iri);
   std::map<std::string, std::string> readConfiguration(std::string const config);
-  void readMetadata(std::map<std::string, int>* metadata, const Gringo::Value &element);
-  void readMetadata(std::string name, std::map<std::string, int> *metadata, const Gringo::Value &element);
+  void readMetadata(std::map<std::string, int> &metadata, const Gringo::Value &element);
+  void readMetadata(std::string name, std::map<std::string, int> &metadata, const Gringo::Value &element);
   std::string dataTypeForRepresentation(std::string representation);
   bool extractedSubModel(std::shared_ptr<ASPSystem> system, std::shared_ptr<SubModel> subModel);
   bool extractNodes(vector<NodeDesc> *nodes, std::shared_ptr<ASPSystem> system);

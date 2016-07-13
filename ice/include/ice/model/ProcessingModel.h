@@ -101,7 +101,7 @@ public:
   const std::shared_ptr<std::vector<std::shared_ptr<SubModel>>>& getSubModels() const;
 
 private:
-  const int index; /**< Index of the processing model */
+  const int index; /**< Index of the processing modcel */
   std::shared_ptr<std::vector<std::shared_ptr<SubModel>>> subModels; /**< Sub models that needs to be estableshed by other engines */
   std::shared_ptr<std::vector<NodeDesc>> nodes; /**< Nodes required by this model */
   std::shared_ptr<std::vector<std::shared_ptr<StreamTransfer>>> send; /**< Streams that needs to be send to other engines */

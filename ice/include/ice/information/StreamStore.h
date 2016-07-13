@@ -111,7 +111,7 @@ public:
   std::shared_ptr<BaseInformationStream> registerBaseStream(std::string dataType,
                                                             std::shared_ptr<InformationSpecification> specification,
                                                             const std::string name, const int streamSize,
-                                                            std::map<std::string, int> metadata, std::string provider,
+                                                            std::map<std::string, int> &metadata, std::string provider,
                                                             std::string sourceSystem);
 
   /*!

@@ -81,7 +81,6 @@ void UpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
 
 bool UpdateStrategie::processSubModel(std::shared_ptr<EngineState> engineState, SubModelDesc &subModel)
 {
-//  const char* idCStr = IDGenerator::toString(std::to_string(engineState->getEngineId()).c_str());
   _log->debug("Processing sub model description received from engine '%v'", engineState->getEngineId());
   bool valid = true;
   std::vector<std::shared_ptr<Node>> createdNodes;

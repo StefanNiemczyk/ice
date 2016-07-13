@@ -66,7 +66,7 @@ StreamStore::~StreamStore()
 
 std::shared_ptr<BaseInformationStream> StreamStore::registerBaseStream(
     std::string dataType, std::shared_ptr<InformationSpecification> specification, const std::string name,
-    const int streamSize, std::map<std::string, int> metadata, std::string provider, std::string sourceSystem)
+    const int streamSize, std::map<std::string, int> &metadata, std::string provider, std::string sourceSystem)
 {
   auto ptr = this->getBaseStream(specification.get(), provider, sourceSystem);
 

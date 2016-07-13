@@ -114,7 +114,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   this->streamStore->cleanUpStreams();
 
   // sending sub models
-  for (auto subModel : *model->getSubModels())
+  for (auto &subModel : *model->getSubModels())
   {
     this->communication->sendSubModelRequest(subModel->engine->getEngineId(), *subModel->model);
   }
