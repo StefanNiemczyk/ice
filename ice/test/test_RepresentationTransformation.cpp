@@ -297,34 +297,34 @@ TEST(RepresentationTransformationTest, xmlReader)
 
   ASSERT_TRUE(result);
 
-  auto p2dRep = factory->getRepresentation("o0_Pos2D");
-  auto p3dRep = factory->getRepresentation("o0_Pos3D");
-  auto p3dRotRep = factory->getRepresentation("o0_Pos3DRot");
-  auto rollPitchYawRep = factory->getRepresentation("o0_RollPitchYawRep");
+  auto p2dRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos2D");
+  auto p3dRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");
+  auto p3dRotRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3DRot");
+  auto rollPitchYawRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#RollPitchYawRep");
 
   ASSERT_TRUE(p2dRep != false);
   ASSERT_TRUE(p3dRep != false);
   ASSERT_TRUE(p3dRotRep != false);
 
-  auto p2dX = p2dRep->accessPath({"o2_XCoordinate"});
-  auto p2dY = p2dRep->accessPath({"o2_YCoordinate"});
+  auto p2dX = p2dRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
+  auto p2dY = p2dRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
 
-  auto p3dX = p3dRep->accessPath({"o2_XCoordinate"});
-  auto p3dY = p3dRep->accessPath({"o2_YCoordinate"});
-  auto p3dZ = p3dRep->accessPath({"o2_ZCoordinate"});
+  auto p3dX = p3dRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
+  auto p3dY = p3dRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
+  auto p3dZ = p3dRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
 
-  auto p3dRotX = p3dRotRep->accessPath({"o2_XCoordinate"});
-  auto p3dRotY = p3dRotRep->accessPath({"o2_YCoordinate"});
-  auto p3dRotZ = p3dRotRep->accessPath({"o2_ZCoordinate"});
-  auto p3dRotOri = p3dRotRep->accessPath({"o2_Orientation"});
+  auto p3dRotX = p3dRotRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
+  auto p3dRotY = p3dRotRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
+  auto p3dRotZ = p3dRotRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
+  auto p3dRotOri = p3dRotRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation"});
 
-  auto p3dRotOriA = p3dRotRep->accessPath({"o2_Orientation", "o2_Alpha"});
-  auto p3dRotOriB = p3dRotRep->accessPath({"o2_Orientation", "o2_Beta"});
-  auto p3dRotOriC = p3dRotRep->accessPath({"o2_Orientation", "o2_Gamma"});
+  auto p3dRotOriA = p3dRotRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Alpha"});
+  auto p3dRotOriB = p3dRotRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Beta"});
+  auto p3dRotOriC = p3dRotRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Gamma"});
 
-//  auto roll = rollPitchYawRep->accessPath({"o2_Roll"});
-//  auto pitch = rollPitchYawRep->accessPath({"o2_Pitch"});
-//  auto yaw = rollPitchYawRep->accessPath({"o2_Yaw"});
+//  auto roll = rollPitchYawRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Roll"});
+//  auto pitch = rollPitchYawRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Pitch"});
+//  auto yaw = rollPitchYawRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Yaw"});
 
   bool foundP2toP3 = false;
   bool foundP3toP2 = false;

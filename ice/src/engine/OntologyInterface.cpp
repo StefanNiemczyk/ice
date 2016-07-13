@@ -28,6 +28,8 @@ void OntologyInterface::callJniGc()
   }
 }
 
+const std::string OntologyInterface::ICE_IRI = "http://www.semanticweb.org/sni/ontologies/2013/7/Ice";
+
 OntologyInterface::OntologyInterface(std::string const p_jarPath)
 {
   this->_log = el::Loggers::getLogger("OntologyInterface");
@@ -1166,6 +1168,27 @@ std::string OntologyInterface::toLongIri(std::string p_shortIri)
   return this->ontologyIriMapping.at(id) + "#" + p_shortIri.substr(index + 1);
 }
 
+//std::string OntologyInterface::toLongIri(const char* p_shortIri)
+//{
+//  if (this->mappingDirty)
+//  {
+//    this->readOntologyIriMappingFromOntology();
+//    this->mappingDirty = false;
+//  }
+//
+//  const char* index = std::strchr(p_shortIri, '_');
+//
+//  if (index == nullptr)
+//    return "";
+//
+//  int id = std::atoi(index);
+//
+//  if (this->ontologyIriMapping.size() <= id)
+//    return "";
+//
+//  return this->ontologyIriMapping.at(id) + "#" + index;
+//}
+
 std::string OntologyInterface::toShortIri(std::string p_longIri)
 {
   if (this->mappingDirty)
@@ -1196,6 +1219,32 @@ std::string OntologyInterface::toShortIri(std::string p_longIri)
     return "";
 
   return "o" + std::to_string(id) + "_" + p_longIri.substr(index + 1);
+}
+
+std::string OntologyInterface::toShortIriAll(std::string p_string)
+
+{
+  if (this->mappingDirty)
+  {
+    this->readOntologyIriMappingFromOntology();
+    this->mappingDirty = false;
+  }
+  int indexLast = 0;
+
+
+  for (int i = 0; i < this->ontologyIriMapping.size(); ++i)
+  {
+    size_t start_pos = 0;
+    std::string from = this->ontologyIriMapping.at(i) + "#";
+    std::string to = "o" + std::to_string(i) + "_";
+    while((start_pos = p_string.find(from, start_pos)) != std::string::npos)
+    {
+      p_string.replace(start_pos, from.length(), to);
+      start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
+  }
+
+  return p_string;
 }
 
 bool OntologyInterface::addOntologyIRI(std::string const p_iri)

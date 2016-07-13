@@ -156,16 +156,16 @@ TEST(JNITest, addInfoStructure)
 
   std::vector<std::string> toSearch;
 
-  EXPECT_TRUE(str.find("entityType(o0_TestEntity).") != std::string::npos);
-  EXPECT_TRUE(str.find("scope(o0_TestScope).") != std::string::npos);
-  EXPECT_TRUE(str.find("valueScope(o0_TestValueScope1).") != std::string::npos);
-  EXPECT_TRUE(str.find("valueScope(o0_TestValueScope2).") != std::string::npos);
-  EXPECT_TRUE(str.find("representation(o0_TestRep1).") != std::string::npos);
+  EXPECT_TRUE(str.find("entityType(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).") != std::string::npos);
+  EXPECT_TRUE(str.find("scope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope1).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope2).") != std::string::npos);
+  EXPECT_TRUE(str.find("representation(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1).") != std::string::npos);
 
-  EXPECT_TRUE(str.find("hasScope(o0_TestEntity,o0_TestScope).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasRepresentation(o0_TestScope,o0_TestRep1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_TestValueScope1,o0_DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_TestValueScope2,o0_DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasRepresentation(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
 }
 
 TEST(JNITest, addDimension)
@@ -240,19 +240,19 @@ TEST(JNITest, addDimension)
 
   std::cout << str << std::endl;
 
-  EXPECT_TRUE(str.find("entityType(o0_TestEntity).") != std::string::npos);
-  EXPECT_TRUE(str.find("scope(o0_TestScope).") != std::string::npos);
-  EXPECT_TRUE(str.find("valueScope(o0_TestValueScope1).") != std::string::npos);
-  EXPECT_TRUE(str.find("valueScope(o0_TestValueScope2).") != std::string::npos);
-  EXPECT_TRUE(str.find("representation(o0_TestRep1).") != std::string::npos);
+  EXPECT_TRUE(str.find("entityType(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).") != std::string::npos);
+  EXPECT_TRUE(str.find("scope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope1).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope2).") != std::string::npos);
+  EXPECT_TRUE(str.find("representation(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1).") != std::string::npos);
 
-  EXPECT_TRUE(str.find("hasScope(o0_TestEntity,o0_TestScope).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasRepresentation(o0_TestScope,o0_TestRep1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_TestValueScope1,o0_DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_TestValueScope2,o0_DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_Orientation,o0_EulerAnglesRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_TestValueScope3,o0_DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(o0_TestRep1,o0_XCoordinate,o0_DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasRepresentation(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#EulerAnglesRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope3,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
 }
 
 TEST(JNITest, addStreamClass)
@@ -327,8 +327,8 @@ TEST(JNITest, addRequiredStream)
     ASSERT_EQ(returnValues->at(4)->size(), 1);
 
     EXPECT_EQ("REQUIRED_STREAM", std::string(returnValues->at(0)->at(0)));
-    EXPECT_EQ("o0_TestReqStream", std::string(returnValues->at(1)->at(0)));
-    EXPECT_EQ("requiredStream(o0_TestSystem,information(o0_TestEntity,o0_Position,o0_CoordinatePositionRep,none)).\n", std::string(returnValues->at(2)->at(0)));
+    EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestReqStream", std::string(returnValues->at(1)->at(0)));
+    EXPECT_EQ("requiredStream(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,information(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none)).\n", std::string(returnValues->at(2)->at(0)));
 
     EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
@@ -402,15 +402,15 @@ TEST(JNITest, addSourceNode)
   ASSERT_EQ(returnValues->at(4)->size(), 1);
 
   EXPECT_EQ("SOURCE_NODE", std::string(returnValues->at(0)->at(0)));
-  EXPECT_EQ("o0_TestSourceNodeInd", std::string(returnValues->at(1)->at(0)));
-  EXPECT_EQ("sourceNode(o0_TestSystem,o0_TestSourceNodeInd,o0_TestEntity).\n", std::string(returnValues->at(2)->at(0)));
+  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("sourceNode(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).\n", std::string(returnValues->at(2)->at(0)));
 
   std::string toTest = std::string(returnValues->at(3)->at(0));
-  EXPECT_TRUE(toTest.find("#external sourceNode(o0_TestSystem,o0_TestSourceNodeInd,o0_TestEntity).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,o0_TestSystem,o0_TestSourceNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,o0_TestSystem,o0_TestSourceNodeInd,fix,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,o0_TestSystem,o0_TestSourceNodeInd,fix,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(o0_TestSystem,o0_TestSourceNodeInd,o0_Position,o0_CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external sourceNode(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,fix,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,fix,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
 
   EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
@@ -482,18 +482,18 @@ TEST(JNITest, addComputationNode)
   ASSERT_EQ(returnValues->at(4)->size(), 1);
 
   EXPECT_EQ("COMPUTATION_NODE", std::string(returnValues->at(0)->at(0)));
-  EXPECT_EQ("o0_TestNodeInd", std::string(returnValues->at(1)->at(0)));
-  EXPECT_EQ("nodeTemplate(o0_TestSystem,o0_TestNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
+  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("nodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
 
 
   std::string toTest = std::string(returnValues->at(3)->at(0));
-  EXPECT_TRUE(toTest.find("#external nodeTemplate(o0_TestSystem,o0_TestNodeInd,any).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(o0_TestSystem,o0_TestNodeInd,o0_Position,o0_CoordinatePositionRep,none).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input(o0_TestSystem,o0_TestNodeInd,o0_Position,o0_CoordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,o0_TestSystem,o0_TestNodeInd,max,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,o0_TestSystem,o0_TestNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,o0_TestSystem,o0_TestNodeInd,max,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(o0_TestSystem,o0_TestNodeInd,o0_Position,o0_CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external nodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
 
   EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
@@ -573,17 +573,17 @@ TEST(JNITest, addIroNode)
   ASSERT_EQ(returnValues->at(4)->size(), 1);
 
   EXPECT_EQ("IRO_NODE", std::string(returnValues->at(0)->at(0)));
-  EXPECT_EQ("o0_TestNodeInd", std::string(returnValues->at(1)->at(0)));
-  EXPECT_EQ("iro(o0_TestSystem,o0_TestNodeInd,any,none).\n", std::string(returnValues->at(2)->at(0)));
+  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("iro(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any,none).\n", std::string(returnValues->at(2)->at(0)));
 
   std::string toTest = std::string(returnValues->at(3)->at(0));
-  EXPECT_TRUE(toTest.find("#external iro(o0_TestSystem,o0_TestNodeInd,any,none).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input(o0_TestSystem,o0_TestNodeInd,o0_Position,o0_CoordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input2(o0_TestSystem,o0_TestNodeInd,o0_Position,o0_CoordinatePositionRep,none,1,1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,o0_TestSystem,o0_TestNodeInd,max,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,o0_TestSystem,o0_TestNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,o0_TestSystem,o0_TestNodeInd,max,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(o0_TestSystem,o0_TestNodeInd,o0_Position,o0_CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external iro(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input2(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
 
   EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
@@ -660,14 +660,14 @@ TEST(JNITest, addNodeToSystem)
   ASSERT_EQ(returnValues->at(4)->size(), 1);
 
   EXPECT_EQ("SOURCE_NODE", std::string(returnValues->at(0)->at(0)));
-  EXPECT_EQ("o0_TestSourceNodeInd", std::string(returnValues->at(1)->at(0)));
-  EXPECT_EQ("sourceNode(o0_TestSystem2,o0_TestSourceNodeInd,o0_TestEntity).\n", std::string(returnValues->at(2)->at(0)));
+  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("sourceNode(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).\n", std::string(returnValues->at(2)->at(0)));
 
   std::string toTest = std::string(returnValues->at(3)->at(0));
-  EXPECT_TRUE(toTest.find("#external sourceNode(o0_TestSystem2,o0_TestSourceNodeInd,o0_TestEntity).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,o0_TestSystem2,o0_TestSourceNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,o0_TestSystem2,o0_TestSourceNodeInd,fix,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,o0_TestSystem2,o0_TestSourceNodeInd,fix,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external sourceNode(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,fix,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,fix,-1,-1).") != std::string::npos);
 
   EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
@@ -761,17 +761,17 @@ TEST(JNITest, addMapNodeToSystem1)
   ASSERT_EQ(returnValues->at(4)->size(), 1);
 
   EXPECT_EQ("MAP_NODE", std::string(returnValues->at(0)->at(0)));
-  EXPECT_EQ("o0_TestMapNodeInd", std::string(returnValues->at(1)->at(0)));
-  EXPECT_EQ("mapNodeTemplate(o0_TestSystem2,o0_TestMapNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
+  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("mapNodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
 
   std::string toTest = std::string(returnValues->at(3)->at(0));
 
-  EXPECT_TRUE(toTest.find("#external mapNodeTemplate(o0_TestSystem2,o0_TestMapNodeInd,any)") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input(o0_TestSystem2,o0_TestMapNodeInd,o0_Position,o0_CoordinatePositionRep,none,1,1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("outputMap(o0_TestSystem2,o0_TestMapNodeInd,o0_Robot,o0_Position,o0_CoordinatePositionRep,none).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,o0_TestSystem2,o0_TestMapNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,o0_TestSystem2,o0_TestMapNodeInd,fix,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,o0_TestSystem2,o0_TestMapNodeInd,fix,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external mapNodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,any)") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("outputMap(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,fix,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,fix,-1,-1).") != std::string::npos);
 
   EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
@@ -869,18 +869,18 @@ TEST(JNITest, addMapNodeToSystem2)
   ASSERT_EQ(returnValues->at(4)->size(), 1);
 
   EXPECT_EQ("MAP_NODE", std::string(returnValues->at(0)->at(0)));
-  EXPECT_EQ("o0_TestMapNodeInd", std::string(returnValues->at(1)->at(0)));
-  EXPECT_EQ("mapNodeTemplate(o0_TestSystem2,o0_TestMapNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
+  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("mapNodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
 
   std::string toTest = std::string(returnValues->at(3)->at(0));
 
-  EXPECT_TRUE(toTest.find("#external mapNodeTemplate(o0_TestSystem2,o0_TestMapNodeInd,any)") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input(o0_TestSystem2,o0_TestMapNodeInd,o0_Position,o0_CoordinatePositionRep,none,1,1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("inputMap(o0_TestSystem2,o0_TestMapNodeInd,o0_Robot,o0_Position,o0_CoordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("outputMap(o0_TestSystem2,o0_TestMapNodeInd,o0_Robot,o0_Position,o0_CoordinatePositionRep,none).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,o0_TestSystem2,o0_TestMapNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,o0_TestSystem2,o0_TestMapNodeInd,fix,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,o0_TestSystem2,o0_TestMapNodeInd,fix,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external mapNodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,any)") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("inputMap(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("outputMap(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,fix,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,fix,-1,-1).") != std::string::npos);
 
   EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
@@ -936,12 +936,12 @@ TEST(JNITest, addRequiredMap)
   ASSERT_EQ(returnValues->at(4)->size(), 1);
 
   EXPECT_EQ("REQUIRED_MAP", std::string(returnValues->at(0)->at(0)));
-  EXPECT_EQ("o0_ReqMap", std::string(returnValues->at(1)->at(0)));
-  EXPECT_EQ("requiredMap(o0_TestSystem,informationType(o0_Robot,o0_Position,o0_CoordinatePositionRep,none)).\n", std::string(returnValues->at(2)->at(0)));
+  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ReqMap", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("requiredMap(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,informationType(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none)).\n", std::string(returnValues->at(2)->at(0)));
 
   std::string toTest = std::string(returnValues->at(3)->at(0));
 
-  EXPECT_TRUE(toTest.find("#external requiredMap(o0_TestSystem,informationType(o0_Robot,o0_Position,o0_CoordinatePositionRep,none))") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external requiredMap(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,informationType(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none))") != std::string::npos);
 
   EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
@@ -1033,17 +1033,17 @@ TEST(JNITest, save)
   ASSERT_EQ(1, returnValues->at(4)->size());
 
   EXPECT_EQ("COMPUTATION_NODE", std::string(returnValues->at(0)->at(0)));
-  EXPECT_EQ("o0_TestNodeInd", std::string(returnValues->at(1)->at(0)));
-  EXPECT_EQ("nodeTemplate(o0_TestSystem,o0_TestNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
+  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd", std::string(returnValues->at(1)->at(0)));
+  EXPECT_EQ("nodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any).\n", std::string(returnValues->at(2)->at(0)));
 
   std::string toTest = std::string(returnValues->at(3)->at(0));
-  EXPECT_TRUE(toTest.find("#external nodeTemplate(o0_TestSystem,o0_TestNodeInd,any).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(o0_TestSystem,o0_TestNodeInd,o0_Position,o0_CoordinatePositionRep,none).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input(o0_TestSystem,o0_TestNodeInd,o0_Position,o0_CoordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,o0_TestSystem,o0_TestNodeInd,max,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,o0_TestSystem,o0_TestNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,o0_TestSystem,o0_TestNodeInd,max,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(o0_TestSystem,o0_TestNodeInd,o0_Position,o0_CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external nodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
 
   EXPECT_TRUE(strlen(returnValues->at(4)->at(0)) == 0);
 }
@@ -2270,7 +2270,7 @@ TEST(JNITest, readBaseRepresentationsAsCSV)
   // Sample testing of integer representation
   int index =
       read_csv_res.find(
-          "o0_DefaultMovementRep;o0_Orientation;o0_EulerAnglesRep");
+          "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DefaultMovementRep;http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation;http://www.semanticweb.org/sni/ontologies/2013/7/Ice#EulerAnglesRep");
   ASSERT_FALSE(index == std::string::npos);
 }
 

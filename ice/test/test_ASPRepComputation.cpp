@@ -95,24 +95,24 @@ TEST(ASPRepComp, ontology1)
   asp.extractTransformations();
 
   // Test transformation
-  std::string name = "autoTrans_o2_Position_o2_CoordinatePositionRep_o0_Pos3D";
+  std::string name = "autoTrans_http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position_http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep_http://vs.uni-kassel.de/IceTest#Pos3D";
   auto trans = factory->getTransformationByName(name);
 
   ASSERT_TRUE(trans != false);
 
-  auto repIn = factory->getRepresentation("o2_CoordinatePositionRep");
-  auto repOut = factory->getRepresentation("o0_Pos3D");
+  auto repIn = factory->getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep");
+  auto repOut = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");
 
   ASSERT_TRUE(repIn != false);
   ASSERT_TRUE(repOut != false);
 
-  auto inX = repIn->accessPath( {"o2_XCoordinate"});
-  auto inY = repIn->accessPath( {"o2_YCoordinate"});
-  auto inZ = repIn->accessPath( {"o2_ZCoordinate"});
+  auto inX = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
+  auto inY = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
+  auto inZ = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
 
-  auto outX = repOut->accessPath( {"o2_XCoordinate"});
-  auto outY = repOut->accessPath( {"o2_YCoordinate"});
-  auto outZ = repOut->accessPath( {"o2_ZCoordinate"});
+  auto outX = repOut->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
+  auto outY = repOut->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
+  auto outZ = repOut->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
 
   ASSERT_TRUE(inX != nullptr);
   ASSERT_TRUE(inY != nullptr);
@@ -176,26 +176,26 @@ TEST(ASPRepComp, ontology2)
   asp.extractTransformations();
 
   // Test transformation
-  std::string name = "autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2";
+  std::string name = "autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2";
   auto trans = factory->getTransformationByName(name);
 
   ASSERT_TRUE(trans != false);
 
-  auto repIn = factory->getRepresentation("o0_TestTransformation1");
-  auto repOut = factory->getRepresentation("o0_TestTransformation2");
+  auto repIn = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#TestTransformation1");
+  auto repOut = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#TestTransformation2");
 
   ASSERT_TRUE(repIn != false);
   ASSERT_TRUE(repOut != false);
 
-  auto inO = repIn->accessPath( {"o2_Orientation"});
-  auto inP = repIn->accessPath( {"o2_Position"});
-  auto inX = repIn->accessPath( {"o2_Position", "o2_XCoordinate"});
-  auto inY = repIn->accessPath( {"o2_Position", "o2_YCoordinate"});
-  auto inZ = repIn->accessPath( {"o2_Position", "o2_ZCoordinate"});
+  auto inO = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation"});
+  auto inP = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position"});
+  auto inX = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
+  auto inY = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
+  auto inZ = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
 
-  auto inOa = repIn->accessPath( {"o2_Orientation", "o2_Alpha"});
-  auto inOb = repIn->accessPath( {"o2_Orientation", "o2_Beta"});
-  auto inOc = repIn->accessPath( {"o2_Orientation", "o2_Gamma"});
+  auto inOa = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Alpha"});
+  auto inOb = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Beta"});
+  auto inOc = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Gamma"});
 
   ASSERT_TRUE(inO != nullptr);
   ASSERT_TRUE(inP != nullptr);
@@ -207,15 +207,15 @@ TEST(ASPRepComp, ontology2)
   ASSERT_TRUE(inOb != nullptr);
   ASSERT_TRUE(inOc != nullptr);
 
-  auto outO = repIn->accessPath( {"o2_Orientation"});
-  auto outP = repIn->accessPath( {"o2_Position"});
-  auto outX = repIn->accessPath( {"o2_Position", "o2_XCoordinate"});
-  auto outY = repIn->accessPath( {"o2_Position", "o2_YCoordinate"});
-  auto outZ = repIn->accessPath( {"o2_Position", "o2_ZCoordinate"});
+  auto outO = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation"});
+  auto outP = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position"});
+  auto outX = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
+  auto outY = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
+  auto outZ = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
 
-  auto outOa = repIn->accessPath( {"o2_Orientation", "o2_Alpha"});
-  auto outOb = repIn->accessPath( {"o2_Orientation", "o2_Beta"});
-  auto outOc = repIn->accessPath( {"o2_Orientation", "o2_Gamma"});
+  auto outOa = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Alpha"});
+  auto outOb = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Beta"});
+  auto outOc = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Gamma"});
 
   ASSERT_TRUE(outO != nullptr);
   ASSERT_TRUE(outP != nullptr);
@@ -258,17 +258,17 @@ TEST(ASPRepComp, ontology2)
   auto aspStr = trans->getASPRepreentation("system");
   for (auto s : *aspStr)
   {
-    if (s == "iro(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,any,none).")
+    if (s == "iro(system,autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2,any,none).")
     {
       // fine
     }
     else if (s
-        == "output(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,o0_TestScope1,o0_TestTransformation1,none).")
+        == "output(system,autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2,http://vs.uni-kassel.de/IceTest#TestScope1,http://vs.uni-kassel.de/IceTest#TestTransformation1,none).")
     {
       // fine
     }
     else if (s
-        == "input(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,o0_TestScope1,o0_TestTransformation1,none,1,1) :- iro(system,autoTrans_o0_TestScope1_o0_TestTransformation1_o0_TestTransformation2,any,none).")
+        == "input(system,autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2,http://vs.uni-kassel.de/IceTest#TestScope1,http://vs.uni-kassel.de/IceTest#TestTransformation1,none,1,1) :- iro(system,autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2,any,none).")
     {
       // fine
     }

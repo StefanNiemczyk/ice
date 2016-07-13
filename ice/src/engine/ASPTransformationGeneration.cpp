@@ -96,7 +96,7 @@ void ASPTransformationGeneration::extractTransformations()
 
   for (auto entity : this->entities)
   {
-    asp.add(programPart, {}, entity);
+    asp.add(programPart, {}, this->ontology->toShortIriAll(entity));
   }
   asp.ground(programPart, {});
 
@@ -125,9 +125,9 @@ void ASPTransformationGeneration::extractTransformations()
 
   for (auto trans : *queryResult)
   {
-    auto scope = *trans.args()[0].name();
-    auto representation1 = *trans.args()[1].name();
-    auto representation2 = *trans.args()[2].name();
+    auto scope = this->ontology->toLongIri(*trans.args()[0].name());
+    auto representation1 = this->ontology->toLongIri(*trans.args()[1].name());
+    auto representation2 = this->ontology->toLongIri(*trans.args()[2].name());
 
     _log->debug("Process transformation for '%v' (scope), '%v' (represetnation1), '%v' (representation2)", scope,
                 representation1, representation2);
@@ -166,9 +166,9 @@ void ASPTransformationGeneration::extractTransformations()
     transformation->getInputs().push_back(rep1);
 
     values.clear();
-    values.push_back(Gringo::Value(scope));
-    values.push_back(Gringo::Value(representation1));
-    values.push_back(Gringo::Value(representation2));
+    values.push_back(trans.args()[0]);
+    values.push_back(trans.args()[1]);
+    values.push_back(trans.args()[2]);
     Gringo::Value simRep("simRep", values);
 
     std::vector<std::string> path;
@@ -221,7 +221,7 @@ bool ASPTransformationGeneration::extractOperations(supplementary::ClingWrapper 
 
   for (auto match : *matchQueryResult)
   {
-    auto matchingScope = *match.args()[1].name();
+    auto matchingScope = this->ontology->toLongIri(*match.args()[1].name());
 
     path.push_back(matchingScope);
     auto pathSource = rep1->accessPath(path);
@@ -278,7 +278,7 @@ bool ASPTransformationGeneration::extractOperations(supplementary::ClingWrapper 
     }
 
     auto defaultValue = result->at(0);
-    path.push_back(div);
+    path.push_back(this->ontology->toLongIri(div));
     auto pathTarget = rep2->accessPath(path);
     path.pop_back();
 
@@ -344,7 +344,7 @@ bool ASPTransformationGeneration::extractOperations(supplementary::ClingWrapper 
     values.push_back(Gringo::Value(r2Str));
     Gringo::Value simRep("simRep", values);
 
-    path.push_back(scope);
+    path.push_back(this->ontology->toLongIri(scope));
 
     bool resultExtract = this->extractOperations(asp, transformation, simRep, rep1, rep2, path);
 

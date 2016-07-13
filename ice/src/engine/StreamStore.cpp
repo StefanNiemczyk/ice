@@ -79,7 +79,7 @@ std::shared_ptr<BaseInformationStream> StreamStore::registerBaseStream(
   }
 
   auto desc = std::make_shared<StreamDescription>(specification, name, provider, sourceSystem, metadata);
-  std::string type = this->ontology->toLongIri(dataType);
+  std::string type = dataType;
   auto stream = this->streamFactory->createStream(type, desc, this->eventHandler, streamSize);
 
   if (stream)

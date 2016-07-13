@@ -35,6 +35,9 @@ public:
   static void callJniGc();
 
 public:
+  static const std::string ICE_IRI;
+
+public:
   OntologyInterface(std::string const p_jarPath);
   virtual ~OntologyInterface();
   bool errorOccurred();
@@ -81,7 +84,9 @@ public:
                        std::vector<int> p_inputMapsMaxSize, std::vector<std::string> p_outputMaps,
                        std::vector<int> p_outputMapsMinSize, std::vector<int> p_outputMapsMaxSize);
   std::string toLongIri(std::string p_shortIri);
+//  std::string toLongIri(const char* p_shortIri);
   std::string toShortIri(std::string p_longIri);
+  std::string toShortIriAll(std::string p_string);
 
   bool addOntologyIRI(std::string const p_iri);
   bool removeOntologyIRI(std::string const p_iri);

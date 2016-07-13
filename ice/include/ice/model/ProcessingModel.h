@@ -8,6 +8,7 @@
 #ifndef PROCESSINGMODEL_H_
 #define PROCESSINGMODEL_H_
 
+#include <map>
 #include <memory>
 #include <tuple>
 #include <vector>
@@ -30,13 +31,15 @@ typedef tuple<string,                   // source system
               string,                   // entity
               string,                   // scope
               string,                   // representation
-              string                    // related entity
+              string,                   // related entity
+              std::map<std::string, int>// metadata
               > InputStreamDesc;
 
 typedef tuple<string,                   // entity
               string,                   // scope
               string,                   // representation
-              string                    // related entity
+              string,                   // related entity
+              std::map<std::string, int>// metadata
               > OutputStreamDesc;
 
 typedef tuple<uint8_t,                  // Type

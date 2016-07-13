@@ -26,7 +26,7 @@ UpdateStrategie::UpdateStrategie(std::weak_ptr<ICEngine> engine)
 
 UpdateStrategie::~UpdateStrategie()
 {
-  // TODO Auto-generated destructor stub
+  //
 }
 
 void UpdateStrategie::init()
@@ -208,8 +208,7 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
     string scope = std::get<5>(input);
     string rep = std::get<6>(input);
     string entity2 = std::get<7>(input);
-
-    std::map<std::string, int> metadata; // TODO
+    std::map<std::string, int> metadata = std::get<8>(input);
 
     auto stream = this->getStream(nodeName, sourceSystem, entity, scope, rep, entity2, metadata);
 
@@ -228,12 +227,11 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
     string scope = std::get<1>(output);
     string rep = std::get<2>(output);
     string entity2 = std::get<3>(output);
-
-    std::map<std::string, int> metadata; // TODO
+    std::map<std::string, int> metadata = std::get<4>(output);
 
     _log->debug("Look up output stream for node '%v'", nodeName);
 
-    std::string iriShort = this->self->getSystemIriShort();
+    std::string iriShort = this->self->getSystemIri();
 
     auto stream = this->getStream(nodeName, iriShort, entity, scope, rep, entity2, metadata);
 
@@ -262,7 +260,6 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engin
   if (subModel == nullptr)
   {
     _log->info("Sub model accepted received from system '%v' is empty", engineState->getEngineId());
-    // TODO
     return false;
   }
 
@@ -272,7 +269,6 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engin
   {
     _log->info("Sub model accepted received from system '%v', wrong index '%v' expected '%v'", engineState->getEngineId(), index,
                modelIndex);
-    // TODO
     return false;
   }
 
@@ -292,8 +288,6 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engin
 
   if (false == valid)
   {
-    // TODO
-
     return false;
   }
 
@@ -313,7 +307,6 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engin
 
   if (false == valid)
   {
-    // TODO
     return false;
   }
 
@@ -352,6 +345,11 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string no
 
     std::string dataType = this->dataTypeForRepresentation(rep);
     std::string name = entity + "_" + nodeName + "_" + source;
+    std::replace(name.begin(), name.end(), '.', '_');
+    std::replace(name.begin(), name.end(), '#', '_');
+    std::replace(name.begin(), name.end(), '/', '_');
+    std::replace(name.begin(), name.end(), ':', '_');
+    std::replace(name.begin(), name.end(), '-', '_');
     stream = this->streamStore->registerBaseStream(dataType, infoSpec, name, 10, metadata, nodeName, source);
   }
 

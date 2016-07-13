@@ -46,14 +46,14 @@ TEST(GContainerTest, simpleTest)
   fac.setOntologyInterface(oi);
   fac.init();
 
-  auto rep = fac.getRepresentation("o0_DefaultMovementRep");
+  auto rep = fac.getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DefaultMovementRep");
 
   ASSERT_TRUE(rep != false);
 
   auto movement = fac.makeInstance(rep);
 
   const double testVal = 4.2f;
-  auto pos = rep->accessPath({"o0_Translation"});
+  auto pos = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Translation"});
 
   ASSERT_TRUE(pos != nullptr);
 
@@ -95,7 +95,7 @@ TEST(GContainerTest, serialize)
   fac.setOntologyInterface(oi);
   fac.init();
 
-  auto rep = fac.getRepresentation("o0_DefaultMovementRep");
+  auto rep = fac.getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DefaultMovementRep");
 
   ASSERT_TRUE(rep != false);
 
@@ -103,7 +103,7 @@ TEST(GContainerTest, serialize)
   auto movement2 = fac.makeInstance(rep);
 
   const double testVal = 4.2f;
-  auto pos = rep->accessPath({"o0_Translation"});
+  auto pos = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Translation"});
 
   ASSERT_TRUE(pos != nullptr);
 

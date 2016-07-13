@@ -57,18 +57,18 @@ TEST(RepresentationTransformationTest, rollPitchYawToEulerAngles)
 
   ASSERT_TRUE(result);
 
-  auto rollPitchYawRep = factory->getRepresentation("o0_RollPitchYawRep");
-  auto eulerRep = factory->getRepresentation("o0_EulerAnglesRep");
+  auto rollPitchYawRep = factory->getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RollPitchYawRep");
+  auto eulerRep = factory->getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#EulerAnglesRep");
 
   ASSERT_TRUE(rollPitchYawRep != false);
 
-  auto roll = rollPitchYawRep->accessPath({"o0_Roll"});
-  auto pitch = rollPitchYawRep->accessPath({"o0_Pitch"});
-  auto yaw = rollPitchYawRep->accessPath({"o0_Yaw"});
+  auto roll = rollPitchYawRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Roll"});
+  auto pitch = rollPitchYawRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Pitch"});
+  auto yaw = rollPitchYawRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Yaw"});
 
-  auto alpha = eulerRep->accessPath({"o0_Alpha"});
-  auto beta = eulerRep->accessPath({"o0_Beta"});
-  auto gamma = eulerRep->accessPath({"o0_Gamma"});
+  auto alpha = eulerRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Alpha"});
+  auto beta = eulerRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Beta"});
+  auto gamma = eulerRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Gamma"});
 
   bool foundRollPitchYawRep = false;
 
