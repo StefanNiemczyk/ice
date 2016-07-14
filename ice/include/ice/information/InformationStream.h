@@ -111,7 +111,7 @@ template<typename T>
      * \param timeObservation observation time of the information.
      * \param timeProcessed time of the processing of the information.
      */
-    int add(std::unique_ptr<T> information, time timeValidity = NO_TIME, time timeObservation = NO_TIME,
+    int add(std::shared_ptr<T> information, time timeValidity = NO_TIME, time timeObservation = NO_TIME,
             time timeProcessed = NO_TIME);
 
     /*!
@@ -244,12 +244,12 @@ template<typename T>
   }
 
 template<typename T>
-  int ice::InformationStream<T>::add(std::unique_ptr<T> information, time timeValidity, time timeObservation,
+  int ice::InformationStream<T>::add(std::shared_ptr<T> information, time timeValidity, time timeObservation,
                                      time timeProcessed)
   {
     std::lock_guard<std::mutex> guard(_mtx);
     auto informationElement = std::make_shared<InformationElement<T>>(
-        this->streamDescription->getInformationSpecification(), std::move(information), timeValidity, timeObservation,
+        this->streamDescription->getInformationSpecification(), information, timeValidity, timeObservation,
         timeProcessed);
 
     int returnValue = this->ringBuffer->add(informationElement);

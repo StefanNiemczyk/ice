@@ -106,7 +106,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
 
   this->readOntology();
 
-  if (groundingDirty)
+  if (this->groundingDirty)
   {
     this->groundingDirty = false;
     _log->debug("Grounding flagged dirty, grounding asp program");
@@ -121,7 +121,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
                                              {this->queryIndex, 3, this->maxChainLength}, true);
   }
 
-  if (false == this->self)
+  if (this->self == nullptr)
   {
     auto en = this->engine.lock();
     this->self = this->getASPSystemByIRI(en->getIri());
@@ -161,7 +161,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
   std::shared_ptr<ProcessingModel> model = std::make_shared<ProcessingModel>();
 
   // Extract nodes that needs to be activated within own system
-  if (false == this->extractNodes(model->getNodes().get(), this->self))
+  if (false == this->extractNodes(*model->getNodes().get(), this->self))
   {
     _log->error("Optimizing failed, error by extracting own processing model");
     return nullptr;
@@ -193,7 +193,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
     auto send = std::make_shared<StreamTransfer>();
     send->engine = system->getEngineState();
 
-    if (false == this->extractStreamTransfers(this->self, system, &send->transfer))
+    if (false == this->extractStreamTransfers(this->self, system, send->transfer))
     {
       _log->error("Optimizing failed, error by extracting streams transfers from '%v' to '%v'", this->self->getIri(),
                   system->getIri());
@@ -206,7 +206,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
     auto receive = std::make_shared<StreamTransfer>();
     receive->engine = system->getEngineState();
 
-    if (false == this->extractStreamTransfers(system, this->self, &receive->transfer))
+    if (false == this->extractStreamTransfers(system, this->self, receive->transfer))
     {
       _log->error("Optimizing failed, error by extracting streams transfers from '%v' to '%v'", system->getIri(),
                   this->self->getIri());
@@ -227,14 +227,24 @@ bool ASPModelGenerator::extractedSubModel(std::shared_ptr<ASPSystem> system, std
   _log->debug("Look up ASP elements for system '%v'", system->getIri());
 
   bool valid = true;
-  vector<NodeDesc> nodes;
 
   // extract nodes
-  valid = this->extractNodes(&nodes, system);
+  vector<NodeDesc> nodes;
+  valid = this->extractNodes(nodes, system);
+  if (false == valid)
+  {
+    _log->error("Sub model extraction for system '%v' failed", system->getIri());
+    subModel->model = nullptr;
+
+    return false;
+  }
+  std::cout << "=================================================" << std::endl;
+  std::cout << nodes.size() << " " << nodes.capacity() << std::endl;
+  std::cout << "=================================================" << std::endl;
 
   // identify streams send from self -> system
   std::vector<TransferDesc> send;
-  valid = this->extractStreamTransfers(system, this->self, &send);
+  valid = this->extractStreamTransfers(system, this->self, send);
 
   if (false == valid)
   {
@@ -246,7 +256,7 @@ bool ASPModelGenerator::extractedSubModel(std::shared_ptr<ASPSystem> system, std
 
   // identify streams send from system -> self
   std::vector<TransferDesc> receive;
-  valid = this->extractStreamTransfers(this->self, system, &receive);
+  valid = this->extractStreamTransfers(this->self, system, receive);
 
   if (false == valid)
   {
@@ -271,7 +281,7 @@ bool ASPModelGenerator::extractedSubModel(std::shared_ptr<ASPSystem> system, std
   return true;
 }
 
-bool ASPModelGenerator::extractNodes(vector<NodeDesc> *nodes, std::shared_ptr<ASPSystem> system)
+bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<ASPSystem> system)
 {
   bool valid = true;
 
@@ -379,15 +389,15 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> *nodes, std::shared_ptr<AS
       std::string relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(relatedEntity);
 
       std::map<std::string, int> metadata;
-      this->readMetadata(metadata, output);
+//      this->readMetadata(metadata, output);
 
       outputs.push_back(std::make_tuple(entity, scope, rep, relatedEntity, metadata));
     }
 
-    std::string ne = (nodeEntity == "none" ? "none" : this->ontology->toLongIri(nodeEntity));
-    std::string ne2 = (nodeEntity2 == "none" ? "none" : this->ontology->toLongIri(nodeEntity2));
+    std::string ne = (nodeEntity == "none" ? "" : this->ontology->toLongIri(nodeEntity));
+    std::string ne2 = (nodeEntity2 == "none" ? "" : this->ontology->toLongIri(nodeEntity2));
 
-    nodes->push_back(
+    nodes.push_back(
         std::make_tuple(aspNode->getNodeType(), aspNode->className,
                         this->ontology->toLongIri(aspNode->name), ne, ne2,
                         aspNode->configAsString, inputs, outputs));
@@ -403,7 +413,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> *nodes, std::shared_ptr<AS
 }
 
 bool ASPModelGenerator::extractStreamTransfers(std::shared_ptr<ASPSystem> from, std::shared_ptr<ASPSystem> to,
-                                           std::vector<TransferDesc> *transfers)
+                                           std::vector<TransferDesc> &transfers)
 {
   bool valid = true;
 
@@ -437,25 +447,15 @@ bool ASPModelGenerator::extractStreamTransfers(std::shared_ptr<ASPSystem> from, 
     auto entity = this->ontology->toLongIri(*info.args()[0].name());
     auto scope = this->ontology->toLongIri(*info.args()[1].name());
     auto rep = this->ontology->toLongIri(*info.args()[2].name());
-    std::string relatedEntity = *info.args()[3].name();
+    std::string relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(relatedEntity);
 
     std::string source = this->ontology->toLongIri(*node.args()[1].name());
     std::string nodeName = this->ontology->toLongIri(*node.args()[2].name());
     std::string nodeEntity = this->ontology->toLongIri(*node.args()[3].name());
-    std::string nodeEntity2 = *node.args()[4].name();
-
-    if (relatedEntity == "none")
-      relatedEntity = "";
-    else
-      relatedEntity = this->ontology->toLongIri(relatedEntity);
-
-    if (nodeEntity2 == "none")
-      nodeEntity2 = "";
-    else
-      nodeEntity2 = this->ontology->toLongIri(nodeEntity2);
+    std::string nodeEntity2 = *node.args()[4].name() == "none" ? "" : this->ontology->toLongIri(nodeEntity2);
 
     TransferDesc transferTo(source, nodeName, nodeEntity, nodeEntity2, entity, scope, rep, relatedEntity);
-    transfers->push_back(transferTo);
+    transfers.push_back(transferTo);
   }
 
   return valid;
@@ -468,20 +468,14 @@ void ASPModelGenerator::readInfoStructureFromOntology()
   if (this->ontology->isLoadDirty())
     this->ontology->loadOntologies();
 
-//  if (false == this->ontology->isInformationDirty())
-//    return;
-
-  const char* infoStructure = this->ontology->readInformationStructureAsASP();
+  std::stringstream ss;
+  ss.str(this->ontology->readInformationStructureAsASP());
 
   _log->debug("Extracted structure from ontology");
-  _log->verbose(1, infoStructure);
+  _log->verbose(1, ss.str());
 
   std::string programPart = "ontology" + ++this->queryIndex;
-  std::stringstream ss;
   std::string item, noIri;
-
-  ss << infoStructure;
-//  delete infoStructure
 
   while (std::getline(ss, item, '\n'))
   {
@@ -525,69 +519,56 @@ void ASPModelGenerator::readSystemsFromOntology()
 
     auto nodes = this->ontology->readNodesAndIROsAsASP(ontSystem);
 
-    std::vector<const char*>* types = nodes->at(0);
-    std::vector<const char*>* names = nodes->at(1);
-    std::vector<const char*>* strings = nodes->at(2);
-    std::vector<const char*>* aspStrings = nodes->at(3);
-    std::vector<const char*>* cppStrings = nodes->at(4);
+    auto &types = nodes->at(0);
+    auto &names = nodes->at(1);
+    auto &strings = nodes->at(2);
+    auto &aspStrings = nodes->at(3);
+    auto &cppStrings = nodes->at(4);
 
-    for (int i = 0; i < names->size(); ++i)
+    for (int i = 0; i < names.size(); ++i)
     {
-      const char* name = names->at(i);
-      const char* elementStr = strings->at(i);
-      const char* aspStr = aspStrings->at(i);
-      const char* cppStr = cppStrings->at(i);
-      const char* typeStr = types->at(i);
+      std::string &name = names.at(i);
+      std::string &elementStr = strings.at(i);
+      std::string &aspStr = aspStrings.at(i);
+      std::string &cppStr = cppStrings.at(i);
+      std::string &typeStr = types.at(i);
       ASPElementType type;
 
-      if (typeStr == nullptr || name == nullptr || elementStr == nullptr)
+      if (typeStr == "" || name == "" || elementStr == "")
       {
         _log->error("Empty string for element '%v': '%v' (elementStr), '%v' (typeStr), element will be skipped",
-                    name == nullptr ? "null" : name, elementStr == nullptr ? "null" : elementStr,
-                    typeStr == nullptr ? "null" : typeStr);
-
-        delete name;
-        delete elementStr;
-        delete aspStr;
-        delete cppStr;
-        delete typeStr;
+                    name, elementStr, typeStr);
 
         continue;
       }
 
-      if (std::strcmp(typeStr, "COMPUTATION_NODE") == 0)
+      if (typeStr == "COMPUTATION_NODE")
       {
         type = ASPElementType::ASP_COMPUTATION_NODE;
       }
-      else if (std::strcmp(typeStr, "SOURCE_NODE") == 0)
+      else if (typeStr == "SOURCE_NODE")
       {
         type = ASPElementType::ASP_SOURCE_NODE;
       }
-      else if (std::strcmp(typeStr, "REQUIRED_STREAM") == 0)
+      else if (typeStr == "REQUIRED_STREAM")
       {
         type = ASPElementType::ASP_REQUIRED_STREAM;
       }
-      else if (std::strcmp(typeStr, "MAP_NODE") == 0)
+      else if (typeStr == "MAP_NODE")
       {
         type = ASPElementType::ASP_MAP_NODE;
       }
-      else if (std::strcmp(typeStr, "IRO_NODE") == 0)
+      else if (typeStr == "IRO_NODE")
       {
         type = ASPElementType::ASP_IRO_NODE;
       }
-      else if (std::strcmp(typeStr, "REQUIRED_MAP") == 0)
+      else if (typeStr == "REQUIRED_MAP")
       {
         type = ASPElementType::ASP_REQUIRED_MAP;
       }
       else
       {
         _log->error("Unknown asp element type '%v' for element '%v', element will be skipped", typeStr, name);
-
-        delete name;
-        delete elementStr;
-        delete aspStr;
-        delete cppStr;
-        delete typeStr;
 
         continue;
       }
@@ -603,11 +584,11 @@ void ASPModelGenerator::readSystemsFromOntology()
         element->state = ASPElementState::ADDED_TO_ASP;
         element->type = type;
 
-        if (std::strlen(cppStr) != 0)
+        if (cppStr != "")
         {
-          const char* index = std::strchr(cppStr, '\n');
-          element->className = std::string(cppStr, index);
-          element->configAsString = std::string(index + 1);
+          int index = cppStr.find('\n');
+          element->className = cppStr.substr(0, index);
+          element->configAsString = cppStr.substr(index + 1, cppStr.length() - index - 1);
           element->config = this->readConfiguration(element->configAsString);
         }
 
@@ -644,18 +625,7 @@ void ASPModelGenerator::readSystemsFromOntology()
         system->addASPElement(element);
         this->groundingDirty = true;
       }
-
-      delete name;
-      delete elementStr;
-      delete aspStr;
-      delete cppStr;
-      delete typeStr;
     }
-    delete types;
-    delete names;
-    delete strings;
-    delete aspStrings;
-    delete cppStrings;
   }
 }
 
@@ -705,7 +675,7 @@ std::map<std::string, std::string> ASPModelGenerator::readConfiguration(std::str
 {
   std::map<std::string, std::string> configuration;
   std::stringstream ss(config);
-  std::string item, iri;
+  std::string item;
 
   while (std::getline(ss, item, ';'))
   {
@@ -716,8 +686,7 @@ std::map<std::string, std::string> ASPModelGenerator::readConfiguration(std::str
       _log->warn("Broken configuration '%v', skipped", item);
     }
 
-    iri = item.substr(0, index);
-    configuration[iri] = item.substr(index + 1, item.size());
+    configuration[item.substr(0, index)] = item.substr(index + 1);
   }
 
   return configuration;

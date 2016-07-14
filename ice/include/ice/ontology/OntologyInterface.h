@@ -92,10 +92,10 @@ public:
   bool removeOntologyIRI(std::string const p_iri);
   std::unique_ptr<std::vector<std::string>> getOntologyIriMapping();
   void readOntologyIriMappingFromOntology();
-  const char* readInformationStructureAsASP();
-  const char* readRepresentationsAsCSV();
+  std::string readInformationStructureAsASP();
+  std::string readRepresentationsAsCSV();
   std::unique_ptr<std::vector<std::string>> readRepresentations();
-  std::unique_ptr<std::vector<std::vector<const char*>*>>readNodesAndIROsAsASP(std::string const p_system);
+  std::unique_ptr<std::vector<std::vector<std::string>>>readNodesAndIROsAsASP(std::string const p_system);
   bool addNodeIndividual(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::string const p_aboutEntity, std::string const p_aboutRelatedEntity, std::vector<std::string> p_metadatas,
       std::vector<int> p_metadataValues, std::vector<int> p_metadataValues2, std::vector<std::string> p_metadataGroundings);
   bool addIROIndividual(std::string const p_iro, std::string const p_iroClass, std::string const p_system, std::vector<std::string> p_metadatas,
@@ -134,6 +134,7 @@ private:
   std::mutex mtx_; /**< Mutex */
 
   jclass javaOntologyInterface; /**< java class to access the ontology */
+  jstring empty;
   jobject javaInterface; /**< java interface object */
   jmethodID addIRIMapperMethod; /**< Method id */
   jmethodID loadOntologiesMethod; /**< Method id */

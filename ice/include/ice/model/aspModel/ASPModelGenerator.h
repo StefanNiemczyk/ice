@@ -59,8 +59,8 @@ private:
   void readMetadata(std::string name, std::map<std::string, int> &metadata, const Gringo::Value &element);
   std::string dataTypeForRepresentation(std::string representation);
   bool extractedSubModel(std::shared_ptr<ASPSystem> system, std::shared_ptr<SubModel> subModel);
-  bool extractNodes(vector<NodeDesc> *nodes, std::shared_ptr<ASPSystem> system);
-  bool extractStreamTransfers(std::shared_ptr<ASPSystem> from, std::shared_ptr<ASPSystem> to, std::vector<TransferDesc> *transfers);
+  bool extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<ASPSystem> system);
+  bool extractStreamTransfers(std::shared_ptr<ASPSystem> from, std::shared_ptr<ASPSystem> to, std::vector<TransferDesc> &transfers);
 
 
 private:

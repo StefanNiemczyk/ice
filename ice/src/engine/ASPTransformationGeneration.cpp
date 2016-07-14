@@ -56,16 +56,13 @@ void ASPTransformationGeneration::readInfoStructureFromOntology()
   if (this->ontology->isLoadDirty())
     this->ontology->loadOntologies();
 
-  const char* infoStructure = this->ontology->readInformationStructureAsASP();
+  std::stringstream ss;
+  ss.str(this->ontology->readInformationStructureAsASP());
 
   _log->debug("Extracted structure from ontology");
-  _log->verbose(1, infoStructure);
+  _log->verbose(1, ss.str());
 
-  std::stringstream ss;
   std::string item;
-
-  ss << infoStructure;
-  //  delete infoStructure;
 
   while (std::getline(ss, item, '\n'))
   {

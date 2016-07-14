@@ -179,6 +179,8 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->getLogLevelMethod = this->env->GetMethodID(this->javaOntologyInterface, "getLogLevel", "()I");
   this->setLogLevelMethod = this->env->GetMethodID(this->javaOntologyInterface, "setLogLevel", "(I)V");
 
+  this->empty = env->NewStringUTF("");
+
   if (this->checkError("Constructor", "Failed to lookup method ids for class de/unikassel/vs/ice/IceOntologyInterface"))
     return;
 
@@ -206,13 +208,6 @@ bool OntologyInterface::checkError(std::string p_method, std::string p_error)
     this->error = true;
     _log->error("%v, %v", p_method, p_error);
     env->ExceptionDescribe();
-
-//    jboolean isCopy = false;
-//    jmethodID toString = env->GetMethodID(env->FindClass("java/lang/Object"), "toString", "()Ljava/lang/String;");
-//    jstring s = (jstring)env->CallObjectMethod(exc, toString);
-//    const char* utf = env->GetStringUTFChars(s, &isCopy);
-//    _log->error(utf);
-//    std::cout << "#########################" << utf << std::endl;
   }
   else
   {
@@ -239,7 +234,7 @@ bool OntologyInterface::loadOntologies()
 {
   this->checkError("loadOntologies", "Error exists, method loadOntologies will not be executed");
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->loadOntologiesMethod);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->loadOntologiesMethod);
 
   if (this->checkError("loadOntologies", "Error occurred at loading the ontologies"))
     return false;
@@ -261,7 +256,7 @@ bool OntologyInterface::loadOntology(std::string const p_path)
 
   jstring jstr = env->NewStringUTF(p_path.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->loadOntologyMethod, jstr);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->loadOntologyMethod, jstr);
 
   env->DeleteLocalRef(jstr);
 
@@ -281,7 +276,7 @@ bool OntologyInterface::saveOntology(std::string const p_path)
 
   jstring jstr = env->NewStringUTF(p_path.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->saveOntologyMethod, jstr);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->saveOntologyMethod, jstr);
   env->DeleteLocalRef(jstr);
 
   if (this->checkError("saveOntology", "Error occurred saving ontology " + p_path))
@@ -322,15 +317,15 @@ void OntologyInterface::readOntologyIDsFromOntology()
 
       if (str != nullptr)
       {
-        const char* cstr = env->GetStringUTFChars(str, 0);
+        const char* cstr = env->GetStringUTFChars(str, JNI_FALSE);
         vec2.push_back(std::string(cstr));
-        delete cstr;
+        env->ReleaseStringUTFChars(str, cstr);
       }
       else
       {
         vec2.push_back("");
+        env->ReleaseStringUTFChars(str, JNI_FALSE);
       }
-      env->ReleaseStringUTFChars(str, 0);
       env->DeleteLocalRef(str);
     }
 
@@ -382,7 +377,7 @@ bool OntologyInterface::initReasoner(bool const p_force)
 {
   this->checkError("initReasoner", "Error exists, method initReasoner will not be executed");
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->initReasonerMethod, p_force);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->initReasonerMethod, p_force);
 
   if (this->checkError("initReasoner", "Error occurred at init reasoner " + p_force))
     return false;
@@ -396,7 +391,7 @@ bool OntologyInterface::isConsistent()
 {
   this->checkError("isConsistent", "Error exists, method isConsistent will not be executed");
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->isConsistentMethod);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->isConsistentMethod);
 
   if (this->checkError("isConsistent", "Error occurred at checking consistency"))
     return false;
@@ -447,8 +442,7 @@ void OntologyInterface::readSystemsFromOntology()
     jstring jstr = (jstring)env->GetObjectArrayElement(result, i);
     const char* cstr = env->GetStringUTFChars(jstr, 0);
     this->knownSystem.push_back(std::string(cstr));
-    delete cstr;
-    env->ReleaseStringUTFChars(jstr, 0);
+    env->ReleaseStringUTFChars(jstr, cstr);
     env->DeleteLocalRef(jstr);
   }
 
@@ -460,7 +454,7 @@ bool OntologyInterface::addSystem(std::string const p_system)
   this->checkError("addSystem", "Error exists, method addSystem will not be executed");
 
   jstring jstr = env->NewStringUTF(p_system.c_str());
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addSystemMethod, jstr);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addSystemMethod, jstr);
   env->DeleteLocalRef(jstr);
 
   if (this->checkError("addSystem", "Error occurred adding a system " + p_system))
@@ -485,7 +479,7 @@ bool OntologyInterface::addNodesToSystem(std::string const p_system, std::vector
     env->SetObjectArrayElement(toAdd, i, env->NewStringUTF(p_toAdd[i].c_str()));
   }
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addNodesToSystemMethod, system, toAdd);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addNodesToSystemMethod, system, toAdd);
 
   for (int i = 0; i < size; i++)
   {
@@ -510,7 +504,7 @@ bool OntologyInterface::addIndividual(std::string const p_individual, std::strin
   jstring individual = env->NewStringUTF(p_individual.c_str());
   jstring cls = env->NewStringUTF(p_class.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addIndividualMethod, individual, cls);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addIndividualMethod, individual, cls);
 
   env->DeleteLocalRef(individual);
   env->DeleteLocalRef(cls);
@@ -538,7 +532,7 @@ bool OntologyInterface::addScopesToEntityType(std::string const p_entityType, st
     env->SetObjectArrayElement(entityScopes, i, env->NewStringUTF(p_entityScopes[i].c_str()));
   }
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addScopesToEntityTypeMethod, entityType,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addScopesToEntityTypeMethod, entityType,
                                        entityScopes);
 
   for (int i = 0; i < size; ++i)
@@ -571,7 +565,7 @@ bool OntologyInterface::addEntityType(std::string const p_entityType, std::vecto
     env->SetObjectArrayElement(entityScopes, i, env->NewStringUTF(p_entityScopes[i].c_str()));
   }
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addEntityTypeMethod, entityType, entityScopes);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addEntityTypeMethod, entityType, entityScopes);
 
   for (int i = 0; i < size; ++i)
   {
@@ -595,15 +589,16 @@ bool OntologyInterface::addEntityScope(std::string const p_entityScope, std::vec
 
   int size = p_representations.size();
   jstring entityScope = env->NewStringUTF(p_entityScope.c_str());
-  jobjectArray representations = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
-                                                                   env->NewStringUTF(""));
+  jobjectArray representations = (jobjectArray)env->NewObjectArray(size,
+                                                                   env->FindClass("java/lang/String"),
+                                                                   empty);
 
   for (int i = 0; i < size; ++i)
   {
     env->SetObjectArrayElement(representations, i, env->NewStringUTF(p_representations[i].c_str()));
   }
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addEntityScopeMethod, entityScope, representations);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addEntityScopeMethod, entityScope, representations);
 
   for (int i = 0; i < size; ++i)
   {
@@ -629,7 +624,7 @@ bool OntologyInterface::addValueScope(std::string const p_superValueScope, std::
   jstring valueScope = env->NewStringUTF(p_valueScope.c_str());
   jstring representation = env->NewStringUTF(p_representation.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addValueScopeMethod, superValueScope, valueScope, representation);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addValueScopeMethod, superValueScope, valueScope, representation);
 
   env->DeleteLocalRef(superValueScope);
   env->DeleteLocalRef(valueScope);
@@ -651,14 +646,14 @@ bool OntologyInterface::addRepresentation(std::string const p_superRepresentatio
   jstring superRepresentation = env->NewStringUTF(p_superRepresentation.c_str());
   jstring representation = env->NewStringUTF(p_representation.c_str());
   jobjectArray dimensions = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
-                                                              env->NewStringUTF(""));
+                                                              empty);
 
   for (int i = 0; i < size; ++i)
   {
     env->SetObjectArrayElement(dimensions, i, env->NewStringUTF(p_dimensions[i].c_str()));
   }
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addRepresentationMethod, superRepresentation,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addRepresentationMethod, superRepresentation,
                                        representation, dimensions);
 
   for (int i = 0; i < size; ++i)
@@ -687,7 +682,7 @@ bool OntologyInterface::addDimensionToRep(std::string const p_representation, st
   jstring dimension = env->NewStringUTF(p_dimension.c_str());
   jstring entityScope = env->NewStringUTF(p_entityScope.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addDimensionToRep3Method, representation, dimension,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addDimensionToRep3Method, representation, dimension,
                                        entityScope);
 
   env->DeleteLocalRef(representation);
@@ -710,7 +705,7 @@ bool OntologyInterface::addDimensionToRep(std::string const p_representation, st
   jstring representation = env->NewStringUTF(p_representation.c_str());
   jstring dimension = env->NewStringUTF(p_dimension.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addDimensionToRep2Method, representation, dimension);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addDimensionToRep2Method, representation, dimension);
 
   env->DeleteLocalRef(representation);
   env->DeleteLocalRef(dimension);
@@ -733,7 +728,7 @@ bool OntologyInterface::addNamedStream(std::string const p_stream, std::string c
   jstring entityScope = env->NewStringUTF(p_entityScope.c_str());
   jstring representation = env->NewStringUTF(p_representation.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addNamedStreamMethod, stream, entityScope,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addNamedStreamMethod, stream, entityScope,
                                        representation);
 
   env->DeleteLocalRef(stream);
@@ -758,7 +753,7 @@ bool OntologyInterface::addNamedMap(std::string const p_map, std::string const p
   jstring entityScope = env->NewStringUTF(p_entityScope.c_str());
   jstring representation = env->NewStringUTF(p_representation.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addNamedMapMethod, map, entityType, entityScope,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addNamedMapMethod, map, entityType, entityScope,
                                        representation);
 
   env->DeleteLocalRef(map);
@@ -786,7 +781,7 @@ bool OntologyInterface::addRequiredStream(std::string const p_namedStream, std::
   jstring entity = env->NewStringUTF(p_entity.c_str());
   jstring relatedEntity = env->NewStringUTF(p_relatedEntity.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addRequiredStreamMethod, namedStream,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addRequiredStreamMethod, namedStream,
                                        namedStreamClass, system, entity, relatedEntity);
 
   env->DeleteLocalRef(namedStream);
@@ -814,7 +809,7 @@ bool OntologyInterface::addRequiredMap(std::string const p_namedMap, std::string
   jstring system = env->NewStringUTF(p_system.c_str());
   jstring relatedEntity = env->NewStringUTF(p_relatedEntity.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addRequiredMapMethod, namedMap, namedMapClass, system,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addRequiredMapMethod, namedMap, namedMapClass, system,
                                        relatedEntity);
 
   env->DeleteLocalRef(namedMap);
@@ -840,7 +835,7 @@ bool OntologyInterface::addSourceNodeClass(std::string const p_node, std::vector
 
   jstring node = env->NewStringUTF(p_node.c_str());
   jobjectArray outputs = (jobjectArray)env->NewObjectArray(sizeOutput, env->FindClass("java/lang/String"),
-                                                           env->NewStringUTF(""));
+                                                           empty);
   jintArray outputsMinSize = env->NewIntArray(sizeOutput);
   jintArray outputsMaxSize = env->NewIntArray(sizeOutput);
 
@@ -851,16 +846,13 @@ bool OntologyInterface::addSourceNodeClass(std::string const p_node, std::vector
   env->SetIntArrayRegion(outputsMinSize, 0, sizeOutput, p_outputsMinSize.data());
   env->SetIntArrayRegion(outputsMaxSize, 0, sizeOutput, p_outputsMaxSize.data());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addSourceNodeClassMethod, node, outputs,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addSourceNodeClassMethod, node, outputs,
                                        outputsMinSize, outputsMaxSize);
 
   for (int i = 0; i < sizeOutput; ++i)
   {
     env->DeleteLocalRef(env->GetObjectArrayElement(outputs, i));
   }
-
-//  env->ReleaseIntArrayElements(outputsMinSize, (jint *)p_outputsMinSize.data(), 0);
-//  env->ReleaseIntArrayElements(outputsMaxSize, (jint *)p_outputsMaxSize.data(), 0);
 
   env->DeleteLocalRef(outputsMinSize);
   env->DeleteLocalRef(outputsMaxSize);
@@ -887,9 +879,9 @@ bool OntologyInterface::addComputationNodeClass(std::string const p_node, std::v
 
   jstring node = env->NewStringUTF(p_node.c_str());
   jobjectArray inputs = (jobjectArray)env->NewObjectArray(sizeInput, env->FindClass("java/lang/String"),
-                                                          env->NewStringUTF(""));
+                                                          empty);
   jobjectArray outputs = (jobjectArray)env->NewObjectArray(sizeOutput, env->FindClass("java/lang/String"),
-                                                           env->NewStringUTF(""));
+                                                           empty);
   jintArray inputsMinSize = env->NewIntArray(sizeInput);
   jintArray inputsMaxSize = env->NewIntArray(sizeInput);
 
@@ -910,7 +902,7 @@ bool OntologyInterface::addComputationNodeClass(std::string const p_node, std::v
   env->SetIntArrayRegion(outputsMinSize, 0, sizeOutput, p_outputsMinSize.data());
   env->SetIntArrayRegion(outputsMaxSize, 0, sizeOutput, p_outputsMaxSize.data());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addComputationNodeClassMethod, node, inputs,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addComputationNodeClassMethod, node, inputs,
                                        inputsMinSize, inputsMaxSize, outputs, outputsMinSize, outputsMaxSize);
 
   for (int i = 0; i < sizeInput; ++i)
@@ -954,11 +946,11 @@ bool OntologyInterface::addIroNodeClass(std::string const p_node, std::vector<st
 
   jstring node = env->NewStringUTF(p_node.c_str());
   jobjectArray inputs = (jobjectArray)env->NewObjectArray(sizeInput, env->FindClass("java/lang/String"),
-                                                          env->NewStringUTF(""));
+                                                          empty);
   jobjectArray inputsRelated = (jobjectArray)env->NewObjectArray(sizeInputRelated, env->FindClass("java/lang/String"),
-                                                                 env->NewStringUTF(""));
+                                                                 empty);
   jobjectArray outputs = (jobjectArray)env->NewObjectArray(sizeOutput, env->FindClass("java/lang/String"),
-                                                           env->NewStringUTF(""));
+                                                           empty);
   jintArray inputsMinSize = env->NewIntArray(sizeInput);
   jintArray inputsMaxSize = env->NewIntArray(sizeInput);
 
@@ -989,7 +981,7 @@ bool OntologyInterface::addIroNodeClass(std::string const p_node, std::vector<st
   env->SetIntArrayRegion(outputsMinSize, 0, sizeOutput, p_outputsMinSize.data());
   env->SetIntArrayRegion(outputsMaxSize, 0, sizeOutput, p_outputsMaxSize.data());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addIroNodeClassMethod, node, inputs, inputsMinSize,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addIroNodeClassMethod, node, inputs, inputsMinSize,
                                        inputsMaxSize, inputsRelated, inputsRelatedMinSize, inputsRelatedMaxSize,
                                        outputs, outputsMinSize, outputsMaxSize);
 
@@ -1048,13 +1040,13 @@ bool OntologyInterface::addMapNodeClass(std::string const p_node, std::vector<st
 
   jstring node = env->NewStringUTF(p_node.c_str());
   jobjectArray inputs = (jobjectArray)env->NewObjectArray(sizeInput, env->FindClass("java/lang/String"),
-                                                          env->NewStringUTF(""));
+                                                          empty);
   jobjectArray inputsRelated = (jobjectArray)env->NewObjectArray(sizeInputRelated, env->FindClass("java/lang/String"),
-                                                                 env->NewStringUTF(""));
+                                                                 empty);
   jobjectArray inputMaps = (jobjectArray)env->NewObjectArray(sizeInputMap, env->FindClass("java/lang/String"),
-                                                             env->NewStringUTF(""));
+                                                             empty);
   jobjectArray outputMaps = (jobjectArray)env->NewObjectArray(sizeOutputMap, env->FindClass("java/lang/String"),
-                                                              env->NewStringUTF(""));
+                                                              empty);
 
   jintArray inputsMinSize = env->NewIntArray(sizeInput);
   jintArray inputsMaxSize = env->NewIntArray(sizeInput);
@@ -1096,7 +1088,7 @@ bool OntologyInterface::addMapNodeClass(std::string const p_node, std::vector<st
   env->SetIntArrayRegion(outputMapsMinSize, 0, sizeOutputMap, p_outputMapsMinSize.data());
   env->SetIntArrayRegion(outputMapsMaxSize, 0, sizeOutputMap, p_outputMapsMaxSize.data());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addMapNodeClassMethod, node, inputs, inputsMinSize,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addMapNodeClassMethod, node, inputs, inputsMinSize,
                                        inputsMaxSize, inputsRelated, inputsRelatedMinSize, inputsRelatedMaxSize,
                                        inputMaps, inputMapsMinSize, inputMapsMaxSize, outputMaps, outputMapsMinSize,
                                        outputMapsMaxSize);
@@ -1165,29 +1157,11 @@ std::string OntologyInterface::toLongIri(std::string p_shortIri)
   if (this->ontologyIriMapping.size() <= id)
     return "";
 
-  return this->ontologyIriMapping.at(id) + "#" + p_shortIri.substr(index + 1);
-}
+  std::stringstream ss;
+  ss << this->ontologyIriMapping.at(id) << "#" << p_shortIri.substr(index + 1);
 
-//std::string OntologyInterface::toLongIri(const char* p_shortIri)
-//{
-//  if (this->mappingDirty)
-//  {
-//    this->readOntologyIriMappingFromOntology();
-//    this->mappingDirty = false;
-//  }
-//
-//  const char* index = std::strchr(p_shortIri, '_');
-//
-//  if (index == nullptr)
-//    return "";
-//
-//  int id = std::atoi(index);
-//
-//  if (this->ontologyIriMapping.size() <= id)
-//    return "";
-//
-//  return this->ontologyIriMapping.at(id) + "#" + index;
-//}
+  return ss.str();
+}
 
 std::string OntologyInterface::toShortIri(std::string p_longIri)
 {
@@ -1218,7 +1192,10 @@ std::string OntologyInterface::toShortIri(std::string p_longIri)
   if (id == -1)
     return "";
 
-  return "o" + std::to_string(id) + "_" + p_longIri.substr(index + 1);
+  std::stringstream ss;
+  ss << "o" << std::to_string(id) << "_" << p_longIri.substr(index + 1);
+
+  return ss.str();
 }
 
 std::string OntologyInterface::toShortIriAll(std::string p_string)
@@ -1253,7 +1230,7 @@ bool OntologyInterface::addOntologyIRI(std::string const p_iri)
 
   jstring jstr = env->NewStringUTF(p_iri.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addOntologyIRIMethod, jstr);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addOntologyIRIMethod, jstr);
 
   env->DeleteLocalRef(jstr);
 
@@ -1271,7 +1248,7 @@ bool OntologyInterface::removeOntologyIRI(std::string const p_iri)
 
   jstring jstr = env->NewStringUTF(p_iri.c_str());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->removeOntologyIRIMethod, jstr);
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->removeOntologyIRIMethod, jstr);
 
   env->DeleteLocalRef(jstr);
 
@@ -1307,20 +1284,20 @@ void OntologyInterface::readOntologyIriMappingFromOntology()
   for (int i = 0; i < size; ++i)
   {
     jstring jstr = (jstring)env->GetObjectArrayElement(result, i);
-    const char* cstr = env->GetStringUTFChars(jstr, 0);
-    this->ontologyIriMapping.push_back(std::string(cstr));
-    delete cstr;
-    env->ReleaseStringUTFChars(jstr, 0);
+    const char* cstr = env->GetStringUTFChars(jstr, JNI_FALSE);
+    std::string str(cstr);
+    this->ontologyIriMapping.push_back(str);
+    env->ReleaseStringUTFChars(jstr, cstr);
     env->DeleteLocalRef(jstr);
   }
 
   env->DeleteLocalRef(result);
 }
 
-const char* OntologyInterface::readInformationStructureAsASP()
+std::string OntologyInterface::readInformationStructureAsASP()
 {
   if (this->informationDirty == false)
-    return this->informationStructure.c_str();
+    return this->informationStructure;
 
   this->checkError("readInformationStructureAsASP", "Error exists, readInformationStructureAsASP will not be executed");
 
@@ -1331,15 +1308,14 @@ const char* OntologyInterface::readInformationStructureAsASP()
 
   this->informationDirty = false;
 
-  const char* cstr = env->GetStringUTFChars(result, 0);
-  env->ReleaseStringUTFChars(result, 0);
+  const char* cstr = env->GetStringUTFChars(result, JNI_FALSE);
 
-  this->informationStructure = std::string(cstr);
-  delete cstr;
-  return this->informationStructure.c_str();
+  this->informationStructure.assign(cstr);
+  env->ReleaseStringUTFChars(result, cstr);
+  return this->informationStructure;
 }
 
-const char* OntologyInterface::readRepresentationsAsCSV()
+std::string OntologyInterface::readRepresentationsAsCSV()
 {
   this->checkError("readRepresentationsAsCsv", "Error exists, readRepresentationsAsCsv will not be executed");
 
@@ -1348,10 +1324,11 @@ const char* OntologyInterface::readRepresentationsAsCSV()
   if (this->checkError("readRepresentationsAsCsv", "Error occurred at reading representations"))
     return "";
 
-  const char* cstr = env->GetStringUTFChars(result, 0);
-  env->ReleaseStringUTFChars(result, 0);
+  const char* cstr = env->GetStringUTFChars(result, JNI_FALSE);
+  std::string str(cstr);
+  env->ReleaseStringUTFChars(result, cstr);
 
-  return cstr;
+  return str;
 }
 
 std::unique_ptr<std::vector<std::string>> OntologyInterface::readRepresentations()
@@ -1363,18 +1340,17 @@ std::unique_ptr<std::vector<std::string>> OntologyInterface::readRepresentations
   if (this->checkError("readRepresentationsAsCsv", "Error occurred at reading representations"))
     return nullptr;
 
-  const char* cstr = env->GetStringUTFChars(result, 0);
-  env->ReleaseStringUTFChars(result, 0);
+  const char* cstr = env->GetStringUTFChars(result, JNI_FALSE);
 
   auto lines = split(cstr, '\n');
 
+  env->ReleaseStringUTFChars(result, cstr);
   env->DeleteLocalRef(result);
-  delete cstr;
 
   return std::move(lines);
 }
 
-std::unique_ptr<std::vector<std::vector<const char*>*>> OntologyInterface::readNodesAndIROsAsASP(
+std::unique_ptr<std::vector<std::vector<std::string>>> OntologyInterface::readNodesAndIROsAsASP(
     std::string const p_system)
 {
   this->checkError("readNodesAndIROsAsASP", "Error exists, readNodesAndIROsAsASP will not be executed");
@@ -1389,29 +1365,27 @@ std::unique_ptr<std::vector<std::vector<const char*>*>> OntologyInterface::readN
   if (this->checkError("readNodesAndIROsAsASP", "Error occurred at reading nodes and iros for system " + p_system))
     return nullptr;
 
-  std::unique_ptr<std::vector<std::vector<const char*>*>> vec(new std::vector<std::vector<const char*>*>);
+  std::unique_ptr<std::vector<std::vector<std::string>>> vec(new std::vector<std::vector<std::string>>);
 
   int size = env->GetArrayLength(result);
+  vec->resize(size);
 
   for (int i = 0; i < size; ++i)
   {
     jobjectArray arr = (jobjectArray)env->GetObjectArrayElement(result, i);
     int size2 = env->GetArrayLength(arr);
-    std::vector<const char*>* vec2 = new std::vector<const char*>();
 
     for (int j = 0; j < size2; ++j)
     {
       jstring str = (jstring)env->GetObjectArrayElement(arr, j);
-      const char* cstr = env->GetStringUTFChars(str, 0);
-      vec2->push_back(cstr);
+      const char* cstr = env->GetStringUTFChars(str, JNI_FALSE);
+      vec->at(i).push_back(cstr);
 
-      env->ReleaseStringUTFChars(str, 0);
+      env->ReleaseStringUTFChars(str, cstr);
       env->DeleteLocalRef(str);
     }
 
     env->DeleteLocalRef(arr);
-
-    vec->push_back(vec2);
   }
 
   env->DeleteLocalRef(result);
@@ -1451,7 +1425,7 @@ bool OntologyInterface::addNodeIndividual(std::string const p_node, std::string 
   env->SetIntArrayRegion(metadataValues, 0, size, p_metadataValues.data());
   env->SetIntArrayRegion(metadataValues2, 0, size, p_metadataValues2.data());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addNodeIndividualMethod, node, nodeClass, system,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addNodeIndividualMethod, node, nodeClass, system,
                                        aboutEntity, aboutRelatedEntity, metadatas, metadataValues, metadataValues2,
                                        metadataGroundings);
 
@@ -1492,10 +1466,10 @@ bool OntologyInterface::addIROIndividual(std::string const p_iro, std::string co
   jstring iroClass = env->NewStringUTF(p_iroClass.c_str());
   jstring system = env->NewStringUTF(p_system.c_str());
   jobjectArray metadatas = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
-                                                             env->NewStringUTF(""));
+                                                             empty);
   jintArray metadataValues = env->NewIntArray(size);
   jobjectArray metadataGroundings = (jobjectArray)env->NewObjectArray(size, env->FindClass("java/lang/String"),
-                                                                      env->NewStringUTF(""));
+                                                                      empty);
 
   for (int i = 0; i < size; ++i)
   {
@@ -1504,7 +1478,7 @@ bool OntologyInterface::addIROIndividual(std::string const p_iro, std::string co
   }
   env->SetIntArrayRegion(metadataValues, 0, size, p_metadataValues.data());
 
-  bool result = env->CallBooleanMethod(this->javaInterface, this->addIROIndividualMethod, iro, iroClass, system,
+  jboolean result = env->CallBooleanMethod(this->javaInterface, this->addIROIndividualMethod, iro, iroClass, system,
                                        metadatas, metadataValues, metadataGroundings);
 
   for (int i = 0; i < size; ++i)

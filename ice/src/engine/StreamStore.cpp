@@ -41,8 +41,6 @@ void StreamStore::init()
     this->streamFactory = engineObject->getStreamFactory();
     this->ontology = engineObject->getOntologyInterface();
   }
-
-//  this->readEntitiesFromOntology();
 }
 
 void StreamStore::cleanUp()
@@ -61,7 +59,7 @@ void StreamStore::cleanUp()
 
 StreamStore::~StreamStore()
 {
-  // TODO Auto-generated destructor stub
+  //
 }
 
 std::shared_ptr<BaseInformationStream> StreamStore::registerBaseStream(
@@ -71,7 +69,7 @@ std::shared_ptr<BaseInformationStream> StreamStore::registerBaseStream(
   auto ptr = this->getBaseStream(specification.get(), provider, sourceSystem);
 
   //stream already registered
-  if (ptr)
+  if (ptr != nullptr)
   {
     _log->warn("Duplicated Stream with '%v', '%v', '%v'",
                   specification->toString(), provider, sourceSystem);
@@ -101,7 +99,7 @@ std::shared_ptr<EventHandler> StreamStore::getEventHandler() const
   return this->eventHandler;
 }
 
-std::shared_ptr<BaseInformationStream> StreamStore::getBaseStream(InformationSpecification * specification)
+std::shared_ptr<BaseInformationStream> StreamStore::getBaseStream(InformationSpecification *specification)
 {
   return this->getBaseStream(specification, "", "");
 }
@@ -135,7 +133,7 @@ std::shared_ptr<BaseInformationStream> StreamStore::getBaseStream(InformationSpe
 
   if (selected.size() == 0)
   {
-    return std::shared_ptr<BaseInformationStream>();
+    return nullptr;
   }
 
   return selectBestStream(&selected);
@@ -216,18 +214,15 @@ void StreamStore::readEntitiesFromOntology()
   if (this->ontology->isLoadDirty())
     this->ontology->loadOntologies();
 
-  const char* infoStructure = this->ontology->readInformationStructureAsASP();
+  std::stringstream ss;
+  ss.str(this->ontology->readInformationStructureAsASP());
 
   _log->debug("Extracted entities from ontology");
-  _log->verbose(1, infoStructure);
+  _log->verbose(1, ss.str());
 
   this->entityTypeMap.clear();
 
-  std::stringstream ss;
   std::string item;
-
-  ss << infoStructure;
-//  delete infoStructure;
 
   while (std::getline(ss, item, '\n'))
   {

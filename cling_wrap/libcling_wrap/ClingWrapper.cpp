@@ -33,7 +33,7 @@ namespace supplementary
 
 	ClingWrapper::~ClingWrapper()
 	{
-		// TODO Auto-generated destructor stub
+		// nothing to do
 	}
 
 	void ClingWrapper::init()

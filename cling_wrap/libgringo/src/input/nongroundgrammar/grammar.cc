@@ -71,7 +71,7 @@ int GringoNonGroundGrammar_lex(void *value, Gringo::Location* loc, NonGroundPars
 }
 
 
-#line 75 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:399
+#line 75 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:399
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -85,7 +85,7 @@ int GringoNonGroundGrammar_lex(void *value, Gringo::Location* loc, NonGroundPars
 
 // User implementation prologue.
 
-#line 89 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:407
+#line 89 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:407
 // Unqualified %code blocks.
 #line 89 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:408
 
@@ -95,7 +95,7 @@ void NonGroundGrammar::parser::error(DefaultLocation const &l, std::string const
 }
 
 
-#line 99 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:408
+#line 99 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:408
 
 
 #ifndef YY_
@@ -181,7 +181,7 @@ void NonGroundGrammar::parser::error(DefaultLocation const &l, std::string const
 
 #line 23 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:474
 namespace Gringo { namespace Input { namespace NonGroundGrammar {
-#line 185 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:474
+#line 185 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:474
 
   /* Return YYSTR after stripping away unnecessary quotes and
      backslashes, so that it's suitable for yyerror.  The heuristic is
@@ -630,1265 +630,1265 @@ namespace Gringo { namespace Input { namespace NonGroundGrammar {
   case 7:
 #line 303 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.uid) = (yystack_[0].value.uid); }
-#line 634 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 634 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 8:
 #line 311 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::XOR, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 640 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 640 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 9:
 #line 312 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::OR, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 646 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 646 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 10:
 #line 313 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::AND, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 652 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 652 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 11:
 #line 314 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::ADD, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 658 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 658 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 12:
 #line 315 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::SUB, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 664 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 664 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 13:
 #line 316 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::MUL, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 670 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 670 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 14:
 #line 317 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::DIV, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 676 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 676 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 15:
 #line 318 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::MOD, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 682 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 682 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 16:
 #line 319 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::POW, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 688 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 688 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 17:
 #line 320 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[1].location + yystack_[0].location, UnOp::NEG, (yystack_[0].value.term)); }
-#line 694 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 694 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 18:
 #line 321 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[1].location + yystack_[0].location, UnOp::NOT, (yystack_[0].value.term)); }
-#line 700 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 700 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 19:
 #line 322 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, FWString(""), (yystack_[1].value.termvecvec), false); }
-#line 706 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 706 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 20:
 #line 323 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[3].location + yystack_[0].location, (yystack_[3].value.uid), (yystack_[1].value.termvecvec), false); }
-#line 712 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 712 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 21:
 #line 324 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[4].location + yystack_[0].location, (yystack_[3].value.uid), (yystack_[1].value.termvecvec), true); }
-#line 718 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 718 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 22:
 #line 325 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, UnOp::ABS, (yystack_[1].value.term)); }
-#line 724 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 724 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 23:
 #line 326 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, Value(FWString((yystack_[0].value.uid)))); }
-#line 730 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 730 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 24:
 #line 327 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, Value((yystack_[0].value.num))); }
-#line 736 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 736 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 25:
 #line 328 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, Value(FWString((yystack_[0].value.uid)), false)); }
-#line 742 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 742 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 26:
 #line 329 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, Value(true)); }
-#line 748 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 748 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 27:
 #line 330 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, Value(false)); }
-#line 754 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 754 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 28:
 #line 336 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvec) = BUILDER.termvec(BUILDER.termvec(), (yystack_[0].value.term));  }
-#line 760 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 760 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 29:
 #line 337 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvec) = BUILDER.termvec((yystack_[2].value.termvec), (yystack_[0].value.term));  }
-#line 766 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 766 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 30:
 #line 341 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvecvec) = BUILDER.termvecvec(BUILDER.termvecvec(), (yystack_[0].value.termvec));  }
-#line 772 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 772 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 31:
 #line 342 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvecvec) = BUILDER.termvecvec();  }
-#line 778 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 778 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 32:
 #line 350 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 784 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 784 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 33:
 #line 351 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::XOR, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 790 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 790 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 34:
 #line 352 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::OR, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 796 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 796 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 35:
 #line 353 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::AND, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 802 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 802 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 36:
 #line 354 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::ADD, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 808 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 808 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 37:
 #line 355 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::SUB, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 814 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 814 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 38:
 #line 356 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::MUL, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 820 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 820 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 39:
 #line 357 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::DIV, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 826 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 826 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 40:
 #line 358 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::MOD, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 832 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 832 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 41:
 #line 359 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, BinOp::POW, (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 838 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 838 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 42:
 #line 360 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[1].location + yystack_[0].location, UnOp::NEG, (yystack_[0].value.term)); }
-#line 844 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 844 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 43:
 #line 361 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[1].location + yystack_[0].location, UnOp::NOT, (yystack_[0].value.term)); }
-#line 850 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 850 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 44:
 #line 362 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, FWString(""), (yystack_[1].value.termvecvec), false); }
-#line 856 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 856 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 45:
 #line 363 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[3].location + yystack_[0].location, (yystack_[3].value.uid), (yystack_[1].value.termvecvec), false); }
-#line 862 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 862 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 46:
 #line 364 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[4].location + yystack_[0].location, (yystack_[3].value.uid), (yystack_[1].value.termvecvec), true); }
-#line 868 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 868 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 47:
 #line 365 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[2].location + yystack_[0].location, UnOp::ABS, (yystack_[1].value.termvec)); }
-#line 874 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 874 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 48:
 #line 366 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, Value(FWString((yystack_[0].value.uid)))); }
-#line 880 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 880 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 49:
 #line 367 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, Value((yystack_[0].value.num))); }
-#line 886 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 886 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 50:
 #line 368 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, Value(FWString((yystack_[0].value.uid)), false)); }
-#line 892 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 892 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 51:
 #line 369 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, Value(true)); }
-#line 898 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 898 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 52:
 #line 370 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, Value(false)); }
-#line 904 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 904 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 53:
 #line 371 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, FWString((yystack_[0].value.uid))); }
-#line 910 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 910 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 54:
 #line 372 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.term) = BUILDER.term(yystack_[0].location, FWString("_")); }
-#line 916 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 916 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 55:
 #line 378 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvec) = BUILDER.termvec(BUILDER.termvec(), (yystack_[0].value.term)); }
-#line 922 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 922 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 56:
 #line 379 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvec) = BUILDER.termvec((yystack_[2].value.termvec), (yystack_[0].value.term)); }
-#line 928 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 928 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 57:
 #line 386 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvec) = BUILDER.termvec(BUILDER.termvec(), (yystack_[0].value.term)); }
-#line 934 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 934 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 58:
 #line 387 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvec) = BUILDER.termvec((yystack_[2].value.termvec), (yystack_[0].value.term)); }
-#line 940 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 940 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 59:
 #line 391 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvec) = (yystack_[0].value.termvec); }
-#line 946 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 946 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 60:
 #line 392 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvec) = BUILDER.termvec(); }
-#line 952 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 952 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 61:
 #line 396 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvecvec) = BUILDER.termvecvec(BUILDER.termvecvec(), (yystack_[0].value.termvec)); }
-#line 958 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 958 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 62:
 #line 397 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvecvec) = BUILDER.termvecvec((yystack_[2].value.termvecvec), (yystack_[0].value.termvec)); }
-#line 964 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 964 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 63:
 #line 406 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::GT; }
-#line 970 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 970 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 64:
 #line 407 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::LT; }
-#line 976 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 976 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 65:
 #line 408 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::GEQ; }
-#line 982 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 982 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 66:
 #line 409 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::LEQ; }
-#line 988 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 988 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 67:
 #line 410 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::EQ; }
-#line 994 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 994 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 68:
 #line 411 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::NEQ; }
-#line 1000 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1000 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 69:
 #line 412 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::ASSIGN; }
-#line 1006 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1006 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 70:
 #line 416 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.pair) = { (yystack_[0].value.uid), BUILDER.termvecvec(BUILDER.termvecvec(), BUILDER.termvec()) << 1u }; }
-#line 1012 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1012 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 71:
 #line 417 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.pair) = { (yystack_[3].value.uid), (yystack_[1].value.termvecvec) << 1u }; }
-#line 1018 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1018 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 72:
 #line 418 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.pair) = { (yystack_[0].value.uid), BUILDER.termvecvec(BUILDER.termvecvec(), BUILDER.termvec()) << 1u | 1u }; }
-#line 1024 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1024 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 73:
 #line 419 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.pair) = { (yystack_[3].value.uid), (yystack_[1].value.termvecvec) << 1u | 1u }; }
-#line 1030 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1030 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 74:
 #line 423 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.lit) = BUILDER.boollit(yylhs.location, true); }
-#line 1036 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1036 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 75:
 #line 424 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.lit) = BUILDER.boollit(yylhs.location, false); }
-#line 1042 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1042 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 76:
 #line 425 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.lit) = BUILDER.predlit(yylhs.location, NAF::POS, (yystack_[0].value.pair).second & 1, FWString((yystack_[0].value.pair).first), TermVecVecUid((yystack_[0].value.pair).second >> 1u)); }
-#line 1048 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1048 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 77:
 #line 426 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.lit) = BUILDER.predlit(yylhs.location, NAF::NOT, (yystack_[0].value.pair).second & 1, FWString((yystack_[0].value.pair).first), TermVecVecUid((yystack_[0].value.pair).second >> 1u)); }
-#line 1054 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1054 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 78:
 #line 427 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.lit) = BUILDER.predlit(yylhs.location, NAF::NOTNOT, (yystack_[0].value.pair).second & 1, FWString((yystack_[0].value.pair).first), TermVecVecUid((yystack_[0].value.pair).second >> 1u)); }
-#line 1060 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1060 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 79:
 #line 428 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.lit) = BUILDER.rellit(yylhs.location, (yystack_[1].value.rel), (yystack_[2].value.term), (yystack_[0].value.term)); }
-#line 1066 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1066 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 80:
 #line 429 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.lit) = BUILDER.csplit((yystack_[0].value.csplit)); }
-#line 1072 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1072 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 81:
 #line 433 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.cspmulterm) = BUILDER.cspmulterm(yylhs.location, (yystack_[0].value.term),                     (yystack_[2].value.term)); }
-#line 1078 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1078 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 82:
 #line 434 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.cspmulterm) = BUILDER.cspmulterm(yylhs.location, (yystack_[3].value.term),                     (yystack_[0].value.term)); }
-#line 1084 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1084 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 83:
 #line 435 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.cspmulterm) = BUILDER.cspmulterm(yylhs.location, BUILDER.term(yylhs.location, Value(1)), (yystack_[0].value.term)); }
-#line 1090 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1090 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 84:
 #line 436 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.cspmulterm) = BUILDER.cspmulterm(yylhs.location, (yystack_[0].value.term)); }
-#line 1096 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1096 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 85:
 #line 440 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.cspaddterm) = BUILDER.cspaddterm(yylhs.location, (yystack_[2].value.cspaddterm), (yystack_[0].value.cspmulterm), true); }
-#line 1102 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1102 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 86:
 #line 441 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.cspaddterm) = BUILDER.cspaddterm(yylhs.location, (yystack_[2].value.cspaddterm), (yystack_[0].value.cspmulterm), false); }
-#line 1108 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1108 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 87:
 #line 442 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.cspaddterm) = BUILDER.cspaddterm(yylhs.location, (yystack_[0].value.cspmulterm)); }
-#line 1114 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1114 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 88:
 #line 446 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::GT; }
-#line 1120 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1120 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 89:
 #line 447 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::LT; }
-#line 1126 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1126 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 90:
 #line 448 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::GEQ; }
-#line 1132 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1132 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 91:
 #line 449 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::LEQ; }
-#line 1138 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1138 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 92:
 #line 450 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::EQ; }
-#line 1144 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1144 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 93:
 #line 451 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.rel) = Relation::NEQ; }
-#line 1150 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1150 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 94:
 #line 455 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.csplit) = BUILDER.csplit(yylhs.location, (yystack_[2].value.csplit), (yystack_[1].value.rel), (yystack_[0].value.cspaddterm)); }
-#line 1156 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1156 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 95:
 #line 456 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.csplit) = BUILDER.csplit(yylhs.location, (yystack_[2].value.cspaddterm),   (yystack_[1].value.rel), (yystack_[0].value.cspaddterm)); }
-#line 1162 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1162 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 96:
 #line 464 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.litvec) = BUILDER.litvec(BUILDER.litvec(), (yystack_[0].value.lit)); }
-#line 1168 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1168 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 97:
 #line 465 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.litvec) = BUILDER.litvec((yystack_[2].value.litvec), (yystack_[0].value.lit)); }
-#line 1174 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1174 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 98:
 #line 469 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.litvec) = (yystack_[0].value.litvec); }
-#line 1180 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1180 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 99:
 #line 470 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.litvec) = BUILDER.litvec(); }
-#line 1186 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1186 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 100:
 #line 474 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.litvec) = (yystack_[0].value.litvec); }
-#line 1192 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1192 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 101:
 #line 475 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.litvec) = BUILDER.litvec(); }
-#line 1198 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1198 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 102:
 #line 479 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.litvec) = (yystack_[0].value.litvec); }
-#line 1204 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1204 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 103:
 #line 480 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.litvec) = BUILDER.litvec(); }
-#line 1210 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1210 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 104:
 #line 484 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.fun) = AggregateFunction::SUM; }
-#line 1216 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1216 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 105:
 #line 485 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.fun) = AggregateFunction::SUMP; }
-#line 1222 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1222 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 106:
 #line 486 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.fun) = AggregateFunction::MIN; }
-#line 1228 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1228 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 107:
 #line 487 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.fun) = AggregateFunction::MAX; }
-#line 1234 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1234 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 108:
 #line 488 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.fun) = AggregateFunction::COUNT; }
-#line 1240 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1240 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 109:
 #line 496 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.bodyaggrelem) = { BUILDER.termvec(), (yystack_[0].value.litvec) }; }
-#line 1246 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1246 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 110:
 #line 497 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.bodyaggrelem) = { (yystack_[1].value.termvec), (yystack_[0].value.litvec) }; }
-#line 1252 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1252 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 111:
 #line 501 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.bodyaggrelemvec) = BUILDER.bodyaggrelemvec(BUILDER.bodyaggrelemvec(), (yystack_[0].value.bodyaggrelem).first, (yystack_[0].value.bodyaggrelem).second); }
-#line 1258 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1258 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 112:
 #line 502 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.bodyaggrelemvec) = BUILDER.bodyaggrelemvec((yystack_[2].value.bodyaggrelemvec), (yystack_[0].value.bodyaggrelem).first, (yystack_[0].value.bodyaggrelem).second); }
-#line 1264 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1264 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 113:
 #line 508 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.lbodyaggrelem) = { (yystack_[1].value.lit), (yystack_[0].value.litvec) }; }
-#line 1270 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1270 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 114:
 #line 512 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.condlitlist) = BUILDER.condlitvec(BUILDER.condlitvec(), (yystack_[0].value.lbodyaggrelem).first, (yystack_[0].value.lbodyaggrelem).second); }
-#line 1276 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1276 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 115:
 #line 513 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.condlitlist) = BUILDER.condlitvec((yystack_[2].value.condlitlist), (yystack_[0].value.lbodyaggrelem).first, (yystack_[0].value.lbodyaggrelem).second); }
-#line 1282 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1282 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 116:
 #line 519 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.aggr) = { AggregateFunction::COUNT, true, BUILDER.condlitvec() }; }
-#line 1288 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1288 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 117:
 #line 520 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.aggr) = { AggregateFunction::COUNT, true, (yystack_[1].value.condlitlist) }; }
-#line 1294 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1294 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 118:
 #line 521 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.aggr) = { (yystack_[2].value.fun), false, BUILDER.bodyaggrelemvec() }; }
-#line 1300 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1300 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 119:
 #line 522 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.aggr) = { (yystack_[3].value.fun), false, (yystack_[1].value.bodyaggrelemvec) }; }
-#line 1306 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1306 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 120:
 #line 526 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.bound) = { Relation::LEQ, (yystack_[0].value.term) }; }
-#line 1312 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1312 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 121:
 #line 527 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.bound) = { (yystack_[1].value.rel), (yystack_[0].value.term) }; }
-#line 1318 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1318 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 122:
 #line 528 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.bound) = { Relation::LEQ, TermUid(-1) }; }
-#line 1324 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1324 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 123:
 #line 532 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.uid) = lexer->aggregate((yystack_[1].value.aggr).fun, (yystack_[1].value.aggr).choice, (yystack_[1].value.aggr).elems, lexer->boundvec(Relation::LEQ, (yystack_[2].value.term), (yystack_[0].value.bound).rel, (yystack_[0].value.bound).term)); }
-#line 1330 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1330 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 124:
 #line 533 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.uid) = lexer->aggregate((yystack_[1].value.aggr).fun, (yystack_[1].value.aggr).choice, (yystack_[1].value.aggr).elems, lexer->boundvec((yystack_[2].value.rel), (yystack_[3].value.term), (yystack_[0].value.bound).rel, (yystack_[0].value.bound).term)); }
-#line 1336 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1336 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 125:
 #line 534 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.uid) = lexer->aggregate((yystack_[1].value.aggr).fun, (yystack_[1].value.aggr).choice, (yystack_[1].value.aggr).elems, lexer->boundvec(Relation::LEQ, TermUid(-1), (yystack_[0].value.bound).rel, (yystack_[0].value.bound).term)); }
-#line 1342 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1342 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 126:
 #line 542 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.headaggrelemvec) = BUILDER.headaggrelemvec((yystack_[5].value.headaggrelemvec), (yystack_[3].value.termvec), (yystack_[1].value.lit), (yystack_[0].value.litvec)); }
-#line 1348 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1348 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 127:
 #line 543 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.headaggrelemvec) = BUILDER.headaggrelemvec(BUILDER.headaggrelemvec(), (yystack_[3].value.termvec), (yystack_[1].value.lit), (yystack_[0].value.litvec)); }
-#line 1354 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1354 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 128:
 #line 547 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.condlitlist) = BUILDER.condlitvec(BUILDER.condlitvec(), (yystack_[1].value.lit), (yystack_[0].value.litvec)); }
-#line 1360 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1360 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 129:
 #line 548 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.condlitlist) = BUILDER.condlitvec((yystack_[3].value.condlitlist), (yystack_[1].value.lit), (yystack_[0].value.litvec)); }
-#line 1366 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1366 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 130:
 #line 554 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.aggr) = { (yystack_[2].value.fun), false, BUILDER.headaggrelemvec() }; }
-#line 1372 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1372 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 131:
 #line 555 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.aggr) = { (yystack_[3].value.fun), false, (yystack_[1].value.headaggrelemvec) }; }
-#line 1378 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1378 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 132:
 #line 556 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.aggr) = { AggregateFunction::COUNT, true, BUILDER.condlitvec()}; }
-#line 1384 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1384 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 133:
 #line 557 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.aggr) = { AggregateFunction::COUNT, true, (yystack_[1].value.condlitlist)}; }
-#line 1390 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1390 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 134:
 #line 561 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.uid) = lexer->aggregate((yystack_[1].value.aggr).fun, (yystack_[1].value.aggr).choice, (yystack_[1].value.aggr).elems, lexer->boundvec(Relation::LEQ, (yystack_[2].value.term), (yystack_[0].value.bound).rel, (yystack_[0].value.bound).term)); }
-#line 1396 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1396 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 135:
 #line 562 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.uid) = lexer->aggregate((yystack_[1].value.aggr).fun, (yystack_[1].value.aggr).choice, (yystack_[1].value.aggr).elems, lexer->boundvec((yystack_[2].value.rel), (yystack_[3].value.term), (yystack_[0].value.bound).rel, (yystack_[0].value.bound).term)); }
-#line 1402 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1402 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 136:
 #line 563 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.uid) = lexer->aggregate((yystack_[1].value.aggr).fun, (yystack_[1].value.aggr).choice, (yystack_[1].value.aggr).elems, lexer->boundvec(Relation::LEQ, TermUid(-1), (yystack_[0].value.bound).rel, (yystack_[0].value.bound).term)); }
-#line 1408 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1408 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 137:
 #line 570 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.cspelemvec) = BUILDER.cspelemvec(BUILDER.cspelemvec(), yylhs.location, (yystack_[3].value.termvec), (yystack_[1].value.cspaddterm), (yystack_[0].value.litvec)); }
-#line 1414 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1414 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 138:
 #line 571 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.cspelemvec) = BUILDER.cspelemvec((yystack_[5].value.cspelemvec), yylhs.location, (yystack_[3].value.termvec), (yystack_[1].value.cspaddterm), (yystack_[0].value.litvec)); }
-#line 1420 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1420 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 139:
 #line 575 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.cspelemvec) = (yystack_[0].value.cspelemvec); }
-#line 1426 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1426 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 140:
 #line 576 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.cspelemvec) = BUILDER.cspelemvec(); }
-#line 1432 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1432 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 141:
 #line 580 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.disjoint) = { NAF::POS, (yystack_[1].value.cspelemvec) }; }
-#line 1438 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1438 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 142:
 #line 581 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.disjoint) = { NAF::NOT, (yystack_[1].value.cspelemvec) }; }
-#line 1444 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1444 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 143:
 #line 582 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.disjoint) = { NAF::NOTNOT, (yystack_[1].value.cspelemvec) }; }
-#line 1450 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1450 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 144:
 #line 589 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.lbodyaggrelem) = { (yystack_[2].value.lit), (yystack_[0].value.litvec) }; }
-#line 1456 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1456 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 147:
 #line 601 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.condlitlist) = BUILDER.condlitvec((yystack_[2].value.condlitlist), (yystack_[1].value.lit), BUILDER.litvec()); }
-#line 1462 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1462 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 148:
 #line 602 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.condlitlist) = BUILDER.condlitvec((yystack_[3].value.condlitlist), (yystack_[2].value.lit), (yystack_[1].value.litvec)); }
-#line 1468 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1468 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 149:
 #line 603 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.condlitlist) = BUILDER.condlitvec(); }
-#line 1474 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1474 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 150:
 #line 608 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.condlitlist) = BUILDER.condlitvec(BUILDER.condlitvec((yystack_[2].value.condlitlist), (yystack_[1].value.lit), (yystack_[0].value.litvec)), (yystack_[4].value.lit), BUILDER.litvec()); }
-#line 1480 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1480 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 151:
 #line 609 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.condlitlist) = BUILDER.condlitvec(BUILDER.condlitvec((yystack_[2].value.condlitlist), (yystack_[1].value.lit), (yystack_[0].value.litvec)), (yystack_[4].value.lit), BUILDER.litvec()); }
-#line 1486 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1486 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 152:
 #line 610 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.condlitlist) = BUILDER.condlitvec(BUILDER.condlitvec((yystack_[2].value.condlitlist), (yystack_[1].value.lit), (yystack_[0].value.litvec)), (yystack_[6].value.lit), (yystack_[4].value.litvec)); }
-#line 1492 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1492 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 153:
 #line 611 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.condlitlist) = BUILDER.condlitvec(BUILDER.condlitvec(), (yystack_[2].value.lit), (yystack_[0].value.litvec)); }
-#line 1498 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1498 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 154:
 #line 620 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.bodylit((yystack_[2].value.body), (yystack_[1].value.lit)); }
-#line 1504 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1504 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 155:
 #line 621 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.bodylit((yystack_[2].value.body), (yystack_[1].value.lit)); }
-#line 1510 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1510 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 156:
 #line 622 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = lexer->bodyaggregate((yystack_[2].value.body), yystack_[1].location, NAF::POS, (yystack_[1].value.uid)); }
-#line 1516 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1516 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 157:
 #line 623 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = lexer->bodyaggregate((yystack_[2].value.body), yystack_[1].location, NAF::POS, (yystack_[1].value.uid)); }
-#line 1522 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1522 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 158:
 #line 624 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = lexer->bodyaggregate((yystack_[3].value.body), yystack_[1].location + yystack_[2].location, NAF::NOT, (yystack_[1].value.uid)); }
-#line 1528 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1528 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 159:
 #line 625 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = lexer->bodyaggregate((yystack_[3].value.body), yystack_[1].location + yystack_[2].location, NAF::NOT, (yystack_[1].value.uid)); }
-#line 1534 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1534 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 160:
 #line 626 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = lexer->bodyaggregate((yystack_[4].value.body), yystack_[1].location + yystack_[3].location, NAF::NOTNOT, (yystack_[1].value.uid)); }
-#line 1540 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1540 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 161:
 #line 627 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = lexer->bodyaggregate((yystack_[4].value.body), yystack_[1].location + yystack_[3].location, NAF::NOTNOT, (yystack_[1].value.uid)); }
-#line 1546 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1546 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 162:
 #line 628 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.conjunction((yystack_[2].value.body), yystack_[1].location, (yystack_[1].value.lbodyaggrelem).first, (yystack_[1].value.lbodyaggrelem).second); }
-#line 1552 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1552 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 163:
 #line 629 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.disjoint((yystack_[2].value.body), yystack_[1].location, (yystack_[1].value.disjoint).first, (yystack_[1].value.disjoint).second); }
-#line 1558 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1558 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 164:
 #line 630 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.body(); }
-#line 1564 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1564 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 165:
 #line 634 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.bodylit((yystack_[2].value.body), (yystack_[1].value.lit)); }
-#line 1570 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1570 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 166:
 #line 635 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = lexer->bodyaggregate((yystack_[2].value.body), yystack_[1].location, NAF::POS, (yystack_[1].value.uid)); }
-#line 1576 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1576 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 167:
 #line 636 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = lexer->bodyaggregate((yystack_[3].value.body), yystack_[1].location + yystack_[2].location, NAF::NOT, (yystack_[1].value.uid)); }
-#line 1582 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1582 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 168:
 #line 637 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = lexer->bodyaggregate((yystack_[4].value.body), yystack_[1].location + yystack_[3].location, NAF::NOTNOT, (yystack_[1].value.uid)); }
-#line 1588 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1588 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 169:
 #line 638 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.conjunction((yystack_[2].value.body), yystack_[1].location, (yystack_[1].value.lbodyaggrelem).first, (yystack_[1].value.lbodyaggrelem).second); }
-#line 1594 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1594 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 170:
 #line 639 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.disjoint((yystack_[2].value.body), yystack_[1].location, (yystack_[1].value.disjoint).first, (yystack_[1].value.disjoint).second); }
-#line 1600 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1600 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 171:
 #line 643 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.head) = BUILDER.headlit((yystack_[0].value.lit)); }
-#line 1606 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1606 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 172:
 #line 644 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.head) = BUILDER.disjunction(yylhs.location, (yystack_[0].value.condlitlist)); }
-#line 1612 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1612 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 173:
 #line 645 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.head) = lexer->headaggregate(yylhs.location, (yystack_[0].value.uid)); }
-#line 1618 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1618 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 174:
 #line 649 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.rule(yylhs.location, (yystack_[1].value.head)); }
-#line 1624 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1624 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 175:
 #line 650 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.rule(yylhs.location, (yystack_[2].value.head), (yystack_[0].value.body)); }
-#line 1630 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1630 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 176:
 #line 651 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.rule(yylhs.location, BUILDER.headlit(BUILDER.boollit(yylhs.location, false)), (yystack_[0].value.body)); }
-#line 1636 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1636 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 177:
 #line 652 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.rule(yylhs.location, BUILDER.headlit(BUILDER.boollit(yylhs.location, false)), BUILDER.body()); }
-#line 1642 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1642 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 178:
 #line 659 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.rule(yylhs.location, BUILDER.headlit(BUILDER.boollit(yystack_[2].location, false)), BUILDER.disjoint((yystack_[0].value.body), yystack_[2].location, inv((yystack_[2].value.disjoint).first), (yystack_[2].value.disjoint).second)); }
-#line 1648 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1648 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 179:
 #line 660 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.rule(yylhs.location, BUILDER.headlit(BUILDER.boollit(yystack_[2].location, false)), BUILDER.disjoint(BUILDER.body(), yystack_[2].location, inv((yystack_[2].value.disjoint).first), (yystack_[2].value.disjoint).second)); }
-#line 1654 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1654 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 180:
 #line 661 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.rule(yylhs.location, BUILDER.headlit(BUILDER.boollit(yystack_[1].location, false)), BUILDER.disjoint(BUILDER.body(), yystack_[1].location, inv((yystack_[1].value.disjoint).first), (yystack_[1].value.disjoint).second)); }
-#line 1660 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1660 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 181:
 #line 668 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvec) = (yystack_[0].value.termvec); }
-#line 1666 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1666 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 182:
 #line 669 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termvec) = BUILDER.termvec(); }
-#line 1672 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1672 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 183:
 #line 673 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termpair) = {(yystack_[2].value.term), (yystack_[0].value.term)}; }
-#line 1678 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1678 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 184:
 #line 674 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.termpair) = {(yystack_[0].value.term), BUILDER.term(yylhs.location, Value(0))}; }
-#line 1684 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1684 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 185:
 #line 678 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.bodylit(BUILDER.body(), (yystack_[0].value.lit)); }
-#line 1690 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1690 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 186:
 #line 679 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.bodylit((yystack_[2].value.body), (yystack_[0].value.lit)); }
-#line 1696 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1696 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 187:
 #line 683 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = (yystack_[0].value.body); }
-#line 1702 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1702 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 188:
 #line 684 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.body(); }
-#line 1708 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1708 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 189:
 #line 685 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.body) = BUILDER.body(); }
-#line 1714 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1714 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 190:
 #line 689 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.optimize(yylhs.location, (yystack_[2].value.termpair).first, (yystack_[2].value.termpair).second, (yystack_[1].value.termvec), (yystack_[4].value.body)); }
-#line 1720 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1720 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 191:
 #line 690 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.optimize(yylhs.location, (yystack_[2].value.termpair).first, (yystack_[2].value.termpair).second, (yystack_[1].value.termvec), BUILDER.body()); }
-#line 1726 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1726 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 192:
 #line 694 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.optimize(yylhs.location, BUILDER.term(yystack_[2].location, UnOp::NEG, (yystack_[2].value.termpair).first), (yystack_[2].value.termpair).second, (yystack_[1].value.termvec), (yystack_[0].value.body)); }
-#line 1732 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1732 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 193:
 #line 695 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.optimize(yylhs.location, BUILDER.term(yystack_[2].location, UnOp::NEG, (yystack_[2].value.termpair).first), (yystack_[2].value.termpair).second, (yystack_[1].value.termvec), (yystack_[0].value.body)); }
-#line 1738 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1738 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 194:
 #line 699 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.optimize(yylhs.location, (yystack_[2].value.termpair).first, (yystack_[2].value.termpair).second, (yystack_[1].value.termvec), (yystack_[0].value.body)); }
-#line 1744 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1744 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 195:
 #line 700 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.optimize(yylhs.location, (yystack_[2].value.termpair).first, (yystack_[2].value.termpair).second, (yystack_[1].value.termvec), (yystack_[0].value.body)); }
-#line 1750 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1750 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 200:
 #line 714 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.showsig(yylhs.location, (yystack_[3].value.uid), (yystack_[1].value.num), false); }
-#line 1756 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1756 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 201:
 #line 715 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.showsig(yylhs.location, "-"+*FWString((yystack_[3].value.uid)), (yystack_[1].value.num), false); }
-#line 1762 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1762 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 202:
 #line 716 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.showsig(yylhs.location, "", 0, false); }
-#line 1768 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1768 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 203:
 #line 717 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.show(yylhs.location, (yystack_[2].value.term), (yystack_[0].value.body), false); }
-#line 1774 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1774 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 204:
 #line 718 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.show(yylhs.location, (yystack_[1].value.term), BUILDER.body(), false); }
-#line 1780 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1780 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 205:
 #line 719 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.showsig(yylhs.location, (yystack_[3].value.uid), (yystack_[1].value.num), true); }
-#line 1786 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1786 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 206:
 #line 720 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.show(yylhs.location, (yystack_[2].value.term), (yystack_[0].value.body), true); }
-#line 1792 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1792 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 207:
 #line 721 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.show(yylhs.location, (yystack_[1].value.term), BUILDER.body(), true); }
-#line 1798 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1798 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 208:
 #line 728 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     {  BUILDER.define(yylhs.location, (yystack_[2].value.uid), (yystack_[0].value.term), false); }
-#line 1804 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1804 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 209:
 #line 732 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     {  BUILDER.define(yylhs.location, (yystack_[3].value.uid), (yystack_[1].value.term), true); }
-#line 1810 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1810 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 210:
 #line 739 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.python(yylhs.location, (yystack_[1].value.uid)); }
-#line 1816 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1816 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 211:
 #line 740 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.lua(yylhs.location, (yystack_[1].value.uid)); }
-#line 1822 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1822 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 212:
 #line 747 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { lexer->include((yystack_[1].value.uid), yylhs.location, false); }
-#line 1828 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1828 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 213:
 #line 748 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { lexer->include((yystack_[2].value.uid), yylhs.location, true); }
-#line 1834 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1834 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 214:
 #line 755 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.idlist) = BUILDER.idvec((yystack_[2].value.idlist), yystack_[0].location, (yystack_[0].value.uid)); }
-#line 1840 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1840 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 215:
 #line 756 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.idlist) = BUILDER.idvec(BUILDER.idvec(), yystack_[0].location, (yystack_[0].value.uid)); }
-#line 1846 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1846 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 216:
 #line 760 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.idlist) = BUILDER.idvec(); }
-#line 1852 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1852 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 217:
 #line 761 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { (yylhs.value.idlist) = (yystack_[0].value.idlist); }
-#line 1858 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1858 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 218:
 #line 765 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.block(yylhs.location, (yystack_[4].value.uid), (yystack_[2].value.idlist)); }
-#line 1864 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1864 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 219:
 #line 766 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.block(yylhs.location, (yystack_[1].value.uid), BUILDER.idvec()); }
-#line 1870 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1870 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 220:
 #line 773 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.external(yylhs.location, BUILDER.predlit(yystack_[2].location, NAF::POS, (yystack_[2].value.pair).second & 1, FWString((yystack_[2].value.pair).first), TermVecVecUid((yystack_[2].value.pair).second >> 1u)), (yystack_[0].value.body)); }
-#line 1876 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1876 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 221:
 #line 774 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.external(yylhs.location, BUILDER.predlit(yystack_[2].location, NAF::POS, (yystack_[2].value.pair).second & 1, FWString((yystack_[2].value.pair).first), TermVecVecUid((yystack_[2].value.pair).second >> 1u)), BUILDER.body()); }
-#line 1882 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1882 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
   case 222:
 #line 775 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:847
     { BUILDER.external(yylhs.location, BUILDER.predlit(yystack_[1].location, NAF::POS, (yystack_[1].value.pair).second & 1, FWString((yystack_[1].value.pair).first), TermVecVecUid((yystack_[1].value.pair).second >> 1u)), BUILDER.body()); }
-#line 1888 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1888 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
     break;
 
 
-#line 1892 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
+#line 1892 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:847
             default:
               break;
             }
@@ -2819,4 +2819,4 @@ namespace Gringo { namespace Input { namespace NonGroundGrammar {
 
 #line 23 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:1155
 } } } // Gringo::Input::NonGroundGrammar
-#line 2823 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:1155
+#line 2823 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.cc" // lalr1.cc:1155

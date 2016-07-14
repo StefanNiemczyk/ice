@@ -31,14 +31,14 @@
 // version 2.2 of Bison.
 
 /**
- ** \file /home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.hh
+ ** \file /home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.hh
  ** Define the Gringo::Input::NonGroundGrammar::parser class.
  */
 
 // C++ LALR(1) parser skeleton written by Akim Demaille.
 
-#ifndef YY_GRINGONONGROUNDGRAMMAR_HOME_PASPARTOUT_ICEWS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_GRAMMAR_HH_INCLUDED
-# define YY_GRINGONONGROUNDGRAMMAR_HOME_PASPARTOUT_ICEWS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_GRAMMAR_HH_INCLUDED
+#ifndef YY_GRINGONONGROUNDGRAMMAR_HOME_SNI_PJX_CATKIN_WS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_GRAMMAR_HH_INCLUDED
+# define YY_GRINGONONGROUNDGRAMMAR_HOME_SNI_PJX_CATKIN_WS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_GRAMMAR_HH_INCLUDED
 // //                    "%code requires" blocks.
 #line 41 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:372
 
@@ -51,7 +51,7 @@
     };
 
 
-#line 55 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.hh" // lalr1.cc:372
+#line 55 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.hh" // lalr1.cc:372
 
 
 # include <vector>
@@ -122,7 +122,7 @@
 
 #line 23 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:372
 namespace Gringo { namespace Input { namespace NonGroundGrammar {
-#line 126 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.hh" // lalr1.cc:372
+#line 126 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.hh" // lalr1.cc:372
 
 
 
@@ -188,7 +188,7 @@ namespace Gringo { namespace Input { namespace NonGroundGrammar {
     unsigned uid;
     int num;
 
-#line 192 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.hh" // lalr1.cc:372
+#line 192 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.hh" // lalr1.cc:372
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -592,9 +592,9 @@ namespace Gringo { namespace Input { namespace NonGroundGrammar {
 
 #line 23 "libgringo/src/input/nongroundgrammar.yy" // lalr1.cc:372
 } } } // Gringo::Input::NonGroundGrammar
-#line 596 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.hh" // lalr1.cc:372
+#line 596 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/grammar.hh" // lalr1.cc:372
 
 
 
 
-#endif // !YY_GRINGONONGROUNDGRAMMAR_HOME_PASPARTOUT_ICEWS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_GRAMMAR_HH_INCLUDED
+#endif // !YY_GRINGONONGROUNDGRAMMAR_HOME_SNI_PJX_CATKIN_WS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_GRAMMAR_HH_INCLUDED

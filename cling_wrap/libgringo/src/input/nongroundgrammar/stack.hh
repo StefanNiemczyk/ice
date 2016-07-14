@@ -31,18 +31,18 @@
 // version 2.2 of Bison.
 
 /**
- ** \file /home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/stack.hh
+ ** \file /home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/stack.hh
  ** Define the Gringo::Input::NonGroundGrammar::stack class.
  */
 
-#ifndef YY_GRINGONONGROUNDGRAMMAR_HOME_PASPARTOUT_ICEWS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_STACK_HH_INCLUDED
-# define YY_GRINGONONGROUNDGRAMMAR_HOME_PASPARTOUT_ICEWS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_STACK_HH_INCLUDED
+#ifndef YY_GRINGONONGROUNDGRAMMAR_HOME_SNI_PJX_CATKIN_WS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_STACK_HH_INCLUDED
+# define YY_GRINGONONGROUNDGRAMMAR_HOME_SNI_PJX_CATKIN_WS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_STACK_HH_INCLUDED
 
 # include <vector>
 
 #line 23 "libgringo/src/input/nongroundgrammar.yy" // stack.hh:133
 namespace Gringo { namespace Input { namespace NonGroundGrammar {
-#line 46 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/stack.hh" // stack.hh:133
+#line 46 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/stack.hh" // stack.hh:133
   template <class T, class S = std::vector<T> >
   class stack
   {
@@ -153,6 +153,6 @@ namespace Gringo { namespace Input { namespace NonGroundGrammar {
 
 #line 23 "libgringo/src/input/nongroundgrammar.yy" // stack.hh:133
 } } } // Gringo::Input::NonGroundGrammar
-#line 157 "/home/paspartout/icews/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/stack.hh" // stack.hh:133
+#line 157 "/home/sni/pjx/catkin_ws/src/ice/cling_wrap/libgringo/src/input/nongroundgrammar/stack.hh" // stack.hh:133
 
-#endif // !YY_GRINGONONGROUNDGRAMMAR_HOME_PASPARTOUT_ICEWS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_STACK_HH_INCLUDED
+#endif // !YY_GRINGONONGROUNDGRAMMAR_HOME_SNI_PJX_CATKIN_WS_SRC_ICE_CLING_WRAP_LIBGRINGO_SRC_INPUT_NONGROUNDGRAMMAR_STACK_HH_INCLUDED

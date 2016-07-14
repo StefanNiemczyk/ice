@@ -23,6 +23,7 @@ Configuration::Configuration()
   this->eventHandlerThreadCount = 2;
 
   // coordination
+  this->heartbeatTimeout = 1000; // 1 sec
   this->coordinationMessageTimeout = 5000; // 5 sec
   this->maxRetryCount = 5;
 }

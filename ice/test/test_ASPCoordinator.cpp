@@ -38,12 +38,12 @@ TEST(ASPModelGenerator, simpleTest)
   ASSERT_TRUE((stream1 ? true : false));
   ASSERT_TRUE((stream2 ? true : false));
 
-  std::unique_ptr<ice::Position> position1(new ice::Position());
+  auto position1 = std::make_shared<ice::Position>();
   position1->x = 3;
   position1->y = 2;
   position1->z = 1;
 
-  stream1->add(std::move(position1));
+  stream1->add(position1);
 
   std::this_thread::sleep_for(std::chrono::milliseconds {10});
 
@@ -102,12 +102,12 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   int y = rand();
   int z = rand();
 
-  std::unique_ptr<ice::Position> position1(new ice::Position());
+  auto position1 = std::make_shared<ice::Position>();
   position1->x = x;
   position1->y = y;
   position1->z = z;
 
-  stream1->add(std::move(position1));
+  stream1->add(position1);
 
   // wait some time
   std::this_thread::sleep_for(std::chrono::milliseconds {500});
@@ -115,10 +115,18 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   // check if element was send to system 2 and placed in stream2
   auto position2 = stream2->getLast();
 
-  ASSERT_TRUE((position2 ? true : false));
+  ASSERT_NE(nullptr, position2);
   EXPECT_EQ(x, position2->getInformation()->x);
   EXPECT_EQ(y, position2->getInformation()->y);
   EXPECT_EQ(z, position2->getInformation()->z);
+
+
+  std::cout << "Stopping engine 2" << std::endl;
+  engine2.reset();
+  std::cout << "Stopping engine 1" << std::endl;
+  engine.reset();
+
+  std::cout << "done" << std::endl;
 }
 
 TEST(ASPModelGenerator, twoSystemsComplex)
@@ -179,12 +187,12 @@ TEST(ASPModelGenerator, twoSystemsComplex)
   int y = rand();
   int z = rand();
 
-  std::unique_ptr<ice::Position> position1(new ice::Position());
+  auto position1 = std::make_shared<ice::Position>();
   position1->x = x;
   position1->y = y;
   position1->z = z;
 
-  stream11->add(std::move(position1));
+  stream11->add(position1);
 
   // wait some time
   std::this_thread::sleep_for(std::chrono::milliseconds {500});
