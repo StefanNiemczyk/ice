@@ -69,7 +69,7 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_) : nh
   pnh_.param("xml_template_file", this->params->xmlTemplateFile, std::string("UNSET"));
 
   _log->info("-------------------------------------------------------");
-  _log->info("Parameters:");
+  _log->info("Starting ice serval brdige with");
   _log->info("ontologyPath          : %v", this->params->ontologyPath);
   _log->info("ontologyIri           : %v", this->params->ontologyIri);
   _log->info("ontologyIriSelf       : %v", this->params->ontologyIriSelf);
@@ -99,7 +99,7 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_, Init
   this->identityDirectory = std::make_shared<EntityDirectory>();
 
   _log->info("-------------------------------------------------------");
-  _log->info("Parameters:");
+  _log->info("Starting ice serval brdige with");
   _log->info("ontologyPath          : %v", this->params->ontologyPath);
   _log->info("ontologyIri           : %v", this->params->ontologyIri);
   _log->info("ontologyIriSelf       : %v", this->params->ontologyIriSelf);

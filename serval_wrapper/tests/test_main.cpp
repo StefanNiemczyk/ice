@@ -40,6 +40,8 @@ void createConfig()
   myfile2 << "rhizome.http.port=4110\n";
   myfile2 << "api.restful.users.peter.password=venkman\n";
   myfile2.close();
+
+  sleep(2);
 }
 
 int main(int argc, char **argv)

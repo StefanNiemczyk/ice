@@ -119,14 +119,6 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   EXPECT_EQ(x, position2->getInformation()->x);
   EXPECT_EQ(y, position2->getInformation()->y);
   EXPECT_EQ(z, position2->getInformation()->z);
-
-
-  std::cout << "Stopping engine 2" << std::endl;
-  engine2.reset();
-  std::cout << "Stopping engine 1" << std::endl;
-  engine.reset();
-
-  std::cout << "done" << std::endl;
 }
 
 TEST(ASPModelGenerator, twoSystemsComplex)

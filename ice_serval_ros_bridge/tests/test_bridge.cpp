@@ -58,7 +58,7 @@ TEST(Bridge, discovery)
   params2->ontologyPath = path + "/tests/data/";
   params2->servalInstancePath = "/tmp/mops";
   params2->servalHost = "localhost";
-  params2->servalPort = 4111;
+  params2->servalPort = 4110;
   params2->servalUser = "peter";
   params2->servalPassword = "venkman";
   params2->servalLocal = true;

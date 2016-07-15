@@ -48,72 +48,57 @@ int Entity::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ont
 
   auto nodes = ontologyInterface->readNodesAndIROsAsASP(ownIri);
 
-  std::vector<const char*>* types = nodes->at(0);
-  std::vector<const char*>* names = nodes->at(1);
-  std::vector<const char*>* strings = nodes->at(2);
-  std::vector<const char*>* aspStrings = nodes->at(3);
-  std::vector<const char*>* cppStrings = nodes->at(4);
+  auto &types = nodes->at(0);
+  auto &names = nodes->at(1);
+  auto &strings = nodes->at(2);
+  auto &aspStrings = nodes->at(3);
+  auto &cppStrings = nodes->at(4);
 
   int count = 0;
 
-  for (int i = 0; i < names->size(); ++i)
+  for (int i = 0; i < names.size(); ++i)
   {
-    const char* name = names->at(i);
-    const char* elementStr = strings->at(i);
-    const char* aspStr = aspStrings->at(i);
-    const char* cppStr = cppStrings->at(i);
-    const char* typeStr = types->at(i);
+    std::string &name = names.at(i);
+    std::string &elementStr = strings.at(i);
+    std::string &aspStr = aspStrings.at(i);
+    std::string &cppStr = cppStrings.at(i);
+    std::string &typeStr = types.at(i);
     ASPElementType type;
 
-    if (typeStr == nullptr || name == nullptr || elementStr == nullptr)
+    if (typeStr == "" || name == "" || elementStr == "")
     {
       _log->error("Empty string for element '%v': '%v' (elementStr), '%v' (typeStr), element will be skipped",
-                  name == nullptr ? "null" : name, elementStr == nullptr ? "null" : elementStr,
-                  typeStr == nullptr ? "null" : typeStr);
-
-      delete name;
-      delete elementStr;
-      delete aspStr;
-      delete cppStr;
-      delete typeStr;
-
+                  name, elementStr, typeStr);
       continue;
     }
 
-    if (std::strcmp(typeStr, "COMPUTATION_NODE") == 0)
+    if (typeStr == "COMPUTATION_NODE")
     {
       type = ASPElementType::ASP_COMPUTATION_NODE;
     }
-    else if (std::strcmp(typeStr, "SOURCE_NODE") == 0)
+    else if (typeStr == "SOURCE_NODE")
     {
       type = ASPElementType::ASP_SOURCE_NODE;
     }
-    else if (std::strcmp(typeStr, "REQUIRED_STREAM") == 0)
+    else if (typeStr == "REQUIRED_STREAM")
     {
       type = ASPElementType::ASP_REQUIRED_STREAM;
     }
-    else if (std::strcmp(typeStr, "MAP_NODE") == 0)
+    else if (typeStr == "MAP_NODE")
     {
       type = ASPElementType::ASP_MAP_NODE;
     }
-    else if (std::strcmp(typeStr, "IRO_NODE") == 0)
+    else if (typeStr == "IRO_NODE")
     {
       type = ASPElementType::ASP_IRO_NODE;
     }
-    else if (std::strcmp(typeStr, "REQUIRED_MAP") == 0)
+    else if (typeStr == "REQUIRED_MAP")
     {
       type = ASPElementType::ASP_REQUIRED_MAP;
     }
     else
     {
       _log->error("Unknown asp element type '%v' for element '%v', element will be skipped", typeStr, name);
-
-      delete name;
-      delete elementStr;
-      delete aspStr;
-      delete cppStr;
-      delete typeStr;
-
       continue;
     }
 
@@ -121,18 +106,18 @@ int Entity::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ont
 
     if (!node)
     {
-      _log->info("ASP element '%v' not found, creating new element", std::string(name));
+      _log->info("ASP element '%v' not found, creating new element", name);
       auto element = std::make_shared<ASPElement>();
       element->aspString = aspStr;
       element->name = name;
       element->state = ASPElementState::ADDED_TO_ASP;
       element->type = type;
 
-      if (std::strlen(cppStr) != 0)
+      if (cppStr != "")
       {
-        const char* index = std::strchr(cppStr, '\n');
-        element->className = std::string(cppStr, index);
-        element->configAsString = std::string(index + 1, std::strlen(cppStr));
+        int index = cppStr.find('\n');
+        element->className = cppStr.substr(0, index);
+        element->configAsString = cppStr.substr(index + 1, cppStr.length() - index - 1);
         element->config = this->readConfiguration(element->configAsString);
       }
 
@@ -172,19 +157,7 @@ int Entity::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ont
 //      this->groundingDirty = true;
       ++count;
     }
-
-    delete name;
-    delete elementStr;
-    delete aspStr;
-    delete cppStr;
-    delete typeStr;
   }
-
-  delete types;
-  delete names;
-  delete strings;
-  delete aspStrings;
-  delete cppStrings;
 
   return count;
 }

@@ -58,8 +58,6 @@ serval_interface::serval_interface(std::string configPath, std::string const hos
 
   if (!this->startDeamon())
 	  std::cerr << "Error starting deamon!" << std::endl;
-
-  this->keyring.getSelf();
 }
 
 serval_interface::~serval_interface()
