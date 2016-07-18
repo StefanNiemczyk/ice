@@ -5,22 +5,23 @@
  *      Author: sni
  */
 
-#include "EntityDirectory.h"
+#include "ice/EntityDirectory.h"
 
 #include <iostream>
 
-#include <ice/ontology/OntologyInterface.h>
+#include "ice/ontology/OntologyInterface.h"
 
 namespace ice
 {
 
+const std::string EntityDirectory::ID_ICE = "id_ice";
 const std::string EntityDirectory::ID_SERVAL = "id_serval";
 const std::string EntityDirectory::ID_ONTOLOGY = "id_ontology";
 const std::string EntityDirectory::ID_ONTOLOGY_SHORT = "id_ontology_short";
 
 EntityDirectory::EntityDirectory()
 {
-  this->self = std::shared_ptr<Entity>(new Entity(this, {{"id_serval", ""}, {"id_ontology", ""}}));
+  this->self = std::shared_ptr<Entity>(new Entity(this, {{ID_SERVAL, ""}, {ID_ONTOLOGY, ""}}));
   this->self->setIceIdentity(true);
 }
 
@@ -118,11 +119,11 @@ std::shared_ptr<Entity> EntityDirectory::create(std::string const &key, std::str
 
 std::shared_ptr<Entity> EntityDirectory::create(const std::initializer_list<Id>& ids)
 {
-  // create new identity
-  auto newId = std::make_shared<Entity>(this, ids);
-  this->entities.push_back(newId);
+  // create new entity
+  auto entity = std::make_shared<Entity>(this, ids);
+  this->entities.push_back(entity);
 
-  return newId;
+  return entity;
 }
 
 std::unique_ptr<std::vector<std::shared_ptr<Entity>>> EntityDirectory::availableIdentities()
@@ -163,7 +164,7 @@ void EntityDirectory::print()
 {
   std::cout << "---------------------------------------------------------" << std::endl;
   std::cout << "---------------------------------------------------------" << std::endl;
-  std::cout << "IdentityDirectory: " << this->entities.size() << " entries" << std::endl;
+  std::cout << "EntityDirectory: " << this->entities.size() << " entries" << std::endl;
   std::cout << "---------------------------------------------------------" << std::endl;
   for (auto &id : this->entities)
   {

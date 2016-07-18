@@ -11,9 +11,9 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <ice/processing/CallbackList.h>
 
-#include "Entity.h"
+#include "ice/processing/CallbackList.h"
+#include "ice/Entity.h"
 
 namespace ice
 {
@@ -27,6 +27,7 @@ typedef std::string ontology_iri;
 class EntityDirectory
 {
 public:
+  static const std::string ID_ICE;
   static const std::string ID_SERVAL;
   static const std::string ID_ONTOLOGY;
   static const std::string ID_ONTOLOGY_SHORT;

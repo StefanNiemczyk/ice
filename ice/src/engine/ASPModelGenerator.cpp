@@ -124,7 +124,9 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
   if (this->self == nullptr)
   {
     auto en = this->engine.lock();
-    this->self = this->getASPSystemByIRI(en->getIri());
+    std::string iri;
+    en->getSelf()->getId(EntityDirectory::ID_ONTOLOGY, iri);
+    this->self = this->getASPSystemByIRI(iri);
 
     for (auto system : this->systems)
     {

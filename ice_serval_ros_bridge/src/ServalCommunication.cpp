@@ -8,14 +8,15 @@
 #include "ServalCommunication.h"
 
 #include <chrono>
-#include <serval_interface.h>
-#include <serval_wrapper/MDPSocket.h>
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <ice/communication/messages/Message.h>
+#include <serval_interface.h>
+#include <serval_wrapper/MDPSocket.h>
 
-#include "Entity.h"
+#include "ice/Entity.h"
 #include "IceServalBridge.h"
-#include "messages/Message.h"
 
 // Short alias for this namespace
 namespace pt = boost::property_tree;
@@ -23,13 +24,11 @@ namespace pt = boost::property_tree;
 namespace ice
 {
 
-ServalCommunication::ServalCommunication(IceServalBridge *bridge, std::string configPath, std::string const host,
+ServalCommunication::ServalCommunication(ICEngine *engine, std::string configPath, std::string const host,
                                          int const port, std::string const authName, std::string const authPass, bool const local) :
-    CommunicationInterface(), configPath(configPath), host(host), port(port), authName(authName), authPass(authPass), serval(nullptr), local(local)
+    CommunicationInterface(engine), configPath(configPath), host(host), port(port), authName(authName), authPass(authPass), serval(nullptr), local(local)
 {
   _log = el::Loggers::getLogger("ServalCommunication");
-  this->bridge = bridge;
-  this->directory = bridge->identityDirectory;
 }
 
 ServalCommunication::~ServalCommunication()
@@ -54,7 +53,6 @@ void ServalCommunication::initInternal()
 {
   // create interface
   this->serval = std::make_shared<serval_interface>(this->configPath, this->host, this->port, this->authName, this->authPass);
-  this->self = this->directory->self;
 
   // get own id
   if (local)
@@ -147,7 +145,7 @@ void ServalCommunication::read()
       entity = this->directory->create(EntityDirectory::ID_SERVAL, sid);
       // At the beginning each discovered node is expected to be an ice node
       entity->setAvailable(true);
-      this->requestIds(entity);
+      this->discoveredEntity(entity);
     }
     else if (sid == this->ownSid)
     {
@@ -156,9 +154,11 @@ void ServalCommunication::read()
       continue;
     }
 
-    std::string json(buffer, buffer+recCount);
+    std::string json(buffer+2, buffer+recCount);
 
-    auto message = Message::parse(json, this->bridge);
+    auto message = Message::parse(json, this->engine->getGContainerFactory());
+    message->setJobId(buffer[0]);
+    message->setJobIndex(buffer[1]);
 
     if (message == nullptr)
     {
@@ -199,7 +199,7 @@ void ServalCommunication::discover()
       entity = this->directory->create(EntityDirectory::ID_SERVAL, sid.sid);
       // At the beginning each discovered node is expected to be an ice node
       entity->setAvailable(true);
-      this->requestIds(entity);
+      this->discoveredEntity(entity);
 
       _log->info("New ID discovered: %v", entity->toString());
     }
@@ -224,7 +224,7 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
   }
 
   std::string json = msg->toJson();
-  int size = json.size();
+  int size = json.size() + 2;
 
   if (size > 1024)
   {
@@ -233,7 +233,10 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
   }
 
   unsigned char buffer[size];
-  std::copy(json.begin(), json.end(), buffer);
+  std::copy(json.begin(), json.end(), buffer + 2);
+
+  buffer[0] = msg->getJobId();
+  buffer[1] = msg->getJobIndex();
 
   this->socket->send(sid, buffer, size);
 }

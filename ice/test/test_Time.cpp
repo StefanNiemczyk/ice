@@ -13,8 +13,6 @@
 #include <memory>
 
 #include "ice/Time.h"
-#include "ice/TimeFactory.h"
-#include "etc/TestTime.cpp"
 
 #include "gtest/gtest.h"
 
@@ -40,26 +38,9 @@ protected:
 };
 
 
-TEST_F(TimeTest, create)
-{
-  TestTime t1;
-
-  EXPECT_EQ(0, t1.getTime());
-}
-
-
-TEST_F(TimeTest, lower)
-{
-  ice::time t0 = 1;
-  ice::time t1 = 2;
-
-  EXPECT_TRUE(t0 < t1);
-  EXPECT_FALSE(t1 < t0);
-}
-
 TEST_F(TimeTest, lower3)
 {
-  TestTimeFactory ttf;
+  ice::SimpleTimeFactory ttf;
   auto t0 = ttf.createTime();
 
   std::this_thread::sleep_for(std::chrono::milliseconds {1});

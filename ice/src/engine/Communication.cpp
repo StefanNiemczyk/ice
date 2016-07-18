@@ -20,7 +20,9 @@ namespace ice
 Communication::Communication(std::weak_ptr<ICEngine> engine)
 {
   this->engine = engine;
-  this->engineId = engine.lock()->getId();
+  std::string id;
+  engine.lock()->getSelf()->getId(EntityDirectory::ID_ICE, id);
+  this->engineId = std::stoi(id);
   this->_log = el::Loggers::getLogger("Communication");
 }
 

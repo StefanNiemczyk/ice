@@ -8,11 +8,11 @@
 #ifndef INFORMATIONMESSAGE_H_
 #define INFORMATIONMESSAGE_H_
 
-#include "messages/Message.h"
+#include "ice/communication/messages/Message.h"
 
 #include <vector>
 
-#include <ice/information/InformationStore.h>
+#include "ice/information/InformationStore.h"
 
 namespace ice
 {
@@ -30,7 +30,7 @@ public:
 
 protected:
   virtual rapidjson::Value payloadToJson(rapidjson::Document &document);
-  virtual bool parsePayload(rapidjson::Value& value, IceServalBridge* bridge);
+  virtual bool parsePayload(rapidjson::Value& value,  std::shared_ptr<GContainerFactory> factory);
 
 private:
   std::vector<std::shared_ptr<InformationElement<GContainer>>> informations;

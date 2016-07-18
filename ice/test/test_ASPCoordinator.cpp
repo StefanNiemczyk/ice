@@ -7,7 +7,6 @@
 #include "ice/model/updateStrategie/UpdateStrategie.h"
 
 #include "etc/EngineStuff.cpp"
-#include "etc/TestTime.cpp"
 
 TEST(ASPModelGenerator, simpleTest)
 {
@@ -15,10 +14,15 @@ TEST(ASPModelGenerator, simpleTest)
   ice::Node::registerNodeCreator("TestComputationalNodeGrounding", &SmothingNode::createNode);
 
   auto streamFactory = std::make_shared<TestFactory>();
-  auto timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest", "http://vs.uni-kassel.de/IceTest#TestSystem");
-  engine->init();
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSystem";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  engine->setTimeFactory(timeFactory);
+  engine->setStreamFactory(streamFactory);
 
+  engine->init();
   engine->start();
 
   auto spec1 = ice::InformationSpecification("http://vs.uni-kassel.de/IceTest#TestEntity1",
@@ -62,15 +66,28 @@ TEST(ASPModelGenerator, twoSystemsSimple)
 
   // create engine 1
   auto streamFactory = std::make_shared<TestFactory>();
-  auto timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest", "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd1");
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd1";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  engine->setTimeFactory(timeFactory);
+  engine->setStreamFactory(streamFactory);
+
   engine->init();
   engine->start();
 
   // create engine 2
   streamFactory = std::make_shared<TestFactory>();
-  timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest", "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd2");
+  timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+
+  std::shared_ptr<ice::Configuration> config2 = std::make_shared<ice::Configuration>();
+  config2->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config2->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd2";
+  std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(config2);
+  engine2->setTimeFactory(timeFactory);
+  engine2->setStreamFactory(streamFactory);
+
   engine2->init();
   engine2->start();
 
@@ -128,15 +145,29 @@ TEST(ASPModelGenerator, twoSystemsComplex)
 
   // create engine 1
   auto streamFactory = std::make_shared<TestFactory>();
-  auto timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest", "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd1");
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd1";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  engine->setTimeFactory(timeFactory);
+  engine->setStreamFactory(streamFactory);
+
   engine->init();
   engine->start();
 
   // create engine 2
   streamFactory = std::make_shared<TestFactory>();
-  timeFactory = std::make_shared<TestTimeFactory>();
-  std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(timeFactory, streamFactory, "http://vs.uni-kassel.de/IceTest", "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd2");
+  timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+
+  std::shared_ptr<ice::Configuration> config2 = std::make_shared<ice::Configuration>();
+  config2->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config2->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd2";
+  std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(config2);
+  engine2->setTimeFactory(timeFactory);
+  engine2->setStreamFactory(streamFactory);
+
   engine2->init();
   engine2->start();
 

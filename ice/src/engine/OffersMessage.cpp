@@ -5,9 +5,9 @@
  *      Author: sni
  */
 
-#include <messages/OffersMessage.h>
+#include "ice/communication/messages/OffersMessage.h"
 
-#include <ice/information/InformationSpecification.h>
+#include "ice/information/InformationSpecification.h"
 
 namespace ice
 {
@@ -55,7 +55,7 @@ rapidjson::Value OffersMessage::payloadToJson(rapidjson::Document &document)
   return value;
 }
 
-bool OffersMessage::parsePayload(rapidjson::Value& value, IceServalBridge* bridge)
+bool OffersMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
 {
   if (false == value.IsArray())
   {

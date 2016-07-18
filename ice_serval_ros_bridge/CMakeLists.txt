@@ -64,19 +64,10 @@ include_directories(
 )  
 
 add_library(${PROJECT_NAME}
-  src/CommunicationInterface.cpp
-  src/Entity.cpp
-  src/EntityDirectory.cpp
   src/IceServalBridge.cpp
   src/RosGContainerPublisher.cpp
   src/ServalCommunication.cpp
   src/XMLInformationReader.cpp
-  src/Message.cpp
-  src/CommandMessage.cpp
-  src/IdMessage.cpp
-  src/InformationMessage.cpp
-  src/OffersMessage.cpp
-  src/RequestMessage.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ice)

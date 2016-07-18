@@ -16,8 +16,9 @@
 #include <rapidjson/document.h>
 #include <ice/ontology/OntologyInterface.h>
 #include <ice/representation/GContainerFactory.h>
+#include <ice/EntityDirectory.h>
+#include <ice/ICEngine.h>
 
-#include "EntityDirectory.h"
 #include "RosGContainerPublisher.h"
 
 namespace ice
@@ -70,7 +71,7 @@ struct InitParams
   std::string xmlTemplateFile;
 };
 
-class IceServalBridge
+class IceServalBridge : public ICEngine
 {
 public:
   static void createConfig(ice::InitParams const * const params);
@@ -79,7 +80,7 @@ public:
   IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_);
   IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_, InitParams* params);
   virtual ~IceServalBridge();
-  void init();
+  virtual void init();
 
   void discoveredIceIdentity(std::shared_ptr<Entity> entity);
   void vanishedIceIdentity(std::shared_ptr<Entity> entity);
@@ -93,12 +94,6 @@ private:
   bool json2Information(std::string const &filePath);
 
 public:
-  std::shared_ptr<EventHandler>                         eventHandler;
-  std::shared_ptr<EntityDirectory>                      identityDirectory;
-  std::shared_ptr<OntologyInterface>                    ontologyInterface;
-  std::shared_ptr<CommunicationInterface>               communicationInterface;
-  std::shared_ptr<InformationStore>                     informationStore;
-  std::shared_ptr<GContainerFactory>                    gcontainerFactory;
   std::shared_ptr<RosGContainerPublisher>               publisher;
 
 private:

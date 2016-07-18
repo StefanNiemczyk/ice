@@ -5,26 +5,26 @@
  *      Author: sni
  */
 
-#include <messages/Message.h>
+#include "ice/communication/messages/Message.h"
 
 #include <string.h>
 
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-#include "messages/CommandMessage.h"
-#include "messages/IdMessage.h"
-#include "messages/InformationMessage.h"
-#include "messages/OffersMessage.h"
-#include "messages/RequestMessage.h"
-#include "Entity.h"
+#include "ice/communication/messages/CommandMessage.h"
+#include "ice/communication/messages/IdMessage.h"
+#include "ice/communication/messages/InformationMessage.h"
+#include "ice/communication/messages/OffersMessage.h"
+#include "ice/communication/messages/RequestMessage.h"
+#include "ice/Entity.h"
 
 namespace ice
 {
 
 el::Logger* Message::_logFactory = el::Loggers::getLogger("Message");
 
-std::shared_ptr<Message> Message::parse(std::string &jsonString, IceServalBridge* bridge)
+std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr<GContainerFactory> factory)
 {
   std::cout << jsonString << std::endl;
   rapidjson::Document document;
@@ -54,6 +54,7 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, IceServalBridge
     case(SCMD_IDS_REQUEST):
     case(SCMD_ID_REQUEST):
     case(SCMD_OFFERS_REQUEST):
+    case(SCMD_CANCLE_JOB):
         return std::make_shared<CommandMessage>(command);
         break;
     case(SCMD_IDS_RESPONSE):
@@ -75,7 +76,7 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, IceServalBridge
       break;
   }
 
-  if (false == message->parsePayload(payload->value, bridge))
+  if (false == message->parsePayload(payload->value, factory))
   {
     _logFactory->error("Message could not be parsed, Error while parsing payload for Message ID '%v'", command);
     return nullptr;
@@ -84,7 +85,7 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, IceServalBridge
   return message;
 }
 
-Message::Message(int id, bool payload) : id(id), payload(payload), _log(nullptr)
+Message::Message(int id, bool payload) : id(id), payload(payload), _log(nullptr), jobId(0), jobIndex(0)
 {
 
 }
@@ -125,6 +126,26 @@ std::string Message::toJson()
 int Message::getId()
 {
   return this->id;
+}
+
+uint8_t Message::getJobId()
+{
+  return jobId;
+}
+
+void Message::setJobId(uint8_t jobId)
+{
+  this->jobId = jobId;
+}
+
+uint8_t Message::getJobIndex()
+{
+  return jobIndex;
+}
+
+void Message::setJobIndex(uint8_t jobIndex)
+{
+  this->jobIndex = jobIndex;
 }
 
 std::shared_ptr<Entity> Message::getEntity()

@@ -14,8 +14,8 @@
 #include <memory>
 #include <easylogging++.h>
 
-#include <ice/information/InformationSpecification.h>
-#include <ice/model/aspModel/ASPSystem.h>
+#include "ice/information/InformationSpecification.h"
+#include "ice/model/aspModel/ASPSystem.h"
 
 namespace ice
 {
@@ -46,6 +46,8 @@ class Entity : public std::enable_shared_from_this<Entity>
 public:
   Entity(EntityDirectory *directory, const std::initializer_list<Id>& ids);
   virtual ~Entity();
+
+  uint8_t getNextIndex();
 
   int initializeFromOntology(std::shared_ptr<OntologyInterface> const &ontologyInterface);
   std::map<std::string, std::string> readConfiguration(std::string const config);
@@ -93,6 +95,7 @@ private:
   EntityDirectory                                       *directory;
   bool                                                  iceIdentity;
   bool                                                  available;
+  uint8_t                                               index;
   std::chrono::steady_clock::time_point                 timestamp;
   std::chrono::milliseconds                             timeoutDuration;
   std::map<std::string, std::string>                    ids;

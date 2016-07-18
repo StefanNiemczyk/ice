@@ -12,20 +12,21 @@
 #include <thread>
 #include <vector>
 
-#include "CommunicationInterface.h"
+#include <ice/communication/CommunicationInterface.h>
 
 #define SERVAL_PORT 8045
 
 namespace ice
 {
 
+class IceServalBridge;
 class serval_interface;
 class MDPSocket;
 
 class ServalCommunication : public CommunicationInterface
 {
 public:
-  ServalCommunication(IceServalBridge *bridge, std::string const configPath, std::string const host,
+  ServalCommunication(ICEngine *engine, std::string const configPath, std::string const host,
                       int const port, std::string const authName, std::string const authPass, bool const local = false);
   virtual ~ServalCommunication();
 
@@ -34,11 +35,11 @@ public:
   void setOwnSid(std::string const &sid);
 
 protected:
-  void read();
+          void read();
   virtual void initInternal();
   virtual void cleanUpInternal();
   virtual void discover();
-  virtual int readMessage(std::vector<std::shared_ptr<Message>> &outMessages);
+  virtual int  readMessage(std::vector<std::shared_ptr<Message>> &outMessages);
   virtual void sendMessage(std::shared_ptr<Message> msg);
 
 private:

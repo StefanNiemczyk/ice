@@ -5,21 +5,20 @@
  *      Author: sni
  */
 
-#include "Entity.h"
+#include "ice/Entity.h"
 
 #include <iostream>
 #include <tuple>
 #include <sstream>
 
-#include <ice/ontology/OntologyInterface.h>
-
-#include "EntityDirectory.h"
+#include "ice/ontology/OntologyInterface.h"
+#include "ice/EntityDirectory.h"
 
 namespace ice
 {
 
 Entity::Entity(EntityDirectory *directory, const std::initializer_list<Id>& ids)
-      : iceIdentity(false), directory(directory), available(false), _log(el::Loggers::getLogger("Entity"))
+      : iceIdentity(false), directory(directory), available(false), _log(el::Loggers::getLogger("Entity")), index(0)
 {
   if (ids.size() == 0)
   {
@@ -36,6 +35,11 @@ Entity::Entity(EntityDirectory *directory, const std::initializer_list<Id>& ids)
 Entity::~Entity()
 {
   //
+}
+
+uint8_t Entity::getNextIndex()
+{
+  return ++this->index % 256;
 }
 
 int Entity::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ontologyInterface)

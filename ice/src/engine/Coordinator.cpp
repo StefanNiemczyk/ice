@@ -11,7 +11,6 @@
 
 #include "ice/Configuration.h"
 #include "ice/ICEngine.h"
-#include "ice/TimeFactory.h"
 #include "ice/communication/Communication.h"
 #include "ice/coordination/EngineState.h"
 #include "ice/coordination/CooperationRequest.h"
@@ -51,14 +50,16 @@ void Coordinator::init()
   this->streamStore = e->getStreamStore();
   this->config = e->getConfig();
   this->timeFactory = e->getTimeFactory();
-  this->engineIri = e->getIri();
+  e->getSelf()->getId(EntityDirectory::ID_ONTOLOGY, this->engineIri);
   this->nodeStore = e->getNodeStore();
   this->ontologyInterface = e->getOntologyInterface();
   this->modelGenerator = e->getProcessingModelGenerator();
   this->updateStrategie = e->getUpdateStrategie();
 
-  this->self = std::make_shared<EngineState>(e->getId(), engine);
-  this->self->setSystemIri(e->getIri());
+  std::string id;
+  e->getSelf()->getId(EntityDirectory::ID_ICE, id);
+  this->self = std::make_shared<EngineState>(std::stoi(id), engine);
+  this->self->setSystemIri(this->engineIri);
   this->engineStates.push_back(this->self);
 
   // create worker thread
@@ -1176,12 +1177,6 @@ void Coordinator::workerTask()
   }
 
   int counter = 1;
-  std::string engineIri = "unknown";
-  {
-     auto e = this->engine.lock();
-     if (e)
-       engineIri = std::string(e->getIri());
-  }
 
   while (this->running)
   {

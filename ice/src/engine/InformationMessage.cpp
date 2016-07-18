@@ -5,12 +5,11 @@
  *      Author: sni
  */
 
-#include <messages/InformationMessage.h>
+#include "ice/communication/messages/InformationMessage.h"
 
 #include "ice/information/InformationElement.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/representation/GContainer.h"
-#include "IceServalBridge.h"
 
 namespace ice
 {
@@ -75,7 +74,7 @@ rapidjson::Value InformationMessage::payloadToJson(rapidjson::Document &document
   return value;
 }
 
-bool InformationMessage::parsePayload(rapidjson::Value& value, IceServalBridge* bridge)
+bool InformationMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
 {
   if (false == value.IsArray())
   {
@@ -157,7 +156,7 @@ bool InformationMessage::parsePayload(rapidjson::Value& value, IceServalBridge* 
        return false;
      }
 
-     auto information = bridge->gcontainerFactory->fromJSON(info->value);
+     auto information = factory->fromJSON(info->value);
 
      if (information == nullptr)
      {

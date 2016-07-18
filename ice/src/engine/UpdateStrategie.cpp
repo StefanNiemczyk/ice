@@ -42,7 +42,9 @@ void UpdateStrategie::init()
   this->modelGenerator = en->getProcessingModelGenerator();
   this->worker = std::thread(&UpdateStrategie::workerTask, this);
 
-  this->self = this->coordinator->getEngineStateNoMutex(en->getIri());
+  std::string iri;
+  en->getSelf()->getId(EntityDirectory::ID_ONTOLOGY, iri);
+  this->self = this->coordinator->getEngineStateNoMutex(iri);
 
   this->initInternal();
 }

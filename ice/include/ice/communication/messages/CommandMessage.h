@@ -8,7 +8,7 @@
 #ifndef COMMANDMESSAGE_H_
 #define COMMANDMESSAGE_H_
 
-#include "messages/Message.h"
+#include "ice/communication/messages/Message.h"
 
 namespace ice
 {
@@ -21,7 +21,7 @@ public:
 
 protected:
   virtual rapidjson::Value payloadToJson(rapidjson::Document &document);
-  virtual bool parsePayload(rapidjson::Value& value, IceServalBridge* bridge);
+  virtual bool parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory);
 };
 
 } /* namespace ice */

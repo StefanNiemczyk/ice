@@ -145,13 +145,23 @@ include_directories(
 
 ## Declare a cpp library
 add_library(${PROJECT_NAME}
+  src/engine/CommunicationInterface.cpp
   src/engine/Communication.cpp
   src/engine/InformationSender.cpp
   src/engine/InformationReceiver.cpp
+  
+  src/engine/Message.cpp
+  src/engine/CommandMessage.cpp
+  src/engine/IdMessage.cpp
+  src/engine/InformationMessage.cpp
+  src/engine/OffersMessage.cpp
+  src/engine/RequestMessage.cpp
+  
+  src/engine/ComJobBase.cpp
+  src/engine/IdentityRequest.cpp
 
   src/engine/Position.cpp
   src/engine/RingBuffer.cpp
-  src/engine/Time.cpp
   
   src/engine/CooperationRequest.cpp
   src/engine/CooperationResponse.cpp
@@ -195,9 +205,10 @@ add_library(${PROJECT_NAME}
   src/engine/XMLTransformationReader.cpp
   
   src/engine/Configuration.cpp
+  src/engine/Entity.cpp
+  src/engine/EntityDirectory.cpp
   src/engine/Identifier.cpp
   src/engine/ICEngine.cpp 
-  src/engine/TimeFactory.cpp
   src/engine/XMLReader.cpp  
 
   src/ros/RosCommunication.cpp
@@ -270,7 +281,6 @@ catkin_add_gtest(${PROJECT_NAME}-test
  # test/eval/EvalScenarios.cpp
  # test/eval/eval_AccessSpeed.cpp
  
-  test/etc/TestTime.cpp
   test/etc/EngineStuff.cpp
   test/test_ASPCoordinator.cpp
   test/test_JNI.cpp

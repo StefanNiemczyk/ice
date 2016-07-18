@@ -27,12 +27,10 @@ FastUpdateStrategie::~FastUpdateStrategie()
 
 void FastUpdateStrategie::initInternal()
 {
-  // TODO Auto-generated destructor stub
 }
 
 void FastUpdateStrategie::cleanUpInternal()
 {
-  // TODO Auto-generated destructor stub
 }
 
 void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)

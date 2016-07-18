@@ -2,7 +2,7 @@
 #include <memory>
 
 #include "gtest/gtest.h"
-#include "Entity.h"
+#include "ice/Entity.h"
 
 TEST(Entity, checkMatching)
 {

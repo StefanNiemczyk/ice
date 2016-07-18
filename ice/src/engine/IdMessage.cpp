@@ -5,7 +5,7 @@
  *      Author: sni
  */
 
-#include <messages/IdMessage.h>
+#include "ice/communication/messages/IdMessage.h"
 
 namespace ice
 {
@@ -43,7 +43,7 @@ rapidjson::Value IdMessage::payloadToJson(rapidjson::Document &document)
   return value;
 }
 
-bool IdMessage::parsePayload(rapidjson::Value& value, IceServalBridge* bridge)
+bool IdMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
 {
   if (false == value.IsObject())
   {

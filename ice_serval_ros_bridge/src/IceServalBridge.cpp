@@ -10,12 +10,12 @@
 #include <fstream>
 
 #include <ros/package.h>
+#include <ice/communication/CommunicationInterface.h>
 #include <ice/information/InformationStore.h>
 #include <ice/processing/EventHandler.h>
 #include <ice/representation/GContainerFactory.h>
 #include <rapidjson/filereadstream.h>
 
-#include "CommunicationInterface.h"
 #include "RosGContainerPublisher.h"
 #include "ServalCommunication.h"
 #include "XMLInformationReader.h"
@@ -51,7 +51,6 @@ void IceServalBridge::createConfig(ice::InitParams const * const params)
 IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_) : nh_(nh_), pnh_(pnh_)
 {
   _log = el::Loggers::getLogger("IceServalBridge");
-  this->identityDirectory = std::make_shared<EntityDirectory>();
   this->params = new InitParams();
 
   // loading params
@@ -83,20 +82,12 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_) : nh
   _log->info("jsonInformationPath   : %v", this->params->jsonInformationPath);
   _log->info("xmlTemplatePath       : %v", this->params->xmlTemplateFile);
   _log->info("-------------------------------------------------------");
-
-  this->communicationInterface = std::make_shared<ServalCommunication>(this,
-                                                             this->params->servalInstancePath,
-                                                             this->params->servalHost,
-                                                             this->params->servalPort,
-                                                             this->params->servalUser,
-                                                             this->params->servalPassword);
 }
 
 IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_, InitParams* params) :
     nh_(nh_), pnh_(pnh_), params(params)
 {
   _log = el::Loggers::getLogger("IceServalBridge");
-  this->identityDirectory = std::make_shared<EntityDirectory>();
 
   _log->info("-------------------------------------------------------");
   _log->info("Starting ice serval brdige with");
@@ -113,14 +104,6 @@ IceServalBridge::IceServalBridge(ros::NodeHandle nh_, ros::NodeHandle pnh_, Init
   _log->info("jsonInformationPath   : %v", this->params->jsonInformationPath);
   _log->info("xmlTemplatePath       : %v", this->params->xmlTemplateFile);
   _log->info("-------------------------------------------------------");
-
-  this->communicationInterface = std::make_shared<ServalCommunication>(this,
-                                                             this->params->servalInstancePath,
-                                                             this->params->servalHost,
-                                                             this->params->servalPort,
-                                                             this->params->servalUser,
-                                                             this->params->servalPassword,
-                                                             this->params->servalLocal);
 }
 
 IceServalBridge::~IceServalBridge()
@@ -130,16 +113,31 @@ IceServalBridge::~IceServalBridge()
 
 void IceServalBridge::init()
 {
+  // set time factory
+  this->setTimeFactory(std::make_shared<SimpleTimeFactory>());
+
+  // init entity directory
+  this->entityDirectory = std::make_shared<EntityDirectory>();
+  this->self = this->entityDirectory->self;
+  this->self->addId(EntityDirectory::ID_ONTOLOGY, this->params->ontologyIriSelf);
+  this->self->addId(EntityDirectory::ID_ICE, IDGenerator::toString(IDGenerator::getInstance()->getIdentifier()));
+
+  // init communication
+  this->communicationInterface = std::make_shared<ServalCommunication>(this,
+                                                             this->params->servalInstancePath,
+                                                             this->params->servalHost,
+                                                             this->params->servalPort,
+                                                             this->params->servalUser,
+                                                             this->params->servalPassword,
+                                                             this->params->servalLocal);
+
   // init event handler
   this->eventHandler = std::make_shared<EventHandler>(2, 100);
 
   // register hooks
-  this->identityDirectory->disvoeredIceIdentity.registerCallback(this, &IceServalBridge::discoveredIceIdentity);
-  this->identityDirectory->vanishedIceIdentity.registerCallback(this, &IceServalBridge::vanishedIceIdentity);
-  this->identityDirectory->offeredInformation.registerCallback(this, &IceServalBridge::offeredInformation);
-
-  //set own iri
-  this->identityDirectory->self->addId(EntityDirectory::ID_ONTOLOGY, this->params->ontologyIriSelf);
+  this->entityDirectory->disvoeredIceIdentity.registerCallback(this, &IceServalBridge::discoveredIceIdentity);
+  this->entityDirectory->vanishedIceIdentity.registerCallback(this, &IceServalBridge::vanishedIceIdentity);
+  this->entityDirectory->offeredInformation.registerCallback(this, &IceServalBridge::offeredInformation);
 
   // init ontology
   std::string icePath = ros::package::getPath("ice");
@@ -195,7 +193,7 @@ void IceServalBridge::init()
   }
 
   _log->info("Bridge for identity '%v' initialized, requests: '%v', offers '%v'",
-             this->identityDirectory->self->toString(), this->requiredInfos.size(), this->offeredInfos.size());
+             this->self->toString(), this->requiredInfos.size(), this->offeredInfos.size());
 }
 
 void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> entity)

@@ -43,7 +43,7 @@ public:
 
   void setMaxRetryCount(int maxRetryCount);
 
-private:
+public:
   int informationStreamBufferSize;
 
   int eventHandlerThreadCount;
@@ -52,6 +52,9 @@ private:
   long heartbeatTimeout;
   long coordinationMessageTimeout;
   int maxRetryCount;
+
+  std::string ontologyIri;
+  std::string ontologyIriOwnEntity;
 
   //Static values
 public:

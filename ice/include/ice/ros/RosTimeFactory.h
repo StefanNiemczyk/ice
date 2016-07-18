@@ -11,7 +11,6 @@
 #include "ros/ros.h"
 
 #include "ice/Time.h"
-#include "ice/TimeFactory.h"
 
 namespace ice
 {

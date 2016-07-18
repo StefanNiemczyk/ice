@@ -5,20 +5,20 @@
  *      Author: sni
  */
 
-#include <messages/CommandMessage.h>
+#include "ice/communication/messages/CommandMessage.h"
 
 namespace ice
 {
 
 CommandMessage::CommandMessage(int id) : Message(id, false)
 {
-  // TODO Auto-generated constructor stub
+  //
 
 }
 
 CommandMessage::~CommandMessage()
 {
-  // TODO Auto-generated destructor stub
+  //
 }
 
 rapidjson::Value CommandMessage::payloadToJson(rapidjson::Document &document)
@@ -26,7 +26,7 @@ rapidjson::Value CommandMessage::payloadToJson(rapidjson::Document &document)
   return rapidjson::Value("");
 }
 
-bool CommandMessage::parsePayload(rapidjson::Value& value, IceServalBridge* bridge)
+bool CommandMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
 {
   return true;
 }

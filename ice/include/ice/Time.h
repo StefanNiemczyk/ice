@@ -9,7 +9,7 @@
 #define TIME_H_
 
 #include <memory>
-
+#include <sys/time.h>
 
 namespace ice
 {
@@ -19,33 +19,58 @@ typedef unsigned long long time;
 /** Value definition of not specified time fields */
 static time NO_TIME = 0;
 
-
-
-
-
-// OLD #########################################################################################
-class Time
+//* TimeFactory
+/**
+ * Factory to create new time stamps.
+ *
+ */
+class TimeFactory
 {
 public:
-  Time();
-  virtual ~Time();
+  TimeFactory() {};
+  virtual ~TimeFactory() {};
 
-  virtual bool isBefore(Time* otherTime) const = 0;
-  virtual bool isBeforeOrEqual(Time* otherTime) const = 0;
-  virtual bool isAfter(Time* otherTime) const = 0;
-  virtual bool isAfterOrEqual(Time* otherTime) const = 0;
+  /*!
+   * \brief Creates and returns a new time stamp.
+   *
+   * Creates and returns a new time stamp.
+   */
+  virtual time createTime() = 0;
 
-  virtual bool isBefore(std::shared_ptr<Time> otherTime) const = 0;
-  virtual bool isBeforeOrEqual(std::shared_ptr<Time> otherTime) const = 0;
-  virtual bool isAfter(std::shared_ptr<Time> otherTime) const = 0;
-  virtual bool isAfterOrEqual(std::shared_ptr<Time> otherTime) const = 0;
+  /*!
+   * \brief Checks if the timestamp is more than millisecond in past.
+   *
+   * Checks if the timestamp is more than millisecond in past.
+   *
+   * \param timestamp The timestamp to check.
+   * \param millisecond The timeout duration in milliseconds.
+   */
+  virtual bool checkTimeout(time timestamp, long milliseconds) = 0;
+};
 
-  virtual bool isBeforeCurrent() const = 0;
-  virtual bool isAfterCurrent() const = 0;
 
-  virtual std::shared_ptr<Time> clone(std::shared_ptr<Time> otherTime) const = 0;
+class SimpleTimeFactory : public TimeFactory
+{
+public:
+  SimpleTimeFactory() {}
 
-  virtual Time* clone(Time* otherTime) const = 0;
+  virtual ~SimpleTimeFactory() {}
+
+  virtual ice::time createTime()
+  {
+    timeval val;
+    gettimeofday(&val, NULL);
+
+    return val.tv_usec;
+  }
+
+  virtual bool checkTimeout(ice::time timestamp, long millisecond)
+  {
+    timeval val;
+    gettimeofday(&val, NULL);
+
+    return (timestamp + (millisecond * 1000)) < val.tv_usec;
+  }
 };
 
 } /* namespace ice */

@@ -11,7 +11,6 @@
 #include "ice/processing/Node.h"
 #include "ice/Configuration.h"
 #include "ice/ICEngine.h"
-#include "ice/TimeFactory.h"
 
 #include "easylogging++.h"
 
@@ -94,15 +93,6 @@ const std::string EngineState::getSystemIriShort()
   this->systemIriShort = e->getOntologyInterface()->toShortIri(this->systemIri);
 
   return this->systemIriShort;
-
-//  int index1 = this->systemIri.find("#");
-//
-//  if (index1 == std::string::npos)
-//    return this->systemIri;
-//
-//  std::string name = this->systemIri.substr(index1 + 1, this->systemIri.size() - index1 - 1);
-//  name[0] = std::tolower(name[0]);
-//  return name;
 }
 
 time EngineState::getTimeLastActivity() const
