@@ -44,17 +44,6 @@ public:
   void removeComJob(std::shared_ptr<ComJobBase> const &job);
   void discoveredEntity(std::shared_ptr<Entity> const &entity);
 
-  // stuff which needs to be removed!
-  virtual void requestIds(std::shared_ptr<Entity> const &entity);
-  virtual void onRequestIds(std::shared_ptr<Entity> const &entity);
-  virtual void requestOffers(std::shared_ptr<Entity> const &entity);
-  virtual void onRequestOffers(std::shared_ptr<Entity> const &entity);
-  virtual void requestInformation(std::shared_ptr<Entity> const &entity,
-                                  std::vector<std::shared_ptr<InformationSpecification>> const &requests);
-  virtual void onRequestInformation(std::shared_ptr<Entity> const &identity,
-                                    std::vector<std::shared_ptr<InformationSpecification>> const &requests);
-  virtual void onInformation(std::shared_ptr<Entity> const &identity, std::vector<std::shared_ptr<InformationElement<GContainer>>> &information);
-
   // Get/Set
   std::shared_ptr<GContainerFactory> getGContainerFactory();
   void setGContainerFactory(std::shared_ptr<GContainerFactory> factory);
@@ -87,11 +76,13 @@ protected:
 
   std::vector<std::shared_ptr<Message>>       messages;
   std::vector<std::shared_ptr<ComJobBase>>    comJobsOwn;
+  std::vector<std::shared_ptr<ComJobBase>>    comJobsOwnNew;
   std::vector<std::shared_ptr<ComJobBase>>    comJobsIncomming;
   std::thread                                 worker;
   bool                                        running;
   std::mutex                                  _messageMtx;
   std::mutex                                  _jobMtx;
+  std::mutex                                  _jobAddMtx;
 
 private:
   el::Logger                                  *_log;

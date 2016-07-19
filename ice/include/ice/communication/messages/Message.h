@@ -23,18 +23,21 @@ class Entity;
 namespace ice
 {
 
-enum IceCmd
+enum IceMessageIds
 {
-  SCMD_IDS_REQUEST                      = 1,
-  SCMD_IDS_RESPONSE                     = 2,
-  SCMD_ID_REQUEST                       = 3,
-  SCMD_ID_RESPONSE                      = 4,
-  SCMD_OFFERS_REQUEST                   = 5,
-  SCMD_OFFERS_RESPONSE                  = 6,
-  SCMD_INFORMATION_REQUEST              = 7,
-  SCMD_INFORMATION_RESPONSE             = 8,
+  IMI_IDS_REQUEST                      = 1,
+  IMI_IDS_RESPONSE                     = 2,
+  IMI_ID_REQUEST                       = 3,
+  IMI_ID_RESPONSE                      = 4,
+  IMI_OFFERS_REQUEST                   = 5,
+  IMI_OFFERS_RESPONSE                  = 6,
+  IMI_INFORMATION_REQUEST              = 7,
+  IMI_INFORMATION_RESPONSE             = 8,
 
-  SCMD_CANCLE_JOB                       = 255
+  IMI_ACK                              = 250,
+
+  IMI_NO_RESULT                        = 254,
+  IMI_CANCLE_JOB                       = 255
 };
 
 class Message

@@ -12,7 +12,7 @@
 namespace ice
 {
 
-OffersMessage::OffersMessage() : Message(IceCmd::SCMD_OFFERS_RESPONSE, true)
+OffersMessage::OffersMessage() : Message(IceMessageIds::IMI_OFFERS_RESPONSE, true)
 {
   _log = el::Loggers::getLogger("OffersMessage");
 }

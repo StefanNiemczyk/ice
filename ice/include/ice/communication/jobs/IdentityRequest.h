@@ -15,11 +15,13 @@ namespace ice
 class IdentityRequest : public ComJob<IdentityRequest>
 {
 public:
+  static int ID;
+
+public:
   IdentityRequest(ICEngine* const engine, std::shared_ptr<Entity> const &entity);
   virtual ~IdentityRequest();
 
   virtual void init();
-  virtual void init(std::shared_ptr<Message> const &message);
   virtual void handleMessage(std::shared_ptr<Message> const &message);
 };
 
@@ -34,11 +36,10 @@ class IdentityRequestCreator
 
   static int init()
   {
-    ComJobRegistry::put(1, *makeInstance);
+    ComJobRegistry::put(IdentityRequest::ID, *makeInstance);
     return 0;
   }
 };
-
 
 } /* namespace ice */
 

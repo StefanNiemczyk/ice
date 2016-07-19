@@ -65,20 +65,26 @@ void CommunicationInterface::cleanUp()
 void CommunicationInterface::send(std::shared_ptr<Message> message)
 {
   std::lock_guard<std::mutex> guard(this->_messageMtx);
-
   this->messages.push_back(message);
 }
 
 void CommunicationInterface::addComJob(std::shared_ptr<ComJobBase> const &job)
 {
-  std::lock_guard<std::mutex> guard(this->_jobMtx);
-  this->comJobsOwn.push_back(job);
+  std::lock_guard<std::mutex> guard(this->_jobAddMtx);
+  this->comJobsOwnNew.push_back(job);
+  job->init();
 }
 
 void CommunicationInterface::removeComJob(std::shared_ptr<ComJobBase> const &job)
 {
-  std::lock_guard<std::mutex> guard(this->_jobMtx);
-  auto j = std::find(this->comJobsOwn.begin(), this->comJobsOwn.end(), job);
+  std::lock_guard<std::mutex> guard(this->_jobAddMtx);
+  auto j = std::find(this->comJobsOwnNew.begin(), this->comJobsOwnNew.end(), job);
+
+  if (j != this->comJobsOwnNew.end())
+    this->comJobsOwnNew.erase(j);
+
+  std::lock_guard<std::mutex> guard2(this->_jobMtx);
+  j = std::find(this->comJobsOwn.begin(), this->comJobsOwn.end(), job);
 
   if (j != this->comJobsOwn.end())
     this->comJobsOwn.erase(j);
@@ -86,129 +92,55 @@ void CommunicationInterface::removeComJob(std::shared_ptr<ComJobBase> const &job
 
 void CommunicationInterface::discoveredEntity(std::shared_ptr<Entity> const &entity)
 {
-  std::lock_guard<std::mutex> guard(this->_jobMtx);
   _log->info("Requesting information from discovered entity '%v'", entity->toString());
 
   auto request = std::make_shared<IdentityRequest>(this->engine, entity);
-  this->comJobsOwn.push_back(request);
-  request->init();
+  this->addComJob(request);
 }
 
-void CommunicationInterface::requestIds(std::shared_ptr<Entity> const &entity)
-{
-  _log->info("Requesting Ids from '%v'", entity->toString());
-  auto m = std::make_shared<CommandMessage>(IceCmd::SCMD_IDS_REQUEST);
-  m->setEntity(entity);
-
-  this->send(m);
-}
-
-void CommunicationInterface::onRequestIds(std::shared_ptr<Entity> const &entity)
-{
-  _log->info("Sending Ids to '%v'", entity->toString());
-  auto m = std::make_shared<IdMessage>();
-  m->setEntity(entity);
-  this->self->pushIds(m->getIds());
-
-  this->send(m);
-}
-
-void CommunicationInterface::requestOffers(std::shared_ptr<Entity> const &entity)
-{
-  _log->info("Requesting offered information from '%v'", entity->toString());
-  auto m = std::make_shared<CommandMessage>(IceCmd::SCMD_OFFERS_REQUEST);
-  m->setEntity(entity);
-
-  this->send(m);
-}
-
-void CommunicationInterface::onRequestOffers(std::shared_ptr<Entity> const &entity)
-{
-  _log->info("Sending offered information to '%v'", entity->toString());
-  auto m = std::make_shared<OffersMessage>();
-  m->setEntity(entity);
-
-  auto &vec = m->getOfferes();
-//  for (auto info : this->bridge->getOfferedInfos())
-//  {
-//    vec.push_back(info->infoSpec);
-//  }
-
-  this->send(m);
-}
-
-void CommunicationInterface::requestInformation(std::shared_ptr<Entity> const &entity,
-                                                std::vector<std::shared_ptr<InformationSpecification>> const &requests)
-{
-  _log->info("Requesting information from '%v'", entity->toString());
-  auto m = std::make_shared<RequestMessage>();
-  m->setEntity(entity);
-
-  auto &vec = m->getRequests();
-  for (auto info : requests)
-  {
-    vec.push_back(info);
-  }
-
-  this->send(m);
-}
-
-void CommunicationInterface::onRequestInformation(
-    std::shared_ptr<Entity> const &entity, std::vector<std::shared_ptr<InformationSpecification>> const &requests)
-{
-  _log->info("Information request received from '%v'", entity->toString());
-  std::vector<std::shared_ptr<InformationElement<GContainer>>>infos;
-
-//  for (auto &request : requests)
-//  {
-//    this->bridge->informationStore->getInformation(request,infos);
-//  }
-
-  int count = infos.size();
-  if (count == 0)
-  {
-    _log->warn("No information found for request from '%v'", entity->toString());
-    return;
-  }
-
-  _log->info("Sending '%v' information to '%v'", count, entity->toString());
-  for (auto &info : infos)
-  {
-    auto m = std::make_shared<InformationMessage>();
-    m->setEntity(entity);
-    m->getInformations().push_back(info);
-    this->sendMessage(m);
-  }
-}
-
-void CommunicationInterface::onInformation(std::shared_ptr<Entity> const &entity,
-                                           std::vector<std::shared_ptr<InformationElement<GContainer>>>&information)
-{
-  _log->info("Information received from '%v'", entity->toString());
-
-  for (auto &info : information)
-  {
-    this->informationStore->addInformation(info);
-  }
-}
+//void CommunicationInterface::requestOffers(std::shared_ptr<Entity> const &entity)
+//{
+//  _log->info("Requesting offered information from '%v'", entity->toString());
+//  auto m = std::make_shared<CommandMessage>(IceCmd::SCMD_OFFERS_REQUEST);
+//  m->setEntity(entity);
+//
+//  this->send(m);
+//}
+//
+//void CommunicationInterface::onRequestOffers(std::shared_ptr<Entity> const &entity)
+//{
+//  _log->info("Sending offered information to '%v'", entity->toString());
+//  auto m = std::make_shared<OffersMessage>();
+//  m->setEntity(entity);
+//
+//  auto &vec = m->getOfferes();
+////  for (auto info : this->bridge->getOfferedInfos())
+////  {
+////    vec.push_back(info->infoSpec);
+////  }
+//
+//  this->send(m);
+//}
 
 void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
 {
   auto entity = message->getEntity();
+  entity->setActiveTimestamp();
   _log->info("Received Message with id '%v', job id '%v' and index '%v' from %v", std::to_string(message->getId()),
              std::to_string(message->getJobId()), std::to_string(message->getJobIndex()), entity->toString());
-  entity->setActiveTimestamp();
 
   // message for own job
   if (message->getJobId() <= 127)
   {
-    std::lock_guard<std::mutex> guard(this->_jobMtx);
-    for (auto &job : this->comJobsOwn)
     {
-      if (job->match(message->getJobId(), message->getJobIndex()))
+      std::lock_guard<std::mutex> guard(this->_jobMtx);
+      for (auto &job : this->comJobsOwn)
       {
-        job->handleMessage(message);
-        return;
+        if (job->match(message->getJobId(), message->getJobIndex()))
+        {
+          job->handleMessage(message);
+          return;
+        }
       }
     }
 
@@ -216,11 +148,11 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
                std::to_string(message->getJobId()), std::to_string(message->getJobIndex()), entity->toString());
     // received answer for missing request
 
-    if (message->getId() == IceCmd::SCMD_CANCLE_JOB)
+    if (message->getId() == IceMessageIds::IMI_CANCLE_JOB)
     {
       return;
     }
-    auto msg = std::make_shared<CommandMessage>(IceCmd::SCMD_CANCLE_JOB);
+    auto msg = std::make_shared<CommandMessage>(IceMessageIds::IMI_CANCLE_JOB);
     msg->setJobIndex(message->getJobIndex());
     msg->setJobId(message->getJobId());
     msg->setEntity(entity);
@@ -231,6 +163,7 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
 
   // message for incomming job
   uint8_t id = message->getJobId() - 127;
+  std::lock_guard<std::mutex> guard(this->_jobMtx);
   for (auto &job : this->comJobsIncomming)
   {
     if (job->match(id, message->getJobIndex()))
@@ -244,22 +177,11 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
   auto job = ComJobRegistry::makeInstance(id, this->engine, entity);
   job->setIndex(message->getJobIndex());
   job->setOwnJob(false);
-  this->comJobsOwn.push_back(job);
   job->handleMessage(message);
 
-//  switch (message->getId())
-//  {
-//    case (SCMD_IDS_REQUEST):
-//      this->onRequestIds(entity);
-//      break;
-//
-//    case (SCMD_IDS_RESPONSE):
-//    {
-//      entity->fuse(std::static_pointer_cast<IdMessage>(message)->getIds());
-//      entity->checkIce();
-//      break;
-//    }
-//
+  this->comJobsIncomming.push_back(job);
+
+
 //    case (SCMD_OFFERS_REQUEST):
 //      this->onRequestOffers(entity);
 //      break;
@@ -267,19 +189,6 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
 //    case (SCMD_OFFERS_RESPONSE):
 //        entity->addOfferedInformation(std::static_pointer_cast<OffersMessage>(message)->getOfferes());
 //      break;
-//
-//    case (SCMD_INFORMATION_REQUEST):
-//        this->onRequestInformation(entity, std::static_pointer_cast<RequestMessage>(message)->getRequests());
-//    break;
-//
-//    case (SCMD_INFORMATION_RESPONSE):
-//        this->onInformation(entity, std::static_pointer_cast<InformationMessage>(message)->getInformations());
-//    break;
-//
-//    default:
-//      _log->error("Unknown command '%v', message will be skipped", std::to_string(message->getId()));
-//      break;
-//  }
 }
 
 void CommunicationInterface::workerTask()
@@ -306,9 +215,19 @@ void CommunicationInterface::workerTask()
       this->handleMessage(msg);
     }
 
-    // handle own jobs
     {
       std::lock_guard<std::mutex> guard(this->_jobMtx);
+
+      {
+        std::lock_guard<std::mutex> guard(this->_jobAddMtx);
+
+        for (auto &job : this->comJobsOwnNew)
+        {
+          this->comJobsOwn.push_back(job);
+        }
+      }
+
+      // handle own jobs
       for (int i = 0; i < this->comJobsOwn.size(); ++i)
       {
         auto &job = this->comJobsOwn.at(i);

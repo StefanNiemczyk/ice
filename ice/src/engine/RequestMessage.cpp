@@ -12,7 +12,7 @@
 namespace ice
 {
 
-RequestMessage::RequestMessage() : Message(IceCmd::SCMD_INFORMATION_REQUEST, true)
+RequestMessage::RequestMessage() : Message(IceMessageIds::IMI_INFORMATION_REQUEST, true)
 {
   _log = el::Loggers::getLogger("RequestMessage");
 

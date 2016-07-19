@@ -23,12 +23,9 @@
 namespace ice
 {
 
-enum CJState {
-  CJ_CREATED,
-  CJ_INITIALIZED,
-  CJ_ACTIVE,
-  CJ_WAITING,
-  CJ_FINISHED
+enum CJState
+{
+  CJ_CREATED, CJ_INITIALIZED, CJ_ACTIVE, CJ_WAITING, CJ_FINISHED, CJ_ABORTED
 };
 
 typedef std::function<std::shared_ptr<ComJobBase>(ICEngine* const engine, std::shared_ptr<Entity> const &entity)> jobCreator;
@@ -38,7 +35,8 @@ class ComJobRegistry
   static std::map<uint8_t, jobCreator> jobs;
 
 public:
-  static std::shared_ptr<ComJobBase> makeInstance(uint8_t id, ICEngine* const engine, std::shared_ptr<Entity> const &entity)
+  static std::shared_ptr<ComJobBase> makeInstance(uint8_t id, ICEngine* const engine,
+                                                  std::shared_ptr<Entity> const &entity)
   {
     auto func = ComJobRegistry::jobs.find(id);
     if (func == ComJobRegistry::jobs.end())
@@ -60,33 +58,24 @@ public:
   }
 };
 
-
 class ComJobBase
 {
 public:
   ComJobBase(uint8_t id, ICEngine* const engine, std::shared_ptr<Entity> const &entity, el::Logger *log) :
       id(id), engine(engine), entity(entity), timeout(0), lastTimestamp(0), _log(log), state(CJ_CREATED), ownJob(true)
   {
-    this->index = 0;//entity->getNextRequestId();
+    this->index = 0; //entity->getNextRequestId();
     this->self = engine->getSelf();
     this->com = engine->getCommunicationInterface();
   }
+
   virtual ~ComJobBase()
   {
-    if (this->state != CJState::CJ_FINISHED)
+    if (this->state != CJState::CJ_FINISHED && this->state != CJ_ABORTED)
     {
-      auto msg = std::make_shared<CommandMessage>(IceCmd::SCMD_CANCLE_JOB);
-      msg->setEntity(entity);
-
-      if (this->ownJob)
-        msg->setJobId(this->id + 127);
-      else
-        msg->setJobId(this->id);
-
-      msg->setJobIndex(this->index);
-      this->com->send(msg);
+      this->sendCommand(IceMessageIds::IMI_CANCLE_JOB);
     }
-  };
+  }
 
   const std::shared_ptr<Entity>& getEntity() const
   {
@@ -133,6 +122,12 @@ public:
     this->timeout = timeout;
   }
 
+  void sendCommand(IceMessageIds command)
+  {
+    auto msg = std::make_shared<CommandMessage>(command);
+    this->send(msg);
+  }
+
   void send(std::shared_ptr<Message> msg)
   {
     if (this->ownJob)
@@ -155,27 +150,70 @@ public:
   {
     this->index = entity->getNextIndex();
     this->state = CJ_INITIALIZED;
-  };
+  }
+  ;
 
-  virtual void init(std::shared_ptr<Message> const &message) = 0;
-  virtual void tick(time timestamp) {};
-  virtual void handleMessage(std::shared_ptr<Message> const &message) = 0;
-  virtual void cleanUp() {};
+  void init(std::shared_ptr<Message> const &message)
+  {
+    this->handleMessage(message);
+  }
+
+  virtual void cleanUp()
+  {
+
+  }
+
+  virtual void tick(time timestamp)
+  {
+
+  }
+
+  virtual void handleMessage(std::shared_ptr<Message> const &message)
+  {
+    if (message->getId() == IceMessageIds::IMI_CANCLE_JOB)
+    {
+      this->abort();
+    }
+    else
+    {
+      _log->warn("Unknown command '%v' for job '%v', message will be skipped", std::to_string(message->getId()),
+                 std::to_string(this->id));
+    }
+  }
+
+  virtual void abort()
+  {
+    this->state = CJState::CJ_ABORTED;
+    this->sendCommand(IceMessageIds::IMI_CANCLE_JOB);
+    this->callCallbackAborted();
+  }
+  ;
+
+  virtual void finish()
+  {
+    this->state = CJState::CJ_FINISHED;
+    this->callCallbackFinished();
+  }
 
 protected:
-  ICEngine                                    *engine;
-  bool                                        ownJob;
-  std::shared_ptr<Entity>                     self;
-  std::shared_ptr<Entity>                     entity;
-  uint8_t                                     id;
-  uint8_t                                     index;
-  CJState                                     state;
-  time                                        timeout;
-  time                                        lastTimestamp;
-  el::Logger                                  *_log;
+  // callback stuff
+  virtual void callCallbackFinished() = 0;
+  virtual void callCallbackAborted() = 0;
+
+protected:
+  ICEngine *engine;
+  bool ownJob;
+  std::shared_ptr<Entity> self;
+  std::shared_ptr<Entity> entity;
+  uint8_t id;
+  uint8_t index;
+  CJState state;
+  time timeout;
+  time lastTimestamp;
+  el::Logger *_log;
 
 private:
-  std::shared_ptr<CommunicationInterface>     com;
+  std::shared_ptr<CommunicationInterface> com;
 };
 
 } /* namespace ice */

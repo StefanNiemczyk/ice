@@ -11,6 +11,7 @@
 
 #include <ros/package.h>
 #include <ice/communication/CommunicationInterface.h>
+#include <ice/communication/jobs/InformationRequest.h>
 #include <ice/information/InformationStore.h>
 #include <ice/processing/EventHandler.h>
 #include <ice/representation/GContainerFactory.h>
@@ -200,17 +201,18 @@ void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> entity)
 {
   this->_log->info("Discovered: '%v'", entity->toString());
 
-  // init ontology
-  this->ontologyInterface->attachCurrentThread();
-  int result = entity->initializeFromOntology(this->ontologyInterface);
-  // request offered information if no knowledge can be extracted from ontology
-  if (result == 0)
-  {
-    this->communicationInterface->requestOffers(entity);
-    return;
-  }
-
   // check if information are required
+  if (this->requiredInfos.size())
+  {
+    auto request = std::make_shared<InformationRequest>(this, entity);
+
+    for (auto &req : this->requiredInfos)
+    {
+      request->getRequests().push_back(req->infoSpec);
+    }
+
+    this->communicationInterface->addComJob(request);
+  }
 }
 
 void IceServalBridge::vanishedIceIdentity(std::shared_ptr<Entity> entity)
@@ -238,7 +240,8 @@ void IceServalBridge::offeredInformation(std::shared_ptr<Entity> entity)
   if (requests.size() > 0)
   {
     _log->info("Requesting '%v' information from: '%v'", requests.size(), entity->toString());
-    this->communicationInterface->requestInformation(entity, requests);
+    // TODO currently not supported
+//    this->communicationInterface->requestInformation(entity, requests);
   }
   else
   {

@@ -159,6 +159,7 @@ add_library(${PROJECT_NAME}
   
   src/engine/ComJobBase.cpp
   src/engine/IdentityRequest.cpp
+  src/engine/InformationRequest.cpp
 
   src/engine/Position.cpp
   src/engine/RingBuffer.cpp

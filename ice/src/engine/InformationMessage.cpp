@@ -14,7 +14,7 @@
 namespace ice
 {
 
-InformationMessage::InformationMessage() : Message(IceCmd::SCMD_INFORMATION_RESPONSE, true)
+InformationMessage::InformationMessage() : Message(IceMessageIds::IMI_INFORMATION_RESPONSE, true)
 {
   _log = el::Loggers::getLogger("InformationMessage");
 

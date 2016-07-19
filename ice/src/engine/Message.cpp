@@ -26,7 +26,6 @@ el::Logger* Message::_logFactory = el::Loggers::getLogger("Message");
 
 std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr<GContainerFactory> factory)
 {
-  std::cout << jsonString << std::endl;
   rapidjson::Document document;
 
   document.Parse(jsonString.c_str());
@@ -51,22 +50,22 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr
 
   switch(command)
   {
-    case(SCMD_IDS_REQUEST):
-    case(SCMD_ID_REQUEST):
-    case(SCMD_OFFERS_REQUEST):
-    case(SCMD_CANCLE_JOB):
+    case(IMI_IDS_REQUEST):
+    case(IMI_ID_REQUEST):
+    case(IMI_OFFERS_REQUEST):
+    case(IMI_CANCLE_JOB):
         return std::make_shared<CommandMessage>(command);
         break;
-    case(SCMD_IDS_RESPONSE):
+    case(IMI_IDS_RESPONSE):
         message = std::make_shared<IdMessage>();
         break;
-    case(SCMD_OFFERS_RESPONSE):
+    case(IMI_OFFERS_RESPONSE):
         message = std::make_shared<OffersMessage>();
         break;
-    case(SCMD_INFORMATION_REQUEST):
+    case(IMI_INFORMATION_REQUEST):
         message = std::make_shared<RequestMessage>();
         break;
-    case(SCMD_INFORMATION_RESPONSE):
+    case(IMI_INFORMATION_RESPONSE):
         message = std::make_shared<InformationMessage>();
         break;
 

@@ -10,7 +10,7 @@
 namespace ice
 {
 
-IdMessage::IdMessage() : Message(IceCmd::SCMD_IDS_RESPONSE, true)
+IdMessage::IdMessage() : Message(IceMessageIds::IMI_IDS_RESPONSE, true)
 {
   _log = el::Loggers::getLogger("IdMessage");
 }
