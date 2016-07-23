@@ -62,11 +62,12 @@ class ComJobBase
 {
 public:
   ComJobBase(uint8_t id, ICEngine* const engine, std::shared_ptr<Entity> const &entity, el::Logger *log) :
-      id(id), engine(engine), entity(entity), timeout(0), lastTimestamp(0), _log(log), state(CJ_CREATED), ownJob(true)
+      id(id), engine(engine), entity(entity), timeout(0), timestampLastActive(0), _log(log), state(CJ_CREATED), ownJob(true)
   {
     this->index = 0; //entity->getNextRequestId();
     this->self = engine->getSelf();
     this->com = engine->getCommunicationInterface();
+    this->timeFactory = engine->getTimeFactory();
   }
 
   virtual ~ComJobBase()
@@ -112,14 +113,29 @@ public:
     return state;
   }
 
-  time getTimeout() const
+  unsigned long long getTimeout() const
   {
     return timeout;
   }
 
-  void setTimeout(time timeout)
+  void setTimeout(unsigned long long timeout)
   {
     this->timeout = timeout;
+  }
+
+  virtual bool checkTimeout()
+  {
+    if (this->ownJob || this->timestampLastActive == 0 || this->timeout == 0)
+    {
+      return false;
+    }
+
+    return this->timeFactory->checkTimeout(this->timestampLastActive, this->timeout);
+  }
+
+  void updateActiveTime()
+  {
+    this->timestampLastActive = this->timeFactory->createTime();
   }
 
   void sendCommand(IceMessageIds command)
@@ -151,10 +167,10 @@ public:
     this->index = entity->getNextIndex();
     this->state = CJ_INITIALIZED;
   }
-  ;
 
   void init(std::shared_ptr<Message> const &message)
   {
+    this->state = CJ_INITIALIZED;
     this->handleMessage(message);
   }
 
@@ -163,7 +179,7 @@ public:
 
   }
 
-  virtual void tick(time timestamp)
+  virtual void tick()
   {
 
   }
@@ -205,11 +221,12 @@ protected:
   bool ownJob;
   std::shared_ptr<Entity> self;
   std::shared_ptr<Entity> entity;
+  std::shared_ptr<TimeFactory> timeFactory;
   uint8_t id;
   uint8_t index;
   CJState state;
-  time timeout;
-  time lastTimestamp;
+  unsigned long long timeout;
+  time timestampLastActive;
   el::Logger *_log;
 
 private:

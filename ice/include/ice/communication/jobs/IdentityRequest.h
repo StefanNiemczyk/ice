@@ -22,7 +22,14 @@ public:
   virtual ~IdentityRequest();
 
   virtual void init();
+  virtual void tick();
   virtual void handleMessage(std::shared_ptr<Message> const &message);
+
+private:
+  void requestIds();
+
+private:
+  int tryCount;
 };
 
 class IdentityRequestCreator

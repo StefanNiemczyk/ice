@@ -15,6 +15,7 @@
 #include "ice/communication/messages/CommandMessage.h"
 #include "ice/communication/messages/IdMessage.h"
 #include "ice/communication/messages/InformationMessage.h"
+#include "ice/communication/messages/IntMessage.h"
 #include "ice/communication/messages/OffersMessage.h"
 #include "ice/communication/messages/RequestMessage.h"
 #include "ice/Entity.h"
@@ -67,6 +68,10 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr
         break;
     case(IMI_INFORMATION_RESPONSE):
         message = std::make_shared<InformationMessage>();
+        break;
+    case(IMI_ACK):
+    case(IMI_INFORMATION_REQUEST_INDEX):
+        message = std::make_shared<IntMessage>(command);
         break;
 
     default:

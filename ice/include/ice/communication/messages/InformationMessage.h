@@ -26,14 +26,14 @@ public:
   InformationMessage();
   virtual ~InformationMessage();
 
-  std::vector<std::shared_ptr<InformationElement<GContainer>>>& getInformations();
+  std::vector<std::pair<int,std::shared_ptr<InformationElement<GContainer>>>>& getInformations();
 
 protected:
   virtual rapidjson::Value payloadToJson(rapidjson::Document &document);
   virtual bool parsePayload(rapidjson::Value& value,  std::shared_ptr<GContainerFactory> factory);
 
 private:
-  std::vector<std::shared_ptr<InformationElement<GContainer>>> informations;
+  std::vector<std::pair<int,std::shared_ptr<InformationElement<GContainer>>>> informations;
 };
 
 } /* namespace ice */

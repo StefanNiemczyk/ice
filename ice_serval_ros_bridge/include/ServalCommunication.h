@@ -14,7 +14,7 @@
 
 #include <ice/communication/CommunicationInterface.h>
 
-#define SERVAL_PORT 8045
+#define SERVAL_PORT 8845
 
 namespace ice
 {

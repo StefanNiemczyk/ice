@@ -154,6 +154,7 @@ add_library(${PROJECT_NAME}
   src/engine/CommandMessage.cpp
   src/engine/IdMessage.cpp
   src/engine/InformationMessage.cpp
+  src/engine/IntMessage.cpp
   src/engine/OffersMessage.cpp
   src/engine/RequestMessage.cpp
   

@@ -154,7 +154,7 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
     }
     auto msg = std::make_shared<CommandMessage>(IceMessageIds::IMI_CANCLE_JOB);
     msg->setJobIndex(message->getJobIndex());
-    msg->setJobId(message->getJobId());
+    msg->setJobId(message->getJobId() + 127);
     msg->setEntity(entity);
     this->send(msg);
 
@@ -177,18 +177,10 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
   auto job = ComJobRegistry::makeInstance(id, this->engine, entity);
   job->setIndex(message->getJobIndex());
   job->setOwnJob(false);
-  job->handleMessage(message);
+  job->setTimeout(120000);
+  job->init(message);
 
   this->comJobsIncomming.push_back(job);
-
-
-//    case (SCMD_OFFERS_REQUEST):
-//      this->onRequestOffers(entity);
-//      break;
-//
-//    case (SCMD_OFFERS_RESPONSE):
-//        entity->addOfferedInformation(std::static_pointer_cast<OffersMessage>(message)->getOfferes());
-//      break;
 }
 
 void CommunicationInterface::workerTask()
@@ -225,13 +217,14 @@ void CommunicationInterface::workerTask()
         {
           this->comJobsOwn.push_back(job);
         }
+
+        this->comJobsOwnNew.clear();
       }
 
       // handle own jobs
       for (int i = 0; i < this->comJobsOwn.size(); ++i)
       {
         auto &job = this->comJobsOwn.at(i);
-        time t = this->timeFactory->createTime();
         switch (job->getState())
         {
           case (CJ_CREATED):
@@ -240,9 +233,10 @@ void CommunicationInterface::workerTask()
           case (CJ_INITIALIZED):
           case (CJ_ACTIVE):
           case (CJ_WAITING):
-            job->tick(t);
+            job->tick();
             break;
           case (CJ_FINISHED):
+          case (CJ_ABORTED):
             job->cleanUp();
             this->comJobsOwn.erase(this->comJobsOwn.begin() + i);
             --i;
@@ -254,11 +248,27 @@ void CommunicationInterface::workerTask()
       {
         auto &job = this->comJobsIncomming.at(i);
 
-        if (job->getState() == CJState::CJ_FINISHED)
+        switch (job->getState())
         {
-          job->cleanUp();
-          this->comJobsIncomming.erase(this->comJobsIncomming.begin() + i);
-          --i;
+          case (CJ_INITIALIZED):
+          case (CJ_ACTIVE):
+          case (CJ_WAITING):
+            job->tick();
+            break;
+          case (CJ_FINISHED):
+          case (CJ_ABORTED):
+            job->cleanUp();
+            this->comJobsIncomming.erase(this->comJobsIncomming.begin() + i);
+            --i;
+            break;
+          default:
+            if (job->checkTimeout())
+            {
+              job->abort();
+              this->comJobsIncomming.erase(this->comJobsIncomming.begin() + i);
+              --i;
+            }
+            break;
         }
       }
     }

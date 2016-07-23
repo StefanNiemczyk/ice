@@ -25,8 +25,10 @@ namespace ice
 {
 
 ServalCommunication::ServalCommunication(ICEngine *engine, std::string configPath, std::string const host,
-                                         int const port, std::string const authName, std::string const authPass, bool const local) :
-    CommunicationInterface(engine), configPath(configPath), host(host), port(port), authName(authName), authPass(authPass), serval(nullptr), local(local)
+                                         int const port, std::string const authName, std::string const authPass,
+                                         bool const local) :
+    CommunicationInterface(engine), configPath(configPath), host(host), port(port), authName(authName),
+    authPass(authPass), serval(nullptr), local(local), running (false)
 {
   _log = el::Loggers::getLogger("ServalCommunication");
 }
@@ -125,7 +127,8 @@ void ServalCommunication::read()
 
     if (recCount == 0)
     {
-      _log->debug("Received empty message from sid %v", sid);
+      // huge amount of emtpy messages, will be skipped
+//      _log->debug("Received empty message from sid %v", sid);
       continue;
     }
 

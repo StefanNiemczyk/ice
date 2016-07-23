@@ -15,6 +15,7 @@ namespace ice
 
 class RequestMessage;
 class InformationMessage;
+class IntMessage;
 
 class InformationRequest : public ComJob<InformationRequest>
 {
@@ -26,17 +27,26 @@ public:
   virtual ~InformationRequest();
 
   virtual void init();
+  virtual void tick();
   virtual void handleMessage(std::shared_ptr<Message> const &message);
 
   std::vector<std::shared_ptr<InformationSpecification>>& getRequests();
 
 private:
   void requestInformation();
+  void requestInformation(int index);
+  void sendInformation(int index);
+
   void onRequestInformation(std::shared_ptr<RequestMessage> const &message);
+  void onAcc(std::shared_ptr<IntMessage> const &message);
   void onInformation(std::shared_ptr<InformationMessage> const &message);
 
 private:
-  std::vector<std::shared_ptr<InformationSpecification>> requests;
+  int                                                           tryCount;
+  int                                                           currentIndex;
+  std::vector<std::shared_ptr<InformationSpecification>>        requests;
+  std::vector<std::shared_ptr<InformationElement<GContainer>>>  information;
+  std::vector<bool>                                             received;
 };
 
 class InformationRequestCreator

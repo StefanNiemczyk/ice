@@ -25,7 +25,7 @@ InformationMessage::~InformationMessage()
 
 }
 
-std::vector<std::shared_ptr<InformationElement<GContainer>>>& InformationMessage::getInformations()
+std::vector<std::pair<int,std::shared_ptr<InformationElement<GContainer>>>>& InformationMessage::getInformations()
 {
   return this->informations;
 }
@@ -35,13 +35,20 @@ rapidjson::Value InformationMessage::payloadToJson(rapidjson::Document &document
   rapidjson::Value value;
   value.SetArray();
 
-  for (auto &ie : this->informations)
+  for (auto &infoElement : this->informations)
   {
     rapidjson::Value element, spec, info, infoValue;
+    rapidjson::Value indexName("index", document.GetAllocator());
     rapidjson::Value specName("spec", document.GetAllocator());
     rapidjson::Value infoName("info", document.GetAllocator());
 
     element.SetObject();
+
+    rapidjson::Value index;
+    index.SetInt(infoElement.first);
+    element.AddMember(indexName, index, document.GetAllocator());
+
+    auto &ie = infoElement.second;
     // spec
     spec.SetArray();
     auto sp = ie->getSpecification();
@@ -83,90 +90,106 @@ bool InformationMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<G
   }
 
   std::string entity, entityType, scope, rep, relatedEntity;
-   int count = 0;
+  int count = 0;
 
-   for (auto it = value.Begin(); it != value.End(); ++it)
-   {
-     if (false == it->IsObject())
-     {
-       _log->error("Payload could not be parsed: InformationElement is not an object");
-       return false;
-     }
+  for (auto it = value.Begin(); it != value.End(); ++it)
+  {
+    if (false == it->IsObject())
+    {
+      _log->error("Payload could not be parsed: InformationElement is not an object");
+      return false;
+    }
 
-     auto spec = it->FindMember("spec");
-     auto info = it->FindMember("info");
+    auto index = it->FindMember("index");
+    auto spec = it->FindMember("spec");
+    auto info = it->FindMember("info");
 
-     if (spec == it->MemberEnd())
-     {
-       _log->error("Payload could not be parsed: Specification not");
-       return false;
-     }
+    if (index == it->MemberEnd())
+    {
+      _log->error("Payload could not be parsed: Index not found");
+      return false;
+    }
 
-     if (false == spec->value.IsArray())
-     {
-       _log->error("Payload could not be parsed: Specification is not an array");
-       return false;
-     }
+    if (spec == it->MemberEnd())
+    {
+      _log->error("Payload could not be parsed: Specification not found");
+      return false;
+    }
 
-     count = 0;
-
-     for (auto it2 = spec->value.Begin(); it2 != spec->value.End(); ++it2)
-     {
-       if (false == it2->IsString())
-       {
-         _log->error("Payload could not be parsed: Field is not a string");
-         return false;
-       }
-
-       switch(count)
-       {
-         case 0:
-           entity = it2->GetString();
-           break;
-         case 1:
-           entityType = it2->GetString();
-           break;
-         case 2:
-           scope = it2->GetString();
-           break;
-         case 3:
-           rep = it2->GetString();
-           break;
-         case 4:
-           relatedEntity = it2->GetString();
-           break;
-       }
-
-       ++count;
-     }
-
-     if (count != 5)
-     {
-       _log->error("Payload could not be parsed: Wrong number of fields for offer");
-       return false;
-     }
-
-     auto specification = std::make_shared<InformationSpecification>(entity, entityType, scope, rep, relatedEntity);
+    if (false == spec->value.IsArray())
+    {
+      _log->error("Payload could not be parsed: Specification is not an array");
+      return false;
+    }
 
 
+    if (false == index->value.IsInt())
+    {
+      _log->error("Payload could not be parsed: Index is not an int");
+      return false;
+    }
 
-     if (info == it->MemberEnd())
-     {
-       _log->error("Payload could not be parsed: Specification not");
-       return false;
-     }
+    int indexValue = index->value.GetInt();
 
-     auto information = factory->fromJSON(info->value);
+    count = 0;
 
-     if (information == nullptr)
-     {
-       _log->error("Payload could not be parsed: Error while extracting information");
-       return false;
-     }
+    for (auto it2 = spec->value.Begin(); it2 != spec->value.End(); ++it2)
+    {
 
-     auto informationElement = std::make_shared<InformationElement<GContainer>>(specification, information);
-     this->informations.push_back(informationElement);
-   }
+      if (false == it2->IsString())
+      {
+        _log->error("Payload could not be parsed: Field is not a string");
+        return false;
+      }
+
+      switch (count)
+      {
+        case 0:
+          entity = it2->GetString();
+          break;
+        case 1:
+          entityType = it2->GetString();
+          break;
+        case 2:
+          scope = it2->GetString();
+          break;
+        case 3:
+          rep = it2->GetString();
+          break;
+        case 4:
+          relatedEntity = it2->GetString();
+          break;
+      }
+
+      ++count;
+    }
+
+    if (count != 5)
+    {
+      _log->error("Payload could not be parsed: Wrong number of fields for offer");
+      return false;
+    }
+
+    auto specification = std::make_shared<InformationSpecification>(entity, entityType, scope, rep, relatedEntity);
+
+    if (info == it->MemberEnd())
+    {
+      _log->error("Payload could not be parsed: Specification not");
+      return false;
+    }
+
+    auto information = factory->fromJSON(info->value);
+
+    if (information == nullptr)
+    {
+      _log->error("Payload could not be parsed: Error while extracting information");
+      return false;
+    }
+
+    auto informationElement = std::make_shared<InformationElement<GContainer>>(specification, information);
+    auto pair = std::make_pair(indexValue, informationElement);
+    this->informations.push_back(pair);
+  }
 
   return true;
 }

@@ -33,6 +33,7 @@ enum IceMessageIds
   IMI_OFFERS_RESPONSE                  = 6,
   IMI_INFORMATION_REQUEST              = 7,
   IMI_INFORMATION_RESPONSE             = 8,
+  IMI_INFORMATION_REQUEST_INDEX        = 9,
 
   IMI_ACK                              = 250,
 
