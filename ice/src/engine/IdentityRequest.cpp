@@ -66,7 +66,7 @@ void IdentityRequest::handleMessage(std::shared_ptr<Message> const &message)
       auto m = std::make_shared<IdMessage>();
       this->self->pushIds(m->getIds());
       this->send(m);
-      this->state = CJState::CJ_FINISHED;
+      this->finish();
       break;
     }
     case (IMI_IDS_RESPONSE):
