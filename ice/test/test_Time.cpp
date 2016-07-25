@@ -38,7 +38,7 @@ protected:
 };
 
 
-TEST_F(TimeTest, lower3)
+TEST_F(TimeTest, isLower)
 {
   ice::SimpleTimeFactory ttf;
   auto t0 = ttf.createTime();
@@ -49,6 +49,21 @@ TEST_F(TimeTest, lower3)
 
   EXPECT_TRUE(t0 < t1);
   EXPECT_FALSE(t1 < t0);
+}
+
+
+TEST_F(TimeTest, timeOut)
+{
+  ice::SimpleTimeFactory ttf;
+  auto t0 = ttf.createTime();
+
+  std::cout << t0 << std::endl;
+
+  EXPECT_FALSE(ttf.checkTimeout(t0, 500));
+
+  std::this_thread::sleep_for(std::chrono::milliseconds {1000});
+
+  EXPECT_TRUE(ttf.checkTimeout(t0, 500));
 }
 
 }

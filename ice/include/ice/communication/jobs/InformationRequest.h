@@ -44,6 +44,7 @@ private:
 private:
   int                                                           tryCount;
   int                                                           currentIndex;
+  bool                                                          receivedAck;
   std::vector<std::shared_ptr<InformationSpecification>>        requests;
   std::vector<std::shared_ptr<InformationElement<GContainer>>>  information;
   std::vector<bool>                                             received;

@@ -19,7 +19,7 @@ int InformationRequestCreator::val = InformationRequestCreator::init();
 
 InformationRequest::InformationRequest(ICEngine* const engine, std::shared_ptr<Entity> const &entity) :
     ComJob(InformationRequest::ID, engine, entity, el::Loggers::getLogger("InformationRequest")), currentIndex(-1), tryCount(
-        0)
+        0), receivedAck(false)
 {
   this->timeout = 2000;
 }
@@ -35,6 +35,7 @@ void InformationRequest::init()
   ComJobBase::init();
   this->requestInformation();
   this->state = CJState::CJ_WAITING;
+  this->updateActiveTime();
 }
 
 void InformationRequest::tick()
@@ -48,7 +49,7 @@ void InformationRequest::tick()
     }
 
     // check timestamp since last message
-    if (false == this->engine->getTimeFactory()->checkTimeout(this->timestampLastActive, this->timeout))
+    if (false == this->timeFactory->checkTimeout(this->timestampLastActive, this->timeout))
     {
       return;
     }
@@ -57,7 +58,7 @@ void InformationRequest::tick()
     ++this->tryCount;
 
     // request ack again
-    if (true)
+    if (false == this->receivedAck)
     {
       this->requestInformation();
 
@@ -79,8 +80,9 @@ void InformationRequest::tick()
       }
     }
 
-    if (count == 0)
+    if (count == this->received.size())
     {
+      this->sendCommand(IceMessageIds::IMI_FINISH);
       this->finish();
       return;
     }
@@ -127,6 +129,15 @@ void InformationRequest::handleMessage(std::shared_ptr<Message> const &message)
     case (IMI_INFORMATION_RESPONSE):
     {
       this->onInformation(std::static_pointer_cast<InformationMessage>(message));
+      break;
+    }
+    case (IMI_FINISH):
+    {
+      if (this->ownJob == false)
+      {
+        _log->info("Job finished from '%v'", entity->toString());
+        this->finish();
+      }
       break;
     }
     default:
@@ -187,6 +198,8 @@ void InformationRequest::onRequestInformation(std::shared_ptr<RequestMessage> co
 void InformationRequest::onAcc(std::shared_ptr<IntMessage> const &message)
 {
   int value = message->getValue();
+  receivedAck = true;
+
   if (value == 0)
   {
     _log->info("No information received from engine '%v'", entity->toString());

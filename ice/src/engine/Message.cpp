@@ -54,6 +54,7 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr
     case(IMI_IDS_REQUEST):
     case(IMI_ID_REQUEST):
     case(IMI_OFFERS_REQUEST):
+    case(IMI_FINISH):
     case(IMI_CANCLE_JOB):
         return std::make_shared<CommandMessage>(command);
         break;

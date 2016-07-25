@@ -203,7 +203,6 @@ public:
     this->sendCommand(IceMessageIds::IMI_CANCLE_JOB);
     this->callCallbackAborted();
   }
-  ;
 
   virtual void finish()
   {

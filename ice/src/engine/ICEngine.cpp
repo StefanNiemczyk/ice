@@ -22,7 +22,7 @@ ICEngine::ICEngine(std::shared_ptr<Configuration> config) :
 
 ICEngine::~ICEngine()
 {
-  if (this->running)
+//  if (this->running)
     this->cleanUp();
 }
 
@@ -88,15 +88,31 @@ void ICEngine::cleanUp()
 {
   this->running = false;
 
-  this->eventHandler->cleanUp();
-  this->coordinator->cleanUp();
-  this->communication->cleanUp();
-  this->streamStore->cleanUp();
+  if (this->eventHandler)
+    this->eventHandler->cleanUp();
+
+  if (this->coordinator)
+    this->coordinator->cleanUp();
+
+  if (this->communication)
+    this->communication->cleanUp();
+
+  if (this->streamStore)
+    this->streamStore->cleanUp();
+
 //  this->nodeStore;
-  this->modelGenerator->cleanUp();
-  this->updateStrategie->cleanUp();
-  this->gcontainerFactory->cleanUp();
-  this->aspTransformationGenerator->cleanUp();
+
+  if (this->modelGenerator)
+    this->modelGenerator->cleanUp();
+
+  if (this->updateStrategie)
+    this->updateStrategie->cleanUp();
+
+  if (this->gcontainerFactory)
+    this->gcontainerFactory->cleanUp();
+
+  if (this->aspTransformationGenerator)
+    this->aspTransformationGenerator->cleanUp();
 }
 
 

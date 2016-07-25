@@ -160,7 +160,13 @@ bool EngineState::isCooperationPossible() const
 
   // Connection lost
   if (this->timeFactory->checkTimeout(this->timeLastActivity, this->config->getHeartbeatTimeout()))
+  {
+    std::cout << "----------------------------------------" << std::endl;
+    std::cout << this->timeLastActivity << std::endl;
+    std::cout << this->config->getHeartbeatTimeout() << std::endl;
+    std::cout << "----------------------------------------" << std::endl;
     return false;
+  }
 
   // Nodes of this engine are unknown, no cooperation is possible
   if (false == this->nodesKnown)

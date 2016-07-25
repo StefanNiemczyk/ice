@@ -30,7 +30,6 @@ ASPModelGenerator::ASPModelGenerator(std::weak_ptr<ICEngine> engine) :
   _log->verbose(1, "Constructor called");
 
   this->maxChainLength = 10;
-//  this->engine = engine;
   this->queryIndex = 0;
   this->groundingDirty = true;
   this->globalOptimization = true;
@@ -45,10 +44,6 @@ void ASPModelGenerator::initInternal()
   _log->debug("Default ASP path %v", path);
 
   auto en = this->engine.lock();
-//  this->nodeStore = en->getNodeStore();
-//  this->informationStore = en->getInformationStore();
-//  this->coordinator = en->getCoordinator();
-//  this->communication = en->getCommunication();
 
   // Initializing ASP
   this->asp = std::make_shared<supplementary::ClingWrapper>();
@@ -66,8 +61,7 @@ void ASPModelGenerator::initInternal()
 
 void ASPModelGenerator::cleanUpInternal()
 {
-//  this->nodeStore.reset();
-//  this->informationStore.reset();
+
 }
 
 ASPModelGenerator::~ASPModelGenerator()
@@ -83,10 +77,6 @@ void ASPModelGenerator::readOntology()
     this->ontology->loadOntologies();
   }
 
-//  if (this->ontology->isInformationDirty())
-//  {
-//    _log->debug("Information model flagged dirty, reload information structure");
-//  }
   this->readInfoStructureFromOntology();
 
   if (this->ontology->isSystemDirty())
@@ -240,9 +230,6 @@ bool ASPModelGenerator::extractedSubModel(std::shared_ptr<ASPSystem> system, std
 
     return false;
   }
-  std::cout << "=================================================" << std::endl;
-  std::cout << nodes.size() << " " << nodes.capacity() << std::endl;
-  std::cout << "=================================================" << std::endl;
 
   // identify streams send from self -> system
   std::vector<TransferDesc> send;

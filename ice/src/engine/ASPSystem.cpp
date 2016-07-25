@@ -156,22 +156,14 @@ void ASPSystem::updateExternals(bool activateRequired)
 {
   bool active = false;
 
-  if (this->getEngineState())
-  {
-    active = this->getEngineState()->isCooperationPossible();
-  }
-  else
+  if (this->getEngineState() == nullptr)
   {
     auto e = this->engine.lock();
     auto coord = e->getCoordinator();
     this->setEngineState(coord->getEngineState(this->getIri()));
-
-    if (this->getEngineState())
-      active = this->getEngineState()->isCooperationPossible();
-    else
-      active = false;
   }
 
+  active = this->getEngineState() && this->getEngineState()->isCooperationPossible();
   this->systemExternal->assign(active);
 
   for (auto element : this->aspIro)

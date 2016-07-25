@@ -37,6 +37,7 @@ enum IceMessageIds
 
   IMI_ACK                              = 250,
 
+  IMI_FINISH                           = 253,
   IMI_NO_RESULT                        = 254,
   IMI_CANCLE_JOB                       = 255
 };

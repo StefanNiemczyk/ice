@@ -9,7 +9,7 @@
 #define TIME_H_
 
 #include <memory>
-#include <sys/time.h>
+#include <chrono>
 
 namespace ice
 {
@@ -58,18 +58,22 @@ public:
 
   virtual ice::time createTime()
   {
-    timeval val;
-    gettimeofday(&val, NULL);
+    auto now = std::chrono::system_clock::now();
+    auto tms = std::chrono::time_point_cast<std::chrono::nanoseconds>(now);
+    auto epoch = tms.time_since_epoch();
+    auto value = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch);
 
-    return val.tv_usec;
+    return value.count();
   }
 
   virtual bool checkTimeout(ice::time timestamp, long millisecond)
   {
-    timeval val;
-    gettimeofday(&val, NULL);
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    auto tms = std::chrono::time_point_cast<std::chrono::nanoseconds>(now);
+    auto epoch = tms.time_since_epoch();
+    auto value = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch);
 
-    return (timestamp + (millisecond * 1000)) < val.tv_usec;
+    return (timestamp + (millisecond * 1000000)) < value.count();
   }
 };
 
