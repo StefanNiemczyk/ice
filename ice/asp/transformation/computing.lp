@@ -32,7 +32,7 @@ simRep(SCOPE,REP1,REP2) :-
 match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP) :-
 	autoIRO(SCOPE,REP1,REP2),
 	hasDimension(REP1,DIM,DIM_REP),
-	hasDimension(REP2,DIM,DIM_REp).
+	hasDimension(REP2,DIM,DIM_REP).
 
 
 % diviations
