@@ -307,7 +307,7 @@ int Coordinator::onSubModelRequest(identifier engineId, SubModelDesc modelDesc)
   if (result)
   {
     _log->info("Sub model from engine %v processed, sending acknowledgment", IDGenerator::toString(engineId));
-    this->communication->sendSubModelResponse(engineId, std::get<0>(modelDesc), true);
+    this->communication->sendSubModelResponse(engineId, modelDesc.index, true);
 
     return 0;
   }
@@ -315,7 +315,7 @@ int Coordinator::onSubModelRequest(identifier engineId, SubModelDesc modelDesc)
   {
     _log->info("Sub model from engine %v could not be processed", IDGenerator::toString(engineId));
     engineState->getOffering()->state = CooperationState::NO_COOPERATION;
-    this->communication->sendSubModelResponse(engineId, std::get<0>(modelDesc), false);
+    this->communication->sendSubModelResponse(engineId, modelDesc.index, false);
 
     return 0;
   }

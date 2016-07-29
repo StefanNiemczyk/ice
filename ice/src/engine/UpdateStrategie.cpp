@@ -91,7 +91,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<EngineState> engineState, 
 
   engineState->getOffering()->subModel = std::make_shared<SubModelDesc>(subModel);
 
-  for (auto &nodeDesc : std::get<1>(subModel))
+  for (auto &nodeDesc : subModel.nodes)
   {
     auto node = this->activateNode(nodeDesc);
 
@@ -113,13 +113,13 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<EngineState> engineState, 
     return false;
   }
 
-  for (auto transferTo : std::get<2>(subModel))
+  for (auto &transferTo : subModel.send)
   {
     auto stream = this->getStream(transferTo);
 
     if (false == stream)
     {
-      _log->error("Stream '%v' could not be found, sub model is invalid!", std::get<1>(transferTo));
+      _log->error("Stream '%v' could not be found, sub model is invalid!", transferTo.nodeName);
       valid = false;
       break;
     }
@@ -136,13 +136,13 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<EngineState> engineState, 
     return false;
   }
 
-  for (auto transferFrom : std::get<3>(subModel))
+  for (auto &transferFrom : subModel.receive)
   {
     auto stream = this->getStream(transferFrom);
 
     if (false == stream)
     {
-      _log->error("Stream '%v' could not be found, sub model is invalid!", std::get<1>(transferFrom));
+      _log->error("Stream '%v' could not be found, sub model is invalid!", transferFrom.nodeName);
       valid = false;
       break;
     }
@@ -178,67 +178,50 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<EngineState> engineState, 
 
 std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
 {
-  NodeType type = static_cast<NodeType>(std::get<0>(nodeDesc));
-  string className = std::get<1>(nodeDesc);
-  string nodeName = std::get<2>(nodeDesc);
-  string entity = std::get<3>(nodeDesc);
-  string entity2 = std::get<4>(nodeDesc);
-  string cfg = std::get<5>(nodeDesc);
-  vector<InputStreamDesc> inputs = std::get<6>(nodeDesc);
-  vector<OutputStreamDesc> outputs = std::get<7>(nodeDesc);
+  _log->debug("Look up node '%v' to process entity '%v'", nodeDesc.aspName, nodeDesc.entity);
 
-  _log->debug("Look up node '%v' to process entity '%v'", nodeName, entity);
-
-  auto node = this->nodeStore->registerNode(type, className, nodeName, entity, entity2, this->readConfiguration(cfg));
+  auto node = this->nodeStore->registerNode(static_cast<NodeType>(nodeDesc.type),
+                                            nodeDesc.className,
+                                            nodeDesc.aspName,
+                                            nodeDesc.entity,
+                                            nodeDesc.relatedEntity,
+                                            this->readConfiguration(nodeDesc.config));
 
   if (node == nullptr)
   {
-    _log->error("Node '%v' (%v) could not be created, sub model is invalid!", nodeName, className);
+    _log->error("Node '%v' (%v) could not be created, sub model is invalid!", nodeDesc.aspName, nodeDesc.className);
     return nullptr;
   }
 
-  for (auto input : inputs)
+  for (auto &input : nodeDesc.inputs)
   {
-    _log->debug("Look up connected stream for node '%v'", nodeName);
+    _log->debug("Look up connected stream for node '%v'", nodeDesc.aspName);
 
-    string sourceSystem = std::get<0>(input);
-    string nodeName = std::get<1>(input);
-    string nodeEntity = std::get<2>(input);
-    string nodeEntity2 = std::get<3>(input);
-    string entity = std::get<4>(input);
-    string scope = std::get<5>(input);
-    string rep = std::get<6>(input);
-    string entity2 = std::get<7>(input);
-    std::map<std::string, int> metadata = std::get<8>(input);
-
-    auto stream = this->getStream(nodeName, sourceSystem, entity, scope, rep, entity2, metadata);
+    auto stream = this->getStream(input.nodeName, input.sourceSystem, input.entity, input.scope, input.representation,
+                                  input.relatedEntity, input.metadata);
 
     if (false == stream)
     {
-      _log->error("Stream '%v' could not be created, sub model is invalid!", nodeName);
+      _log->error("Stream '%v' could not be created, sub model is invalid!", nodeDesc.aspName);
       return nullptr;
     }
 
     node->addInput(stream, true); // TODO stream is trigger?
   }
 
-  for (auto output : outputs)
+  for (auto &output : nodeDesc.outputs)
   {
-    string entity = std::get<0>(output);
-    string scope = std::get<1>(output);
-    string rep = std::get<2>(output);
-    string entity2 = std::get<3>(output);
-    std::map<std::string, int> metadata = std::get<4>(output);
 
-    _log->debug("Look up output stream for node '%v'", nodeName);
+    _log->debug("Look up output stream for node '%v'", nodeDesc.aspName);
 
     std::string iriShort = this->self->getSystemIri();
 
-    auto stream = this->getStream(nodeName, iriShort, entity, scope, rep, entity2, metadata);
+    auto stream = this->getStream(nodeDesc.aspName, iriShort, output.entity, output.scope, output.representation,
+                                  output.relatedEntity, output.metadata);
 
     if (false == stream)
     {
-      _log->error("Stream '%v' could not be created, sub model is invalid!", nodeName);
+      _log->error("Stream '%v' could not be created, sub model is invalid!", nodeDesc.aspName);
       return nullptr;
     }
 
@@ -250,7 +233,6 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
 
 bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engineState, int modelIndex)
 {
-//  const char* idCStr = IDGenerator::toString(std::to_string(engineState->getEngineId()).c_str());
   auto subModel = engineState->getRequesting()->subModel;
   bool valid = true;
   std::vector<std::shared_ptr<BaseInformationStream>> streamsSend;
@@ -264,7 +246,7 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engin
     return false;
   }
 
-  int index = std::get<0>(*subModel);
+  int index = subModel->index;
 
   if (index != modelIndex)
   {
@@ -273,13 +255,13 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engin
     return false;
   }
 
-  for (auto transferTo : std::get<3>(*subModel))
+  for (auto &transferTo : subModel->send)
   {
     auto stream = this->getStream(transferTo);
 
     if (false == stream)
     {
-      _log->error("Stream '%v' could not be found, sub model is invalid!", std::get<1>(transferTo));
+      _log->error("Stream '%v' could not be found, sub model is invalid!", transferTo.nodeName);
       valid = false;
       break;
     }
@@ -292,13 +274,13 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engin
     return false;
   }
 
-  for (auto transferFrom : std::get<2>(*subModel))
+  for (auto &transferFrom : subModel->receive)
   {
     auto stream = this->getStream(transferFrom);
 
     if (false == stream)
     {
-      _log->error("Stream '%v' could not be found, sub model is invalid!", std::get<1>(transferFrom));
+      _log->error("Stream '%v' could not be found, sub model is invalid!", transferFrom.nodeName);
       valid = false;
       break;
     }
@@ -324,10 +306,10 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engin
   return true;
 }
 
-std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string nodeName, std::string source,
-                                                                  std::string entity, std::string scope,
-                                                                  std::string rep, std::string relatedEntity,
-                                                                  std::map<std::string, int> metadata)
+std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string &nodeName, std::string &source,
+                                                                  std::string &entity, std::string &scope,
+                                                                  std::string &rep, std::string &relatedEntity,
+                                                                  std::map<std::string, int> &metadata)
 {
   auto infoSpec = std::make_shared<InformationSpecification>(entity, this->streamStore->getEntityType(entity),
                                                              scope, rep, relatedEntity);
@@ -336,14 +318,6 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string no
 
   if (false == stream)
   {
-
-    //        std::shared_ptr<InformationSpecification> specification,
-    //        const std::string name,
-    //        const int streamSize,
-    //        std::map<std::string, int> metadatas,
-    //        std::string provider,
-    //        std::string sourceSystem
-
     std::string dataType = this->dataTypeForRepresentation(rep);
     std::string name = entity + "_" + nodeName + "_" + source;
     std::replace(name.begin(), name.end(), '.', '_');
@@ -359,22 +333,8 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string no
 
 std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(TransferDesc &desc)
 {
-  string source = std::get<0>(desc);
-  string nodeName = std::get<1>(desc);
-  string nodeEntity = std::get<2>(desc);
-  string nodeEntity2 = std::get<3>(desc);
-  string entity = std::get<4>(desc);
-  string scope = std::get<5>(desc);
-  string rep = std::get<6>(desc);
-  string entity2 = std::get<7>(desc);
-
-//  _log->debug("Look up stream from node '%v'", nodeName);
-//
-//  auto infoSpec = make_shared<InformationSpecification>(entity, this->informationStore->getEntityType(entity), scope,
-//                                                        rep, entity2);
   std::map<std::string, int> metadata; //TODO
-  return this->getStream(nodeName, source, entity, scope, rep, entity2, metadata);
-//  return this->informationStore->getBaseStream(infoSpec.get(), nodeName, source);
+  return this->getStream(desc.nodeName, desc.sourceSystem, desc.entity, desc.scope, desc.representation, desc.relatedEntity, metadata);
 }
 
 std::map<std::string, std::string> UpdateStrategie::readConfiguration(std::string const config)
@@ -390,6 +350,7 @@ std::map<std::string, std::string> UpdateStrategie::readConfiguration(std::strin
     if (index == std::string::npos)
     {
       _log->warn("Broken configuration '%v', skipped", item);
+      continue;
     }
 
     configuration[item.substr(0, index)] = item.substr(index + 1, item.size());
@@ -409,7 +370,7 @@ std::shared_ptr<SubModel> UpdateStrategie::getSubModelDesc(std::shared_ptr<Engin
   if (this->model == nullptr)
     return nullptr;
 
-  for (auto sub : *this->model->getSubModels())
+  for (auto &sub : this->model->getSubModels())
   {
     if (sub->engine == engineState)
       return sub;

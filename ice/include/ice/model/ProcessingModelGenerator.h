@@ -44,9 +44,6 @@ protected:
   virtual void initInternal() = 0;
   virtual void cleanUpInternal() = 0;
 
-private:
-  void workerTask();
-
 protected:
   std::weak_ptr<ICEngine> engine; /*< Weak pointer to ice engine */
   std::shared_ptr<NodeStore> nodeStore; /**< The node store */

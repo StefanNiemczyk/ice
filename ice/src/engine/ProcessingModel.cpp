@@ -15,15 +15,12 @@ int ProcessingModel::counter = 0;
 
 ProcessingModel::ProcessingModel() : index(++counter)
 {
-  this->subModels = std::make_shared<std::vector<std::shared_ptr<SubModel>>>();
-  this->nodes = std::make_shared<std::vector<NodeDesc>>();
-  this->send = std::make_shared<std::vector<std::shared_ptr<StreamTransfer>>>();
-  this->receive = std::make_shared<std::vector<std::shared_ptr<StreamTransfer>>>();
+
 }
 
 ProcessingModel::~ProcessingModel()
 {
-  // TODO Auto-generated destructor stub
+  //
 }
 
 int ProcessingModel::getIndex() const
@@ -31,22 +28,22 @@ int ProcessingModel::getIndex() const
   return index;
 }
 
-const std::shared_ptr<std::vector<NodeDesc>>& ProcessingModel::getNodes() const
+std::vector<NodeDesc>& ProcessingModel::getNodes()
 {
-  return nodes;
+  return this->nodes;
 }
 
-const std::shared_ptr<std::vector<std::shared_ptr<StreamTransfer>>>& ProcessingModel::getReceive() const
+std::vector<std::shared_ptr<StreamTransfer>>& ProcessingModel::getReceive()
 {
   return receive;
 }
 
-const std::shared_ptr<std::vector<std::shared_ptr<StreamTransfer>>>& ProcessingModel::getSend() const
+std::vector<std::shared_ptr<StreamTransfer>>& ProcessingModel::getSend()
 {
   return send;
 }
 
-const std::shared_ptr<std::vector<std::shared_ptr<SubModel>>>& ProcessingModel::getSubModels() const
+std::vector<std::shared_ptr<SubModel>>& ProcessingModel::getSubModels()
 {
   return subModels;
 }

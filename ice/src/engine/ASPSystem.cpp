@@ -34,11 +34,6 @@ const std::string ASPSystem::getIri() const
 const std::string ASPSystem::getShortIri() const
 {
   return this->iriShort;
-//  int index = this->iri.find_last_of("#");
-//  std::string asp = (index != std::string::npos ? this->iri.substr(index + 1, this->iri.length()) : this->iri);
-//  std::transform(asp.begin(), asp.begin() + 1, asp.begin(), ::tolower);
-//
-//  return asp;
 }
 
 std::shared_ptr<supplementary::External> ASPSystem::getSystemExternal()

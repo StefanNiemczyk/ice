@@ -7,6 +7,10 @@
 
 #include "ice/ros/RosCommunication.h"
 
+#include <boost/serialization/string.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
 #include "ice/container/Position.h"
 #include "ice/coordination/Coordinator.h"
 #include "ice/coordination/CooperationRequest.h"
@@ -18,8 +22,7 @@
 
 #include "ice_msgs/Position.h"
 #include "easylogging++.h"
-#include "serialize.h"
-
+//#include "serialize.h"
 namespace ice
 {
 
@@ -70,17 +73,6 @@ void RosCommunication::sendHeartbeat()
   _log->verbose(1, "Sending heartbeat");
 
   ice_msgs::Heartbeat heartbeat;
-
-//  auto arr = IDGenerator::toByte(this->engineId);
-//  for (int i = 0; i < 16; ++i)
-//  {
-//    std:: cout << ((int) arr[i]) << " ";
-//    heartbeat.header.senderId.id.push_back(arr[i]);
-//  }
-//  std::cout << std::endl;
-
-//  heartbeat.header.senderId.id.resize(16);
-//  std::copy(this->engineId.begin(), this->engineId.end(), heartbeat.header.senderId.id.begin());
   heartbeat.header.senderId.value = this->engineId;
   heartbeat.header.timestamp = ros::Time::now();
 
@@ -127,31 +119,47 @@ void RosCommunication::sendSystemSpecResponse(
     identifier receiverId, std::tuple<std::string, std::vector<std::string>, std::vector<std::string>> &content)
 {
   _log->info("Sending system specification to engine '%v'", receiverId);
+    std::stringstream ss;
+    boost::archive::text_oarchive ar(ss);
+    ar << std::get<0>(content);
+    ar << std::get<1>(content);
+    ar << std::get<2>(content);
 
-  StreamType res;
-  serialize(content,res);
+    auto s = ss.str();
+    std::vector<uint8_t> buffer(s.size());
+    std::copy(s.c_str(), s.c_str() + s.size(), buffer.begin());
 
-  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SYSTEM_SPEC_RESPONSE, res);
+  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SYSTEM_SPEC_RESPONSE, buffer);
 }
 
 void RosCommunication::sendSubModelRequest(identifier receiverId, SubModelDesc &modelDesc)
 {
   _log->info("Sending sub model request to engine '%v'", receiverId);
+  std::stringstream ss;
+  boost::archive::text_oarchive ar(ss);
+  ar << modelDesc;
 
-  StreamType res;
-  serialize(modelDesc,res);
+  auto s = ss.str();
+  std::vector<uint8_t> buffer(s.size());
+  std::copy(s.c_str(), s.c_str() + s.size(), buffer.begin());
 
-  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SUB_MODEL_REQUEST, res);
+  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SUB_MODEL_REQUEST, buffer);
 }
 
 void RosCommunication::sendSubModelResponse(identifier receiverId, int index, bool accept)
 {
   _log->info("Sending sub model response to engine '%v'", receiverId);
 
-  StreamType res;
-  serialize(std::tuple<int, bool>(index, accept),res);
+  std::stringstream ss;
+  boost::archive::text_oarchive ar(ss);
+  ar << index;
+  ar << accept;
 
-  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SUB_MODEL_RESPONSE, res);
+  auto s = ss.str();
+  std::vector<uint8_t> buffer(s.size());
+  std::copy(s.c_str(), s.c_str() + s.size(), buffer.begin());
+
+  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SUB_MODEL_RESPONSE, buffer);
 }
 
 void RosCommunication::sendNegotiationFinished(identifier receiverId)
@@ -530,24 +538,46 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
     case RosCoordinationCommand::SYSTEM_SPEC_RESPONSE:
       this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
       {
-        auto content = deserialize<std::tuple<std::string, std::vector<std::string>, std::vector<std::string>>>(msg->bytes);
-        return this->coordinator->onSystemSpec(senderId, content);
+        std::stringstream ss;
+        ss.str(std::string(msg->bytes.data(), msg->bytes.data() + msg->bytes.size()));
+        boost::archive::text_iarchive ar(ss);
+        std::string str;
+        std::vector<std::string> vec1;
+        std::vector<std::string> vec2;
+        ar >> str;
+        ar >> vec1;
+        ar >> vec2;
+
+        return this->coordinator->onSystemSpec(senderId, std::make_tuple(str, vec1, vec2));
       }
       ));
       break;
     case RosCoordinationCommand::SUB_MODEL_REQUEST:
       this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
       {
-        auto content = deserialize<SubModelDesc>(msg->bytes);
-        return this->coordinator->onSubModelRequest(senderId, content);
+        std::stringstream ss;
+        ss.str(std::string(msg->bytes.data(), msg->bytes.data() + msg->bytes.size()));
+        boost::archive::text_iarchive ar(ss);
+        SubModelDesc desc;
+        ar >> desc;
+
+        return this->coordinator->onSubModelRequest(senderId, desc);
       }
       ));
       break;
     case RosCoordinationCommand::SUB_MODEL_RESPONSE:
       this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
       {
-        auto content = deserialize<std::tuple<int, bool>>(msg->bytes);
-        return this->coordinator->onSubModelResponse(senderId, std::get<0>(content), std::get<1>(content));
+        std::stringstream ss;
+        ss.str(std::string(msg->bytes.data(), msg->bytes.data() + msg->bytes.size()));
+        boost::archive::text_iarchive ar(ss);
+
+        int value;
+        ar >> value;
+        bool value2;
+        ar >> value2;
+
+        return this->coordinator->onSubModelResponse(senderId, value, value2);
       }
       ));
       break;

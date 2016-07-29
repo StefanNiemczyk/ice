@@ -135,12 +135,6 @@ private:
   ros::Subscriber heartbeatSubscriber; /**< Subscriber on the heartbeat channel */
   ros::Publisher coordinationPublisher; /**< Publisher on the coordination channel */
   ros::Subscriber coordinationSubscriber; /**< Subscriber on the coordination channel */
-  ros::Publisher informationModelPublisher; /**< Publisher on the information model channel */
-  ros::Subscriber informationModelSubscriber; /**< Subscriber on the information model channel */
-  ros::Publisher cooperationRequestPublisher; /**< Publisher on the cooperation request channel */
-  ros::Subscriber cooperationRequestSubscriber; /**< Subscriber on the  cooperation request channel */
-  ros::Publisher cooperationResponsePublisher; /**< Publisher on the  cooperation response channel */
-  ros::Subscriber cooperationResponseSubscriber; /**< Subscriber on the  cooperation response channel */
   bool running; /**< True if the worker thread is running, else false */
   std::thread worker; /**< Worker thread to perform the spin */
   el::Logger* _log; /**< Logger for communication */

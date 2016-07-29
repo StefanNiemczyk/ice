@@ -42,7 +42,6 @@ public:
   virtual ~ASPModelGenerator();
 
   std::shared_ptr<ProcessingModel> createProcessingModel();
-  std::shared_ptr<OntologyInterface> getOntologyInterface();
   std::shared_ptr<supplementary::ClingWrapper> getClingWrapper();
 
 protected:
@@ -54,13 +53,13 @@ protected:
 private:
   void readOntology();
   std::shared_ptr<ASPSystem> getASPSystemByIRI(std::string p_iri);
+  std::string dataTypeForRepresentation(std::string representation);
+  bool extractedSubModel(std::shared_ptr<ASPSystem> system, std::shared_ptr<SubModel> subModel);
+  bool extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<ASPSystem> system, bool own);
+  bool extractStreamTransfers(std::shared_ptr<ASPSystem> from, std::shared_ptr<ASPSystem> to, std::vector<TransferDesc> &transfers);
   std::map<std::string, std::string> readConfiguration(std::string const config);
   void readMetadata(std::map<std::string, int> &metadata, const Gringo::Value &element);
   void readMetadata(std::string name, std::map<std::string, int> &metadata, const Gringo::Value &element);
-  std::string dataTypeForRepresentation(std::string representation);
-  bool extractedSubModel(std::shared_ptr<ASPSystem> system, std::shared_ptr<SubModel> subModel);
-  bool extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<ASPSystem> system);
-  bool extractStreamTransfers(std::shared_ptr<ASPSystem> from, std::shared_ptr<ASPSystem> to, std::vector<TransferDesc> &transfers);
 
 
 private:
@@ -68,7 +67,6 @@ private:
   std::vector<std::shared_ptr<ASPSystem>> systems; /**< List of known engines */
   std::shared_ptr<ASPSystem> self; /**< Pointer to the own asp description */
   std::vector<std::string> entities; /**< The entites as strings */
-//  std::map<ont::entity, ont::entityType> entityTypeMap; /**< Maps the entity type to each known entity */
   bool groundingDirty; /**< Flag to check if the grounding is dirty */
   bool globalOptimization; /**< True if QoS metadata should be optimized global, false for local */
   int queryIndex; /**< Index of the query */

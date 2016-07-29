@@ -46,7 +46,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   bool valid = true;
   std::vector<std::shared_ptr<Node>> nodes;
 
-  for (auto &nodeDesc : *model->getNodes())
+  for (auto &nodeDesc : model->getNodes())
   {
     auto node = this->activateNode(nodeDesc);
 
@@ -60,9 +60,9 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   }
 
   // sending streams
-  for (auto send : *model->getSend())
+  for (auto &send : model->getSend())
   {
-    for (auto transfer : send->transfer)
+    for (auto &transfer : send->transfer)
     {
       auto stream = this->getStream(transfer);
 
@@ -79,9 +79,9 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   }
 
   // receiving streams
-  for (auto receive : *model->getReceive())
+  for (auto &receive : model->getReceive())
   {
-    for (auto transfer : receive->transfer)
+    for (auto &transfer : receive->transfer)
     {
       auto stream = this->getStream(transfer);
 
@@ -112,7 +112,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   this->streamStore->cleanUpStreams();
 
   // sending sub models
-  for (auto &subModel : *model->getSubModels())
+  for (auto &subModel : model->getSubModels())
   {
     this->communication->sendSubModelRequest(subModel->engine->getEngineId(), *subModel->model);
   }
@@ -133,10 +133,10 @@ bool FastUpdateStrategie::handleSubModelResponse(std::shared_ptr<EngineState> en
 
   subModel->accepted = true;
 
-  for (auto sub : *this->model->getSubModels())
+  for (auto &sub : this->model->getSubModels())
   {
     if (false == sub->accepted)
-      return true;
+      return false;
   }
 
   this->established = true;
