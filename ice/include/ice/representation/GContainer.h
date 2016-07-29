@@ -12,7 +12,6 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 #include <easylogging++.h>
-#include <serialize.h>
 
 using namespace rapidjson;
 
@@ -60,11 +59,6 @@ public:
 		return this->set(indices, 0, value);
 	}
 
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes) {
-		int index = 0;
-		this->fromByte(bytes, index);
-	}
-
 	virtual GContainer* clone() = 0;
 
 	void print() {
@@ -76,8 +70,6 @@ public:
 			int index) = 0;
 	virtual void* get(std::vector<int> *indices, int index) = 0;
 	virtual bool set(std::vector<int> *indices, int index, const void* value) = 0;
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) = 0;
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) = 0;
 	virtual std::string toJSON() = 0;
 	virtual Value toJSONValue(Document &d) = 0;
 
@@ -183,18 +175,6 @@ public:
 		}
 
 		return this->subs.at(indices->at(index))->set(indices, index + 1, value);
-	}
-
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		for (auto &sub : this->subs) {
-			sub->toByte(out);
-		}
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		for (auto &sub : this->subs) {
-			sub->fromByte(bytes, index);
-		}
 	}
 
 	virtual std::string toJSON() {
@@ -315,17 +295,6 @@ public:
 		value = v;
 	}
 
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<bool>(bytes[index]);
-		++index;
-	}
-
 	virtual void print(int level, std::string dimension) {
 		std::cout << std::string(level, ' ') << dimension << " " << this->value << " (bool)"
 				<< std::endl;
@@ -403,17 +372,6 @@ public:
 		value = v;
 	}
 
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<int8_t>(bytes[index]);
-		++index;
-	}
-
 	virtual void print(int level, std::string dimension) {
 		std::cout << std::string(level, ' ') << dimension << " " << this->value << " (byte)"
 				<< std::endl;
@@ -487,17 +445,6 @@ public:
 
 	virtual void setValue(uint8_t v) {
 		value = v;
-	}
-
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<uint8_t>(bytes[index]);
-		++index;
 	}
 
 	virtual void print(int level, std::string dimension) {
@@ -576,17 +523,6 @@ public:
 		value = v;
 	}
 
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<short>(bytes[index]);
-		++index;
-	}
-
 	virtual void print(int level, std::string dimension) {
 		std::cout << std::string(level, ' ') << dimension << " " << this->value
 				<< " (short)" << std::endl;
@@ -662,17 +598,6 @@ public:
 		value = v;
 	}
 
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<int>(bytes[index]);
-		++index;
-	}
-
 	virtual void print(int level, std::string dimension) {
 		std::cout << std::string(level, ' ') << dimension << " " << this->value << " (int)"
 				<< std::endl;
@@ -746,17 +671,6 @@ public:
 
 	virtual void setValue(long v) {
 		value = v;
-	}
-
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<long>(bytes[index]);
-		++index;
 	}
 
 	virtual void print(int level, std::string dimension) {
@@ -838,17 +752,6 @@ public:
 		value = v;
 	}
 
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<unsigned short>(bytes[index]);
-		++index;
-	}
-
 	virtual void print(int level, std::string dimension) {
 		std::cout << std::string(level, ' ') << dimension << " " << this->value
 				<< " (unsigned short)" << std::endl;
@@ -924,17 +827,6 @@ public:
 		value = v;
 	}
 
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<unsigned int>(bytes[index]);
-		++index;
-	}
-
 	virtual void print(int level, std::string dimension) {
 		std::cout << std::string(level, ' ') << dimension << " " << this->value
 				<< " (unsigned int)" << std::endl;
@@ -1008,17 +900,6 @@ public:
 
 	virtual void setValue(unsigned long v) {
 		value = v;
-	}
-
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<unsigned long>(bytes[index]);
-		++index;
 	}
 
 	virtual void print(int level, std::string dimension) {
@@ -1098,17 +979,6 @@ public:
 		value = v;
 	}
 
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<float>(bytes[index]);
-		++index;
-	}
-
 	virtual void print(int level, std::string dimension) {
 		std::cout << std::string(level, ' ') << dimension << " " << this->value
 				<< " (float)" << std::endl;
@@ -1184,17 +1054,6 @@ public:
 		value = v;
 	}
 
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<double>(bytes[index]);
-		++index;
-	}
-
 	virtual void print(int level, std::string dimension) {
 		std::cout << std::string(level, ' ') << dimension << " " << this->value
 				<< " (double)" << std::endl;
@@ -1267,17 +1126,6 @@ public:
 
 	virtual void setValue(std::string v) {
 		value = v;
-	}
-
-	virtual void toByte(std::vector<std::vector<uint8_t>> &out) {
-		std::vector<uint8_t> vec;
-		serialize(this->value, vec);
-		out.push_back(vec);
-	}
-
-	virtual void fromByte(std::vector<std::vector<uint8_t>> &bytes, int &index) {
-		this->value = deserialize<std::string>(bytes[index]);
-		++index;
 	}
 
 	virtual void print(int level, std::string dimension) {

@@ -203,7 +203,6 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/test_RepresentationTransformation.cpp
   test/test_RepresentationJSON.cpp
   test/test_EulerRepTransformation.cpp
-  test/test_serialize.cpp
   test/test_RingBuffer.cpp
   test/test_Buffer.cpp
   test/test_EventHandler.cpp
