@@ -692,9 +692,9 @@ void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int
     return;
   }
 
-//  std::stringstream o;
-//  o << element;
-//  _log->debug("Metadata '%v' of stream '%v' has value '%v'", name, o.str(), value.num());
+  std::stringstream o;
+  o << element;
+  _log->debug("Metadata '%v' of stream '%v' has value '%v'", name, o.str(), value.num());
 
   metadata.insert(std::make_pair(this->ontology->toLongIri(name), value.num()));
 }
