@@ -57,17 +57,6 @@ struct InputStreamDesc
     }
 };
 
-//typedef tuple<string,                   // source system
-//              string,                   // node name
-//              string,                   // node entity
-//              string,                   // node entity 2
-//              string,                   // entity
-//              string,                   // scope
-//              string,                   // representation
-//              string,                   // related entity
-//              std::map<std::string, int>// metadata
-//              > InputStreamDesc;
-
 struct OutputStreamDesc
 {
   string                        entity;
@@ -88,12 +77,6 @@ struct OutputStreamDesc
       ar & metadata;
     }
 };
-//typedef tuple<string,                   // entity
-//              string,                   // scope
-//              string,                   // representation
-//              string,                   // related entity
-//              std::map<std::string, int>// metadata
-//              > OutputStreamDesc;
 
 struct NodeDesc
 {
@@ -121,15 +104,6 @@ struct NodeDesc
       ar & outputs;
     }
 };
-//typedef tuple<uint8_t,                  // Type
-//              string,                   // class name
-//              string,                   // asp name
-//              string,                   // entity
-//              string,                   // entity 2
-//              string,                   // config as string
-//              vector<InputStreamDesc>,  // inputs
-//              vector<OutputStreamDesc>  // outputs
-//              > NodeDesc;
 
 struct TransferDesc
 {
@@ -157,15 +131,6 @@ struct TransferDesc
       ar & relatedEntity;
     }
 };
-//typedef tuple<string,                   // source
-//              string,                   // node name
-//              string,                   // node entity
-//              string,                   // node entity 2
-//              string,                   // entity
-//              string,                   // scope
-//              string,                   // representation
-//              string                    // related entity
-//              > TransferDesc;
 
 struct SubModelDesc
 {
@@ -185,11 +150,6 @@ struct SubModelDesc
       ar & receive;
     }
 };
-//typedef tuple<int,                      // The index of the sub model
-//              vector<NodeDesc>,         // Nodes which needs to be activated
-//              vector<TransferDesc>,     // Streams transfered from self to the external system
-//              vector<TransferDesc>      // Streams transfered from the external system to self
-//            > SubModelDesc;
 
 struct SubModel
 {

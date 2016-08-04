@@ -25,15 +25,17 @@ namespace ice
 
 enum IceMessageIds
 {
-  IMI_IDS_REQUEST                      = 1,
-  IMI_IDS_RESPONSE                     = 2,
-  IMI_ID_REQUEST                       = 3,
-  IMI_ID_RESPONSE                      = 4,
-  IMI_OFFERS_REQUEST                   = 5,
-  IMI_OFFERS_RESPONSE                  = 6,
-  IMI_INFORMATION_REQUEST              = 7,
-  IMI_INFORMATION_RESPONSE             = 8,
-  IMI_INFORMATION_REQUEST_INDEX        = 9,
+  IMI_IDS_REQUEST                      =  1,
+  IMI_IDS_RESPONSE                     =  2,
+  IMI_ID_REQUEST                       =  3,
+  IMI_ID_RESPONSE                      =  4,
+  IMI_ONTOLOGY_IDS_REQUEST             =  5,
+  IMI_ONTOLOGY_IDS_RESPONSE            =  6,
+  IMI_OFFERS_REQUEST                   =  7,
+  IMI_OFFERS_RESPONSE                  =  8,
+  IMI_INFORMATION_REQUEST              =  9,
+  IMI_INFORMATION_RESPONSE             = 10,
+  IMI_INFORMATION_REQUEST_INDEX        = 11,
 
   IMI_ACK                              = 250,
 

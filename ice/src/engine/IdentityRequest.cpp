@@ -9,6 +9,7 @@
 
 #include "ice/communication/messages/CommandMessage.h"
 #include "ice/communication/messages/IdMessage.h"
+#include "ice/communication/messages/OntologyIdMessage.h"
 
 namespace ice
 {
@@ -28,7 +29,7 @@ void IdentityRequest::init()
 {
   // call init from super class
   ComJobBase::init();
-  this->requestIds();
+  this->sendRequestIds();
 }
 
 void IdentityRequest::tick()
@@ -42,8 +43,9 @@ void IdentityRequest::tick()
   {
     if (++this->tryCount < 3)
     {
+      // TODO
       // retry
-      this->requestIds();
+      this->sendRequestIds();
     }
     else
     {
@@ -55,25 +57,23 @@ void IdentityRequest::tick()
 
 void IdentityRequest::handleMessage(std::shared_ptr<Message> const &message)
 {
-  auto entity = message->getEntity();
-
   switch (message->getId())
   {
     case (IMI_IDS_REQUEST):
     {
-      // sending ids
-      _log->info("Sending Ids to '%v'", entity->toString());
-      auto m = std::make_shared<IdMessage>();
-      this->self->pushIds(m->getIds());
-      this->send(m);
-      this->finish();
+      this->onRequestIds(message);
       break;
     }
     case (IMI_IDS_RESPONSE):
     {
-      entity->fuse(std::static_pointer_cast<IdMessage>(message)->getIds());
-      entity->checkIce();
-      this->state = CJState::CJ_FINISHED;
+      this->onRequestIds(std::static_pointer_cast<IdMessage>(message));
+      break;
+    }
+    case (IMI_FINISH):
+    {
+      if (this->ownJob)
+        this->finish();
+
       break;
     }
     default:
@@ -82,7 +82,7 @@ void IdentityRequest::handleMessage(std::shared_ptr<Message> const &message)
   }
 }
 
-void IdentityRequest::requestIds()
+void IdentityRequest::sendRequestIds()
 {
   _log->info("Requesting Ids from '%v'", entity->toString());
   auto m = std::make_shared<CommandMessage>(IceMessageIds::IMI_IDS_REQUEST);
@@ -90,5 +90,107 @@ void IdentityRequest::requestIds()
   this->state = CJState::CJ_WAITING;
   this->updateActiveTime();
 }
+
+void IdentityRequest::onRequestIds(std::shared_ptr<Message> const &message)
+{
+  _log->info("Sending Ids to '%v'", entity->toString());
+
+  auto m = std::make_shared<IdMessage>();
+  this->self->pushIds(m->getIds());
+  this->send(m);
+}
+
+void IdentityRequest::onResponsIds(std::shared_ptr<IdMessage> const &message)
+{
+  _log->debug("Received ids from %v", this->entity->toString());
+
+  auto entity = message->getEntity();
+
+  entity->fuse(message->getIds());
+  entity->checkIce();
+
+  // if not an ice engine stop here
+  if (false == entity->isIceIdentity())
+  {
+    this->finish();
+    return;
+  }
+
+  // ontology iris known?
+  if (entity->getOntologyIds().size() > 0)
+  {
+    // done
+    this->sendCommand(IceMessageIds::IMI_FINISH);
+    this->finish();
+  }
+
+  // request ontology ids
+  this->sendCommand(IceMessageIds::IMI_ONTOLOGY_IDS_REQUEST);
+}
+
+void IdentityRequest::onRequestOntologyIds(std::shared_ptr<Message> const &message)
+{
+  _log->debug("Sending ontology ids to %v", this->entity->toString());
+
+  // check if request already received
+  // TODO
+
+  // create and send system specification
+  auto msg = std::make_shared<OntologyIdMessage>();
+  this->engine->getOntologyInterface()->getOntologyIDs(msg->getIds());
+
+  this->send(msg);
+}
+
+void IdentityRequest::onResponseOntologyIds(std::shared_ptr<OntologyIdMessage> const &message)
+{
+  _log->debug("Received ontology ids to %v", this->entity->toString());
+
+  if (this->entity->getOntologyIds().size() > 0)
+  {
+    _log->info("Duplicated ontology ids received from engine %v", this->entity->toString());
+    return;
+  }
+
+  this->entity->getOntologyIds() = message->getIds();
+
+   auto result = this->engine->getOntologyInterface()->compareOntologyIDs(message->getIds());
+
+   if (result->size() != 0)
+   {
+     _log->info("Ontology ids do not match, received from %v", this->entity->toString());
+     // TODO implement requesting ontologies
+     engineState->getRequesting()->state = CooperationState::NO_COOPERATION;
+
+     return;
+   }
+
+  // check if system is known in ontology
+  if (this->ontologyInterface->isSystemKnown(std::get<0>(spec)))
+  {
+    // system is known, cooperation is possible
+    _log->info("Entity '%v' known by ontology", this->entity->toString());
+
+
+    // trigger processing model update
+    engineState->setNodesKnown(true);
+    this->updateStrategie->onEngineDiscovered(engineState);
+
+    // done
+    this->sendCommand(IceMessageIds::IMI_FINISH);
+    this->finish();
+  }
+  else
+  {
+    // system is unknown, request nodes
+    _log->info("System' %v' identified by id '%v' is unknown", std::get<0>(spec),
+               IDGenerator::toString(engineId));
+    // TODO request nodes
+    engineState->getRequesting()->state = CooperationState::NO_COOPERATION;
+  }
+
+  return 0;
+}
+
 
 } /* namespace ice */

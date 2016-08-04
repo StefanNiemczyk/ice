@@ -45,8 +45,8 @@ public:
   bool loadOntologies();
   bool loadOntology(std::string const p_path);
   bool saveOntology(std::string const p_path);
-  std::unique_ptr<std::vector<std::vector<std::string>>> getOntologyIDs();
-  std::unique_ptr<std::vector<std::string>> compareOntologyIDs(std::vector<std::string>* ids, std::vector<std::string>* versions);
+  int getOntologyIDs(std::vector<std::pair<std::string,std::string>> &ids);
+  std::unique_ptr<std::vector<std::pair<std::string,std::string>>> compareOntologyIDs(std::vector<std::pair<std::string,std::string>> &ids);
   bool initReasoner(bool const p_force);
   bool isConsistent();
   std::unique_ptr<std::vector<std::string>> getSystems();
@@ -84,7 +84,6 @@ public:
                        std::vector<int> p_inputMapsMaxSize, std::vector<std::string> p_outputMaps,
                        std::vector<int> p_outputMapsMinSize, std::vector<int> p_outputMapsMaxSize);
   std::string toLongIri(std::string p_shortIri);
-//  std::string toLongIri(const char* p_shortIri);
   std::string toShortIri(std::string p_longIri);
   std::string toShortIriAll(std::string p_string);
 
@@ -95,7 +94,7 @@ public:
   std::string readInformationStructureAsASP();
   std::string readRepresentationsAsCSV();
   std::unique_ptr<std::vector<std::string>> readRepresentations();
-  std::unique_ptr<std::vector<std::vector<std::string>>>readNodesAndIROsAsASP(std::string const p_system);
+  std::unique_ptr<std::vector<std::vector<std::string>>> readNodesAndIROsAsASP(std::string const p_system);
   bool addNodeIndividual(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::string const p_aboutEntity, std::string const p_aboutRelatedEntity, std::vector<std::string> p_metadatas,
       std::vector<int> p_metadataValues, std::vector<int> p_metadataValues2, std::vector<std::string> p_metadataGroundings);
   bool addIROIndividual(std::string const p_iro, std::string const p_iroClass, std::string const p_system, std::vector<std::string> p_metadatas,
@@ -119,65 +118,66 @@ private:
   void readOntologyIDsFromOntology();
 
 private:
-  el::Logger* _log; /**< Logger */
-  static JavaVM *jvm; /**< a Java VM */
-  JNIEnv *env; /**< pointer to native method interface */
-  bool error; /**< an error has occurred */
-  bool informationDirty; /**< Flag to check if the information model was changed */
-  bool systemDirty; /**< Flag to check if the system model was changed */
-  bool loadDirty; /**< Flag to check if the ontology needs to be loaded again */
-  bool mappingDirty; /**< Flag to check if the ontology iri mapping needs to be loaded again */
-  std::vector<std::string> knownSystem; /**< List of known systems */
-  std::vector<std::vector<std::string>> ontologyIds; /**< List of ontology iris and version iris */
-  std::vector<std::string> ontologyIriMapping; /**< List of ontology iris for Mapping */
-  std::string informationStructure; /**< The information structure */
-  std::mutex mtx_; /**< Mutex */
+  el::Logger*                                           _log;                   /**< Logger */
+  static JavaVM                                         *jvm;                   /**< a Java VM */
+  JNIEnv                                                *env;                   /**< pointer to native method interface */
+  bool                                                  error;                  /**< an error has occurred */
+  bool                                                  informationDirty;       /**< Flag to check if the information model was changed */
+  bool                                                  systemDirty;            /**< Flag to check if the system model was changed */
+  bool                                                  loadDirty;              /**< Flag to check if the ontology needs to be loaded again */
+  bool                                                  mappingDirty;           /**< Flag to check if the ontology iri mapping needs to be loaded again */
+  std::vector<std::string>                              knownSystem;            /**< List of known systems */
+  std::vector<std::pair<std::string, std::string>>      ontologyIds;            /**< List of ontology iris and version iris */
+  std::vector<std::string>                              ontologyIriMapping;     /**< List of ontology iris for Mapping */
+  std::string                                           informationStructure;   /**< The information structure */
+  std::mutex                                            mtx_;                   /**< Mutex */
 
-  jclass javaOntologyInterface; /**< java class to access the ontology */
-  jstring empty;
-  jobject javaInterface; /**< java interface object */
-  jmethodID addIRIMapperMethod; /**< Method id */
-  jmethodID loadOntologiesMethod; /**< Method id */
-  jmethodID loadOntologyMethod; /**< Method id */
-  jmethodID saveOntologyMethod; /**< Method id */
-  jmethodID getOntologyIDsMethod; /**< Method id */
-  jmethodID initReasonerMethod; /**< Method id */
-  jmethodID isConsistentMethod; /**< Method id */
-  jmethodID getSystemsMethod; /**< Method id */
-  jmethodID addSystemMethod; /**< Method id */
-  jmethodID addNodesToSystemMethod; /**< Method id */
-  jmethodID addIndividualMethod; /**< Method id */
-  jmethodID addEntityTypeMethod; /**< Method id */
-  jmethodID addEntityScopeMethod; /**< Method id */
-  jmethodID addScopesToEntityTypeMethod; /**< Method id */
-  jmethodID addValueScopeMethod; /**< Method id */
-  jmethodID addRepresentationMethod; /**< Method id */
-  jmethodID addDimensionToRep2Method; /**< Method id */
-  jmethodID addDimensionToRep3Method; /**< Method id */
-  jmethodID addNamedStreamMethod; /**< Method id */
-  jmethodID addNamedMapMethod; /**< Method id */
-  jmethodID addRequiredStreamMethod; /**< Method id */
-  jmethodID addRequiredMapMethod; /**< Method id */
-  jmethodID addSourceNodeClassMethod; /**< Method id */
-  jmethodID addComputationNodeClassMethod; /**< Method id */
-  jmethodID addIroNodeClassMethod; /**< Method id */
-  jmethodID addMapNodeClassMethod; /**< Method id */
+  jclass                                                javaOntologyInterface;  /**< java class to access the ontology */
+  jstring                                               empty;                  /**< Empty string */
+  jobject                                               javaInterface;          /**< java interface object */
 
-  jmethodID addOntologyIRIMethod; /**< Method id */
-  jmethodID removeOntologyIRIMethod; /**< Method id */
-  jmethodID getOntologyIriMappingMethod; /**< Method id */
-  jmethodID readInformationStructureAsASPMethod; /**< Method id */
-  jmethodID readRepresentationsAsCSVMethod; /**< Method id */
-  jmethodID readNodesAndIROsAsASPMethod; /**< Method id */
-  jmethodID addNodeIndividualMethod; /**< Method id */
-  jmethodID addIROIndividualMethod; /**< Method id */
-  jmethodID getSomeMinCardinalityMethod; /**< Method id */
-  jmethodID setSomeMinCardinalityMethod; /**< Method id */
-  jmethodID getSomeMaxCardinalityMethod; /**< Method id */
-  jmethodID setSomeMaxCardinalityMethod; /**< Method id */
+  jmethodID                                             addIRIMapperMethod; /**< Method id */
+  jmethodID                                             loadOntologiesMethod; /**< Method id */
+  jmethodID                                             loadOntologyMethod; /**< Method id */
+  jmethodID                                             saveOntologyMethod; /**< Method id */
+  jmethodID                                             getOntologyIDsMethod; /**< Method id */
+  jmethodID                                             initReasonerMethod; /**< Method id */
+  jmethodID                                             isConsistentMethod; /**< Method id */
+  jmethodID                                             getSystemsMethod; /**< Method id */
+  jmethodID                                             addSystemMethod; /**< Method id */
+  jmethodID                                             addNodesToSystemMethod; /**< Method id */
+  jmethodID                                             addIndividualMethod; /**< Method id */
+  jmethodID                                             addEntityTypeMethod; /**< Method id */
+  jmethodID                                             addEntityScopeMethod; /**< Method id */
+  jmethodID                                             addScopesToEntityTypeMethod; /**< Method id */
+  jmethodID                                             addValueScopeMethod; /**< Method id */
+  jmethodID                                             addRepresentationMethod; /**< Method id */
+  jmethodID                                             addDimensionToRep2Method; /**< Method id */
+  jmethodID                                             addDimensionToRep3Method; /**< Method id */
+  jmethodID                                             addNamedStreamMethod; /**< Method id */
+  jmethodID                                             addNamedMapMethod; /**< Method id */
+  jmethodID                                             addRequiredStreamMethod; /**< Method id */
+  jmethodID                                             addRequiredMapMethod; /**< Method id */
+  jmethodID                                             addSourceNodeClassMethod; /**< Method id */
+  jmethodID                                             addComputationNodeClassMethod; /**< Method id */
+  jmethodID                                             addIroNodeClassMethod; /**< Method id */
+  jmethodID                                             addMapNodeClassMethod; /**< Method id */
 
-  jmethodID getLogLevelMethod; /**< Method id */
-  jmethodID setLogLevelMethod; /**< Method id */
+  jmethodID                                             addOntologyIRIMethod; /**< Method id */
+  jmethodID                                             removeOntologyIRIMethod; /**< Method id */
+  jmethodID                                             getOntologyIriMappingMethod; /**< Method id */
+  jmethodID                                             readInformationStructureAsASPMethod; /**< Method id */
+  jmethodID                                             readRepresentationsAsCSVMethod; /**< Method id */
+  jmethodID                                             readNodesAndIROsAsASPMethod; /**< Method id */
+  jmethodID                                             addNodeIndividualMethod; /**< Method id */
+  jmethodID                                             addIROIndividualMethod; /**< Method id */
+  jmethodID                                             getSomeMinCardinalityMethod; /**< Method id */
+  jmethodID                                             setSomeMinCardinalityMethod; /**< Method id */
+  jmethodID                                             getSomeMaxCardinalityMethod; /**< Method id */
+  jmethodID                                             setSomeMaxCardinalityMethod; /**< Method id */
+
+  jmethodID                                             getLogLevelMethod; /**< Method id */
+  jmethodID                                             setLogLevelMethod; /**< Method id */
 
 };
 

@@ -216,17 +216,17 @@ protected:
   virtual void callCallbackAborted() = 0;
 
 protected:
-  ICEngine *engine;
-  bool ownJob;
-  std::shared_ptr<Entity> self;
-  std::shared_ptr<Entity> entity;
-  std::shared_ptr<TimeFactory> timeFactory;
-  uint8_t id;
-  uint8_t index;
-  CJState state;
-  unsigned long long timeout;
-  time timestampLastActive;
-  el::Logger *_log;
+  ICEngine                              *engine;
+  bool                                  ownJob;
+  std::shared_ptr<Entity>               self;
+  std::shared_ptr<Entity>               entity;
+  std::shared_ptr<TimeFactory>          timeFactory;
+  uint8_t                               id;
+  uint8_t                               index;
+  CJState                               state;
+  unsigned long long                    timeout;
+  time                                  timestampLastActive;
+  el::Logger                            *_log;
 
 private:
   std::shared_ptr<CommunicationInterface> com;

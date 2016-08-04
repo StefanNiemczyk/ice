@@ -17,19 +17,21 @@
 namespace ice
 {
 
-Entity::Entity(EntityDirectory *directory, const std::initializer_list<Id>& ids)
-      : iceIdentity(false), directory(directory), available(false), _log(el::Loggers::getLogger("Entity")), index(0)
+Entity::Entity(const std::shared_ptr<EntityDirectory> const &directory,
+		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id>& ids)
+      : iceIdentity(false), directory(directory), timeFactory(factory), available(false), _log(
+				el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000)
 {
   if (ids.size() == 0)
   {
-    throw  std::runtime_error(std::string("Identity ids can not be empty"));
+    throw std::runtime_error(std::string("Entity ids can not be empty"));
   }
 
   for (const auto& id : ids) {
           this->ids[id.key] = id.value;
   }
 
-  timeoutDuration = std::chrono::milliseconds(2000);
+  this->timestamp = this->timeFactory->createTime();
 }
 
 Entity::~Entity()
@@ -179,6 +181,7 @@ std::map<std::string, std::string> Entity::readConfiguration(std::string const c
     if (index == std::string::npos)
     {
       _log->warn("Broken configuration '%v', skipped", item);
+      continue;
     }
 
     configuration[item.substr(0, index)] = item.substr(index + 1, item.size());
@@ -362,14 +365,19 @@ void Entity::setIceIdentity(bool value)
   this->iceIdentity = value;
 }
 
-std::chrono::steady_clock::time_point Entity::getActiveTimestamp()
+time Entity::getActiveTimestamp()
 {
   return this->timestamp;
 }
 
-void Entity::setActiveTimestamp(std::chrono::steady_clock::time_point value)
+void Entity::setActiveTimestamp(time value)
 {
   this->timestamp = value;
+}
+
+void Entity::setActiveTimestamp()
+{
+  this->timestamp = this->timeFactory->createTime();
 }
 
 bool Entity::isAvailable()
@@ -399,9 +407,7 @@ void Entity::setAvailable(bool const &value)
 
 bool Entity::isTimeout()
 {
-  auto now = std::chrono::steady_clock::now();
-
-  return ((now - this->timestamp) > this->timeoutDuration);
+  return this->timeFactory->checkTimeout(this->timestamp, this->timeoutDuration);
 }
 
 void Entity::addId(std::string const &key, std::string const &value)
@@ -474,20 +480,6 @@ std::vector<InformationSpecification>& Entity::getOfferedInformation()
   return this->offeredInformation;
 }
 
-void Entity::addOfferedInformation(std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>> const &offeres)
-{
-  for (auto &info : offeres)
-  {
-    this->offeredInformation.push_back(InformationSpecification(std::get<0>(info),
-                                                                std::get<1>(info),
-                                                                std::get<2>(info),
-                                                                std::get<3>(info),
-                                                                std::get<4>(info)));
-  }
-
-  this->directory->offeredInformation.trigger(this->shared_from_this());
-}
-
 void Entity::addOfferedInformation(std::vector<InformationSpecification> const &offeres)
 {
   for (auto &info : offeres)
@@ -498,6 +490,24 @@ void Entity::addOfferedInformation(std::vector<InformationSpecification> const &
   this->directory->offeredInformation.trigger(this->shared_from_this());
 }
 
+std::vector<std::pair<std::string, std::string>>& Entity::getOntologyIds()
+{
+  return this->ontologyIds;
+}
+
+// -----------------------------------------------------------------------------------
+// ----------------------------------- Sharing Stuff ---------------------------------
+// -----------------------------------------------------------------------------------
+
+std::shared_ptr<SharedSubModel> const& Entity::getSendSubModel()
+{
+  return this->sendSubModel;
+}
+
+std::shared_ptr<SharedSubModel> const& Entity::getReceivedSubModel()
+{
+  return this->receivedSubModel;
+}
 
 // -----------------------------------------------------------------------------------
 // ----------------------------------- ASP Stuff -------------------------------------

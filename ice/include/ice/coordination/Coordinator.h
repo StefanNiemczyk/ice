@@ -25,18 +25,20 @@ namespace ice
 {
 class Communication;
 class Configuration;
-class CooperationRequest;
-class CooperationResponse;
-class EngineState;
+class Entity;
+class EntityDirectory;
 class ICEngine;
-class InformationModel;
 class StreamStore;
-class IntersectionInformationModel;
 class NodeStore;
 class OntologyInterface;
 class ProcessingModelGenerator;
 class TimeFactory;
 class UpdateStrategie;
+
+class CooperationRequest;
+class CooperationResponse;
+class InformationModel;
+class IntersectionInformationModel;
 } /* namespace ice */
 
 namespace ice
@@ -80,22 +82,6 @@ public:
   void cleanUp();
 
   /*!
-   * \brief Returns the engine state object for a given identifier or NULL.
-   *
-   * Returns the engine state object for a given identifier from the list of known engines.
-   * If no engine for the given identifier exists NULL will be returned
-   *
-   * \param engineId The identifier of the searched engine.
-   */
-  std::shared_ptr<EngineState> getEngineState(identifier engineId);
-
-  std::shared_ptr<EngineState> getEngineState(std::string p_iri);
-
-  std::shared_ptr<EngineState> getEngineStateNoMutex(identifier engineId, bool returnNew);
-
-  std::shared_ptr<EngineState> getEngineStateNoMutex(std::string p_iri);
-
-  /*!
    * \brief This method should be called if a heartbeat from another engine is received.
    *
    * This method should be called if a heartbeat from another engine is received.
@@ -131,90 +117,7 @@ public:
    */
   int onStopCooperation(identifier engineId);
 
-  //---------------------------------------------------------------------------
-  /*!
-   * \brief This method should be called if an information model request from another engine is received.
-   *
-   * This method should be called if an information model request from another engine is received.
-   *
-   * @param engineId Identifier of the sending engine.
-   */
-  int onInformationModelRequest(identifier engineId);
-
-  /*!
-   * \brief This method should be called if an information model from another engine is received.
-   *
-   * This method should be called if an information model from another engine is received.
-   *
-   * @param engineId Identifier of the sending engine.
-   */
-  int onInformationModel(identifier engineId, std::shared_ptr<InformationModel> informationModel);
-
-  /*!
-   * \brief This method should be called if a cooperation request from another engine is received.
-   *
-   * This method should be called if a cooperation request from another engine is received.
-   *
-   * @param engineId Identifier of the sending engine.
-   */
-  int onCooperationRequest(identifier engineId, std::shared_ptr<CooperationRequest> request);
-
-  /*!
-   * \brief This method should be called if a cooperation response from another engine is received.
-   *
-   * This method should be called if a cooperation response from another engine is received.
-   *
-   * @param engineId Identifier of the sending engine.
-   */
-  int onCooperationResponse(identifier engineId, std::shared_ptr<CooperationResponse> response);
-
-  /*!
-   * \brief This method should be called if a cooperation accepted from another engine is received.
-   *
-   * This method should be called if a cooperation accepted from another engine is received.
-   *
-   * @param engineId Identifier of the sending engine.
-   */
-  int onCooperationAccept(identifier engineId);
-
-  /*!
-   * \brief This method should be called if a cooperation refuse from another engine is received.
-   *
-   * This method should be called if a cooperation refuse from another engine is received.
-   *
-   * @param engineId Identifier of the sending engine.
-   */
-  int onCooperationRefuse(identifier engineId);
-
-  /*!
-   * \brief This method should be called if a cooperation stopped from another engine is received.
-   *
-   * This method should be called if a cooperation stopped from another engine is received.
-   *
-   * @param engineId Identifier of the sending engine.
-   */
-  int onCooperationStopped(identifier engineId);
-
-  /*!
-   * \brief This method should be called if a retry negotiation from another engine is received.
-   *
-   * This method should be called if a retry negotiation from another engine is received.
-   *
-   * @param engineId Identifier of the sending engine.
-   */
-  int onRetryNegotiation(identifier engineId);
-
-  /*!
-   * \brief Stops the cooperation with an engine identified by the given identifier.
-   *
-   * Stops the cooperation with an engine identified by the given identifier.
-   *
-   * @param engineId Identifier of engine to stop the cooperation.
-   */
-  int stopCooperationWith(identifier engineId);
-
 private:
-
   /*!
    * \brief Stops the cooperation with the given engine.
    *
@@ -233,24 +136,25 @@ private:
   void workerTask();
 
 private:
-  bool running; /**< True if the communication is running, else false */
-  std::thread worker; /**< Thread which sends the heart beat and cyclic tests the engine states */
-  std::weak_ptr<ICEngine> engine; /**< Weak pointer to the engine */
-  std::string engineIri; /**< Iri of the main engine */
-  std::shared_ptr<OntologyInterface> ontologyInterface; /**< The interface to access the ontology */
-  std::shared_ptr<TimeFactory> timeFactory; /**< Time factory to create and compare time stamps */
-  std::shared_ptr<Configuration> config; /**< Configuration object */
-  std::shared_ptr<Communication> communication; /**< Communication interface to send messages */
-  std::shared_ptr<StreamStore> streamStore; /**< The stream store */
-  std::shared_ptr<ProcessingModelGenerator> modelGenerator; /**< The model generator */
-  std::shared_ptr<NodeStore> nodeStore; /**< The node store */
-  std::vector<std::shared_ptr<EngineState>> engineStates; /**< List of known engines */
-  std::shared_ptr<UpdateStrategie> updateStrategie; /**< Update strategie to change the processing model */
-  std::shared_ptr<EngineState> self; /**< Engine state object of the main engine */
-  el::Logger* _log; /**< Logger */
-  std::mutex mtx_; /**< Mutex */
-  std::mutex threadMtx_; /**< Mutex */
-  std::condition_variable cv; /**< Condition variable for synchronizing threads */
+  bool                                          running; /**< True if the communication is running, else false */
+  std::thread                                   worker; /**< Thread which sends the heart beat and cyclic tests the engine states */
+  std::weak_ptr<ICEngine>                       engine; /**< Weak pointer to the engine */
+  std::string                                   engineIri; /**< Iri of the main engine */
+  std::shared_ptr<OntologyInterface>            ontologyInterface; /**< The interface to access the ontology */
+  std::shared_ptr<TimeFactory>                  timeFactory; /**< Time factory to create and compare time stamps */
+  std::shared_ptr<Configuration>                config; /**< Configuration object */
+  std::shared_ptr<Communication>                communication; /**< Communication interface to send messages */
+  std::shared_ptr<StreamStore>                  streamStore; /**< The stream store */
+  std::shared_ptr<ProcessingModelGenerator>     modelGenerator; /**< The model generator */
+  std::shared_ptr<NodeStore>                    nodeStore; /**< The node store */
+  std::shared_ptr<EntityDirectory>              entityDirectory; /**< Directory for known entities */
+  std::shared_ptr<Entity>                       self; /**< Own entity object */
+  std::shared_ptr<UpdateStrategie>              updateStrategie; /**< Update strategie to change the processing model */
+
+  el::Logger*                                   _log; /**< Logger */
+  std::mutex                                    mtx_; /**< Mutex */
+  std::mutex                                    threadMtx_; /**< Mutex */
+  std::condition_variable                       cv; /**< Condition variable for synchronizing threads */
 };
 
 } /* namespace ice */

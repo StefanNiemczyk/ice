@@ -17,6 +17,7 @@
 #include "ice/communication/messages/InformationMessage.h"
 #include "ice/communication/messages/IntMessage.h"
 #include "ice/communication/messages/OffersMessage.h"
+#include "ice/communication/messages/OntologyIdMessage.h"
 #include "ice/communication/messages/RequestMessage.h"
 #include "ice/Entity.h"
 
@@ -53,6 +54,7 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr
   {
     case(IMI_IDS_REQUEST):
     case(IMI_ID_REQUEST):
+    case(IMI_ONTOLOGY_IDS_REQUEST):
     case(IMI_OFFERS_REQUEST):
     case(IMI_FINISH):
     case(IMI_CANCLE_JOB):
@@ -60,6 +62,9 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr
         break;
     case(IMI_IDS_RESPONSE):
         message = std::make_shared<IdMessage>();
+        break;
+    case(IMI_ONTOLOGY_IDS_RESPONSE):
+        message = std::make_shared<OntologyIdMessage>();
         break;
     case(IMI_OFFERS_RESPONSE):
         message = std::make_shared<OffersMessage>();

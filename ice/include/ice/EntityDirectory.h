@@ -19,12 +19,12 @@ namespace ice
 {
 
 class OntologyInterface;
-struct Id;
+class TimeFactory;
 
 typedef std::string serval_id;
 typedef std::string ontology_iri;
 
-class EntityDirectory
+class EntityDirectory : public std::enable_shared_from_this<EntityDirectory>
 {
 public:
   static const std::string ID_ICE;
@@ -33,8 +33,11 @@ public:
   static const std::string ID_ONTOLOGY_SHORT;
 
 public:
-  EntityDirectory();
+  EntityDirectory(std::weak_ptr<ICEngine> const &engine);
   virtual ~EntityDirectory();
+
+  void init();
+  void cleanUp();
 
   int initializeFromOntology(std::shared_ptr<OntologyInterface> const &ontologyInterface);
 
@@ -51,10 +54,12 @@ public:
   void print();
 
 public:
-  std::shared_ptr<Entity> self;
-  CallbackList<std::shared_ptr<Entity>> disvoeredIceIdentity;
-  CallbackList<std::shared_ptr<Entity>> vanishedIceIdentity;
-  CallbackList<std::shared_ptr<Entity>> offeredInformation;
+  std::weak_ptr<ICEngine> 			engine;
+  std::shared_ptr<TimeFactory>			timeFactory;
+  std::shared_ptr<Entity> 			self;
+  CallbackList<std::shared_ptr<Entity>> 	disvoeredIceIdentity;
+  CallbackList<std::shared_ptr<Entity>> 	vanishedIceIdentity;
+  CallbackList<std::shared_ptr<Entity>> 	offeredInformation;
 
 private:
   std::vector<std::shared_ptr<Entity>> entities;

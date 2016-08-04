@@ -16,12 +16,14 @@
 
 #include "ice/information/InformationSpecification.h"
 #include "ice/model/aspModel/ASPSystem.h"
+#include "ice/Time.h"
 
 namespace ice
 {
 
 class EntityDirectory;
 class OntologyInterface;
+class TimeFactory;
 
 enum entity_match {
   FULL_MATCH,
@@ -41,10 +43,18 @@ struct Id {
     std::string value;
 };
 
+struct SharedSubModel
+{
+  std::shared_ptr<SubModelDesc> subModel; /**< Sub model description */
+  std::vector<std::shared_ptr<BaseInformationStream>> streamsSend; /**< List of streams send to this engine */
+  std::vector<std::shared_ptr<BaseInformationStream>> streamsReceived; /**< List of streams received from this engine */
+};
+
 class Entity : public std::enable_shared_from_this<Entity>
 {
 public:
-  Entity(EntityDirectory *directory, const std::initializer_list<Id>& ids);
+  Entity(const std::shared_ptr<EntityDirectory> const &directory,
+		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id>& ids);
   virtual ~Entity();
 
   uint8_t getNextIndex();
@@ -65,8 +75,9 @@ public:
   void setIceIdentity(bool value);
   bool isTimeout();
 
-  std::chrono::steady_clock::time_point getActiveTimestamp();
-  void setActiveTimestamp(std::chrono::steady_clock::time_point = std::chrono::steady_clock::now());
+  time getActiveTimestamp();
+  void setActiveTimestamp();
+  void setActiveTimestamp(time timestamp);
 
   bool isAvailable();
   void setAvailable(bool const &value);
@@ -83,8 +94,13 @@ public:
   std::string toString();
 
   std::vector<InformationSpecification>& getOfferedInformation();
-  void addOfferedInformation( std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>> const &offeres);
   void addOfferedInformation(std::vector<InformationSpecification> const &offeres);
+
+  std::vector<std::pair<std::string, std::string>>& getOntologyIds();
+
+  // Sharing Stuff
+  std::shared_ptr<SharedSubModel> const& getSendSubModel();
+  std::shared_ptr<SharedSubModel> const& getReceivedSubModel();
 
   // ASP Stuff
   std::shared_ptr<ASPElement> getASPElementByName(ASPElementType type, std::string const name);
@@ -92,19 +108,25 @@ public:
   void addASPElement(std::shared_ptr<ASPElement> node);
 
 private:
-  EntityDirectory                                       *directory;
+  std::shared_ptr<EntityDirectory>                      directory;
+  std::shared_ptr<TimeFactory>				timeFactory;
   bool                                                  iceIdentity;
   bool                                                  available;
   uint8_t                                               index;
-  std::chrono::steady_clock::time_point                 timestamp;
-  std::chrono::milliseconds                             timeoutDuration;
+  time							timestamp;
+  unsigned long long 		                        timeoutDuration;
   std::map<std::string, std::string>                    ids;
   std::map<std::string, std::string>                    metadata;
   std::map<std::string, double>                         connectionQuality;
   std::vector<InformationSpecification>                 offeredInformation;
+  std::vector<std::pair<std::string, std::string>>      ontologyIds;
   el::Logger*                                           _log;                   /**< Logger */
 
+  // Sharing Stuff
+  std::shared_ptr<SharedSubModel>                       sendSubModel;
+  std::shared_ptr<SharedSubModel>                       receivedSubModel;
 
+  // ASP Stuff
   std::shared_ptr<supplementary::External>              systemExternal;         /**< The external for the system */
   std::vector<std::shared_ptr<ASPElement>>              aspNodes;               /**< Vector of asp nodes */
   std::vector<std::shared_ptr<ASPElement>>              aspSourceNodes;         /**< Vector of asp source nodes */

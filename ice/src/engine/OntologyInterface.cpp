@@ -285,11 +285,10 @@ bool OntologyInterface::saveOntology(std::string const p_path)
   return result;
 }
 
-std::unique_ptr<std::vector<std::vector<std::string>>>OntologyInterface::getOntologyIDs()
+int OntologyInterface::getOntologyIDs(std::vector<std::pair<std::string,std::string>> &ids)
 {
-  std::unique_ptr<std::vector<std::vector<std::string>>> ids(new std::vector<std::vector<std::string>>(this->ontologyIds));
-
-  return std::move(ids);
+  ids = this->ontologyIds;
+  return this->ontologyIds.size();
 }
 
 void OntologyInterface::readOntologyIDsFromOntology()
@@ -309,7 +308,7 @@ void OntologyInterface::readOntologyIDsFromOntology()
   {
     jobjectArray arr = (jobjectArray)env->GetObjectArrayElement(result, i);
     int size2 = env->GetArrayLength(arr);
-    std::vector<std::string> vec2;
+    std::string id, version;
 
     for (int j = 0; j < size2; ++j)
     {
@@ -318,47 +317,47 @@ void OntologyInterface::readOntologyIDsFromOntology()
       if (str != nullptr)
       {
         const char* cstr = env->GetStringUTFChars(str, JNI_FALSE);
-        vec2.push_back(std::string(cstr));
+
+        if (j == 0)
+          id = std::string(cstr);
+        else
+          version = std::string(cstr);
         env->ReleaseStringUTFChars(str, cstr);
       }
       else
       {
-        vec2.push_back("");
-        env->ReleaseStringUTFChars(str, JNI_FALSE);
+        env->ReleaseStringUTFChars(str, 0);
       }
       env->DeleteLocalRef(str);
     }
 
     env->DeleteLocalRef(arr);
 
-    this->ontologyIds.push_back(vec2);
+    this->ontologyIds.push_back(std::make_pair(id,version));
   }
 
   env->DeleteLocalRef(result);
 }
 
-std::unique_ptr<std::vector<std::string>> OntologyInterface::compareOntologyIDs(std::vector<std::string>* ids,
-                                                                                std::vector<std::string>* versions)
+std::unique_ptr<std::vector<std::pair<std::string,std::string>>> OntologyInterface::compareOntologyIDs(
+    std::vector<std::pair<std::string,std::string>>& ids)
 {
-  int size = ids->size();
-  int sizeOwn = this->ontologyIds.at(0).size();
+  int size = ids.size();
+  int sizeOwn = this->ontologyIds.size();
   bool found = false;
 
-  std::unique_ptr<std::vector<std::string>> vec(new std::vector<std::string>);
+  std::unique_ptr<std::vector<std::pair<std::string,std::string>>> vec(new std::vector<std::pair<std::string,std::string>>);
 
   for (int i = 0; i < size; ++i)
   {
-    std::string id = ids->at(i);
+    auto id = ids.at(i);
     found = false;
 
     for (int j = 0; j < sizeOwn; ++j)
     {
-      if (id == this->ontologyIds.at(0).at(j))
+      if (id.first == this->ontologyIds.at(j).first && id.second == this->ontologyIds.at(j).second)
       {
-        if (versions->at(i) == this->ontologyIds.at(1).at(j))
-        {
-          found = true;
-        }
+        found = true;
 
         break;
       }

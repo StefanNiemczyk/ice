@@ -12,6 +12,9 @@
 
 namespace ice
 {
+
+class OntologyIdMessage;
+
 class IdentityRequest : public ComJob<IdentityRequest>
 {
 public:
@@ -26,7 +29,11 @@ public:
   virtual void handleMessage(std::shared_ptr<Message> const &message);
 
 private:
-  void requestIds();
+  void sendRequestIds();
+  void onRequestIds(std::shared_ptr<Message> const &message);
+  void onResponsIds(std::shared_ptr<IdMessage> const &message);
+  void onRequestOntologyIds(std::shared_ptr<Message> const &message);
+  void onResponseOntologyIds(std::shared_ptr<OntologyIdMessage> const &message);
 
 private:
   int tryCount;
