@@ -7,6 +7,7 @@
 
 #include "ice/model/updateStrategie/FastUpdateStrategie.h"
 
+#include "ice/communication/jobs/CooperationRequest.h"
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/StreamStore.h"
 #include "ice/processing/Node.h"
@@ -113,7 +114,10 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   // sending sub models
   for (auto &subModel : model->getSubModels())
   {
-    this->communication->sendSubModelRequest(subModel->entity, subModel->model);
+    auto job = std::make_shared<CooperationRequest>(subModel->entity);
+    job->setSubModelDesc(subModel->model);
+    // TODO
+//    this->communication->sendSubModelRequest(subModel->entity, subModel->model);
   }
 }
 

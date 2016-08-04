@@ -36,6 +36,8 @@ enum IceMessageIds
   IMI_INFORMATION_REQUEST              =  9,
   IMI_INFORMATION_RESPONSE             = 10,
   IMI_INFORMATION_REQUEST_INDEX        = 11,
+  IMI_SUBMODEL                         = 12,
+  IMI_SUBMODEL_RESPONSE                = 13,
 
   IMI_ACK                              = 250,
 

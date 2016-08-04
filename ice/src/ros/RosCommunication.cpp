@@ -13,8 +13,6 @@
 
 #include "ice/container/Position.h"
 #include "ice/coordination/Coordinator.h"
-#include "ice/coordination/CooperationRequest.h"
-#include "ice/coordination/CooperationResponse.h"
 #include "ice/processing/LambdaTask.h"
 #include "ice/processing/NodeDescription.h"
 #include "ice/ros/RosTimeFactory.h"
@@ -519,7 +517,7 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
 {
   if (false == this->engine.lock()->isRunning())
     return;
-  identifier senderId = msg->header.senderId.value;//IDGenerator::getInstance()->getIdentifier(msg->header.senderId.value);
+  identifier senderId = msg->header.senderId.value;
 
   if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)
     return;

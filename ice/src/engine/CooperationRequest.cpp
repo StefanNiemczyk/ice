@@ -5,7 +5,10 @@
  *      Author: sni
  */
 
-#include <ice/communication/jobs/CooperationRequest.h>
+#include "ice/communication/jobs/CooperationRequest.h"
+#include "ice/communication/messages/SubModelMessage.h"
+
+#include "ice/model/ProcessingModel.h"
 
 namespace ice
 {
@@ -13,7 +16,7 @@ int CooperationRequest::ID = 3;
 int CooperationRequestCreator::val = IdentityRequestCreator::init();
 
 CooperationRequest::CooperationRequest(ICEngine* const engine, std::shared_ptr<Entity> const &entity) :
-        ComJob(IdentityRequest::ID, engine, entity, el::Loggers::getLogger("IdentityRequest")), tryCount(0),
+        ComJob(IdentityRequest::ID, engine, entity, el::Loggers::getLogger("CooperationRequest")), tryCount(0),
         stateCR(CooperationRequestState::CRS_UNKNOWN)
 {
   //
@@ -28,7 +31,7 @@ void CooperationRequest::init()
 {
   // call init from super class
   ComJobBase::init();
-  this->sendRequestIds();
+  this->sendSubModel();
 }
 
 void CooperationRequest::tick()
@@ -44,7 +47,7 @@ void CooperationRequest::tick()
     {
       // TODO
       // retry
-      this->sendRequestIds();
+      this->sendSubModel();
     }
     else
     {
@@ -58,12 +61,12 @@ void CooperationRequest::handleMessage(std::shared_ptr<Message> const &message)
 {
   switch (message->getId())
   {
-    case (IMI_IDS_REQUEST):
+    case (IMI_SUBMODEL):
     {
-
+      this->onSubModel(std::static_pointer_cast<SubModelMessage>(message));
       break;
     }
-    case (IMI_IDS_RESPONSE):
+    case (IMI_SUBMODEL_RESPONSE):
     {
 
       break;
@@ -81,15 +84,25 @@ void CooperationRequest::handleMessage(std::shared_ptr<Message> const &message)
   }
 }
 
-void sendSubModel()
+void CooperationRequest::setSubModelDesc(std::shared_ptr<SubModelDesc> &model)
 {
-
+  this->subModel = model;
 }
 
-int CooperationRequest::onSubModelRequest(identifier engineId, SubModelDesc modelDesc)
+void CooperationRequest::sendSubModel()
 {
-//  if (false == this->running)
-    return 5;
+  _log->info("Send submodel to '%v'", entity->toString());
+  this->stateCR = CooperationRequestState::CRS_SUBMODEL;
+
+  auto m = std::make_shared<SubModelMessage>();
+  m->setSubModel(*this->subModel);
+  this->send(m);
+  this->state = CJState::CJ_WAITING;
+  this->updateActiveTime();
+}
+
+void CooperationRequest::onSubModel(std::shared_ptr<SubModelMessage> message)
+{
 
 //  _log->debug("Sub model request received from %v", IDGenerator::toString(engineId));
 //

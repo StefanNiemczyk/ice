@@ -10,10 +10,13 @@
 
 namespace ice
 {
+
+struct SubModelDesc;
+class SubModelMessage;
+
 enum CooperationRequestState
 {
-  CRS_REQUEST_ID,
-  CRS_REQUEST_ONT_IRI,
+  CRS_SUBMODEL,
 
   CRS_UNKNOWN
 };
@@ -31,11 +34,15 @@ public:
   virtual void tick();
   virtual void handleMessage(std::shared_ptr<Message> const &message);
 
-private:
-  void sendSubModel();
+  void setSubModelDesc(std::shared_ptr<SubModelDesc> &subModel);
 
 private:
-  IdentityRequestState          stateCR;
+  void sendSubModel();
+  void onSubModel(std::shared_ptr<SubModelMessage> message);
+
+private:
+  std::shared_ptr<SubModelDesc> subModel;
+  CooperationRequestState       stateCR;
   int                           tryCount;
 };
 
