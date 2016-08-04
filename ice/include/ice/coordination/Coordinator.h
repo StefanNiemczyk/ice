@@ -126,7 +126,7 @@ private:
    * @param engineState The engine to stop the cooperation with.
    * @param sendStop True if a stop cooperation should be send.
    */
-  void stopCooperationWithEngine(std::shared_ptr<EngineState> engineState, bool sendStop);
+  void stopCooperationWithEngine(std::shared_ptr<Entity> &entity, bool sendStop);
 
   /*!
    * \brief This message is executed by the worker thread.

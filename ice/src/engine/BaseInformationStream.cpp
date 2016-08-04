@@ -9,9 +9,9 @@
 
 #include <sstream>
 
-#include "ice/coordination/EngineState.h"
 #include "ice/information/InformationType.h"
 #include "ice/processing/EventHandler.h"
+#include "ice/Entity.h"
 #include "easylogging++.h"
 
 namespace ice
@@ -22,11 +22,9 @@ int BaseInformationStream::IDENTIFIER_COUNTER = 0;
 BaseInformationStream::BaseInformationStream(std::shared_ptr<StreamDescription> streamDescription,
                                              std::shared_ptr<EventHandler> eventHandler,
                                              int sharingMaxCount) :
-    streamDescription(streamDescription), iid(IDENTIFIER_COUNTER++)
+    streamDescription(streamDescription), iid(IDENTIFIER_COUNTER++), eventHandler(eventHandler),
+    sharingMaxCount(sharingMaxCount)
 {
-  this->eventHandler = eventHandler;
-//  this->description = description;
-  this->sharingMaxCount = sharingMaxCount;
   this->_log = el::Loggers::getLogger("InformationStream");
 }
 
@@ -54,21 +52,6 @@ const std::string BaseInformationStream::getProvider() const
 {
   return this->streamDescription->getProvider();
 }
-
-//void BaseInformationStream::setProvider(std::string provider)
-//{
-//  this->provider = provider;
-//}
-
-//const std::string BaseInformationStream::getDescription() const
-//{
-//  return this->description;
-//}
-//
-//void BaseInformationStream::setDescription(std::string description)
-//{
-//  this->description = description;
-//}
 
 int ice::BaseInformationStream::registerTaskAsync(std::shared_ptr<AsynchronousTask> task)
 {
@@ -136,65 +119,59 @@ int ice::BaseInformationStream::unregisterTaskSync(std::shared_ptr<AsynchronousT
   return 1;
 }
 
-std::shared_ptr<StreamDescription> BaseInformationStream::getStreamDescription()
-{
-//  if (this->streamDescription)
-//    return this->streamDescription;
-//
-//  std::lock_guard<std::mutex> guard(this->_mtx);
-//
-//  if (this->streamDescription)
-//    return this->streamDescription;
-//
-//  this->streamDescription = std::make_shared<StreamDescription>(this->getSpecification(), this->shared);
-
-  return this->streamDescription;
-}
-
-int BaseInformationStream::registerEngineState(std::shared_ptr<EngineState> engineState)
+int BaseInformationStream::registerRemoteListener(std::shared_ptr<Entity> &entity,
+                                                  std::shared_ptr<Communication> &communication)
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
 
-  for (auto itr : this->remoteListeners)
+  if (std::find(this->remoteListeners.begin(), this->remoteListeners.end(), entity) == this->remoteListeners.end())
   {
-    if (itr == engineState)
-      return 1;
+    return 1;
   }
 
-  this->remoteListeners.push_back(engineState);
+  this->remoteListeners.push_back(entity);
+
+  if (this->remoteListeners.size() > 1)
+    this->registerSender(communication);
 
   return 0;
 }
 
-//const std::weak_ptr<InformationStreamTemplate> BaseInformationStream::getStreamTemplate() const
-//{
-//  return streamTemplate;
-//}
-//
-//void BaseInformationStream::setStreamTemplate(const std::weak_ptr<InformationStreamTemplate> streamTemplate)
-//{
-//  this->streamTemplate = streamTemplate;
-//}
-
-int BaseInformationStream::unregisterEngineState(std::shared_ptr<EngineState> engineState)
+int BaseInformationStream::unregisterRemoteListener(std::shared_ptr<Entity> &entity)
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
 
-  for (int i = 0; i < this->remoteListeners.size(); ++i)
+  auto ent = std::find(this->remoteListeners.begin(), this->remoteListeners.end(), entity);
+
+  if (ent != this->remoteListeners.end())
   {
-    auto itr = this->remoteListeners[i];
-
-    if (itr == engineState)
+    this->remoteListeners.erase(ent);
+    if (this->remoteListeners.empty())
     {
-      this->remoteListeners.erase(this->remoteListeners.begin() + i);
-
-      this->allEngineStatesUnregistered();
-
-      return 0;
+      this->dropSender();
     }
+    return 0;
   }
 
   return 1;
+}
+
+int BaseInformationStream::setRemoteSource(std::shared_ptr<Entity> &entity,
+                                           std::shared_ptr<Communication> &communication)
+{
+  std::lock_guard<std::mutex> guard(this->_mtx);
+
+  if (this->remoteSource == entity)
+    return 1;
+
+  if (this->remoteSource != nullptr)
+    this->dropReceiver();
+
+  this->remoteSource = entity;
+  if (entity != nullptr)
+    this->registerReceiver(communication);
+
+  return 0;
 }
 
 void BaseInformationStream::dropReceiver()
@@ -234,7 +211,7 @@ std::string BaseInformationStream::toString()
 
 void BaseInformationStream::destroy()
 {
-  this->allEngineStatesUnregistered();
+  this->dropSender();
   this->dropReceiver();
 }
 

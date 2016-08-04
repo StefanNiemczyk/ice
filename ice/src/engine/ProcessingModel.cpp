@@ -7,7 +7,7 @@
 
 #include <ice/model/ProcessingModel.h>
 
-#include "ice/coordination/EngineState.h"
+#include "ice/Entity.h"
 
 namespace ice
 {

@@ -132,7 +132,7 @@ bool NodeStore::existNodeCreator(const std::string className)
 //  _log->info("Clean up node store: '%v' nodes are removed", counter);
 //}
 
-void NodeStore::unregisterAndCleanUp(std::shared_ptr<EngineState> engineState,
+void NodeStore::unregisterAndCleanUp(std::shared_ptr<Entity> &entity,
                                      std::vector<std::shared_ptr<Node>> &nodesToCleanUp)
 {
   _log->verbose(1, "Start unregistering engine from nodes");
@@ -145,7 +145,7 @@ void NodeStore::unregisterAndCleanUp(std::shared_ptr<EngineState> engineState,
 
     for (auto node : nodesToCleanUp)
     {
-      node->unregisterEngine(engineState);
+      node->unregisterEntity(entity);
     }
   }
 

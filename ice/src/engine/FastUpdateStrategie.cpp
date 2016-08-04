@@ -73,8 +73,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
         break;
       }
 
-      stream->registerEngineState(send->engine);
-      stream->registerSender(this->communication);
+      stream->registerRemoteListener(send->entity, this->communication);
     }
   }
 
@@ -93,7 +92,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
       }
 
 //      stream->registerEngineState(receive->engine);
-      stream->registerReceiver(this->communication);
+      stream->setRemoteSource(receive->entity, this->communication);
     }
   }
 
@@ -105,7 +104,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   for (auto node : nodes)
   {
     node->activate();
-    node->registerEngine(this->self);
+    node->registerEntity(this->self);
   }
 
   this->nodeStore->cleanUpNodes();
@@ -114,22 +113,22 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   // sending sub models
   for (auto &subModel : model->getSubModels())
   {
-    this->communication->sendSubModelRequest(subModel->engine->getEngineId(), *subModel->model);
+    this->communication->sendSubModelRequest(subModel->entity, subModel->model);
   }
 }
 
-bool FastUpdateStrategie::handleSubModel(std::shared_ptr<EngineState> engineState, SubModelDesc &subModel)
+bool FastUpdateStrategie::handleSubModel(std::shared_ptr<Entity> &entity, SubModelDesc &subModel)
 {
-  engineState->getOffering()->subModel = std::make_shared<SubModelDesc>(subModel);
-  return this->processSubModel(engineState, subModel);
+  entity->getReceivedSubModel().subModel = std::make_shared<SubModelDesc>(subModel);
+  return this->processSubModel(entity, subModel);
 }
 
-bool FastUpdateStrategie::handleSubModelResponse(std::shared_ptr<EngineState> engineState, int modelIndex)
+bool FastUpdateStrategie::handleSubModelResponse(std::shared_ptr<Entity> &entity, int modelIndex)
 {
-  _log->debug("Sub model accepted received from system '%v' with index '%v'", engineState->getSystemIri(),
+  _log->debug("Sub model accepted received from system '%v' with index '%v'", entity->toString(),
               modelIndex);
 
-  auto subModel = this->getSubModelDesc(engineState);
+  auto subModel = this->getSubModelDesc(entity);
 
   subModel->accepted = true;
 
@@ -144,7 +143,7 @@ bool FastUpdateStrategie::handleSubModelResponse(std::shared_ptr<EngineState> en
   return true;
 }
 
-void FastUpdateStrategie::onEngineDiscovered(std::shared_ptr<EngineState>)
+void FastUpdateStrategie::onEngineDiscovered(std::shared_ptr<Entity> &entity)
 {
   this->triggerModelUpdate();
 }

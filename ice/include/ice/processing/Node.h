@@ -24,7 +24,7 @@
 namespace ice
 {
   class BaseInformationStream;
-  class EngineState;
+  class Entity;
 }
 
 namespace ice
@@ -44,9 +44,11 @@ private:
 
   // object part
 public:
-  //std::shared_ptr<EventHandler> eventHandler, NodeType type, long cyclicTriggerTime
   Node();
   virtual ~Node();
+
+  std::shared_ptr<NodeDescription>& getNodeDescription();
+  void setNodeDescription(std::shared_ptr<NodeDescription> &desc);
 
   /*!
    * \brief Executes the asynchronous task.
@@ -81,10 +83,6 @@ public:
 
   virtual bool isValid();
 
-  std::shared_ptr<NodeDescription> getNodeDescription();
-
-  void setNodeDescription(std::shared_ptr<NodeDescription> description);
-
   long getCyclicTriggerTime() const;
 
   void setCyclicTriggerTime(long cyclicTriggerTime);
@@ -105,23 +103,23 @@ public:
 
   std::string toString();
 
-  void registerEngine(std::shared_ptr<EngineState> engineState);
+  void registerEntity(std::shared_ptr<Entity> &entity);
 
-  void unregisterEngine(std::shared_ptr<EngineState> engineState);
+  void unregisterEntity(std::shared_ptr<Entity> &entity);
 
   int getRegisteredEngineCount();
 
 protected:
-  long cyclicTriggerTime; /**< period time of triggering this node */
-  bool active; /**< True if the current node is active, else false */
-  std::set<std::shared_ptr<EngineState>> registeredEngines; /**< Engines which are using this node */
-  std::vector<std::shared_ptr<BaseInformationStream>> inputs; /**< Input streams */
-  std::vector<std::shared_ptr<BaseInformationStream>> triggeredByInputs; /**< Input streams triggering this node */
-  std::vector<std::shared_ptr<BaseInformationStream>> outputs; /**< Output streams */
-  std::shared_ptr<EventHandler> eventHandler; /**< The event handler */
-  std::map<std::string, std::string> configuration; /**< Node Configuration */
-  std::shared_ptr<NodeDescription> nodeDescription; /**< Description of the node, used communication with others */
-  std::mutex mtx_; /**< Mutex */
+  long                                                  cyclicTriggerTime;      /**< period time of triggering this node */
+  bool                                                  active;                 /**< True if the current node is active, else false */
+  std::set<std::shared_ptr<Entity>>                     registeredEngines;      /**< Engines which are using this node */
+  std::vector<std::shared_ptr<BaseInformationStream>>   inputs;                 /**< Input streams */
+  std::vector<std::shared_ptr<BaseInformationStream>>   triggeredByInputs;      /**< Input streams triggering this node */
+  std::vector<std::shared_ptr<BaseInformationStream>>   outputs;                /**< Output streams */
+  std::shared_ptr<EventHandler>                         eventHandler;           /**< The event handler */
+  std::map<std::string, std::string>                    configuration;          /**< Node Configuration */
+  std::shared_ptr<NodeDescription>                      nodeDescription;        /**< Description of the node, used communication with others */
+  std::mutex                                            mtx_;                   /**< Mutex */
 };
 
 } /* namespace ice */

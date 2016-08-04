@@ -102,17 +102,17 @@ add_library(${PROJECT_NAME}
   src/engine/InformationMessage.cpp
   src/engine/IntMessage.cpp
   src/engine/OffersMessage.cpp
+  src/engine/OntologyIdMessage.cpp
   src/engine/RequestMessage.cpp
   
   src/engine/ComJobBase.cpp
   src/engine/IdentityRequest.cpp
   src/engine/InformationRequest.cpp
+  src/engine/CooperationRequest.cpp
 
   src/engine/Position.cpp
   src/engine/RingBuffer.cpp
   
-  src/engine/CooperationRequest.cpp
-  src/engine/CooperationResponse.cpp
   src/engine/Coordinator.cpp
   src/engine/EngineState.cpp
 #  src/engine/InformationModel.cpp

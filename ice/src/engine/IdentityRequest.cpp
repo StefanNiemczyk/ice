@@ -17,8 +17,10 @@ int IdentityRequest::ID = 1;
 int IdentityRequestCreator::val = IdentityRequestCreator::init();
 
 IdentityRequest::IdentityRequest(ICEngine* const engine, std::shared_ptr<Entity> const &entity) :
-    ComJob(IdentityRequest::ID, engine, entity, el::Loggers::getLogger("IdentityRequest")), tryCount(0)
+    ComJob(IdentityRequest::ID, engine, entity, el::Loggers::getLogger("IdentityRequest")), tryCount(0),
+    stateIR(IdentityRequestState::IRS_UNKNOWN)
 {
+
 }
 
 IdentityRequest::~IdentityRequest()
@@ -69,6 +71,16 @@ void IdentityRequest::handleMessage(std::shared_ptr<Message> const &message)
       this->onRequestIds(std::static_pointer_cast<IdMessage>(message));
       break;
     }
+    case (IMI_ONTOLOGY_IDS_REQUEST):
+    {
+      this->onRequestOntologyIds(message);
+      break;
+    }
+    case (IMI_ONTOLOGY_IDS_RESPONSE):
+    {
+      this->onRequestOntologyIds(std::static_pointer_cast<OntologyIdMessage>(message));
+      break;
+    }
     case (IMI_FINISH):
     {
       if (this->ownJob)
@@ -85,6 +97,8 @@ void IdentityRequest::handleMessage(std::shared_ptr<Message> const &message)
 void IdentityRequest::sendRequestIds()
 {
   _log->info("Requesting Ids from '%v'", entity->toString());
+  this->stateIR = IdentityRequestState::IRS_REQUEST_ID;
+
   auto m = std::make_shared<CommandMessage>(IceMessageIds::IMI_IDS_REQUEST);
   this->send(m);
   this->state = CJState::CJ_WAITING;
@@ -93,7 +107,22 @@ void IdentityRequest::sendRequestIds()
 
 void IdentityRequest::onRequestIds(std::shared_ptr<Message> const &message)
 {
+  if (this->stateIR != IdentityRequestState::IRS_UNKNOWN)
+  {
+    _log->warn("Received requestIds message in wrong state '%v' from '%v'", this->stateIR, entity->toString());
+    return;
+  }
+
+  // duplicated message
+  if (false == this->timeFactory->checkTimeout(this->timestampLastActive, 100))
+  {
+    _log->debug("Received duplicated requestIds message from '%v'", entity->toString());
+    return;
+  }
+
   _log->info("Sending Ids to '%v'", entity->toString());
+  this->updateActiveTime();
+  this->stateIR = IdentityRequestState::IRS_REQUEST_ID;
 
   auto m = std::make_shared<IdMessage>();
   this->self->pushIds(m->getIds());
@@ -102,15 +131,30 @@ void IdentityRequest::onRequestIds(std::shared_ptr<Message> const &message)
 
 void IdentityRequest::onResponsIds(std::shared_ptr<IdMessage> const &message)
 {
-  _log->debug("Received ids from %v", this->entity->toString());
+  if (this->stateIR != IdentityRequestState::IRS_REQUEST_ID)
+  {
+    _log->warn("Received ids message in wrong state '%v' from '%v'", this->stateIR, entity->toString());
+    return;
+  }
+
+  // duplicated message
+  if (false == this->timeFactory->checkTimeout(this->timestampLastActive, 100))
+  {
+    _log->debug("Received duplicated ids message from '%v'", entity->toString());
+    return;
+  }
+
+  _log->info("Received ids from %v", this->entity->toString());
+  this->updateActiveTime();
 
   auto entity = message->getEntity();
 
   entity->fuse(message->getIds());
-  entity->checkIce();
+
+  bool hasIri = entity->getId(EntityDirectory::ID_ONTOLOGY, this->iri);
 
   // if not an ice engine stop here
-  if (false == entity->isIceIdentity())
+  if (false == hasIri)
   {
     this->finish();
     return;
@@ -119,21 +163,33 @@ void IdentityRequest::onResponsIds(std::shared_ptr<IdMessage> const &message)
   // ontology iris known?
   if (entity->getOntologyIds().size() > 0)
   {
-    // done
-    this->sendCommand(IceMessageIds::IMI_FINISH);
-    this->finish();
+    this->checkOntologyIris();
+    return;
   }
 
   // request ontology ids
+  this->stateIR = IdentityRequestState::IRS_REQUEST_ONT_IRI;
   this->sendCommand(IceMessageIds::IMI_ONTOLOGY_IDS_REQUEST);
 }
 
 void IdentityRequest::onRequestOntologyIds(std::shared_ptr<Message> const &message)
 {
-  _log->debug("Sending ontology ids to %v", this->entity->toString());
+  if (this->stateIR == IdentityRequestState::IRS_UNKNOWN)
+  {
+    _log->warn("Received ids message in wrong state '%v' from '%v'", this->stateIR, entity->toString());
+    return;
+  }
 
-  // check if request already received
-  // TODO
+  // duplicated message
+  if (this->stateIR == IdentityRequestState::IRS_REQUEST_ONT_IRI && false == this->timeFactory->checkTimeout(this->timestampLastActive, 100))
+  {
+    _log->debug("Received duplicated ids message from '%v'", entity->toString());
+    return;
+  }
+
+  _log->info("Sending ontology ids to %v", this->entity->toString());
+  this->updateActiveTime();
+  this->stateIR = IdentityRequestState::IRS_REQUEST_ONT_IRI;
 
   // create and send system specification
   auto msg = std::make_shared<OntologyIdMessage>();
@@ -144,53 +200,58 @@ void IdentityRequest::onRequestOntologyIds(std::shared_ptr<Message> const &messa
 
 void IdentityRequest::onResponseOntologyIds(std::shared_ptr<OntologyIdMessage> const &message)
 {
-  _log->debug("Received ontology ids to %v", this->entity->toString());
-
-  if (this->entity->getOntologyIds().size() > 0)
+  if (this->stateIR != IdentityRequestState::IRS_REQUEST_ONT_IRI)
   {
-    _log->info("Duplicated ontology ids received from engine %v", this->entity->toString());
+    _log->warn("Received ontologyIds message in wrong state '%v' from '%v'", this->stateIR, entity->toString());
     return;
   }
 
-  this->entity->getOntologyIds() = message->getIds();
-
-   auto result = this->engine->getOntologyInterface()->compareOntologyIDs(message->getIds());
-
-   if (result->size() != 0)
-   {
-     _log->info("Ontology ids do not match, received from %v", this->entity->toString());
-     // TODO implement requesting ontologies
-     engineState->getRequesting()->state = CooperationState::NO_COOPERATION;
-
-     return;
-   }
-
-  // check if system is known in ontology
-  if (this->ontologyInterface->isSystemKnown(std::get<0>(spec)))
+  // duplicated message
+  if (false == this->timeFactory->checkTimeout(this->timestampLastActive, 100))
   {
-    // system is known, cooperation is possible
-    _log->info("Entity '%v' known by ontology", this->entity->toString());
+    _log->debug("Received duplicated ontologyIds message from '%v'", entity->toString());
+    return;
+  }
 
+  _log->info("Received ontology ids to %v", this->entity->toString());
 
-    // trigger processing model update
-    engineState->setNodesKnown(true);
-    this->updateStrategie->onEngineDiscovered(engineState);
+  this->entity->getOntologyIds() = message->getIds();
+  this->checkOntologyIris();
+}
+
+void IdentityRequest::checkOntologyIris()
+{
+  // check diff
+  this->engine->getOntologyInterface()->compareOntologyIDs(this->entity->getOntologyIds(),
+                                                           this->entity->getOntologyIriDiff());
+
+  if (this->entity->getOntologyIriDiff().size() != 0)
+  {
+    _log->info("Ontology ids do not match, received from %v", this->entity->toString());
 
     // done
     this->sendCommand(IceMessageIds::IMI_FINISH);
     this->finish();
-  }
-  else
-  {
-    // system is unknown, request nodes
-    _log->info("System' %v' identified by id '%v' is unknown", std::get<0>(spec),
-               IDGenerator::toString(engineId));
-    // TODO request nodes
-    engineState->getRequesting()->state = CooperationState::NO_COOPERATION;
+    return;
   }
 
-  return 0;
+    // check if system is known in ontology
+    if (this->entity->initializeFromOntology(this->engine->getOntologyInterface()) >= 0)
+    {
+      // system is known, cooperation is possible
+      _log->info("Entity '%v' known by ontology", this->entity->toString());
+    }
+    else
+    {
+      // system is unknown, request nodes
+      _log->info("Entity' %v' is unknown in ontology", this->entity->toString());
+      // TODO request nodes
+    }
+
+    // done
+    this->sendCommand(IceMessageIds::IMI_FINISH);
+    this->finish();
+    entity->checkIce();
 }
-
 
 } /* namespace ice */

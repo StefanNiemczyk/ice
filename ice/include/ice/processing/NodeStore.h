@@ -75,7 +75,7 @@ public:
   bool existNodeCreator(const std::string className);
 
 //  void cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes);
-  void unregisterAndCleanUp(std::shared_ptr<EngineState> engineState,
+  void unregisterAndCleanUp(std::shared_ptr<Entity> &entity,
                                  std::vector<std::shared_ptr<Node>> &nodesToCleanUp);
 
   void cleanUpNodes();

@@ -220,91 +220,91 @@ void EngineState::updateContainer(std::shared_ptr<CooperationContainer> containe
                                   std::vector<std::shared_ptr<BaseInformationStream>> *streamsReceived)
 {
   // update nodes
-  for (auto node : this->nodesActivated)
-  {
-    if (std::find(nodes->begin(), nodes->end(), node) == nodes->end())
-    {
-      node->unregisterEngine(this->shared_from_this());
-    }
-  }
-
-  for (auto node : *nodes)
-  {
-    node->registerEngine(this->shared_from_this());
-  }
-
-  // update streams send
-  for (int i = 0; i < container->streamsSend.size(); ++i)
-  {
-    auto stream = container->streamsSend[i];
-    if (std::find(streamsSend->begin(), streamsSend->end(), stream) == streamsSend->end())
-    {
-      container->streamsSend.erase(container->streamsSend.begin() + i);
-      --i;
-      stream->unregisterEngineState(this->shared_from_this());
-    }
-  }
-
-  for (auto stream : *streamsSend)
-  {
-    if (stream->registerEngineState(this->shared_from_this()) == 0)
-    {
-      container->streamsSend.push_back(stream);
-    }
-
-    stream->registerSender(this->communication);
-  }
-
-  // update streams received
-  for (int i = 0; i < container->streamsReceived.size(); ++i)
-  {
-    auto stream = container->streamsReceived[i];
-    if (std::find(streamsReceived->begin(), streamsReceived->end(), stream) == streamsReceived->end())
-    {
-      container->streamsReceived.erase(container->streamsReceived.begin() + i);
-      --i;
-      stream->dropReceiver();
-    }
-  }
-
-  for (auto stream : *streamsReceived)
-  {
-    if (stream->registerEngineState(this->shared_from_this()) == 0)
-    {
-      container->streamsReceived.push_back(stream);
-    }
-
-    stream->registerReceiver(this->communication);
-  }
+//  for (auto node : this->nodesActivated)
+//  {
+//    if (std::find(nodes->begin(), nodes->end(), node) == nodes->end())
+//    {
+////      node->unregisterEntity(this->shared_from_this());
+//    }
+//  }
+//
+//  for (auto node : *nodes)
+//  {
+////    node->registerEngine(this->shared_from_this());
+//  }
+//
+//  // update streams send
+//  for (int i = 0; i < container->streamsSend.size(); ++i)
+//  {
+//    auto stream = container->streamsSend[i];
+//    if (std::find(streamsSend->begin(), streamsSend->end(), stream) == streamsSend->end())
+//    {
+//      container->streamsSend.erase(container->streamsSend.begin() + i);
+//      --i;
+////      stream->unregisterEngineState(this->shared_from_this());
+//    }
+//  }
+//
+//  for (auto stream : *streamsSend)
+//  {
+////    if (stream->registerEngineState(this->shared_from_this()) == 0)
+////    {
+////      container->streamsSend.push_back(stream);
+////    }
+//
+//    stream->registerSender(this->communication);
+//  }
+//
+//  // update streams received
+//  for (int i = 0; i < container->streamsReceived.size(); ++i)
+//  {
+//    auto stream = container->streamsReceived[i];
+//    if (std::find(streamsReceived->begin(), streamsReceived->end(), stream) == streamsReceived->end())
+//    {
+//      container->streamsReceived.erase(container->streamsReceived.begin() + i);
+//      --i;
+//      stream->dropReceiver();
+//    }
+//  }
+//
+//  for (auto stream : *streamsReceived)
+//  {
+////    if (stream->registerEngineState(this->shared_from_this()) == 0)
+////    {
+////      container->streamsReceived.push_back(stream);
+////    }
+//
+//    stream->registerReceiver(this->communication);
+//  }
 }
 
 void EngineState::clearContainer(std::shared_ptr<CooperationContainer> container)
 {
-  // clear sub model
-  container->subModel.reset();
-
-  // clear nodes
-  for (auto node : this->nodesActivated)
-  {
-    node->unregisterEngine(this->shared_from_this());
-  }
-
-  // clear streams send
-  for (int i = 0; i < container->streamsSend.size(); ++i)
-  {
-    auto stream = container->streamsSend[i];
-
-    stream->unregisterEngineState(this->shared_from_this());
-  }
-  container->streamsSend.clear();
-
-  // clear streams received
-  for (int i = 0; i < container->streamsReceived.size(); ++i)
-  {
-    auto stream = container->streamsReceived[i];
-
-    stream->dropReceiver();
-  }
+//  // clear sub model
+//  container->subModel.reset();
+//
+//  // clear nodes
+//  for (auto node : this->nodesActivated)
+//  {
+////    node->unregisterEngine(this->shared_from_this());
+//  }
+//
+//  // clear streams send
+//  for (int i = 0; i < container->streamsSend.size(); ++i)
+//  {
+//    auto stream = container->streamsSend[i];
+//
+////    stream->unregisterEngineState(this->shared_from_this());
+//  }
+//  container->streamsSend.clear();
+//
+//  // clear streams received
+//  for (int i = 0; i < container->streamsReceived.size(); ++i)
+//  {
+//    auto stream = container->streamsReceived[i];
+//
+//    stream->dropReceiver();
+//  }
   container->streamsReceived.clear();
 }
 

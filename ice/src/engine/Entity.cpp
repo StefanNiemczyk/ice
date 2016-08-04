@@ -11,13 +11,15 @@
 #include <tuple>
 #include <sstream>
 
+#include "ice/model/ProcessingModel.h"
 #include "ice/ontology/OntologyInterface.h"
+#include "ice/processing/Node.h"
 #include "ice/EntityDirectory.h"
 
 namespace ice
 {
 
-Entity::Entity(const std::shared_ptr<EntityDirectory> const &directory,
+Entity::Entity(std::shared_ptr<EntityDirectory> const &directory, std::weak_ptr<ICEngine> engine,
 		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id>& ids)
       : iceIdentity(false), directory(directory), timeFactory(factory), available(false), _log(
 				el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000)
@@ -46,10 +48,11 @@ uint8_t Entity::getNextIndex()
 
 int Entity::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ontologyInterface)
 {
+
   _log->debug("Extract asp information from ontology for entity '%v'", this->toString());
   std::string ownIri = "";
 
-  if (false == this->getId(EntityDirectory::ID_ONTOLOGY, ownIri))
+  if (false == this->getId(EntityDirectory::ID_ONTOLOGY, ownIri) || ontologyInterface->isSystemKnown(ownIri))
     return -1;
 
   auto nodes = ontologyInterface->readNodesAndIROsAsASP(ownIri);
@@ -405,6 +408,12 @@ void Entity::setAvailable(bool const &value)
   this->available = value;
 }
 
+bool Entity::isActiveCooperation()
+{
+  return this->isTimeout() == false && this->iceIdentity && this->available
+      && (this->sendSubModel != nullptr || this->receivedSubModel != nullptr);
+}
+
 bool Entity::isTimeout()
 {
   return this->timeFactory->checkTimeout(this->timestamp, this->timeoutDuration);
@@ -499,15 +508,147 @@ std::vector<std::pair<std::string, std::string>>& Entity::getOntologyIds()
 // ----------------------------------- Sharing Stuff ---------------------------------
 // -----------------------------------------------------------------------------------
 
-std::shared_ptr<SharedSubModel> const& Entity::getSendSubModel()
+SharedSubModel& Entity::getSendSubModel()
 {
   return this->sendSubModel;
 }
 
-std::shared_ptr<SharedSubModel> const& Entity::getReceivedSubModel()
+SharedSubModel& Entity::getReceivedSubModel()
 {
   return this->receivedSubModel;
 }
+
+std::set<std::shared_ptr<Node>>& Entity::getNodes()
+{
+  return this->nodes;
+}
+
+std::vector<std::pair<std::string,std::string>>& Entity::getOntologyIriDiff()
+{
+  return this->ontologyIriDiff;
+}
+
+void Entity::updateReceived(std::vector<std::shared_ptr<Node>> &nodes,
+                                  std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
+                                  std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived)
+ {
+   this->updateContainer(this->receivedSubModel, nodes, streamsSend, streamsReceived);
+ }
+
+ void Entity::updateSend(std::vector<std::shared_ptr<Node>> &nodes,
+                                   std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
+                                   std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived)
+ {
+   this->updateContainer(this->sendSubModel, nodes, streamsSend, streamsReceived);
+ }
+
+ void Entity::clearReceived()
+ {
+   this->clearContainer(this->receivedSubModel);
+ }
+
+ void Entity::clearSend()
+ {
+   this->clearContainer(this->sendSubModel);
+ }
+
+ void Entity::updateContainer(SharedSubModel &container,
+                                   std::vector<std::shared_ptr<Node>> &nodes,
+                                   std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
+                                   std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived)
+ {
+   auto ths = this->shared_from_this();
+   auto engine = this->engine.lock();
+   auto communication = engine->getCommunication();
+
+   // update nodes
+   for (auto node : this->nodes)
+   {
+     if (std::find(nodes.begin(), nodes.end(), node) == nodes.end())
+     {
+       node->unregisterEntity(ths);
+     }
+   }
+
+   for (auto node : nodes)
+   {
+     node->registerEntity(ths);
+   }
+
+   // update streams send
+   for (int i = 0; i < container.streamsSend.size(); ++i)
+   {
+     auto stream = container.streamsSend[i];
+     if (std::find(streamsSend.begin(), streamsSend.end(), stream) == streamsSend.end())
+     {
+       container.streamsSend.erase(container.streamsSend.begin() + i);
+       --i;
+       stream->unregisterRemoteListener(ths);
+     }
+   }
+
+   for (auto stream : streamsSend)
+   {
+     if (stream->registerRemoteListener(ths, communication) == 0)
+     {
+       container.streamsSend.push_back(stream);
+     }
+   }
+
+   // update streams received
+   for (int i = 0; i < container.streamsReceived.size(); ++i)
+   {
+     auto stream = container.streamsReceived[i];
+     if (std::find(streamsReceived.begin(), streamsReceived.end(), stream) == streamsReceived.end())
+     {
+       container.streamsReceived.erase(container.streamsReceived.begin() + i);
+       --i;
+       stream->setRemoteSource(nullptr, communication);
+     }
+   }
+
+   for (auto stream : streamsReceived)
+   {
+     if (stream->setRemoteSource(ths, communication) == 0)
+     {
+       container.streamsReceived.push_back(stream);
+     }
+   }
+ }
+
+ void Entity::clearContainer(SharedSubModel &container)
+ {
+   auto ths = this->shared_from_this();
+   auto engine = this->engine.lock();
+   auto communication = engine->getCommunication();
+
+   // clear sub model
+   container.subModel.reset();
+
+   // clear nodes
+   for (auto node : this->nodes)
+   {
+     node->unregisterEntity(ths);
+   }
+
+   // clear streams send
+   for (int i = 0; i < container.streamsSend.size(); ++i)
+   {
+     auto stream = container.streamsSend[i];
+
+     stream->unregisterRemoteListener(ths);
+   }
+   container.streamsSend.clear();
+
+   // clear streams received
+   for (int i = 0; i < container.streamsReceived.size(); ++i)
+   {
+     auto stream = container.streamsReceived[i];
+
+     stream->setRemoteSource(nullptr, communication);
+   }
+   container.streamsReceived.clear();
+ }
 
 // -----------------------------------------------------------------------------------
 // ----------------------------------- ASP Stuff -------------------------------------

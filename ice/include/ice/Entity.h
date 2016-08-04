@@ -10,20 +10,23 @@
 
 #include <chrono>
 #include <map>
-#include <string>
 #include <memory>
-#include <easylogging++.h>
+#include <set>
+#include <string>
 
 #include "ice/information/InformationSpecification.h"
 #include "ice/model/aspModel/ASPSystem.h"
 #include "ice/Time.h"
+#include "easylogging++.h"
 
 namespace ice
 {
 
 class EntityDirectory;
+class Node;
 class OntologyInterface;
 class TimeFactory;
+struct SubModelDesc;
 
 enum entity_match {
   FULL_MATCH,
@@ -53,7 +56,7 @@ struct SharedSubModel
 class Entity : public std::enable_shared_from_this<Entity>
 {
 public:
-  Entity(const std::shared_ptr<EntityDirectory> const &directory,
+  Entity(std::shared_ptr<EntityDirectory> const &directory, std::weak_ptr<ICEngine> engine,
 		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id>& ids);
   virtual ~Entity();
 
@@ -82,6 +85,8 @@ public:
   bool isAvailable();
   void setAvailable(bool const &value);
 
+  bool isActiveCooperation();
+
   void addId(std::string const &key, std::string const &value);
   bool getId(std::string const &key, std::string &outValue);
 
@@ -99,8 +104,19 @@ public:
   std::vector<std::pair<std::string, std::string>>& getOntologyIds();
 
   // Sharing Stuff
-  std::shared_ptr<SharedSubModel> const& getSendSubModel();
-  std::shared_ptr<SharedSubModel> const& getReceivedSubModel();
+  SharedSubModel& getSendSubModel();
+  SharedSubModel& getReceivedSubModel();
+  std::set<std::shared_ptr<Node>>& getNodes();
+  std::vector<std::pair<std::string,std::string>>& getOntologyIriDiff();
+  void updateReceived(std::vector<std::shared_ptr<Node>> &nodes,
+                        std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
+                        std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived);
+  void updateSend(std::vector<std::shared_ptr<Node>> &nodes,
+                       std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
+                       std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived);
+  void clearReceived();
+  void clearSend();
+
 
   // ASP Stuff
   std::shared_ptr<ASPElement> getASPElementByName(ASPElementType type, std::string const name);
@@ -108,6 +124,13 @@ public:
   void addASPElement(std::shared_ptr<ASPElement> node);
 
 private:
+  void updateContainer(SharedSubModel &container, std::vector<std::shared_ptr<Node>> &nodes,
+                       std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
+                       std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived);
+  void clearContainer(SharedSubModel &container);
+
+private:
+  std::weak_ptr<ICEngine>                               engine;
   std::shared_ptr<EntityDirectory>                      directory;
   std::shared_ptr<TimeFactory>				timeFactory;
   bool                                                  iceIdentity;
@@ -123,8 +146,10 @@ private:
   el::Logger*                                           _log;                   /**< Logger */
 
   // Sharing Stuff
-  std::shared_ptr<SharedSubModel>                       sendSubModel;
-  std::shared_ptr<SharedSubModel>                       receivedSubModel;
+  SharedSubModel                                        sendSubModel;
+  SharedSubModel                                        receivedSubModel;
+  std::set<std::shared_ptr<Node>>                       nodes;                  /**< Nodes activated by this engine */
+  std::vector<std::pair<std::string,std::string>>       ontologyIriDiff;
 
   // ASP Stuff
   std::shared_ptr<supplementary::External>              systemExternal;         /**< The external for the system */

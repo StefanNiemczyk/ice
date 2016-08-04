@@ -7,12 +7,12 @@
 
 #include <ice/model/updateStrategie/UpdateStrategie.h>
 
-#include "ice/coordination/EngineState.h"
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/model/ProcessingModelGenerator.h"
 #include "ice/processing/Node.h"
 #include "ice/ICEngine.h"
+#include "ice/Entity.h"
 
 namespace ice
 {
@@ -22,6 +22,8 @@ UpdateStrategie::UpdateStrategie(std::weak_ptr<ICEngine> engine)
   this->_log = el::Loggers::getLogger("UpdateStrategie");
   this->engine = engine;
   this->running = false;
+  this->established = false;
+  this->valid = false;
 }
 
 UpdateStrategie::~UpdateStrategie()
@@ -42,9 +44,7 @@ void UpdateStrategie::init()
   this->modelGenerator = en->getProcessingModelGenerator();
   this->worker = std::thread(&UpdateStrategie::workerTask, this);
 
-  std::string iri;
-  en->getSelf()->getId(EntityDirectory::ID_ONTOLOGY, iri);
-  this->self = this->coordinator->getEngineStateNoMutex(iri);
+  this->self = en->getSelf();
 
   this->initInternal();
 }
@@ -73,7 +73,7 @@ void UpdateStrategie::cleanUp()
   this->cleanUpInternal();
 }
 
-void UpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
+void UpdateStrategie::update(std::shared_ptr<ProcessingModel> &model)
 {
   this->lastModel = this->model;
   this->model = model;
@@ -81,15 +81,15 @@ void UpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   this->established = false;
 }
 
-bool UpdateStrategie::processSubModel(std::shared_ptr<EngineState> engineState, SubModelDesc &subModel)
+bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, SubModelDesc &subModel)
 {
-  _log->debug("Processing sub model description received from engine '%v'", engineState->getEngineId());
+  _log->debug("Processing sub model description received from '%v'", entity->toString());
   bool valid = true;
   std::vector<std::shared_ptr<Node>> createdNodes;
   std::vector<std::shared_ptr<BaseInformationStream>> streamsSend;
   std::vector<std::shared_ptr<BaseInformationStream>> streamsReceived;
 
-  engineState->getOffering()->subModel = std::make_shared<SubModelDesc>(subModel);
+  entity->getReceivedSubModel().subModel = std::make_shared<SubModelDesc>(subModel);
 
   for (auto &nodeDesc : subModel.nodes)
   {
@@ -106,7 +106,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<EngineState> engineState, 
 
   if (false == valid)
   {
-    engineState->clearOffering();
+    entity->clearReceived();
     this->nodeStore->cleanUpNodes();
     this->streamStore->cleanUpStreams();
 
@@ -129,7 +129,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<EngineState> engineState, 
 
   if (false == valid)
   {
-    engineState->clearOffering();
+    entity->clearReceived();
     this->nodeStore->cleanUpNodes();
     this->streamStore->cleanUpStreams();
 
@@ -152,7 +152,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<EngineState> engineState, 
 
   if (false == valid)
   {
-    engineState->clearOffering();
+    entity->clearReceived();
     this->nodeStore->cleanUpNodes();
     this->streamStore->cleanUpStreams();
 
@@ -160,10 +160,9 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<EngineState> engineState, 
   }
   else
   {
-    _log->info("Processed sub model received from system '%v'",
-               IDGenerator::toString(engineState->getEngineId()));
+    _log->info("Processed sub model received from system '%v'", entity->toString());
 
-    engineState->updateOffering(&createdNodes, &streamsSend, &streamsReceived);
+    entity->updateReceived(createdNodes, streamsSend, streamsReceived);
 
     for (auto node : createdNodes)
     {
@@ -214,9 +213,12 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
 
     _log->debug("Look up output stream for node '%v'", nodeDesc.aspName);
 
-    std::string iriShort = this->self->getSystemIri();
+    std::string iri;
+    this->self->getId(EntityDirectory::ID_ONTOLOGY, iri);
+    std::string iriShort = this->ontology->toShortIri(iri);
 
-    auto stream = this->getStream(nodeDesc.aspName, iriShort, output.entity, output.scope, output.representation,
+    auto stream = this->getStream(nodeDesc.aspName, iriShort,
+                                  output.entity, output.scope, output.representation,
                                   output.relatedEntity, output.metadata);
 
     if (false == stream)
@@ -231,18 +233,18 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
   return node;
 }
 
-bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engineState, int modelIndex)
+bool UpdateStrategie::processSubModelResponse(std::shared_ptr<Entity> &entity, int modelIndex)
 {
-  auto subModel = engineState->getRequesting()->subModel;
+  auto subModel = entity->getSendSubModel().subModel;
   bool valid = true;
   std::vector<std::shared_ptr<BaseInformationStream>> streamsSend;
   std::vector<std::shared_ptr<BaseInformationStream>> streamsReceived;
 
-  _log->debug("Sub model accepted received from system '%v' with index '%v'", engineState->getEngineId(), modelIndex);
+  _log->debug("Sub model accepted received from system '%v' with index '%v'", entity->toString(), modelIndex);
 
   if (subModel == nullptr)
   {
-    _log->info("Sub model accepted received from system '%v' is empty", engineState->getEngineId());
+    _log->info("Sub model accepted received from system '%v' is empty", entity->toString());
     return false;
   }
 
@@ -250,7 +252,7 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engin
 
   if (index != modelIndex)
   {
-    _log->info("Sub model accepted received from system '%v', wrong index '%v' expected '%v'", engineState->getEngineId(), index,
+    _log->info("Sub model accepted received from system '%v', wrong index '%v' expected '%v'", entity->toString(), index,
                modelIndex);
     return false;
   }
@@ -293,6 +295,7 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<EngineState> engin
     return false;
   }
 
+  // TODO strange
   for (auto stream : streamsSend)
   {
     stream->registerSender(this->communication);
@@ -365,14 +368,14 @@ std::string UpdateStrategie::dataTypeForRepresentation(std::string representatio
   return representation;
 }
 
-std::shared_ptr<SubModel> UpdateStrategie::getSubModelDesc(std::shared_ptr<EngineState> engineState)
+std::shared_ptr<SubModel> UpdateStrategie::getSubModelDesc(std::shared_ptr<Entity> &entity)
 {
   if (this->model == nullptr)
     return nullptr;
 
   for (auto &sub : this->model->getSubModels())
   {
-    if (sub->engine == engineState)
+    if (sub->entity == entity)
       return sub;
   }
 
@@ -395,7 +398,8 @@ void UpdateStrategie::workerTask()
     if (false == this->running)
       break;
 
-    this->update(this->modelGenerator->createProcessingModel());
+    auto model = this->modelGenerator->createProcessingModel();
+    this->update(model);
   }
 }
 } /* namespace ice */

@@ -24,7 +24,7 @@ class Communication;
 class InformationReceiver;
 class InformationStreamTemplate;
 class InformationType;
-class EngineState;
+class Entity;
 class EventHandler;
 }
 namespace el {
@@ -61,20 +61,6 @@ public:
    * Default destructor
    */
   virtual ~BaseInformationStream();
-
-  /*!
-   * \brief Registers this stream in the communication class as sending stream.
-   *
-   * Registers this stream in the communication class as sending stream.
-   */
-  virtual std::shared_ptr<BaseInformationSender> registerSender(std::shared_ptr<Communication> communication) = 0;
-
-  /*!
-   * \brief Registers this stream in the communication class as receiving stream.
-   *
-   * Registers this stream in the communication class as receiving stream.
-   */
-  virtual std::shared_ptr<InformationReceiver> registerReceiver(std::shared_ptr<Communication> communication) = 0;
 
   /*!
    * \brief Returns the type_info of the template type.
@@ -155,21 +141,16 @@ public:
    *
    *  Registers an engine state. Returns 1 if the task is already registered, else 0.
    */
-  int registerEngineState(std::shared_ptr<EngineState> engineState);
+  int registerRemoteListener(std::shared_ptr<Entity> &entity, std::shared_ptr<Communication> &communication);
 
   /*!
    * \brief Unregisters a engine state.
    *
    *  Unregisters an engine state. Returns 1 if the task is already registered, else 0.
    */
-  int unregisterEngineState(std::shared_ptr<EngineState> engineState);
+  int unregisterRemoteListener(std::shared_ptr<Entity> &entity);
 
-  /*!
-   * \brief Removes the receiver of this stream.
-   *
-   * Removes the receiver of this stream.
-   */
-  virtual void dropReceiver();
+  int setRemoteSource(std::shared_ptr<Entity> &entity, std::shared_ptr<Communication> &communication);
 
   /*!
    * \brief Returns true if this stream can be shared, else false.
@@ -212,22 +193,44 @@ public:
 
 protected:
   /*!
+   * \brief Registers this stream in the communication class as sending stream.
+   *
+   * Registers this stream in the communication class as sending stream.
+   */
+  virtual std::shared_ptr<BaseInformationSender> registerSender(std::shared_ptr<Communication> &communication) = 0;
+
+  /*!
+   * \brief Registers this stream in the communication class as receiving stream.
+   *
+   * Registers this stream in the communication class as receiving stream.
+   */
+  virtual std::shared_ptr<InformationReceiver> registerReceiver(std::shared_ptr<Communication> &communication) = 0;
+
+  /*!
+   * \brief Removes the receiver of this stream.
+   *
+   * Removes the receiver of this stream.
+   */
+  virtual void dropReceiver();
+
+  /*!
    * \brief This method is calls if the last engine state will be unregistered.
    *
    * This method is calls if the last engine state will be unregistered.
    */
-  virtual void allEngineStatesUnregistered() = 0;
+  virtual void dropSender() = 0;
 
 protected:
-  const long iid; /**< The internal id */
-  int sharingMaxCount; /**< Max number of sharing this stream */
-  std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute events asynchronously */
-  std::vector<std::shared_ptr<AsynchronousTask>> taskAsynchronous; /**< List of events which are fired asynchronous if a new element is addes */
-  std::vector<std::shared_ptr<AsynchronousTask>> taskSynchronous; /**< List of events which are executed synchronous if a new element is addes */
-  std::vector<std::shared_ptr<EngineState>> remoteListeners; /**< List of engine states of remote engines registered */
-  const std::shared_ptr<StreamDescription> streamDescription; /**< Description of this stream used for information coordination */
-  el::Logger* _log; /**< Logger */
-  std::mutex _mtx; /**< Mutex */
+  const long                                            iid;                    /**< The internal id */
+  int                                                   sharingMaxCount;        /**< Max number of sharing this stream */
+  std::shared_ptr<EventHandler>                         eventHandler;           /**< Handler to execute events asynchronously */
+  std::vector<std::shared_ptr<AsynchronousTask>>        taskAsynchronous;       /**< List of events which are fired asynchronous if a new element is addes */
+  std::vector<std::shared_ptr<AsynchronousTask>>        taskSynchronous;        /**< List of events which are executed synchronous if a new element is addes */
+  std::vector<std::shared_ptr<Entity>>                  remoteListeners;        /**< List of engine states of remote engines registered */
+  std::shared_ptr<Entity>                               remoteSource;           /**< Remote source of this stream */
+  const std::shared_ptr<StreamDescription>              streamDescription;      /**< Description of this stream used for information coordination */
+  el::Logger*                                           _log;                   /**< Logger */
+  std::mutex                                            _mtx;                   /**< Mutex */
 
 private:
   static int IDENTIFIER_COUNTER;

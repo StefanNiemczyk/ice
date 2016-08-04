@@ -133,20 +133,6 @@ template<typename T>
     int clear(bool cleanBuffer);
 
     /*!
-     * \brief Registers this stream in the communication class as sending stream.
-     *
-     * Registers this stream in the communication class as sending stream.
-     */
-    virtual std::shared_ptr<BaseInformationSender> registerSender(std::shared_ptr<Communication> communication);
-
-    /*!
-     * \brief Registers this stream in the communication class as receiving stream.
-     *
-     * Registers this stream in the communication class as receiving stream.
-     */
-    virtual std::shared_ptr<InformationReceiver> registerReceiver(std::shared_ptr<Communication> communication);
-
-    /*!
      *\brief Returns the type_info of the used template type.
      *
      * Returns the type_info of the used template type.
@@ -180,6 +166,22 @@ template<typename T>
     const int getFilteredList(std::shared_ptr<std::vector<std::shared_ptr<InformationElement<T> > > > filteredList,
                               std::function<bool(std::shared_ptr<InformationElement<T> >)> func);
 
+
+  protected:
+    /*!
+     * \brief Registers this stream in the communication class as sending stream.
+     *
+     * Registers this stream in the communication class as sending stream.
+     */
+    virtual std::shared_ptr<BaseInformationSender> registerSender(std::shared_ptr<Communication> &communication);
+
+    /*!
+     * \brief Registers this stream in the communication class as receiving stream.
+     *
+     * Registers this stream in the communication class as receiving stream.
+     */
+    virtual std::shared_ptr<InformationReceiver> registerReceiver(std::shared_ptr<Communication> &communication);
+
     /*!
      * \brief Removes the receiver of this stream.
      *
@@ -187,13 +189,12 @@ template<typename T>
      */
     virtual void dropReceiver();
 
-  protected:
     /*!
      * \brief This method is calls if the last engine state will be unregistered.
      *
      * This method is calls if the last engine state will be unregistered.
      */
-    virtual void allEngineStatesUnregistered();
+    virtual void dropSender();
 
   private:
     std::unique_ptr<RingBuffer<InformationElement<T>>> ringBuffer; /**< Ring buffer of information elements */
@@ -281,17 +282,9 @@ template<typename T>
     // send information
     if (this->remoteListeners.size() > 0)
     {
-      std::shared_ptr<std::vector<identifier>> sendTo = std::make_shared<std::vector<identifier>>(
-          this->remoteListeners.size());
-
-      for (auto engine : this->remoteListeners)
-      {
-        sendTo->push_back(engine->getEngineId());
-      }
-
       if (this->sender)
       {
-        this->sender->sendInformationElement(sendTo, informationElement);
+        this->sender->sendInformationElement(this->remoteListeners, informationElement);
       }
       else
       {
@@ -317,7 +310,7 @@ template<typename T>
 
 template<typename T>
   std::shared_ptr<ice::BaseInformationSender> ice::InformationStream<T>::registerSender(
-      std::shared_ptr<Communication> communication)
+      std::shared_ptr<Communication> &communication)
   {
     if (this->sender)
     {
@@ -341,21 +334,20 @@ template<typename T>
 
     if (typeid(T) == *comResult->getTypeInfo())
     {
-      this->sender = std::static_pointer_cast<InformationSender<T> >(comResult);
+      this->sender = std::static_pointer_cast<InformationSender<T>>(comResult);
       return comResult;
     }
     else
     {
       _log->error("Incorrect type of sender %s for stream %s", comResult->getTypeInfo(),
                   this->streamDescription->getName());
-      std::shared_ptr<ice::BaseInformationSender> ptr;
-      return ptr;
+      return nullptr;
     }
   }
 
 template<typename T>
   std::shared_ptr<ice::InformationReceiver> ice::InformationStream<T>::registerReceiver(
-      std::shared_ptr<Communication> communication)
+      std::shared_ptr<Communication> &communication)
   {
     std::lock_guard<std::mutex> guard(_mtx);
     auto comResult = communication->registerStreamAsReceiver(this->shared_from_this());
@@ -363,8 +355,7 @@ template<typename T>
     if (false == comResult)
     {
       _log->error("No receiver returned for stream %s", this->streamDescription->getName());
-      std::shared_ptr<ice::InformationReceiver> ptr;
-      return ptr;
+      return nullptr;
     }
 
     this->receiver = comResult;
@@ -379,7 +370,7 @@ template<typename T>
   }
 
 template<typename T>
-  int ice::InformationStream<T>::registerListenerAsync(std::shared_ptr<AbstractInformationListener<T> > listener)
+  int ice::InformationStream<T>::registerListenerAsync(std::shared_ptr<AbstractInformationListener<T>> listener)
   {
     this->listenersAsynchronous.push_back(listener);
 
@@ -387,7 +378,7 @@ template<typename T>
   }
 
 template<typename T>
-  int ice::InformationStream<T>::registerListenerSync(std::shared_ptr<AbstractInformationListener<T> > listener)
+  int ice::InformationStream<T>::registerListenerSync(std::shared_ptr<AbstractInformationListener<T>> listener)
   {
     this->listenersSynchronous.push_back(listener);
 
@@ -396,8 +387,8 @@ template<typename T>
 
 template<typename T>
   inline const int ice::InformationStream<T>::getFilteredList(
-      std::shared_ptr<std::vector<std::shared_ptr<InformationElement<T> > > > filteredList,
-      std::function<bool(std::shared_ptr<InformationElement<T> >)> func)
+      std::shared_ptr<std::vector<std::shared_ptr<InformationElement<T>>>> filteredList,
+      std::function<bool(std::shared_ptr<InformationElement<T>>)> func)
   {
     std::lock_guard<std::mutex> guard(_mtx);
     int count = 0;
@@ -423,7 +414,7 @@ template<typename T>
   }
 
 template<typename T>
-  inline void ice::InformationStream<T>::allEngineStatesUnregistered()
+  inline void ice::InformationStream<T>::dropSender()
   {
   this->sender.reset();
   }

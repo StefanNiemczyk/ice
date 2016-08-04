@@ -22,7 +22,7 @@ using namespace std;
 //Forward declaration
 namespace ice
 {
-  class EngineState;
+  class Entity;
 } /* namespace ice */
 
 namespace ice
@@ -153,14 +153,14 @@ struct SubModelDesc
 
 struct SubModel
 {
-  std::shared_ptr<EngineState> engine;
+  std::shared_ptr<Entity> entity;
   bool accepted = false;
   std::shared_ptr<SubModelDesc> model;
 };
 
 struct StreamTransfer
 {
-  std::shared_ptr<EngineState> engine;
+  std::shared_ptr<Entity> entity;
   std::vector<TransferDesc> transfer;
 };
 

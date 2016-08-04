@@ -23,7 +23,7 @@ namespace ice
 class BaseInformationStream;
 class Communication;
 class Coordinator;
-class EngineState;
+class Entity;
 class ICEngine;
 class StreamStore;
 class ProcessingModelGenerator;
@@ -44,18 +44,18 @@ public:
   void init();
   void cleanUp();
 
-  virtual void update(std::shared_ptr<ProcessingModel> model);
+  virtual void update(std::shared_ptr<ProcessingModel> &model);
   virtual void initInternal() = 0;
   virtual void cleanUpInternal() = 0;
-  virtual bool handleSubModel(std::shared_ptr<EngineState> engineState, SubModelDesc &subModel) = 0;
-  virtual bool handleSubModelResponse(std::shared_ptr<EngineState> engineState, int modelIndex) = 0;
-  virtual void onEngineDiscovered(std::shared_ptr<EngineState> engine) = 0;
+  virtual bool handleSubModel(std::shared_ptr<Entity> &entity, SubModelDesc &subModel) = 0;
+  virtual bool handleSubModelResponse(std::shared_ptr<Entity> &entity, int modelIndex) = 0;
+  virtual void onEntityDiscovered(std::shared_ptr<Entity> &entity) = 0;
   void triggerModelUpdate();
 
 protected:
-  bool processSubModel(std::shared_ptr<EngineState> engineState, SubModelDesc &subModel);
-  bool processSubModelResponse(std::shared_ptr<EngineState> engineState, int modelIndex);
-  std::shared_ptr<SubModel> getSubModelDesc(std::shared_ptr<EngineState> engineState);
+  bool processSubModel(std::shared_ptr<Entity> &entity, SubModelDesc &subModel);
+  bool processSubModelResponse(std::shared_ptr<Entity> &entity, int modelIndex);
+  std::shared_ptr<SubModel> getSubModelDesc(std::shared_ptr<Entity> &entity);
 
   std::shared_ptr<Node> activateNode(NodeDesc &nodeDesc);
   std::map<std::string, std::string> readConfiguration(std::string const config);
@@ -69,26 +69,26 @@ private:
 
 
 protected:
-  std::shared_ptr<ProcessingModel> lastModel; /**< The last model */
-  std::shared_ptr<ProcessingModel> model; /**< The current model */
-  std::shared_ptr<EngineState> self; /**< Engine state of the own engine */
-  std::weak_ptr<ICEngine> engine; /**< The main engine */
-  std::shared_ptr<NodeStore> nodeStore; /**< The node store */
-  std::shared_ptr<StreamStore> streamStore; /**< The information store */
-  std::shared_ptr<Coordinator> coordinator; /**< Coordinator of engines */
-  std::shared_ptr<Communication> communication; /**< Communication interface */
-  std::shared_ptr<OntologyInterface> ontology; /**< Shared pointer to access the ontology */
-  std::shared_ptr<ProcessingModelGenerator> modelGenerator; /**< The model generator */
-  bool valid; /**< True if the current model is valid, else false */
-  bool established; /**< True if the current model was established, else false */
-  std::mutex mtx_; /**< Mutex */
-  el::Logger* _log; /**< Logger */
+  std::shared_ptr<ProcessingModel>              lastModel;              /**< The last model */
+  std::shared_ptr<ProcessingModel>              model;                  /**< The current model */
+  std::shared_ptr<Entity>                       self;                   /**< Engine state of the own engine */
+  std::weak_ptr<ICEngine>                       engine;                 /**< The main engine */
+  std::shared_ptr<NodeStore>                    nodeStore;              /**< The node store */
+  std::shared_ptr<StreamStore>                  streamStore;            /**< The information store */
+  std::shared_ptr<Coordinator>                  coordinator;            /**< Coordinator of engines */
+  std::shared_ptr<Communication>                communication;          /**< Communication interface */
+  std::shared_ptr<OntologyInterface>            ontology;               /**< Shared pointer to access the ontology */
+  std::shared_ptr<ProcessingModelGenerator>     modelGenerator;         /**< The model generator */
+  bool                                          valid;                  /**< True if the current model is valid, else false */
+  bool                                          established;            /**< True if the current model was established, else false */
+  std::mutex                                    mtx_;                   /**< Mutex */
+  el::Logger*                                   _log;                   /**< Logger */
 
 private:
-  bool running; /**< True if the communication is running, else false */
-  std::thread worker; /**< Thread which sends the heart beat and cyclic tests the engine states */
-  std::mutex threadMtx; /**< Mutex for thread synchronization */
-  std::condition_variable cv; /**< Condition variable for synchronizing threads */
+  bool                                          running;                /**< True if the communication is running, else false */
+  std::thread                                   worker;                 /**< Thread which sends the heart beat and cyclic tests the engine states */
+  std::mutex                                    threadMtx;              /**< Mutex for thread synchronization */
+  std::condition_variable                       cv;                     /**< Condition variable for synchronizing threads */
 };
 
 } /* namespace ice */

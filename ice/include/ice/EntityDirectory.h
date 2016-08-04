@@ -47,7 +47,8 @@ public:
   std::shared_ptr<Entity> create(std::string const &key, std::string const &value);
   std::shared_ptr<Entity> create(const std::initializer_list<Id>& ids);
 
-  std::unique_ptr<std::vector<std::shared_ptr<Entity>>> availableIdentities();
+  std::unique_ptr<std::vector<std::shared_ptr<Entity>>> availableEntities();
+  std::unique_ptr<std::vector<std::shared_ptr<Entity>>> activeCooperationEntities();
   void checkTimeout();
 
   int count();

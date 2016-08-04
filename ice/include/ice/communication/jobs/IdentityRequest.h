@@ -13,7 +13,16 @@
 namespace ice
 {
 
+class IdMessage;
 class OntologyIdMessage;
+
+enum IdentityRequestState
+{
+  IRS_REQUEST_ID,
+  IRS_REQUEST_ONT_IRI,
+
+  IRS_UNKNOWN
+};
 
 class IdentityRequest : public ComJob<IdentityRequest>
 {
@@ -34,9 +43,12 @@ private:
   void onResponsIds(std::shared_ptr<IdMessage> const &message);
   void onRequestOntologyIds(std::shared_ptr<Message> const &message);
   void onResponseOntologyIds(std::shared_ptr<OntologyIdMessage> const &message);
+  void checkOntologyIris();
 
 private:
-  int tryCount;
+  IdentityRequestState          stateIR;
+  std::string                   iri;
+  int                           tryCount;
 };
 
 class IdentityRequestCreator

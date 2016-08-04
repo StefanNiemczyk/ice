@@ -36,7 +36,7 @@ void EntityDirectory::init()
   auto e = this->engine.lock();
 
   this->timeFactory = e->getTimeFactory();
-  this->self = std::make_shared<Entity>(this->shared_from_this(), this->timeFactory,
+  this->self = std::make_shared<Entity>(this->shared_from_this(), this->engine, this->timeFactory,
 		                                {{ID_SERVAL, ""}, {ID_ONTOLOGY, ""}});
   this->self->setIceIdentity(true);
 }
@@ -136,13 +136,13 @@ std::shared_ptr<Entity> EntityDirectory::create(std::string const &key, std::str
 std::shared_ptr<Entity> EntityDirectory::create(const std::initializer_list<Id>& ids)
 {
   // create new entity
-  auto entity = std::make_shared<Entity>(this->shared_from_this(), this->timeFactory, ids);
+  auto entity = std::make_shared<Entity>(this->shared_from_this(), this->engine, this->timeFactory, ids);
   this->entities.push_back(entity);
 
   return entity;
 }
 
-std::unique_ptr<std::vector<std::shared_ptr<Entity>>> EntityDirectory::availableIdentities()
+std::unique_ptr<std::vector<std::shared_ptr<Entity>>> EntityDirectory::availableEntities()
 {
   std::unique_ptr<std::vector<std::shared_ptr<Entity>>> vec (new std::vector<std::shared_ptr<Entity>>);
 
@@ -154,6 +154,26 @@ std::unique_ptr<std::vector<std::shared_ptr<Entity>>> EntityDirectory::available
     }
 
     if (id->isTimeout() == false && id->isAvailable())
+    {
+      vec->push_back(id);
+    }
+  }
+
+  return vec;
+}
+
+std::unique_ptr<std::vector<std::shared_ptr<Entity>>> EntityDirectory::activeCooperationEntities()
+{
+  std::unique_ptr<std::vector<std::shared_ptr<Entity>>> vec (new std::vector<std::shared_ptr<Entity>>);
+
+  for (auto &id : this->entities)
+  {
+    if (id == this->self)
+    {
+      continue;
+    }
+
+    if (id->isActiveCooperation())
     {
       vec->push_back(id);
     }

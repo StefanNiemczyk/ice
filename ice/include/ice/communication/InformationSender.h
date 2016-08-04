@@ -9,7 +9,7 @@
 #define INFORMATIONSENDER_H_
 
 #include <ice/communication/BaseInformationSender.h>
-#include <ice/Identifier.h>
+#include <ice/Entity.h>
 #include <memory>
 #include <vector>
 
@@ -29,7 +29,7 @@ template<typename T>
     InformationSender() {};
     virtual ~InformationSender() {};
 
-    virtual void sendInformationElement(std::shared_ptr<std::vector<identifier>> sendTo,
+    virtual void sendInformationElement(std::vector<Entity> &sendTo,
                                         std::shared_ptr<InformationElement<T>> informationElement) = 0;
 
     /*!

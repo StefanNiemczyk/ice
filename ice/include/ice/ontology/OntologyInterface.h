@@ -46,7 +46,7 @@ public:
   bool loadOntology(std::string const p_path);
   bool saveOntology(std::string const p_path);
   int getOntologyIDs(std::vector<std::pair<std::string,std::string>> &ids);
-  std::unique_ptr<std::vector<std::pair<std::string,std::string>>> compareOntologyIDs(std::vector<std::pair<std::string,std::string>> &ids);
+  void compareOntologyIDs(std::vector<std::pair<std::string,std::string>> &ids, std::vector<std::pair<std::string,std::string>> &outDiff);
   bool initReasoner(bool const p_force);
   bool isConsistent();
   std::unique_ptr<std::vector<std::string>> getSystems();

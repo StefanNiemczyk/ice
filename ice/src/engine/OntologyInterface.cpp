@@ -339,14 +339,12 @@ void OntologyInterface::readOntologyIDsFromOntology()
   env->DeleteLocalRef(result);
 }
 
-std::unique_ptr<std::vector<std::pair<std::string,std::string>>> OntologyInterface::compareOntologyIDs(
-    std::vector<std::pair<std::string,std::string>>& ids)
+void OntologyInterface::compareOntologyIDs(
+    std::vector<std::pair<std::string,std::string>>& ids, std::vector<std::pair<std::string,std::string>> &outDiff)
 {
   int size = ids.size();
   int sizeOwn = this->ontologyIds.size();
   bool found = false;
-
-  std::unique_ptr<std::vector<std::pair<std::string,std::string>>> vec(new std::vector<std::pair<std::string,std::string>>);
 
   for (int i = 0; i < size; ++i)
   {
@@ -365,11 +363,9 @@ std::unique_ptr<std::vector<std::pair<std::string,std::string>>> OntologyInterfa
 
     if (false == found)
     {
-      vec->push_back(id);
+      outDiff.push_back(id);
     }
   }
-
-  return std::move(vec);
 }
 
 bool OntologyInterface::initReasoner(bool const p_force)

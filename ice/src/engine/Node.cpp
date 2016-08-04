@@ -7,7 +7,7 @@
 
 #include "ice/processing/Node.h"
 
-#include "ice/coordination/EngineState.h"
+#include "ice/Entity.h"
 #include "ice/information/BaseInformationStream.h"
 
 #include <sstream>
@@ -56,6 +56,16 @@ Node::Node()
 Node::~Node()
 {
   //
+}
+
+std::shared_ptr<NodeDescription>& Node::getNodeDescription()
+{
+  return this->nodeDescription;
+}
+
+void Node::setNodeDescription(std::shared_ptr<NodeDescription> &desc)
+{
+  this->nodeDescription = desc;
 }
 
 int Node::performTask()
@@ -188,60 +198,6 @@ int Node::removeOutput(std::shared_ptr<BaseInformationStream> stream)
   return 1;
 }
 
-//int Node::addInputTemplate(std::shared_ptr<InformationStreamTemplate> streamTemplate, bool trigger)
-//{
-//  std::lock_guard<std::mutex> guard(this->mtx_);
-//
-//  for (auto streamItr : this->inputTemplates)
-//  {
-//    if (streamItr.expired())
-//      continue;
-//
-//    std::shared_ptr<InformationStreamTemplate> st = streamItr.lock();
-//
-//    if (st == streamTemplate)
-//      return 1;
-//  }
-//
-//  streamTemplate->registerNode(this->shared_from_this(), trigger);
-//
-//  this->inputTemplates.push_back(streamTemplate);
-//
-//  return 0;
-//}
-//
-//int Node::removeInputTemplate(std::shared_ptr<InformationStreamTemplate> streamTemplate)
-//{
-//  std::shared_ptr<InformationStreamTemplate> st;
-//
-//  {
-//    std::lock_guard<std::mutex> guard(this->mtx_);
-//
-//    for (int i = 0; i < this->inputTemplates.size(); ++i)
-//    {
-//      auto streamItr = this->inputTemplates[i];
-//
-//      if (streamItr.expired())
-//        continue;
-//
-//      st = streamItr.lock();
-//      if (st == streamTemplate)
-//      {
-//        this->inputTemplates.erase(this->inputTemplates.begin() + i);
-//
-//      }
-//    }
-//  }
-//
-//  if (st)
-//  {
-//    st->unregisterNode(this->shared_from_this());
-//    return 0;
-//  }
-//
-//  return 1;
-//}
-
 int Node::init()
 {
   //
@@ -297,55 +253,6 @@ bool Node::isValid()
   return true;
 }
 
-std::shared_ptr<NodeDescription> Node::getNodeDescription()
-{
-  return this->nodeDescription;
-//  if (this->nodeDescription)
-//    return this->nodeDescription;
-//
-//  std::lock_guard<std::mutex> guard(this->mtx_);
-//
-//  if (this->nodeDescription)
-//    return this->nodeDescription;
-//
-//  int inputSize = this->inputs.size();
-//  int inputTemplateSize = this->inputTemplates.size();
-//  int outputSize = this->outputs.size();
-//
-//  boost::uuids::uuid * inputUuids = new boost::uuids::uuid[inputSize];
-//
-//  for (int i = 0; i < inputSize; ++i)
-//  {
-//    inputUuids[i] = this->inputs[i]->getSpecification()->getUUID();
-//  }
-//
-//  boost::uuids::uuid * inputTeamplateUuids = new boost::uuids::uuid[inputTemplateSize];
-//
-//  for (int i = 0; i < inputTemplateSize; ++i)
-//  {
-//    inputTeamplateUuids[i] = this->inputTemplates[i].lock()->getSpecification()->getUUID();
-//  }
-//
-//  boost::uuids::uuid * outputUuids = new boost::uuids::uuid[outputSize];
-//
-//  for (int i = 0; i < outputSize; ++i)
-//  {
-//    outputUuids[i] = this->outputs[i]->getSpecification()->getUUID();
-//  }
-//
-//  auto desc = std::make_shared<NodeDescription>(this->getClassName(), inputUuids, inputTeamplateUuids, outputUuids, inputSize,
-//                                                inputTemplateSize, outputSize);
-//
-//  this->nodeDescription = desc;
-//
-//  return desc;
-}
-
-void Node::setNodeDescription(std::shared_ptr<NodeDescription> description)
-{
-  this->nodeDescription = description;
-}
-
 long Node::getCyclicTriggerTime() const
 {
   return this->cyclicTriggerTime;
@@ -366,16 +273,6 @@ void Node::setEventHandler(std::shared_ptr<EventHandler> eventHandler)
   this->eventHandler = eventHandler;
 }
 
-//std::string Node::getStringDescription() const
-//{
-//  return this->stringDescription;
-//}
-//
-//void Node::setStringDescription(std::string stringDescription)
-//{
-//  this->stringDescription = stringDescription;
-//}
-
 std::map<std::string, std::string> Node::getConfiguration() const
 {
   return this->configuration;
@@ -391,20 +288,10 @@ const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getInputs() con
   return &this->inputs;
 }
 
-//const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getBaseInputs() const
-//{
-//  return &this->baseInputs;
-//}
-
 const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getTriggeredByInputs() const
 {
   return &this->triggeredByInputs;
 }
-
-//const std::vector<std::weak_ptr<InformationStreamTemplate>>* Node::getInputTemplates() const
-//{
-//  return &this->inputTemplates;
-//}
 
 const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getOutputs() const
 {
@@ -420,16 +307,16 @@ std::string Node::toString()
   return ss.str();
 }
 
-void Node::registerEngine(std::shared_ptr<EngineState> engineState)
+void Node::registerEntity(std::shared_ptr<Entity> &entity)
 {
-  this->registeredEngines.insert(engineState);
-  engineState->nodesActivated.insert(this->shared_from_this());
+  this->registeredEngines.insert(entity);
+  entity->getNodes().insert(this->shared_from_this());
 }
 
-void Node::unregisterEngine(std::shared_ptr<EngineState> engineState)
+void Node::unregisterEntity(std::shared_ptr<Entity> &entity)
 {
-  this->registeredEngines.erase(engineState);
-  engineState->nodesActivated.erase(this->shared_from_this());
+  this->registeredEngines.erase(entity);
+  entity->getNodes().erase(this->shared_from_this());
 }
 
 int Node::getRegisteredEngineCount()
