@@ -121,7 +121,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   }
 }
 
-bool FastUpdateStrategie::handleSubModel(std::shared_ptr<Entity> &entity, SubModelDesc &subModel)
+bool FastUpdateStrategie::handleSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel)
 {
   entity->getReceivedSubModel().subModel = std::make_shared<SubModelDesc>(subModel);
   return this->processSubModel(entity, subModel);

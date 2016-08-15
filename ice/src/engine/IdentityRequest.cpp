@@ -83,7 +83,7 @@ void IdentityRequest::handleMessage(std::shared_ptr<Message> const &message)
     }
     case (IMI_FINISH):
     {
-      if (this->ownJob)
+      if (false == this->ownJob)
         this->finish();
 
       break;
@@ -107,15 +107,16 @@ void IdentityRequest::sendRequestIds()
 
 void IdentityRequest::onRequestIds(std::shared_ptr<Message> const &message)
 {
-  if (this->stateIR != IdentityRequestState::IRS_UNKNOWN)
+  if (this->stateIR != IdentityRequestState::IRS_UNKNOWN && this->stateIR != IdentityRequestState::IRS_REQUEST_ID)
   {
+    // received message in wrong state
     _log->warn("Received requestIds message in wrong state '%v' from '%v'", this->stateIR, entity->toString());
     return;
   }
-
-  // duplicated message
-  if (false == this->timeFactory->checkTimeout(this->timestampLastActive, 100))
+  else if (this->stateIR == IdentityRequestState::IRS_REQUEST_ID &&
+      false == this->timeFactory->checkTimeout(this->timestampLastActive, 100))
   {
+    // duplicated message
     _log->debug("Received duplicated requestIds message from '%v'", entity->toString());
     return;
   }

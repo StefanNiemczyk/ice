@@ -105,6 +105,7 @@ add_library(${PROJECT_NAME}
   src/engine/OntologyIdMessage.cpp
   src/engine/RequestMessage.cpp
   src/engine/SubModelMessage.cpp
+  src/engine/SubModelResponseMessage.cpp
   
   src/engine/ComJobBase.cpp
   src/engine/IdentityRequest.cpp

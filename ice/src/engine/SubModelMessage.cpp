@@ -7,9 +7,13 @@
 
 #include "ice/communication/messages/SubModelMessage.h"
 
+#include <string.h>
+
 #include <boost/serialization/string.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+
+#include "ice/model/ProcessingModel.h"
 
 namespace ice
 {
@@ -24,12 +28,12 @@ SubModelMessage::~SubModelMessage()
   //
 }
 
-SubModelDesc& SubModelMessage::getSubModel()
+std::shared_ptr<SubModelDesc>& SubModelMessage::getSubModel()
 {
   return this->subModel;
 }
 
-void SubModelMessage::setSubModel(SubModelDesc &desc)
+void SubModelMessage::setSubModel(std::shared_ptr<SubModelDesc> &desc)
 {
   this->subModel = desc;
 }
@@ -54,7 +58,9 @@ bool SubModelMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GCon
     return false;
   }
 
-  boost::archive::text_iarchive ar(value.GetString());
+  std::stringstream str;
+  str.str(value.GetString());
+  boost::archive::text_iarchive ar(str);
   ar >> this->subModel;
 
   return true;

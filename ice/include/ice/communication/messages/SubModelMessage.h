@@ -9,10 +9,11 @@
 #define INCLUDE_ICE_COMMUNICATION_MESSAGES_SUBMODELMESSAGE_H_
 
 #include "ice/communication/messages/Message.h"
-#include "ice/model/ProcessingModel.h"
 
 namespace ice
 {
+
+class SubModelDesc;
 
 class SubModelMessage : public Message
 {
@@ -20,15 +21,15 @@ public:
   SubModelMessage();
   virtual ~SubModelMessage();
 
-  SubModelDesc& getSubModel();
-  void setSubModel(SubModelDesc &desc);
+  std::shared_ptr<SubModelDesc>& getSubModel();
+  void setSubModel(std::shared_ptr<SubModelDesc> &desc);
 
 protected:
   virtual rapidjson::Value payloadToJson(rapidjson::Document &document);
   virtual bool parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory);
 
 private:
-  SubModelDesc subModel;
+  std::shared_ptr<SubModelDesc> subModel;
 };
 
 } /* namespace ice */

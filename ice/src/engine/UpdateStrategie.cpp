@@ -81,7 +81,7 @@ void UpdateStrategie::update(std::shared_ptr<ProcessingModel> &model)
   this->established = false;
 }
 
-bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, SubModelDesc &subModel)
+bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel)
 {
   _log->debug("Processing sub model description received from '%v'", entity->toString());
   bool valid = true;
@@ -89,9 +89,10 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, SubModelD
   std::vector<std::shared_ptr<BaseInformationStream>> streamsSend;
   std::vector<std::shared_ptr<BaseInformationStream>> streamsReceived;
 
+  // TODO altes model prüfen und entsprechend handhaben
   entity->getReceivedSubModel().subModel = std::make_shared<SubModelDesc>(subModel);
 
-  for (auto &nodeDesc : subModel.nodes)
+  for (auto &nodeDesc : subModel->nodes)
   {
     auto node = this->activateNode(nodeDesc);
 
@@ -113,7 +114,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, SubModelD
     return false;
   }
 
-  for (auto &transferTo : subModel.send)
+  for (auto &transferTo : subModel->send)
   {
     auto stream = this->getStream(transferTo);
 
@@ -136,7 +137,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, SubModelD
     return false;
   }
 
-  for (auto &transferFrom : subModel.receive)
+  for (auto &transferFrom : subModel->receive)
   {
     auto stream = this->getStream(transferFrom);
 
@@ -295,7 +296,6 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<Entity> &entity, i
     return false;
   }
 
-  // TODO strange
   for (auto stream : streamsSend)
   {
     stream->registerSender(this->communication);

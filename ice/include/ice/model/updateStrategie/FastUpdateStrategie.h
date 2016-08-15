@@ -22,7 +22,7 @@ public:
   void update(std::shared_ptr<ProcessingModel> model);
   void initInternal();
   void cleanUpInternal();
-  bool handleSubModel(std::shared_ptr<Entity> &entity, SubModelDesc &subModel);
+  bool handleSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel);
   bool handleSubModelResponse(std::shared_ptr<Entity> &entity, int modelIndex);
   void onEngineDiscovered(std::shared_ptr<Entity> &entity);
 };

@@ -8,16 +8,19 @@
 #ifndef INCLUDE_ICE_COMMUNICATION_JOBS_COOPERATIONREQUEST_H_
 #define INCLUDE_ICE_COMMUNICATION_JOBS_COOPERATIONREQUEST_H_
 
+#include "ice/communication/jobs/ComJob.h"
+
 namespace ice
 {
 
 struct SubModelDesc;
 class SubModelMessage;
+class SubModelResponseMessage;
 
 enum CooperationRequestState
 {
   CRS_SUBMODEL,
-
+  CRS_SUBMODEL_RESPONSE,
   CRS_UNKNOWN
 };
 
@@ -39,6 +42,8 @@ public:
 private:
   void sendSubModel();
   void onSubModel(std::shared_ptr<SubModelMessage> message);
+  void onSubModelResponse(std::shared_ptr<SubModelResponseMessage> message);
+  void onFinished(std::shared_ptr<SubModelResponseMessage> message);
 
 private:
   std::shared_ptr<SubModelDesc> subModel;

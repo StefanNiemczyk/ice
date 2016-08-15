@@ -48,6 +48,9 @@ struct Id {
 
 struct SharedSubModel
 {
+  SharedSubModel() : accepted(false) {}
+
+  bool accepted; /**< True if the submodel can be accepted */
   std::shared_ptr<SubModelDesc> subModel; /**< Sub model description */
   std::vector<std::shared_ptr<BaseInformationStream>> streamsSend; /**< List of streams send to this engine */
   std::vector<std::shared_ptr<BaseInformationStream>> streamsReceived; /**< List of streams received from this engine */

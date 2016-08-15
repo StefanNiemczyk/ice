@@ -19,6 +19,8 @@
 #include "ice/communication/messages/OffersMessage.h"
 #include "ice/communication/messages/OntologyIdMessage.h"
 #include "ice/communication/messages/RequestMessage.h"
+#include "ice/communication/messages/SubModelMessage.h"
+#include "ice/communication/messages/SubModelResponseMessage.h"
 #include "ice/Entity.h"
 
 namespace ice
@@ -78,6 +80,12 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr
     case(IMI_ACK):
     case(IMI_INFORMATION_REQUEST_INDEX):
         message = std::make_shared<IntMessage>(command);
+        break;
+    case(IMI_SUBMODEL):
+        message = std::make_shared<SubModelMessage>();
+        break;
+    case(IMI_SUBMODEL_RESPONSE):
+        message = std::make_shared<SubModelResponseMessage>();
         break;
 
     default:

@@ -151,7 +151,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
     _log->debug("Check if sub model exists for engine '%v'", system->getIri());
 
     std::shared_ptr<SubModel> subModel = std::make_shared<SubModel>();
-    subModel->engine = system->getEngineState();
+    subModel->entity = system->getEngineState();
 
     if (false == this->extractedSubModel(system, subModel))
     {
@@ -165,7 +165,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
     }
 
     auto send = std::make_shared<StreamTransfer>();
-    send->engine = system->getEngineState();
+    send->entity = system->getEngineState();
 
     if (false == this->extractStreamTransfers(this->self, system, send->transfer))
     {
@@ -178,7 +178,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
       model->getSend().push_back(send);
 
     auto receive = std::make_shared<StreamTransfer>();
-    receive->engine = system->getEngineState();
+    receive->entity = system->getEngineState();
 
     if (false == this->extractStreamTransfers(system, this->self, receive->transfer))
     {
