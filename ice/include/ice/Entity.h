@@ -16,17 +16,79 @@
 
 #include "ice/information/InformationSpecification.h"
 #include "ice/model/aspModel/ASPSystem.h"
+#include "ice/processing/NodeDescription.h"
 #include "ice/Time.h"
 #include "easylogging++.h"
+
+namespace supplementary
+{
+class External;
+} /* namespace supplementary */
 
 namespace ice
 {
 
+class BaseInformationStream;
 class EntityDirectory;
+class ICEngine;
 class Node;
 class OntologyInterface;
 class TimeFactory;
 struct SubModelDesc;
+
+//* ASPNodeState
+/**
+ * Enum of states an ASP node.
+ *
+ */
+enum ASPElementState
+{
+  NEW_ELEMENT, ADDED_TO_ASP
+};
+
+//* ASPNodeType
+/**
+ * Enum of ASP node types
+ *
+ */
+enum ASPElementType
+{
+  ASP_COMPUTATION_NODE, ASP_SOURCE_NODE, ASP_IRO_NODE, ASP_MAP_NODE, ASP_REQUIRED_STREAM, ASP_REQUIRED_MAP
+};
+const std::string ASPElementTypeNames[] {"ASP_COMPUTATION_NODE", "ASP_SOURCE_NODE", "ASP_IRO_NODE", "ASP_MAP_NODE",
+                                         "ASP_REQUIRED_STREAM", "ASP_REQUIRED_MAP"};
+
+//* ASPNode
+/**
+ * This struct contains the asp informations of a node.
+ *
+ */
+struct ASPElement
+{
+  std::shared_ptr<supplementary::External> external;
+  std::string aspString;
+  std::string name;
+  std::string className;
+  std::string configAsString;
+  std::string raw;
+  std::map<std::string, std::string> config;
+  ASPElementState state;
+  ASPElementType type;
+
+  NodeType getNodeType() {
+    switch (this->type)
+    {
+      case ASPElementType::ASP_SOURCE_NODE:
+        return NodeType::SOURCE;
+      case ASPElementType::ASP_COMPUTATION_NODE:
+        return NodeType::PROCESSING;
+      case ASPElementType::ASP_IRO_NODE:
+        return NodeType::IRO;
+      case ASPElementType::ASP_MAP_NODE:
+        return NodeType::MAP;
+    }
+  }
+};
 
 enum entity_match {
   FULL_MATCH,
@@ -50,17 +112,17 @@ struct SharedSubModel
 {
   SharedSubModel() : accepted(false) {}
 
-  bool accepted; /**< True if the submodel can be accepted */
-  std::shared_ptr<SubModelDesc> subModel; /**< Sub model description */
-  std::vector<std::shared_ptr<BaseInformationStream>> streamsSend; /**< List of streams send to this engine */
-  std::vector<std::shared_ptr<BaseInformationStream>> streamsReceived; /**< List of streams received from this engine */
+  bool                                                  accepted;        /**< True if the submodel can be accepted */
+  std::shared_ptr<SubModelDesc>                         subModel;        /**< Sub model description */
+  std::vector<std::shared_ptr<BaseInformationStream>>   streamsSend;     /**< List of streams send to this engine */
+  std::vector<std::shared_ptr<BaseInformationStream>>   streamsReceived; /**< List of streams received from this engine */
 };
 
 class Entity : public std::enable_shared_from_this<Entity>
 {
 public:
   Entity(std::shared_ptr<EntityDirectory> const &directory, std::weak_ptr<ICEngine> engine,
-		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id>& ids);
+		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id> ids);
   virtual ~Entity();
 
   uint8_t getNextIndex();
@@ -88,6 +150,7 @@ public:
   bool isAvailable();
   void setAvailable(bool const &value);
 
+  bool isCooperationPossible();
   bool isActiveCooperation();
 
   void addId(std::string const &key, std::string const &value);
@@ -125,6 +188,9 @@ public:
   std::shared_ptr<ASPElement> getASPElementByName(ASPElementType type, std::string const name);
   std::shared_ptr<ASPElement> getASPElementByName(std::string const name);
   void addASPElement(std::shared_ptr<ASPElement> node);
+  void setExternal(std::shared_ptr<supplementary::External> &external);
+  std::shared_ptr<supplementary::External>& getExternal();
+  bool updateExternals(bool activateRequired);
 
 private:
   void updateContainer(SharedSubModel &container, std::vector<std::shared_ptr<Node>> &nodes,
@@ -155,7 +221,7 @@ private:
   std::vector<std::pair<std::string,std::string>>       ontologyIriDiff;
 
   // ASP Stuff
-  std::shared_ptr<supplementary::External>              systemExternal;         /**< The external for the system */
+  std::shared_ptr<supplementary::External>              external;               /**< The external for the system */
   std::vector<std::shared_ptr<ASPElement>>              aspNodes;               /**< Vector of asp nodes */
   std::vector<std::shared_ptr<ASPElement>>              aspSourceNodes;         /**< Vector of asp source nodes */
   std::vector<std::shared_ptr<ASPElement>>              aspIro;                 /**< Vector of iro nodes */

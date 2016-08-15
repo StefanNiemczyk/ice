@@ -90,7 +90,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shar
   std::vector<std::shared_ptr<BaseInformationStream>> streamsReceived;
 
   // TODO altes model prüfen und entsprechend handhaben
-  entity->getReceivedSubModel().subModel = std::make_shared<SubModelDesc>(subModel);
+  entity->getReceivedSubModel().subModel = subModel;
 
   for (auto &nodeDesc : subModel->nodes)
   {

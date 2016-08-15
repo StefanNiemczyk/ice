@@ -114,7 +114,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   // sending sub models
   for (auto &subModel : model->getSubModels())
   {
-    auto job = std::make_shared<CooperationRequest>(subModel->entity);
+    auto job = std::make_shared<CooperationRequest>(this->engine.lock().get(), subModel->entity);
     job->setSubModelDesc(subModel->model);
     // TODO
 //    this->communication->sendSubModelRequest(subModel->entity, subModel->model);
@@ -123,7 +123,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
 
 bool FastUpdateStrategie::handleSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel)
 {
-  entity->getReceivedSubModel().subModel = std::make_shared<SubModelDesc>(subModel);
+  entity->getReceivedSubModel().subModel =  subModel;
   return this->processSubModel(entity, subModel);
 }
 
@@ -147,7 +147,7 @@ bool FastUpdateStrategie::handleSubModelResponse(std::shared_ptr<Entity> &entity
   return true;
 }
 
-void FastUpdateStrategie::onEngineDiscovered(std::shared_ptr<Entity> &entity)
+void FastUpdateStrategie::onEntityDiscovered(std::shared_ptr<Entity> &entity)
 {
   this->triggerModelUpdate();
 }

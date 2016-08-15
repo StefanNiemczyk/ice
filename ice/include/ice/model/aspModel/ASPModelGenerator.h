@@ -21,15 +21,13 @@
 //Forward declarations
 namespace ice
 {
-class Communication;
-class Coordinator;
-class ICEngine;
-class StreamStore;
-class NodeStore;
 class BaseInformationStream;
-class ASPSystem;
-class EngineState;
+class ICEngine;
+class Entity;
+class EntityDirectory;
+class NodeStore;
 class OntologyInterface;
+class StreamStore;
 }
 
 namespace ice
@@ -52,29 +50,27 @@ protected:
 
 private:
   void readOntology();
-  std::shared_ptr<ASPSystem> getASPSystemByIRI(std::string p_iri);
-  std::string dataTypeForRepresentation(std::string representation);
-  bool extractedSubModel(std::shared_ptr<ASPSystem> system, std::shared_ptr<SubModel> subModel);
-  bool extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<ASPSystem> system, bool own);
-  bool extractStreamTransfers(std::shared_ptr<ASPSystem> from, std::shared_ptr<ASPSystem> to, std::vector<TransferDesc> &transfers);
-  std::map<std::string, std::string> readConfiguration(std::string const config);
+  std::string dataTypeForRepresentation(std::string &representation);
+  bool extractedSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModel> &subModel);
+  bool extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<Entity> &entity, bool own);
+  bool extractStreamTransfers(std::shared_ptr<Entity> &from, std::shared_ptr<Entity> &to, std::vector<TransferDesc> &transfers);
+  std::map<std::string, std::string> readConfiguration(std::string const &config);
   void readMetadata(std::map<std::string, int> &metadata, const Gringo::Value &element);
   void readMetadata(std::string name, std::map<std::string, int> &metadata, const Gringo::Value &element);
 
 
 private:
-  std::shared_ptr<supplementary::ClingWrapper> asp; /*< Interface to access the asp solver */
-  std::vector<std::shared_ptr<ASPSystem>> systems; /**< List of known engines */
-  std::shared_ptr<ASPSystem> self; /**< Pointer to the own asp description */
-  std::vector<std::string> entities; /**< The entites as strings */
-  bool groundingDirty; /**< Flag to check if the grounding is dirty */
-  bool globalOptimization; /**< True if QoS metadata should be optimized global, false for local */
-  int queryIndex; /**< Index of the query */
-  int subModelIndex; /**< Index of the current sub models */
-  int maxChainLength; /**< Maximal length of a node chain */
-  std::shared_ptr<supplementary::External> lastQuery; /**< The last query */
-  el::Logger* _log; /**< Logger */
-
+  std::shared_ptr<supplementary::ClingWrapper>  asp;                    /**< Interface to access the asp solver */
+  std::shared_ptr<EntityDirectory>              directory;              /**< Directory of entities */
+  std::shared_ptr<Entity>                       self;                   /**< Pointer to the own asp description */
+  std::vector<std::string>                      entities;               /**< The entites as strings */
+  bool                                          groundingDirty;         /**< Flag to check if the grounding is dirty */
+  bool                                          globalOptimization;     /**< True if QoS metadata should be optimized global, false for local */
+  int                                           queryIndex;             /**< Index of the query */
+  int                                           subModelIndex;          /**< Index of the current sub models */
+  int                                           maxChainLength;         /**< Maximal length of a node chain */
+  std::shared_ptr<supplementary::External>      lastQuery;              /**< The last query */
+  el::Logger*                                   _log;                   /**< Logger */
 
   static std::mutex mtxModelGen_;
 };

@@ -156,7 +156,7 @@ int BaseInformationStream::unregisterRemoteListener(std::shared_ptr<Entity> &ent
   return 1;
 }
 
-int BaseInformationStream::setRemoteSource(std::shared_ptr<Entity> &entity,
+int BaseInformationStream::setRemoteSource(std::shared_ptr<Entity> entity,
                                            std::shared_ptr<Communication> &communication)
 {
   std::lock_guard<std::mutex> guard(this->_mtx);

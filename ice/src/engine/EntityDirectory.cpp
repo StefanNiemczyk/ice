@@ -142,6 +142,13 @@ std::shared_ptr<Entity> EntityDirectory::create(const std::initializer_list<Id>&
   return entity;
 }
 
+std::unique_ptr<std::vector<std::shared_ptr<Entity>>> EntityDirectory::allEntities()
+{
+  std::unique_ptr<std::vector<std::shared_ptr<Entity>>> vec (new std::vector<std::shared_ptr<Entity>>(this->entities));
+
+  return vec;
+}
+
 std::unique_ptr<std::vector<std::shared_ptr<Entity>>> EntityDirectory::availableEntities()
 {
   std::unique_ptr<std::vector<std::shared_ptr<Entity>>> vec (new std::vector<std::shared_ptr<Entity>>);

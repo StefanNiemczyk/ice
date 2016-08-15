@@ -24,7 +24,7 @@ public:
   void cleanUpInternal();
   bool handleSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel);
   bool handleSubModelResponse(std::shared_ptr<Entity> &entity, int modelIndex);
-  void onEngineDiscovered(std::shared_ptr<Entity> &entity);
+  void onEntityDiscovered(std::shared_ptr<Entity> &entity);
 };
 
 } /* namespace ice */

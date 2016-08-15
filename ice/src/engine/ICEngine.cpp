@@ -37,7 +37,7 @@ void ICEngine::init()
     return;
 
   // init entity directory
-  this->entityDirectory = std::make_shared<EntityDirectory>();
+  this->entityDirectory = std::make_shared<EntityDirectory>(this->shared_from_this());
   this->self = this->entityDirectory->self;
   this->self->addId(EntityDirectory::ID_ONTOLOGY, this->config->ontologyIriOwnEntity);
   this->self->addId(EntityDirectory::ID_ICE, IDGenerator::toString(IDGenerator::getInstance()->getIdentifier()));
@@ -79,7 +79,8 @@ void ICEngine::init()
 void ICEngine::start()
 {
   // creating processing model
-  this->updateStrategie->update(this->modelGenerator->createProcessingModel());
+  auto model = this->modelGenerator->createProcessingModel();
+  this->updateStrategie->update(model);
 
   this->running = true;
 }

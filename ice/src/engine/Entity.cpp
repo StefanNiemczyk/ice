@@ -11,16 +11,20 @@
 #include <tuple>
 #include <sstream>
 
+#include "External.h"
+
 #include "ice/model/ProcessingModel.h"
 #include "ice/ontology/OntologyInterface.h"
 #include "ice/processing/Node.h"
+#include "ice/information/BaseInformationStream.h"
+#include "ice/ICEngine.h"
 #include "ice/EntityDirectory.h"
 
 namespace ice
 {
 
 Entity::Entity(std::shared_ptr<EntityDirectory> const &directory, std::weak_ptr<ICEngine> engine,
-		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id>& ids)
+		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id> ids)
       : iceIdentity(false), directory(directory), timeFactory(factory), available(false), _log(
 				el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000)
 {
@@ -408,10 +412,15 @@ void Entity::setAvailable(bool const &value)
   this->available = value;
 }
 
+bool Entity::isCooperationPossible()
+{
+  return this->isTimeout() == false && this->isAvailable() && this->isIceIdentity();
+}
+
 bool Entity::isActiveCooperation()
 {
   return this->isTimeout() == false && this->iceIdentity && this->available
-      && (this->sendSubModel != nullptr || this->receivedSubModel != nullptr);
+      && (this->sendSubModel.subModel != nullptr || this->receivedSubModel.subModel != nullptr);
 }
 
 bool Entity::isTimeout()
@@ -755,5 +764,42 @@ void Entity::addASPElement(std::shared_ptr<ASPElement> node)
   }
 }
 
+void Entity::setExternal(std::shared_ptr<supplementary::External> &external)
+{
+  this->external = external;
+}
+
+std::shared_ptr<supplementary::External>& Entity::getExternal()
+{
+  return this->external;
+}
+
+bool Entity::updateExternals(bool activateRequired)
+{
+  bool active = this->isCooperationPossible();
+  this->external->assign(active);
+
+  for (auto element : this->aspIro)
+  {
+    element->external->assign(active);
+  }
+
+  for (auto element : this->aspNodes)
+  {
+    element->external->assign(active);
+  }
+
+  for (auto element : this->aspSourceNodes)
+  {
+    element->external->assign(active);
+  }
+
+  for (auto element : this->aspRequiredStreams)
+  {
+    element->external->assign(active && activateRequired);
+  }
+
+  return active;
+}
 
 } /* namespace ice */

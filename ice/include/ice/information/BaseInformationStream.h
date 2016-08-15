@@ -150,7 +150,7 @@ public:
    */
   int unregisterRemoteListener(std::shared_ptr<Entity> &entity);
 
-  int setRemoteSource(std::shared_ptr<Entity> &entity, std::shared_ptr<Communication> &communication);
+  int setRemoteSource(std::shared_ptr<Entity> entity, std::shared_ptr<Communication> &communication);
 
   /*!
    * \brief Returns true if this stream can be shared, else false.
