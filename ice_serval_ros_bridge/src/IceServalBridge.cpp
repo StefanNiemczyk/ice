@@ -118,13 +118,14 @@ void IceServalBridge::init()
   this->setTimeFactory(std::make_shared<SimpleTimeFactory>());
 
   // init entity directory
-  this->entityDirectory = std::make_shared<EntityDirectory>();
+  this->entityDirectory = std::make_shared<EntityDirectory>(this->shared_from_this());
+  this->entityDirectory->init();
   this->self = this->entityDirectory->self;
   this->self->addId(EntityDirectory::ID_ONTOLOGY, this->params->ontologyIriSelf);
   this->self->addId(EntityDirectory::ID_ICE, IDGenerator::toString(IDGenerator::getInstance()->getIdentifier()));
 
   // init communication
-  this->communicationInterface = std::make_shared<ServalCommunication>(this,
+  this->communicationInterface = std::make_shared<ServalCommunication>(this->shared_from_this(),
                                                              this->params->servalInstancePath,
                                                              this->params->servalHost,
                                                              this->params->servalPort,
@@ -204,7 +205,7 @@ void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> entity)
   // check if information are required
   if (this->requiredInfos.size())
   {
-    auto request = std::make_shared<InformationRequest>(this, entity);
+    auto request = std::make_shared<InformationRequest>(this->shared_from_this(), entity);
 
     for (auto &req : this->requiredInfos)
     {

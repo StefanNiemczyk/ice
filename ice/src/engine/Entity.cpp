@@ -23,6 +23,20 @@
 namespace ice
 {
 
+Entity::Entity(const std::initializer_list<Id> ids)
+    : iceIdentity(false), directory(nullptr), timeFactory(nullptr), available(false), _log(
+                              el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000), timestamp(0)
+{
+  if (ids.size() == 0)
+  {
+    throw std::runtime_error(std::string("Entity ids can not be empty"));
+  }
+
+  for (const auto& id : ids) {
+          this->ids[id.key] = id.value;
+  }
+}
+
 Entity::Entity(std::shared_ptr<EntityDirectory> const &directory, std::weak_ptr<ICEngine> engine,
 		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id> ids)
       : iceIdentity(false), directory(directory), timeFactory(factory), available(false), _log(

@@ -26,7 +26,7 @@ class MDPSocket;
 class ServalCommunication : public CommunicationInterface
 {
 public:
-  ServalCommunication(ICEngine *engine, std::string const configPath, std::string const host,
+  ServalCommunication(std::weak_ptr<ICEngine> engine, std::string const configPath, std::string const host,
                       int const port, std::string const authName, std::string const authPass, bool const local = false);
   virtual ~ServalCommunication();
 
@@ -41,6 +41,8 @@ protected:
   virtual void discover();
   virtual int  readMessage(std::vector<std::shared_ptr<Message>> &outMessages);
   virtual void sendMessage(std::shared_ptr<Message> msg);
+  virtual std::shared_ptr<BaseInformationSender> createSender(std::shared_ptr<BaseInformationStream> stream);
+  virtual std::shared_ptr<InformationReceiver> createReceiver(std::shared_ptr<BaseInformationStream> stream);
 
 private:
   std::shared_ptr<serval_interface>             serval;

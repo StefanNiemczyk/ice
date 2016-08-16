@@ -60,7 +60,6 @@ private:
   bool checkReceiverIds(ice_msgs::ICEHeader header);
 
 private:
-  std::shared_ptr<GContainerFactory>    gcontainerFactory;
   ros::NodeHandle                       nodeHandel;                     /**< Ros node handle */
   ros::Publisher                        heartbeatPublisher;             /**< Publisher on the heartbeat channel */
   ros::Subscriber                       heartbeatSubscriber;            /**< Subscriber on the heartbeat channel */

@@ -24,7 +24,7 @@ namespace pt = boost::property_tree;
 namespace ice
 {
 
-ServalCommunication::ServalCommunication(ICEngine *engine, std::string configPath, std::string const host,
+ServalCommunication::ServalCommunication(std::weak_ptr<ICEngine> engine, std::string configPath, std::string const host,
                                          int const port, std::string const authName, std::string const authPass,
                                          bool const local) :
     CommunicationInterface(engine), configPath(configPath), host(host), port(port), authName(authName),
@@ -159,7 +159,7 @@ void ServalCommunication::read()
 
     std::string json(buffer+2, buffer+recCount);
 
-    auto message = Message::parse(json, this->engine->getGContainerFactory());
+    auto message = Message::parse(json, this->containerFactory);
     message->setJobId(buffer[0]);
     message->setJobIndex(buffer[1]);
 
@@ -242,6 +242,16 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
   buffer[1] = msg->getJobIndex();
 
   this->socket->send(sid, buffer, size);
+}
+
+std::shared_ptr<BaseInformationSender> ServalCommunication::createSender(std::shared_ptr<BaseInformationStream> stream)
+{
+  return nullptr;
+}
+
+std::shared_ptr<InformationReceiver> ServalCommunication::createReceiver(std::shared_ptr<BaseInformationStream> stream)
+{
+  return nullptr;
 }
 
 } /* namespace ice */

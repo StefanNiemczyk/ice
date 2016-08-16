@@ -123,6 +123,7 @@ struct SharedSubModel
 class Entity : public std::enable_shared_from_this<Entity>
 {
 public:
+  Entity(const std::initializer_list<Id> ids);
   Entity(std::shared_ptr<EntityDirectory> const &directory, std::weak_ptr<ICEngine> engine,
 		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id> ids);
   virtual ~Entity();

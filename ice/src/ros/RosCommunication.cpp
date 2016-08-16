@@ -38,8 +38,6 @@ RosCommunication::~RosCommunication()
 
 void RosCommunication::initInternal()
 {
-  auto e = this->engine.lock();
-  this->gcontainerFactory = e->getGContainerFactory();
   std::string sid;
   this->self->getId(EntityDirectory::ID_ICE, sid);
   this->iceId = std::stoi(sid);
@@ -56,8 +54,6 @@ void RosCommunication::initInternal()
 
 void RosCommunication::cleanUpInternal()
 {
-  this->gcontainerFactory.reset();
-
   this->heartbeatPublisher.shutdown();
   this->heartbeatSubscriber.shutdown();
   this->coordinationPublisher.shutdown();
@@ -229,7 +225,7 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
 
   std::string json(msg->bytes.begin(), msg->bytes.end());
 
-  auto message = Message::parse(json, this->gcontainerFactory);
+  auto message = Message::parse(json, this->containerFactory);
 
   if (message == nullptr)
   {
