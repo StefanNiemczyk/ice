@@ -66,7 +66,6 @@ private:
   ros::Subscriber                       heartbeatSubscriber;            /**< Subscriber on the heartbeat channel */
   ros::Publisher                        coordinationPublisher;          /**< Publisher on the coordination channel */
   ros::Subscriber                       coordinationSubscriber;         /**< Subscriber on the coordination channel */
-  std::shared_ptr<Entity>               self;                           /**< Myself */
   int                                   iceId;                          /**< own ice id */
   bool                                  running;                        /**< True if the worker thread is running, else false */
   std::thread                           worker;                         /**< Worker thread to perform the spin */

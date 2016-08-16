@@ -53,6 +53,12 @@ const std::string BaseInformationStream::getProvider() const
   return this->streamDescription->getProvider();
 }
 
+
+std::shared_ptr<StreamDescription> BaseInformationStream::getStreamDescription()
+{
+  return this->streamDescription;
+}
+
 int ice::BaseInformationStream::registerTaskAsync(std::shared_ptr<AsynchronousTask> task)
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
@@ -68,7 +74,7 @@ int ice::BaseInformationStream::registerTaskAsync(std::shared_ptr<AsynchronousTa
   return 0;
 }
 
-int ice::BaseInformationStream::unregisterTaskAsync(std::shared_ptr<AsynchronousTask> task)
+int BaseInformationStream::unregisterTaskAsync(std::shared_ptr<AsynchronousTask> task)
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
 
@@ -86,7 +92,7 @@ int ice::BaseInformationStream::unregisterTaskAsync(std::shared_ptr<Asynchronous
   return 1;
 }
 
-int ice::BaseInformationStream::registerTaskSync(std::shared_ptr<AsynchronousTask> task)
+int BaseInformationStream::registerTaskSync(std::shared_ptr<AsynchronousTask> task)
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
 
@@ -101,7 +107,7 @@ int ice::BaseInformationStream::registerTaskSync(std::shared_ptr<AsynchronousTas
   return 0;
 }
 
-int ice::BaseInformationStream::unregisterTaskSync(std::shared_ptr<AsynchronousTask> task)
+int BaseInformationStream::unregisterTaskSync(std::shared_ptr<AsynchronousTask> task)
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
 

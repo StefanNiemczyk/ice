@@ -36,14 +36,10 @@ void ICEngine::init()
   if (this->initialized)
     return;
 
-  // init entity directory
-  this->entityDirectory = std::make_shared<EntityDirectory>(this->shared_from_this());
-  this->self = this->entityDirectory->self;
-  this->self->addId(EntityDirectory::ID_ONTOLOGY, this->config->ontologyIriOwnEntity);
-  this->self->addId(EntityDirectory::ID_ICE, IDGenerator::toString(IDGenerator::getInstance()->getIdentifier()));
-
   std::string path = ros::package::getPath("ice");
 
+  this->entityDirectory = std::make_shared<EntityDirectory>(this->shared_from_this());
+  this->communicationInterface = std::make_shared<RosCommunication>(this->shared_from_this());
   this->eventHandler = std::make_shared<EventHandler>(this->shared_from_this());
   this->streamStore = std::make_shared<StreamStore>(this->shared_from_this());
   this->nodeStore = std::make_shared<NodeStore>(this->shared_from_this());
@@ -52,6 +48,12 @@ void ICEngine::init()
   this->gcontainerFactory = std::make_shared<GContainerFactory>(this->shared_from_this());
   this->aspTransformationGenerator = std::make_shared<ASPTransformationGeneration>(this->shared_from_this());
 
+  // init entity directory
+  this->entityDirectory->init();
+  this->self = this->entityDirectory->self;
+  this->self->addId(EntityDirectory::ID_ONTOLOGY, this->config->ontologyIriOwnEntity);
+  this->self->addId(EntityDirectory::ID_ICE, IDGenerator::toString(IDGenerator::getInstance()->getIdentifier()));
+
   // init ontology
   this->ontologyInterface = std::make_shared<OntologyInterface>(path + "/java/lib/");
   this->ontologyInterface->addIRIMapper(path + "/ontology/");
@@ -59,6 +61,7 @@ void ICEngine::init()
   this->ontologyInterface->loadOntologies();
 
   // Initialize components
+  this->communicationInterface->init();
   this->eventHandler->init();
   this->modelGenerator->init();
   this->streamStore->init();
@@ -84,6 +87,9 @@ void ICEngine::start()
 void ICEngine::cleanUp()
 {
   this->running = false;
+
+  if (this->communicationInterface)
+    this->communicationInterface->cleanUp();
 
   if (this->eventHandler)
     this->eventHandler->cleanUp();

@@ -77,15 +77,11 @@ TEST(JNITest, getOntologyIDs)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  auto ids = oi.getOntologyIDs();
+  std::vector<std::pair<std::string,std::string>> ids;
+  oi.getOntologyIDs(ids);
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
-
-//  for (auto id : *ids)
-//  {
-//    std::cout << id << std::endl;
-//  }
 }
 
 TEST(JNITest, addSystem)

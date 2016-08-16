@@ -77,7 +77,7 @@ void Coordinator::cleanUp()
 
     for (auto &entity : *this->entityDirectory->activeCooperationEntities())
     {
-      this->stopCooperationWithEngine(entity, true);
+//      this->stopCooperationWithEngine(entity, true);
     }
 
     this->communication.reset();

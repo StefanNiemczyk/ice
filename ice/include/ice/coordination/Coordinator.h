@@ -118,15 +118,6 @@ public:
   int onStopCooperation(identifier engineId);
 
 private:
-  /*!
-   * \brief Stops the cooperation with the given engine.
-   *
-   * Stops the cooperation with the given engine. Sends a stop message if sendStop is true.
-   *
-   * @param engineState The engine to stop the cooperation with.
-   * @param sendStop True if a stop cooperation should be send.
-   */
-  void stopCooperationWithEngine(std::shared_ptr<Entity> &entity, bool sendStop);
 
   /*!
    * \brief This message is executed by the worker thread.

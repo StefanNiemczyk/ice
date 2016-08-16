@@ -59,120 +59,7 @@ int Entity::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ont
   if (false == this->getId(EntityDirectory::ID_ONTOLOGY, ownIri) || ontologyInterface->isSystemKnown(ownIri))
     return -1;
 
-  auto nodes = ontologyInterface->readNodesAndIROsAsASP(ownIri);
-
-  auto &types = nodes->at(0);
-  auto &names = nodes->at(1);
-  auto &strings = nodes->at(2);
-  auto &aspStrings = nodes->at(3);
-  auto &cppStrings = nodes->at(4);
-
-  int count = 0;
-
-  for (int i = 0; i < names.size(); ++i)
-  {
-    std::string &name = names.at(i);
-    std::string &elementStr = strings.at(i);
-    std::string &aspStr = aspStrings.at(i);
-    std::string &cppStr = cppStrings.at(i);
-    std::string &typeStr = types.at(i);
-    ASPElementType type;
-
-    if (typeStr == "" || name == "" || elementStr == "")
-    {
-      _log->error("Empty string for element '%v': '%v' (elementStr), '%v' (typeStr), element will be skipped",
-                  name, elementStr, typeStr);
-      continue;
-    }
-
-    if (typeStr == "COMPUTATION_NODE")
-    {
-      type = ASPElementType::ASP_COMPUTATION_NODE;
-    }
-    else if (typeStr == "SOURCE_NODE")
-    {
-      type = ASPElementType::ASP_SOURCE_NODE;
-    }
-    else if (typeStr == "REQUIRED_STREAM")
-    {
-      type = ASPElementType::ASP_REQUIRED_STREAM;
-    }
-    else if (typeStr == "MAP_NODE")
-    {
-      type = ASPElementType::ASP_MAP_NODE;
-    }
-    else if (typeStr == "IRO_NODE")
-    {
-      type = ASPElementType::ASP_IRO_NODE;
-    }
-    else if (typeStr == "REQUIRED_MAP")
-    {
-      type = ASPElementType::ASP_REQUIRED_MAP;
-    }
-    else
-    {
-      _log->error("Unknown asp element type '%v' for element '%v', element will be skipped", typeStr, name);
-      continue;
-    }
-
-    auto node = this->getASPElementByName(type, name);
-
-    if (!node)
-    {
-      _log->info("ASP element '%v' not found, creating new element", name);
-      auto element = std::make_shared<ASPElement>();
-      element->aspString = aspStr;
-      element->name = name;
-      element->state = ASPElementState::ADDED_TO_ASP;
-      element->type = type;
-
-      if (cppStr != "")
-      {
-        int index = cppStr.find('\n');
-        element->className = cppStr.substr(0, index);
-        element->configAsString = cppStr.substr(index + 1, cppStr.length() - index - 1);
-        element->config = this->readConfiguration(element->configAsString);
-      }
-
-      element->raw = elementStr;
-
-      // ASP external stuff removed
-//      auto value = supplementary::ClingWrapper::stringToValue();
-//      element->external = this->asp->getExternal(*value.name(), value.args());
-//
-//      switch (type)
-//      {
-//        case ASPElementType::ASP_COMPUTATION_NODE:
-//        case ASPElementType::ASP_SOURCE_NODE:
-//        case ASPElementType::ASP_MAP_NODE:
-//        case ASPElementType::ASP_IRO_NODE:
-//          if (false == this->nodeStore->existNodeCreator(element->className))
-//          {
-//            _log->warn("Missing creator for node '%v' of type '%v', cpp grounding '%v', asp external set to false",
-//                       element->name, ASPElementTypeNames[type],
-//                       element->className == "" ? "NULL" : element->className);
-//            element->external->assign(false);
-//          }
-//          else
-//          {
-//            element->external->assign(true);
-//          }
-//          break;
-//        default:
-//          element->external->assign(true);
-//          break;
-//      }
-//
-//      this->asp->add(name, {}, aspStr);
-//      this->asp->ground(name, {});
-//
-//      this->addASPElement(element);
-//      this->groundingDirty = true;
-      ++count;
-    }
-  }
-
-  return count;
+  return 1;
 }
 
 std::map<std::string, std::string> Entity::readConfiguration(std::string const config)
@@ -776,7 +663,7 @@ std::shared_ptr<supplementary::External>& Entity::getExternal()
 
 bool Entity::updateExternals(bool activateRequired)
 {
-  bool active = this->isCooperationPossible();
+  bool active = activateRequired || this->isCooperationPossible();
   this->external->assign(active);
 
   for (auto element : this->aspIro)

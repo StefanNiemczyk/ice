@@ -62,6 +62,15 @@ void ASPModelGenerator::initInternal()
   // init self
   this->directory = en->getEntityDirector();
   this->self = en->getEntityDirector()->self;
+
+  if (this->self->getExternal() == nullptr)
+  {
+    std::string iri;
+    this->self->getId(EntityDirectory::ID_ONTOLOGY, iri);
+    iri = this->ontology->toShortIri(iri);
+    auto ext = this->asp->getExternal("system", {Gringo::Value(iri), "default"}, "system", {Gringo::Value(iri)}, true);
+    this->self->setExternal(ext);
+  }
 }
 
 void ASPModelGenerator::cleanUpInternal()
@@ -113,13 +122,19 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
 
   // activate and deactivate systems
   std::vector<std::shared_ptr<Entity>> used;
-  for (auto entity : *this->directory->allEntities())
+  auto all = this->directory->allEntities();
+  for (auto &entity : *all)
   {
     if (this->self != entity && entity->updateExternals(false))
-        used.push_back(entity);
+    {
+      std::cout << entity->toString() << std::endl;
+      used.push_back(entity);
+    }
   }
+  this->self->updateExternals(true);
 
   // Solving
+  _log->debug("Start solving");
   auto solveResult = this->asp->solve();
   _log->info("Solving finished: %v", (Gringo::SolveResult::SAT == solveResult) ? "SAT" : "UNSAT");
 

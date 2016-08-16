@@ -25,7 +25,7 @@ namespace ice
 {
 
 RosCommunication::RosCommunication(std::weak_ptr<ICEngine> engine) :
-    CommunicationInterface(engine)
+    CommunicationInterface(engine), iceId(-1)
 {
   this->_log = el::Loggers::getLogger("RosCommunication");
   this->running = false;

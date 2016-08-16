@@ -20,6 +20,12 @@ OntologyIdMessage::~OntologyIdMessage()
   //
 }
 
+
+std::vector<std::pair<std::string, std::string>>& OntologyIdMessage::getIds()
+{
+  return this->ids;
+}
+
 rapidjson::Value OntologyIdMessage::payloadToJson(rapidjson::Document &document)
 {
   rapidjson::Value value;

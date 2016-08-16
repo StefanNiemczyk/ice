@@ -24,7 +24,6 @@ const std::string EntityDirectory::ID_ONTOLOGY_SHORT    = "id_ontology_short";
 
 EntityDirectory::EntityDirectory(std::weak_ptr<ICEngine> const &engine) : engine(engine)
 {
-  //
 }
 
 EntityDirectory::~EntityDirectory()
@@ -37,7 +36,7 @@ void EntityDirectory::init()
   auto e = this->engine.lock();
   this->timeFactory = e->getTimeFactory();
 
-  std::initializer_list<Id> ids = {{ID_SERVAL, ""}, {ID_ONTOLOGY, ""}};
+  std::initializer_list<Id> ids = {{ID_SERVAL, ""}, {ID_ONTOLOGY, ""}, {ID_ICE, ""}};
   this->self = std::make_shared<Entity>(this->shared_from_this(), this->engine, this->timeFactory, ids);
   this->self->setIceIdentity(true);
 }
