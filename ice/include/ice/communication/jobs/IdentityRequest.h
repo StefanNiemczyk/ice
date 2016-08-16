@@ -19,8 +19,10 @@ class OntologyInterface;
 
 enum IdentityRequestState
 {
-  IRS_REQUEST_ID,
+  IRS_REQUEST_IDS,
+  IRS_RESPONS_IDS,
   IRS_REQUEST_ONT_IRI,
+  IRS_RESPONS_ONT_IRI,
 
   IRS_UNKNOWN
 };

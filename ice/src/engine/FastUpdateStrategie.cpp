@@ -18,7 +18,7 @@ namespace ice
 
 FastUpdateStrategie::FastUpdateStrategie(std::weak_ptr<ICEngine> engine) : UpdateStrategie(engine)
 {
-  //
+  _log = el::Loggers::getLogger("FastUpdateStrategie");
 }
 
 FastUpdateStrategie::~FastUpdateStrategie()
@@ -34,8 +34,9 @@ void FastUpdateStrategie::cleanUpInternal()
 {
 }
 
-void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
+void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> const &model)
 {
+  _log->info("Processing new model");
   UpdateStrategie::update(model);
 
   if (this->lastModel != nullptr)
@@ -59,7 +60,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
 
     nodes.push_back(node);
   }
-
+  std::cout << 1 << std::endl;
   // sending streams
   for (auto &send : model->getSend())
   {
@@ -77,6 +78,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
       stream->registerRemoteListener(send->entity, this->communication);
     }
   }
+  std::cout << 2 << std::endl;
 
   // receiving streams
   for (auto &receive : model->getReceive())
@@ -96,6 +98,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
       stream->setRemoteSource(receive->entity, this->communication);
     }
   }
+  std::cout << 3 << std::endl;
 
   if (false == valid)
   {
@@ -107,18 +110,20 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
     node->activate();
     node->registerEntity(this->self);
   }
+  std::cout << 4 << std::endl;
 
   this->nodeStore->cleanUpNodes();
   this->streamStore->cleanUpStreams();
 
+  std::cout << 5 << std::endl;
   // sending sub models
   for (auto &subModel : model->getSubModels())
   {
     auto job = std::make_shared<CooperationRequest>(this->engine, subModel->entity);
     job->setSubModelDesc(subModel->model);
-    // TODO
-//    this->communication->sendSubModelRequest(subModel->entity, subModel->model);
+    this->communication->addComJob(job);
   }
+  std::cout << 6 << std::endl;
 }
 
 bool FastUpdateStrategie::handleSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel)
@@ -147,7 +152,7 @@ bool FastUpdateStrategie::handleSubModelResponse(std::shared_ptr<Entity> &entity
   return true;
 }
 
-void FastUpdateStrategie::onEntityDiscovered(std::shared_ptr<Entity> &entity)
+void FastUpdateStrategie::onEntityDiscovered(std::shared_ptr<Entity> entity)
 {
   this->triggerModelUpdate();
 }

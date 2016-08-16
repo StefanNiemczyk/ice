@@ -71,7 +71,7 @@ void UpdateStrategie::cleanUp()
   this->cleanUpInternal();
 }
 
-void UpdateStrategie::update(std::shared_ptr<ProcessingModel> &model)
+void UpdateStrategie::update(std::shared_ptr<ProcessingModel> const &model)
 {
   this->lastModel = this->model;
   this->model = model;
@@ -214,9 +214,8 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
 
     std::string iri;
     this->self->getId(EntityDirectory::ID_ONTOLOGY, iri);
-    std::string iriShort = this->ontology->toShortIri(iri);
 
-    auto stream = this->getStream(nodeDesc.aspName, iriShort,
+    auto stream = this->getStream(nodeDesc.aspName, iri,
                                   output.entity, output.scope, output.representation,
                                   output.relatedEntity, output.metadata);
 

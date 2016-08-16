@@ -217,11 +217,81 @@ entity_match Entity::checkMatching(std::string &key, std::string &value)
   return entity_match::CONFLICTING;
 }
 
-void Entity::fuse(std::shared_ptr<Entity> &identity)
+void Entity::fuse(std::shared_ptr<Entity> &entity)
 {
-  for (auto &id : identity->ids)
+  for (auto &id : entity->ids)
   {
     this->ids[id.first] = id.second;
+  }
+
+  this->iceIdentity |= entity->iceIdentity;
+  this->available |= entity->available;
+  this->index = std::max(this->index, entity->index);
+  this->timestamp = std::max(this->timestamp, entity->timestamp);
+
+  for (auto &meta : entity->metadata)
+  {
+    this->metadata[meta.first] = meta.second;
+  }
+
+  for (auto &con : entity->connectionQuality)
+  {
+    this->connectionQuality[con.first] = con.second;
+  }
+
+  for (auto &spec : entity->offeredInformation)
+  {
+    this->offeredInformation.push_back(spec);
+  }
+
+  for (auto &oid : entity->ontologyIds)
+  {
+    this->ontologyIds.push_back(oid);
+  }
+
+  // Sharing Stuff
+//    SharedSubModel                                        sendSubModel;
+//      SharedSubModel                                        receivedSubModel;
+//      std::set<std::shared_ptr<Node>>                       nodes;                  /**< Nodes activated by this engine */
+//      std::vector<std::pair<std::string,std::string>>       ontologyIriDiff;
+
+  // ASP Stuff
+  if (this->external == nullptr)
+  {
+    this->external = entity->external;
+  }
+  else
+  {
+    if (entity->external != nullptr)
+    {
+      entity->external->assign(false);
+      entity->external->release();
+    }
+  }
+
+  for (auto &element : entity->aspNodes)
+  {
+    this->addASPElement(element);
+  }
+
+  for (auto &element : entity->aspSourceNodes)
+  {
+    this->addASPElement(element);
+  }
+
+  for (auto &element : entity->aspIro)
+  {
+    this->addASPElement(element);
+  }
+
+  for (auto &element : entity->aspRequiredStreams)
+  {
+    this->addASPElement(element);
+  }
+
+  for (auto &element : entity->aspRequiredMaps)
+  {
+    this->addASPElement(element);
   }
 }
 
@@ -248,6 +318,11 @@ void Entity::pushIds(std::vector<std::tuple<std::string, std::string>>& vector)
   {
     vector.push_back(std::make_tuple(id.first, id.second));
   }
+}
+
+void Entity::checkDirectory()
+{
+  this->directory->fuse(this->shared_from_this());
 }
 
 void Entity::checkIce()
@@ -678,6 +753,10 @@ std::shared_ptr<supplementary::External>& Entity::getExternal()
 bool Entity::updateExternals(bool activateRequired)
 {
   bool active = activateRequired || this->isCooperationPossible();
+
+  if (this->external == nullptr)
+    return false;
+
   this->external->assign(active);
 
   for (auto element : this->aspIro)

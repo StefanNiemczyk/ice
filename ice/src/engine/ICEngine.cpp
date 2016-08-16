@@ -48,13 +48,13 @@ void ICEngine::init()
   this->gcontainerFactory = std::make_shared<GContainerFactory>(this->shared_from_this());
   this->aspTransformationGenerator = std::make_shared<ASPTransformationGeneration>(this->shared_from_this());
 
-  // init entity directory
+  // Initialize entity directory
   this->entityDirectory->init();
   this->self = this->entityDirectory->self;
   this->self->addId(EntityDirectory::ID_ONTOLOGY, this->config->ontologyIriOwnEntity);
   this->self->addId(EntityDirectory::ID_ICE, IDGenerator::toString(IDGenerator::getInstance()->getIdentifier()));
 
-  // init ontology
+  // Initialize ontology
   this->ontologyInterface = std::make_shared<OntologyInterface>(path + "/java/lib/");
   this->ontologyInterface->addIRIMapper(path + "/ontology/");
   this->ontologyInterface->addOntologyIRI(this->config->ontologyIri);
@@ -65,9 +65,12 @@ void ICEngine::init()
   this->eventHandler->init();
   this->modelGenerator->init();
   this->streamStore->init();
-  this->updateStrategie->init();
   this->gcontainerFactory->init();
   this->aspTransformationGenerator->init();
+
+  // Initialize update strategy
+  this->updateStrategie->init();
+  this->entityDirectory->disvoeredIceIdentity.registerCallback(this->updateStrategie.get(), &UpdateStrategie::onEntityDiscovered);
 
   // reading information structure from ontology
   this->streamStore->readEntitiesFromOntology();

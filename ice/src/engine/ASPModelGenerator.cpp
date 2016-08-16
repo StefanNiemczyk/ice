@@ -110,7 +110,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
     this->groundingDirty = false;
     _log->debug("Grounding flagged dirty, grounding asp program");
 
-    if (this->lastQuery)
+    if (this->lastQuery != nullptr)
     {
       this->lastQuery->assign(false);
       this->lastQuery->release();
@@ -127,7 +127,6 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
   {
     if (this->self != entity && entity->updateExternals(false))
     {
-      std::cout << entity->toString() << std::endl;
       used.push_back(entity);
     }
   }
@@ -504,13 +503,10 @@ void ASPModelGenerator::readSystemsFromOntology()
     if (entity->getExternal() == nullptr)
     {
       std::string iri = this->ontology->toShortIri(ontSystem);
-
-      auto ext = this->asp->getExternal("system", {Gringo::Value(iri), "default"}, "system", {Gringo::Value(iri)},
-                                        true);
+      auto ext = this->asp->getExternal("system", {Gringo::Value(iri), "default"}, "system", {Gringo::Value(iri)}, true);
       entity->setExternal(ext);
 
-      this->asp->add("base", {},
-                     "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ",default).");
+      this->asp->add("base", {}, "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ",default).");
     }
 
     auto nodes = this->ontology->readNodesAndIROsAsASP(ontSystem);
@@ -570,7 +566,7 @@ void ASPModelGenerator::readSystemsFromOntology()
 
       auto node = entity->getASPElementByName(type, this->ontology->toShortIri(name));
 
-      if (!node)
+      if (node == nullptr)
       {
         _log->info("ASP element '%v' not found, creating new element", std::string(name));
         auto element = std::make_shared<ASPElement>();
@@ -593,7 +589,6 @@ void ASPModelGenerator::readSystemsFromOntology()
 
         std::string shortIris = this->ontology->toShortIriAll(elementStr);
         auto value = supplementary::ClingWrapper::stringToValue(shortIris.c_str());
-        element->external = this->asp->getExternal(*value.name(), value.args());
 
         switch (type)
         {
@@ -606,17 +601,15 @@ void ASPModelGenerator::readSystemsFromOntology()
               _log->warn("Missing creator for node '%v' of type '%v', cpp grounding '%v', asp external set to false",
                          element->name, ASPElementTypeNames[type],
                          element->className == "" ? "NULL" : element->className);
-              element->external->assign(false);
-            }
-            else
-            {
-              element->external->assign(true);
+              continue;
             }
             break;
           default:
-            element->external->assign(true);
             break;
         }
+
+        element->external = this->asp->getExternal(*value.name(), value.args());
+        element->external->assign(false);
 
         this->asp->add(element->name, {}, element->aspString);
         this->asp->ground(element->name, {});

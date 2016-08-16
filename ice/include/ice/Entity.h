@@ -140,6 +140,7 @@ public:
   void fuse(const std::initializer_list<Id>& ids);
   void fuse(std::vector<std::tuple<std::string, std::string>>& ids);
   void pushIds(std::vector<std::tuple<std::string, std::string>>& vector);
+  void checkDirectory();
 
   void checkIce();
   bool isIceIdentity();

@@ -49,7 +49,7 @@ void RosCommunication::initInternal()
   this->coordinationSubscriber = this->nodeHandel.subscribe("ice/coordination", 100, &RosCommunication::onCoordination, this);
 
   this->running = true;
-  this->worker = std::thread(&RosCommunication::workerTask, this);
+  this->worker = std::thread(&RosCommunication::spin, this);
 }
 
 void RosCommunication::cleanUpInternal()
@@ -86,12 +86,13 @@ int RosCommunication::readMessage(std::vector<std::shared_ptr<Message>> &outMess
 
 void RosCommunication::sendMessage(std::shared_ptr<Message> msg)
 {
-  _log->info("Sending system specification to engine '%v'", msg->getEntity()->toString());
+  _log->info("Sending message for job '%v' with index '%v' to '%v'", std::to_string(msg->getJobId()),
+             std::to_string(msg->getJobIndex()), msg->getEntity()->toString());
 
   std::string sid;
   if (false == msg->getEntity()->getId(EntityDirectory::ID_ICE, sid))
   {
-    this->_log->error("Trying to send message with serval to none serval instance %v", msg->getEntity()->toString());
+    this->_log->error("Trying to send message with ROS to none ice instance %v", msg->getEntity()->toString());
     return;
   }
 
@@ -113,7 +114,7 @@ void RosCommunication::sendMessage(std::shared_ptr<Message> msg)
 
   coordinationMsg.jobId = msg->getJobId();
   coordinationMsg.jobIndex = msg->getJobIndex();
-  coordinationMsg.bytes.reserve(size);
+  coordinationMsg.bytes.resize(size);
   std::copy(json.begin(), json.end(), coordinationMsg.bytes.begin());
 
   this->coordinationPublisher.publish(coordinationMsg);
@@ -163,7 +164,7 @@ std::shared_ptr<InformationReceiver> RosCommunication::createReceiver(std::share
   return nullptr;
 }
 
-void RosCommunication::workerTask()
+void RosCommunication::spin()
 {
   ros::Rate loop_rate(30);
 
@@ -179,12 +180,12 @@ void RosCommunication::workerTask()
 void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
 {
   std::string sid = std::to_string(msg->header.senderId.value);
-  auto entity = this->directory->lookup(EntityDirectory::ID_SERVAL, sid);
+  auto entity = this->directory->lookup(EntityDirectory::ID_ICE, sid);
 
   if (entity == nullptr)
   {
     // Create new instance and request ids
-    entity = this->directory->create(EntityDirectory::ID_SERVAL, sid);
+    entity = this->directory->create(EntityDirectory::ID_ICE, sid);
     // At the beginning each discovered node is expected to be an ice node
     entity->setAvailable(true);
     this->discoveredEntity(entity);
@@ -210,14 +211,14 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
     return;
 
   std::string sid = std::to_string(msg->header.senderId.value);
-  auto entity = this->directory->lookup(EntityDirectory::ID_SERVAL, sid, false);
+  auto entity = this->directory->lookup(EntityDirectory::ID_ICE, sid, false);
 
   if (entity == nullptr)
   {
-    this->_log->info("Received message from unknown serval node '%v'", sid);
+    this->_log->info("Received message from unknown ice instance '%v'", sid);
 
     // Create new instance and request ids
-    entity = this->directory->create(EntityDirectory::ID_SERVAL, sid);
+    entity = this->directory->create(EntityDirectory::ID_ICE, sid);
     // At the beginning each discovered node is expected to be an ice node
     entity->setAvailable(true);
     this->discoveredEntity(entity);

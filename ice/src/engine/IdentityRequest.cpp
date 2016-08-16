@@ -69,7 +69,7 @@ void IdentityRequest::handleMessage(std::shared_ptr<Message> const &message)
     }
     case (IMI_IDS_RESPONSE):
     {
-      this->onRequestIds(std::static_pointer_cast<IdMessage>(message));
+      this->onResponsIds(std::static_pointer_cast<IdMessage>(message));
       break;
     }
     case (IMI_ONTOLOGY_IDS_REQUEST):
@@ -79,7 +79,7 @@ void IdentityRequest::handleMessage(std::shared_ptr<Message> const &message)
     }
     case (IMI_ONTOLOGY_IDS_RESPONSE):
     {
-      this->onRequestOntologyIds(std::static_pointer_cast<OntologyIdMessage>(message));
+      this->onResponseOntologyIds(std::static_pointer_cast<OntologyIdMessage>(message));
       break;
     }
     case (IMI_FINISH):
@@ -98,7 +98,7 @@ void IdentityRequest::handleMessage(std::shared_ptr<Message> const &message)
 void IdentityRequest::sendRequestIds()
 {
   _log->info("Requesting Ids from '%v'", entity->toString());
-  this->stateIR = IdentityRequestState::IRS_REQUEST_ID;
+  this->stateIR = IdentityRequestState::IRS_REQUEST_IDS;
 
   auto m = std::make_shared<CommandMessage>(IceMessageIds::IMI_IDS_REQUEST);
   this->send(m);
@@ -108,13 +108,13 @@ void IdentityRequest::sendRequestIds()
 
 void IdentityRequest::onRequestIds(std::shared_ptr<Message> const &message)
 {
-  if (this->stateIR != IdentityRequestState::IRS_UNKNOWN && this->stateIR != IdentityRequestState::IRS_REQUEST_ID)
+  if (this->stateIR != IdentityRequestState::IRS_UNKNOWN && this->stateIR != IdentityRequestState::IRS_REQUEST_IDS)
   {
     // received message in wrong state
     _log->warn("Received requestIds message in wrong state '%v' from '%v'", this->stateIR, entity->toString());
     return;
   }
-  else if (this->stateIR == IdentityRequestState::IRS_REQUEST_ID &&
+  else if (this->stateIR == IdentityRequestState::IRS_REQUEST_IDS &&
       false == this->timeFactory->checkTimeout(this->timestampLastActive, 100))
   {
     // duplicated message
@@ -124,7 +124,7 @@ void IdentityRequest::onRequestIds(std::shared_ptr<Message> const &message)
 
   _log->info("Sending Ids to '%v'", entity->toString());
   this->updateActiveTime();
-  this->stateIR = IdentityRequestState::IRS_REQUEST_ID;
+  this->stateIR = IdentityRequestState::IRS_REQUEST_IDS;
 
   auto m = std::make_shared<IdMessage>();
   this->self->pushIds(m->getIds());
@@ -133,14 +133,15 @@ void IdentityRequest::onRequestIds(std::shared_ptr<Message> const &message)
 
 void IdentityRequest::onResponsIds(std::shared_ptr<IdMessage> const &message)
 {
-  if (this->stateIR != IdentityRequestState::IRS_REQUEST_ID)
+  if (this->stateIR != IdentityRequestState::IRS_REQUEST_IDS && this->stateIR != IdentityRequestState::IRS_RESPONS_IDS)
   {
     _log->warn("Received ids message in wrong state '%v' from '%v'", this->stateIR, entity->toString());
     return;
   }
 
   // duplicated message
-  if (false == this->timeFactory->checkTimeout(this->timestampLastActive, 100))
+  if (this->stateIR == IdentityRequestState::IRS_RESPONS_IDS
+      && false == this->timeFactory->checkTimeout(this->timestampLastActive, 100))
   {
     _log->debug("Received duplicated ids message from '%v'", entity->toString());
     return;
@@ -148,10 +149,12 @@ void IdentityRequest::onResponsIds(std::shared_ptr<IdMessage> const &message)
 
   _log->info("Received ids from %v", this->entity->toString());
   this->updateActiveTime();
+  this->stateIR = IdentityRequestState::IRS_RESPONS_IDS;
 
   auto entity = message->getEntity();
 
   entity->fuse(message->getIds());
+  entity->checkDirectory();
 
   bool hasIri = entity->getId(EntityDirectory::ID_ONTOLOGY, this->iri);
 
@@ -202,20 +205,23 @@ void IdentityRequest::onRequestOntologyIds(std::shared_ptr<Message> const &messa
 
 void IdentityRequest::onResponseOntologyIds(std::shared_ptr<OntologyIdMessage> const &message)
 {
-  if (this->stateIR != IdentityRequestState::IRS_REQUEST_ONT_IRI)
+  if (this->stateIR != IdentityRequestState::IRS_REQUEST_ONT_IRI && this->stateIR != IdentityRequestState::IRS_RESPONS_ONT_IRI)
   {
     _log->warn("Received ontologyIds message in wrong state '%v' from '%v'", this->stateIR, entity->toString());
     return;
   }
 
   // duplicated message
-  if (false == this->timeFactory->checkTimeout(this->timestampLastActive, 100))
+  if (this->stateIR == IdentityRequestState::IRS_RESPONS_ONT_IRI
+      && false == this->timeFactory->checkTimeout(this->timestampLastActive, 100))
   {
     _log->debug("Received duplicated ontologyIds message from '%v'", entity->toString());
     return;
   }
 
   _log->info("Received ontology ids to %v", this->entity->toString());
+  this->updateActiveTime();
+  this->stateIR = IdentityRequestState::IRS_RESPONS_ONT_IRI;
 
   this->entity->getOntologyIds() = message->getIds();
   this->checkOntologyIris();

@@ -39,6 +39,8 @@ void EntityDirectory::init()
   std::initializer_list<Id> ids = {{ID_SERVAL, ""}, {ID_ONTOLOGY, ""}, {ID_ICE, ""}};
   this->self = std::make_shared<Entity>(this->shared_from_this(), this->engine, this->timeFactory, ids);
   this->self->setIceIdentity(true);
+
+  this->entities.push_back(this->self);
 }
 
 void EntityDirectory::cleanUp()
@@ -48,6 +50,8 @@ void EntityDirectory::cleanUp()
 
 int EntityDirectory::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ontologyInterface)
 {
+  std::lock_guard<std::mutex> guard(this->_mtx);
+
   if (ontologyInterface->isLoadDirty())
     ontologyInterface->loadOntologies();
 
@@ -74,21 +78,25 @@ int EntityDirectory::initializeFromOntology(std::shared_ptr<OntologyInterface> c
 
 std::shared_ptr<Entity> EntityDirectory::lookup(const std::initializer_list<Id>& ids, bool create)
 {
+
   std::vector<std::shared_ptr<Entity>> matches;
   std::vector<std::shared_ptr<Entity>> including;
 
-  // Check if an identity with this
-  for (auto &id : this->entities)
   {
-    switch (id->checkMatching(ids))
+    std::lock_guard<std::mutex> guard(this->_mtx);
+    // Check if an identity with this
+    for (auto &id : this->entities)
     {
-      case (entity_match::FULL_MATCH):
-      case (entity_match::INCLUDING):
-        matches.push_back(id);
-        break;
-      case (entity_match::INCLUDED):
-        including.push_back(id);
-        break;
+      switch (id->checkMatching(ids))
+      {
+        case (entity_match::FULL_MATCH):
+        case (entity_match::INCLUDING):
+          matches.push_back(id);
+          break;
+        case (entity_match::INCLUDED):
+          including.push_back(id);
+          break;
+      }
     }
   }
 
@@ -128,6 +136,49 @@ std::shared_ptr<Entity> EntityDirectory::lookup(std::string const &key, std::str
   return this->lookup({{key, value}}, create);
 }
 
+int EntityDirectory::fuse(std::shared_ptr<Entity> entity)
+{
+  std::lock_guard<std::mutex> guard(this->_mtx);
+
+  std::vector<std::shared_ptr<Entity>> matches;
+  std::vector<std::shared_ptr<Entity>> including;
+
+  // Check if an identity with this
+  for (auto &id : this->entities)
+  {
+    if (id == entity)
+      continue;
+
+    switch (id->checkMatching(entity))
+    {
+      case (entity_match::FULL_MATCH):
+      case (entity_match::INCLUDING):
+        matches.push_back(id);
+        break;
+      case (entity_match::INCLUDED):
+        including.push_back(id);
+        break;
+    }
+  }
+
+  if (matches.empty() && including.empty())
+    return 0;
+
+  for (auto &match : matches)
+  {
+    entity->fuse(match);
+    this->removeEntity(match);
+  }
+
+  for (auto &include : including)
+  {
+    entity->fuse(include);
+    this->removeEntity(include);
+  }
+
+  return matches.size() + including.size();
+}
+
 std::shared_ptr<Entity> EntityDirectory::create(std::string const &key, std::string const &value)
 {
   return this->create({{key, value}});
@@ -135,6 +186,7 @@ std::shared_ptr<Entity> EntityDirectory::create(std::string const &key, std::str
 
 std::shared_ptr<Entity> EntityDirectory::create(const std::initializer_list<Id>& ids)
 {
+  std::lock_guard<std::mutex> guard(this->_mtx);
   // create new entity
   auto entity = std::make_shared<Entity>(this->shared_from_this(), this->engine, this->timeFactory, ids);
   this->entities.push_back(entity);
@@ -144,6 +196,7 @@ std::shared_ptr<Entity> EntityDirectory::create(const std::initializer_list<Id>&
 
 std::unique_ptr<std::vector<std::shared_ptr<Entity>>> EntityDirectory::allEntities()
 {
+  std::lock_guard<std::mutex> guard(this->_mtx);
   std::unique_ptr<std::vector<std::shared_ptr<Entity>>> vec (new std::vector<std::shared_ptr<Entity>>(this->entities));
 
   return vec;
@@ -151,6 +204,7 @@ std::unique_ptr<std::vector<std::shared_ptr<Entity>>> EntityDirectory::allEntiti
 
 std::unique_ptr<std::vector<std::shared_ptr<Entity>>> EntityDirectory::availableEntities()
 {
+  std::lock_guard<std::mutex> guard(this->_mtx);
   std::unique_ptr<std::vector<std::shared_ptr<Entity>>> vec (new std::vector<std::shared_ptr<Entity>>);
 
   for (auto &id : this->entities)
@@ -214,6 +268,18 @@ void EntityDirectory::print()
     std::cout << id->toString() << std::endl;
   }
   std::cout << "---------------------------------------------------------" << std::endl;
+}
+
+void EntityDirectory::removeEntity(std::shared_ptr<Entity> &entity)
+{
+  for (int i = 0; i < this->entities.size(); ++i)
+  {
+    if (this->entities.at(i) == entity)
+    {
+      this->entities.erase(this->entities.begin() + i);
+      return;
+    }
+  }
 }
 
 } /* namespace ice */

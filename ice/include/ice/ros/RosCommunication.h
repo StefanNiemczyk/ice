@@ -56,7 +56,7 @@ private:
   template<typename ICEType, typename ROSType>
     std::shared_ptr<InformationReceiver> _createReceiver(std::shared_ptr<BaseInformationStream> stream,
                                                          transformM2C<ICEType, ROSType> &messageTransform);
-  void workerTask();
+  void spin();
   bool checkReceiverIds(ice_msgs::ICEHeader header);
 
 private:

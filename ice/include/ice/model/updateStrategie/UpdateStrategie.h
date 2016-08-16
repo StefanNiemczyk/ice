@@ -43,12 +43,12 @@ public:
   void init();
   void cleanUp();
 
-  virtual void update(std::shared_ptr<ProcessingModel> &model);
+  virtual void update(std::shared_ptr<ProcessingModel> const &model);
   virtual void initInternal() = 0;
   virtual void cleanUpInternal() = 0;
   virtual bool handleSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel) = 0;
   virtual bool handleSubModelResponse(std::shared_ptr<Entity> &entity, int modelIndex) = 0;
-  virtual void onEntityDiscovered(std::shared_ptr<Entity> &entity) = 0;
+  virtual void onEntityDiscovered(std::shared_ptr<Entity> entity) = 0;
   void triggerModelUpdate();
 
 protected:

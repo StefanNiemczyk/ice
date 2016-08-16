@@ -367,36 +367,6 @@ namespace supplementary
 				baseLit->updateOnModel(&s, &m);
 		}
 
-//		std::string str = this->toStringLastModel(false);
-//
-//		std::vector<int> values;
-//
-//		int offset = std::string("before(tnode(1,evalSystem,evalNode").size();
-//		int index = str.find("before(tnode(1,evalSystem,evalNode");
-//
-//		while (index != std::string::npos)
-//		{
-//		  std::string p = str.substr(index + offset + 2, 1);
-//
-//		  if ( p == "u")
-//		    break;
-//
-//		  values.push_back(std::stoi(p));
-//		  index = str.find("before(tnode(1,evalSystem,evalNode", index +1);
-//		}
-//
-//		std::cout << "0 > ";
-//
-//		for (int i = values.size()-1; i >= 0; --i)
-//		{
-//		  std::cout << values[i];
-//
-//		  if (i != 0)
-//		    std::cout << " > ";
-//		}
-//
-//		std::cout << std::endl;
-
 		return true;
 	}
 

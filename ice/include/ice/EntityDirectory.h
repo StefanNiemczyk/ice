@@ -9,6 +9,7 @@
 #define IDENTITIES_H_
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -43,6 +44,7 @@ public:
 
   std::shared_ptr<Entity> lookup(std::string const &key, std::string const &value, bool create = false);
   std::shared_ptr<Entity> lookup(const std::initializer_list<Id>& ids, bool create = false);
+  int fuse(std::shared_ptr<Entity> entity);
 
   std::shared_ptr<Entity> create(std::string const &key, std::string const &value);
   std::shared_ptr<Entity> create(const std::initializer_list<Id>& ids);
@@ -55,6 +57,9 @@ public:
   int count();
   void print();
 
+private:
+  void removeEntity(std::shared_ptr<Entity> &entity);
+
 public:
   std::weak_ptr<ICEngine> 			engine;
   std::shared_ptr<TimeFactory>			timeFactory;
@@ -64,7 +69,8 @@ public:
   CallbackList<std::shared_ptr<Entity>> 	offeredInformation;
 
 private:
-  std::vector<std::shared_ptr<Entity>> entities;
+  std::vector<std::shared_ptr<Entity>>          entities;
+  std::mutex                                    _mtx;
 };
 
 } /* namespace ice */
