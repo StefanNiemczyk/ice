@@ -35,7 +35,7 @@ class TimeFactory;
 class CommunicationInterface
 {
 public:
-  CommunicationInterface(ICEngine * engine);
+  CommunicationInterface(std::weak_ptr<ICEngine> engine);
   virtual ~CommunicationInterface();
 
   // interface
@@ -72,7 +72,7 @@ private:
   virtual void workerTask();
 
 protected:
-  ICEngine                                    *engine;
+  std::weak_ptr<ICEngine>                     engine;
   std::shared_ptr<GContainerFactory>          containerFactory;
   std::shared_ptr<InformationStore>           informationStore;
   std::shared_ptr<OntologyInterface>          ontology;

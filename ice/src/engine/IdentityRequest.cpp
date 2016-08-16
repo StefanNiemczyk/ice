@@ -16,11 +16,12 @@ namespace ice
 int IdentityRequest::ID = 1;
 int IdentityRequestCreator::val = IdentityRequestCreator::init();
 
-IdentityRequest::IdentityRequest(ICEngine* const engine, std::shared_ptr<Entity> const &entity) :
+IdentityRequest::IdentityRequest(std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity) :
     ComJob(IdentityRequest::ID, engine, entity, el::Loggers::getLogger("IdentityRequest")), tryCount(0),
     stateIR(IdentityRequestState::IRS_UNKNOWN)
 {
-
+  auto e = engine.lock();
+  this->ontologyInterface = e->getOntologyInterface();
 }
 
 IdentityRequest::~IdentityRequest()
@@ -194,7 +195,7 @@ void IdentityRequest::onRequestOntologyIds(std::shared_ptr<Message> const &messa
 
   // create and send system specification
   auto msg = std::make_shared<OntologyIdMessage>();
-  this->engine->getOntologyInterface()->getOntologyIDs(msg->getIds());
+  this->ontologyInterface->getOntologyIDs(msg->getIds());
 
   this->send(msg);
 }
@@ -223,8 +224,8 @@ void IdentityRequest::onResponseOntologyIds(std::shared_ptr<OntologyIdMessage> c
 void IdentityRequest::checkOntologyIris()
 {
   // check diff
-  this->engine->getOntologyInterface()->compareOntologyIDs(this->entity->getOntologyIds(),
-                                                           this->entity->getOntologyIriDiff());
+  this->ontologyInterface->compareOntologyIDs(this->entity->getOntologyIds(),
+                                              this->entity->getOntologyIriDiff());
 
   if (this->entity->getOntologyIriDiff().size() != 0)
   {
@@ -237,7 +238,7 @@ void IdentityRequest::checkOntologyIris()
   }
 
     // check if system is known in ontology
-    if (this->entity->initializeFromOntology(this->engine->getOntologyInterface()) >= 0)
+    if (this->entity->initializeFromOntology(this->ontologyInterface) >= 0)
     {
       // system is known, cooperation is possible
       _log->info("Entity '%v' known by ontology", this->entity->toString());

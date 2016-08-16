@@ -10,6 +10,7 @@
 #include "ice/communication/messages/InformationMessage.h"
 #include "ice/communication/messages/IntMessage.h"
 #include "ice/communication/messages/RequestMessage.h"
+#include "ice/information/InformationStore.h"
 
 namespace ice
 {
@@ -17,11 +18,13 @@ namespace ice
 int InformationRequest::ID = 2;
 int InformationRequestCreator::val = InformationRequestCreator::init();
 
-InformationRequest::InformationRequest(ICEngine* const engine, std::shared_ptr<Entity> const &entity) :
+InformationRequest::InformationRequest(std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity) :
     ComJob(InformationRequest::ID, engine, entity, el::Loggers::getLogger("InformationRequest")), currentIndex(-1), tryCount(
         0), receivedAck(false)
 {
   this->timeout = 2000;
+  auto e = this->engine.lock();
+  this->informationStore = e->getInformationStore();
 }
 
 InformationRequest::~InformationRequest()
@@ -176,7 +179,7 @@ void InformationRequest::onRequestInformation(std::shared_ptr<RequestMessage> co
   {
     for (auto &request : message->getRequests())
     {
-      this->engine->getInformationStore()->getInformation(request, this->information);
+      this->informationStore->getInformation(request, this->information);
     }
 
     this->currentIndex = 0;
@@ -244,7 +247,7 @@ void InformationRequest::onInformation(std::shared_ptr<InformationMessage> const
     }
 
     this->received.at(info.first) = true;
-    this->engine->getInformationStore()->addInformation(info.second);
+    this->informationStore->addInformation(info.second);
     this->information.push_back(info.second);
   }
 }

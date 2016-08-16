@@ -1,4 +1,0 @@
-ICEHeader header
-StreamDescription[] streamDescriptions
-StreamTemplateDescription[] streamTemplateDescriptions
-NodeDescription[] nodeDescription

@@ -20,12 +20,12 @@
 
 #include "ice_msgs/Position.h"
 #include "easylogging++.h"
-//#include "serialize.h"
+
 namespace ice
 {
 
 RosCommunication::RosCommunication(std::weak_ptr<ICEngine> engine) :
-    Communication(engine)
+    CommunicationInterface(engine)
 {
   this->_log = el::Loggers::getLogger("RosCommunication");
   this->running = false;
@@ -33,26 +33,30 @@ RosCommunication::RosCommunication(std::weak_ptr<ICEngine> engine) :
 
 RosCommunication::~RosCommunication()
 {
+  //
 }
 
-void RosCommunication::init()
+void RosCommunication::initInternal()
 {
-  Communication::init();
+  auto e = this->engine.lock();
+  this->gcontainerFactory = e->getGContainerFactory();
+  std::string sid;
+  this->self->getId(EntityDirectory::ID_ICE, sid);
+  this->iceId = std::stoi(sid);
 
   // init ros channels
   this->heartbeatPublisher = this->nodeHandel.advertise<ice_msgs::Heartbeat>("ice/heartbeat", 100);
   this->heartbeatSubscriber = this->nodeHandel.subscribe("ice/heartbeat", 100, &RosCommunication::onHeartbeat, this);
   this->coordinationPublisher = this->nodeHandel.advertise<ice_msgs::ICECoordination>("ice/coordination", 100);
-  this->coordinationSubscriber = this->nodeHandel.subscribe("ice/coordination", 100, &RosCommunication::onCoordination,
-                                                            this);
+  this->coordinationSubscriber = this->nodeHandel.subscribe("ice/coordination", 100, &RosCommunication::onCoordination, this);
 
   this->running = true;
   this->worker = std::thread(&RosCommunication::workerTask, this);
 }
 
-void RosCommunication::cleanUp()
+void RosCommunication::cleanUpInternal()
 {
-  Communication::cleanUp();
+  this->gcontainerFactory.reset();
 
   this->heartbeatPublisher.shutdown();
   this->heartbeatSubscriber.shutdown();
@@ -66,350 +70,57 @@ void RosCommunication::cleanUp()
   this->worker.join();
 }
 
-void RosCommunication::sendHeartbeat()
+void RosCommunication::discover()
 {
   _log->verbose(1, "Sending heartbeat");
 
   ice_msgs::Heartbeat heartbeat;
-  heartbeat.header.senderId.value = this->engineId;
+  heartbeat.header.senderId.value = this->iceId;
   heartbeat.header.timestamp = ros::Time::now();
 
   this->heartbeatPublisher.publish(heartbeat);
+
+  // discovery is done in onHeartbeat
 }
 
-void RosCommunication::sendCoordinationMsg(identifier receiverId, RosCoordinationCommand command)
+int RosCommunication::readMessage(std::vector<std::shared_ptr<Message>> &outMessages)
 {
-  ice_msgs::ICECoordination msg;
-
-  msg.header.senderId.value = this->engineId;
-  msg.header.timestamp = ros::Time::now();
-  ice_msgs::Identifier receiver;
-  receiver.value = receiverId;
-  msg.header.receiverIds.push_back(receiver);
-  msg.command = command;
-
-  this->coordinationPublisher.publish(msg);
+  return 0;
 }
 
-void RosCommunication::sendCoordinationMsg(identifier receiverId, RosCoordinationCommand command, std::vector<uint8_t> &bytes)
+void RosCommunication::sendMessage(std::shared_ptr<Message> msg)
 {
-  ice_msgs::ICECoordination msg;
+  _log->info("Sending system specification to engine '%v'", msg->getEntity()->toString());
 
-  msg.header.senderId.value = this->engineId;
-  msg.header.timestamp = ros::Time::now();
-  ice_msgs::Identifier receiver;
-  receiver.value = receiverId;
-  msg.header.receiverIds.push_back(receiver);
-  msg.command = command;
-  msg.bytes = bytes;
-
-  this->coordinationPublisher.publish(msg);
-}
-
-void RosCommunication::sendSystemSpecRequest(identifier receiverId)
-{
-  _log->info("Sending system spec request to engine '%v'", receiverId);
-
-  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SYSTEM_SPEC_REQUEST);
-}
-
-void RosCommunication::sendSystemSpecResponse(
-    identifier receiverId, std::tuple<std::string, std::vector<std::string>, std::vector<std::string>> &content)
-{
-  _log->info("Sending system specification to engine '%v'", receiverId);
-    std::stringstream ss;
-    boost::archive::text_oarchive ar(ss);
-    ar << std::get<0>(content);
-    ar << std::get<1>(content);
-    ar << std::get<2>(content);
-
-    auto s = ss.str();
-    std::vector<uint8_t> buffer(s.size());
-    std::copy(s.c_str(), s.c_str() + s.size(), buffer.begin());
-
-  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SYSTEM_SPEC_RESPONSE, buffer);
-}
-
-void RosCommunication::sendSubModelRequest(identifier receiverId, SubModelDesc &modelDesc)
-{
-  _log->info("Sending sub model request to engine '%v'", receiverId);
-  std::stringstream ss;
-  boost::archive::text_oarchive ar(ss);
-  ar << modelDesc;
-
-  auto s = ss.str();
-  std::vector<uint8_t> buffer(s.size());
-  std::copy(s.c_str(), s.c_str() + s.size(), buffer.begin());
-
-  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SUB_MODEL_REQUEST, buffer);
-}
-
-void RosCommunication::sendSubModelResponse(identifier receiverId, int index, bool accept)
-{
-  _log->info("Sending sub model response to engine '%v'", receiverId);
-
-  std::stringstream ss;
-  boost::archive::text_oarchive ar(ss);
-  ar << index;
-  ar << accept;
-
-  auto s = ss.str();
-  std::vector<uint8_t> buffer(s.size());
-  std::copy(s.c_str(), s.c_str() + s.size(), buffer.begin());
-
-  this->sendCoordinationMsg(receiverId, RosCoordinationCommand::SUB_MODEL_RESPONSE, buffer);
-}
-
-void RosCommunication::sendNegotiationFinished(identifier receiverId)
-{
-  _log->info("Send negotiation finished from engine %v to engine %v",
-             IDGenerator::toString(this->engineId), IDGenerator::toString(receiverId));
-
-  this->sendCommand(receiverId, RosCoordinationCommand::NEGOTIATION_FINISHED);
-}
-
-void RosCommunication::sendStopCooperation(identifier receiverId)
-{
-  _log->info("Send stop cooperation from engine %v to engine %v",
-             IDGenerator::toString(this->engineId), IDGenerator::toString(receiverId));
-
-  this->sendCommand(receiverId, RosCoordinationCommand::STOP_COOPERATION);
-}
-
-
-// -#######################################################################
-
-void RosCommunication::sendInformationRequest(identifier receiverId)
-{
-  _log->info("Send information model request from engine %v to engine %v",
-             IDGenerator::toString(this->engineId), IDGenerator::toString(receiverId));
-
-  this->sendCommand(receiverId, RosCoordinationCommand::REQUEST_INFORMATION_MODEL);
-}
-
-void RosCommunication::sendInformationModel(identifier receiverId, std::shared_ptr<InformationModel> informationModel)
-{
-  _log->info("Send information model from engine %v to engine %v",
-             IDGenerator::toString(this->engineId), IDGenerator::toString(receiverId));
-
-//  ice_msgs::InformationModel model;
-//  model.header.senderId.id.resize(16);
-//  std::copy(this->engineId.begin(), this->engineId.end(), model.header.senderId.id.begin());
-//
-//  ice_msgs::Identifier receiver;
-//  receiver.id.resize(16);
-//  std::copy(receiverId.begin(), receiverId.end(), receiver.id.begin());
-//  model.header.receiverIds.push_back(receiver);
-//
-//  // add streams
-//  for (auto stream : *informationModel->getStreams())
-//  {
-//    ice_msgs::StreamDescription desc;
-//
-//    desc.informationIdentifier.id.resize(16);
-//    std::copy(stream->getId().begin(), stream->getId().end(), desc.informationIdentifier.id.begin());
-//    desc.shared = stream->isShared();
-//
-//    model.streamDescriptions.push_back(desc);
-//  }
-//
-//  // add stream templates
-//  for (auto streamTemplate : *informationModel->getStreamTemplates())
-//  {
-//    ice_msgs::StreamTemplateDescription desc;
-//
-//    desc.informationIdentifier.id.resize(16);
-//    std::copy(streamTemplate->getId().begin(), streamTemplate->getId().end(), desc.informationIdentifier.id.begin());
-//
-//    model.streamTemplateDescriptions.push_back(desc);
-//  }
-//
-//  // add nodes
-//  for (auto node : *informationModel->getNodeDescriptions())
-//  {
-//    ice_msgs::NodeDescription desc;
-//
-//    desc.className = node->getClassName();
-//
-//    int inputSize, inputTemplateSize, outputSize;
-//    const boost::uuids::uuid* inputs = node->getInputUuids(&inputSize);
-//    const boost::uuids::uuid* inputTemplates = node->getInputTemplateIds(&inputTemplateSize);
-//    const boost::uuids::uuid* outputs = node->getOutputIds(&outputSize);
-//
-//    for (int i = 0; i < inputSize; ++i)
-//    {
-//      ice_msgs::Identifier id;
-//      id.id.resize(16);
-//      std::copy(inputs[i].begin(), inputs[i].end(), id.id.begin());
-//      desc.inputInformation.push_back(id);
-//    }
-//
-//    for (int i = 0; i < inputTemplateSize; ++i)
-//    {
-//      ice_msgs::Identifier id;
-//      id.id.resize(16);
-//      std::copy(inputTemplates[i].begin(), inputTemplates[i].end(), id.id.begin());
-//      desc.inputTemplateInformation.push_back(id);
-//    }
-//
-//    for (int i = 0; i < outputSize; ++i)
-//    {
-//      ice_msgs::Identifier id;
-//      id.id.resize(16);
-//      std::copy(outputs[i].begin(), outputs[i].end(), id.id.begin());
-//      desc.outputInformation.push_back(id);
-//    }
-//
-//    model.nodeDescription.push_back(desc);
-//  }
-//
-//  this->informationModelPublisher.publish(model);
-}
-
-void RosCommunication::sendCooperationRequest(identifier receiverId,
-                                              std::shared_ptr<CooperationRequest> cooperationRequest)
-{
-  _log->info("Send cooperation request from engine %v to engine %v",
-             IDGenerator::toString(this->engineId), IDGenerator::toString(receiverId));
-
-//  ice_msgs::CooperationRequest request;
-//  request.header.senderId.id.resize(16);
-//  std::copy(this->engineId.begin(), this->engineId.end(), request.header.senderId.id.begin());
-//
-//  ice_msgs::Identifier receiver;
-//  receiver.id.resize(16);
-//  std::copy(receiverId.begin(), receiverId.end(), receiver.id.begin());
-//  request.header.receiverIds.push_back(receiver);
-//
-//  // add offers
-//  for (auto offer : *cooperationRequest->getOffers())
-//  {
-//    ice_msgs::StreamDescription desc;
-//
-//    desc.informationIdentifier.id.resize(16);
-//    std::copy(offer->getId().begin(), offer->getId().end(), desc.informationIdentifier.id.begin());
-//    desc.shared = offer->isShared();
-//
-//    request.offers.push_back(desc);
-//  }
-//
-//  // add requests
-//  for (auto requests : *cooperationRequest->getRequests())
-//  {
-//    ice_msgs::StreamTemplateDescription desc;
-//
-//    desc.informationIdentifier.id.resize(16);
-//    std::copy(requests->getId().begin(), requests->getId().end(), desc.informationIdentifier.id.begin());
-//
-//    request.requests.push_back(desc);
-//  }
-//
-//  this->cooperationRequestPublisher.publish(request);
-}
-
-void RosCommunication::sendCooperationResponse(identifier receiverId,
-                                               std::shared_ptr<CooperationResponse> cooperationResponse)
-{
-  _log->info("Send cooperation response from engine %v to engine %v",
-             IDGenerator::toString(this->engineId), IDGenerator::toString(receiverId));
-
-//  ice_msgs::CooperationRequest response;
-//  response.header.senderId.id.resize(16);
-//  std::copy(this->engineId.begin(), this->engineId.end(), response.header.senderId.id.begin());
-//
-//  ice_msgs::Identifier receiver;
-//  receiver.id.resize(16);
-//  std::copy(receiverId.begin(), receiverId.end(), receiver.id.begin());
-//  response.header.receiverIds.push_back(receiver);
-//
-//  // add offers
-//  for (auto offer : *cooperationResponse->getOffersAccepted())
-//  {
-//    ice_msgs::StreamDescription desc;
-//
-//    desc.informationIdentifier.id.resize(16);
-//    std::copy(offer->getId().begin(), offer->getId().end(), desc.informationIdentifier.id.begin());
-//    desc.shared = offer->isShared();
-//
-//    response.offers.push_back(desc);
-//  }
-//
-//  // add requests
-//  for (auto requests : *cooperationResponse->getRequestsAccepted())
-//  {
-//    ice_msgs::StreamTemplateDescription desc;
-//
-//    desc.informationIdentifier.id.resize(16);
-//    std::copy(requests->getId().begin(), requests->getId().end(), desc.informationIdentifier.id.begin());
-//
-//    response.requests.push_back(desc);
-//  }
-//
-//  this->cooperationResponsePublisher.publish(response);
-}
-
-void RosCommunication::sendCooperationRefuse(identifier receiverId)
-{
-  _log->info("Send cooperation refuse from engine %v to engine %v",
-             IDGenerator::toString(this->engineId), IDGenerator::toString(receiverId));
-
-  this->sendCommand(receiverId, RosCoordinationCommand::COOPERATION_REFUSE);
-}
-
-void RosCommunication::sendCooperationAccept(identifier receiverId)
-{
-  _log->info("Send cooperation accept from engine %v to engine %v",
-             IDGenerator::toString(this->engineId), IDGenerator::toString(receiverId));
-
-  this->sendCommand(receiverId, RosCoordinationCommand::COOPERATION_ACCEPT);
-}
-
-void RosCommunication::sendRetryNegotiation(identifier receiverId)
-{
-  _log->info("Send retry negotiation from engine %v to engine %v",
-             IDGenerator::toString(this->engineId), IDGenerator::toString(receiverId));
-
-  this->sendCommand(receiverId, RosCoordinationCommand::NEGOTIATION_RETRY);
-}
-
-void RosCommunication::sendCooperationStopped(identifier receiverId)
-{
-  _log->info("Send cooperation stopped from engine %v to engine %v",
-             IDGenerator::toString(this->engineId), IDGenerator::toString(receiverId));
-
-  this->sendCommand(receiverId, RosCoordinationCommand::COOPERATION_STOPPED);
-}
-
-std::shared_ptr<BaseInformationSender> RosCommunication::registerStreamAsSender(
-    std::shared_ptr<BaseInformationStream> stream)
-{
-  std::shared_ptr<BaseInformationSender> ptr;
-
-  ptr = this->createSender(stream);
-
-  if (false == ptr)
+  std::string sid;
+  if (false == msg->getEntity()->getId(EntityDirectory::ID_ICE, sid))
   {
-    auto type = stream->getTypeInfo();
-    _log->error("Unknown information type %v of stream %v with type string %v",
-                (*type).name(), stream->getName(), stream->getSpecification()->getTypeString());
+    this->_log->error("Trying to send message with serval to none serval instance %v", msg->getEntity()->toString());
+    return;
   }
 
-  return ptr;
-}
+  std::string json = msg->toJson();
+  int size = json.size();
 
-std::shared_ptr<InformationReceiver> RosCommunication::registerStreamAsReceiver(
-    std::shared_ptr<BaseInformationStream> stream)
-{
-  std::shared_ptr<InformationReceiver> ptr = this->createReceiver(stream);
-
-  if (false == ptr)
+  if (size > 1024)
   {
-    auto type = stream->getTypeInfo();
-    _log->error("Unknown information type %v of stream %v with type string %v",
-                (*type).name(), stream->getName(), stream->getSpecification()->getTypeString());
+    this->_log->error("Message could not be send to instance '%v', to large '%v' byte", msg->getEntity()->toString(), size);
+    return;
   }
 
-  return ptr;
+  ice_msgs::ICECoordination coordinationMsg;
+  coordinationMsg.header.senderId.value = this->iceId;
+
+  ice_msgs::Identifier receiver;
+  receiver.value = std::stoi(sid);
+  coordinationMsg.header.receiverIds.push_back(receiver);
+
+  coordinationMsg.jobId = msg->getJobId();
+  coordinationMsg.jobIndex = msg->getJobIndex();
+  coordinationMsg.bytes.reserve(size);
+  std::copy(json.begin(), json.end(), coordinationMsg.bytes.begin());
+
+  this->coordinationPublisher.publish(coordinationMsg);
 }
 
 std::shared_ptr<BaseInformationSender> RosCommunication::createSender(std::shared_ptr<BaseInformationStream> stream)
@@ -456,26 +167,6 @@ std::shared_ptr<InformationReceiver> RosCommunication::createReceiver(std::share
   return nullptr;
 }
 
-void RosCommunication::sendCommand(const identifier receiverId, const RosCoordinationCommand command) const
-{
-  if (this->running == false)
-  {
-    this->_log->warn("Communication not initialized, message will not be send '%v'", RosCoordinationCommandString[command]);
-    return;
-  }
-
-  ice_msgs::ICECoordination coordinationMsg;
-  coordinationMsg.header.senderId.value = this->engineId;
-
-  ice_msgs::Identifier receiver;
-  receiver.value = receiverId;
-  coordinationMsg.header.receiverIds.push_back(receiver);
-
-  coordinationMsg.command = command;
-
-  this->coordinationPublisher.publish(coordinationMsg);
-}
-
 void RosCommunication::workerTask()
 {
   ros::Rate loop_rate(30);
@@ -491,268 +182,77 @@ void RosCommunication::workerTask()
 
 void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
 {
-  if (false == this->engine.lock()->isRunning())
-    return;
-  identifier senderId = msg->header.senderId.value;//IDGenerator::getInstance()->getIdentifier(msg->header.senderId.value);
+  std::string sid = std::to_string(msg->header.senderId.value);
+  auto entity = this->directory->lookup(EntityDirectory::ID_SERVAL, sid);
 
-  if (senderId == this->engineId)
+  if (entity == nullptr)
+  {
+    // Create new instance and request ids
+    entity = this->directory->create(EntityDirectory::ID_SERVAL, sid);
+    // At the beginning each discovered node is expected to be an ice node
+    entity->setAvailable(true);
+    this->discoveredEntity(entity);
+
+    _log->info("New ID discovered: %v", entity->toString());
+  }
+
+  entity->setActiveTimestamp();
+
+  identifier senderId = msg->header.senderId.value;
+
+  if (senderId == this->iceId)
     return;
 
   _log->info("Heartbeat received from engine %v", IDGenerator::toString(senderId));
-
-  this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-  { return this->coordinator->onEngineHeartbeat(senderId, RosTimeFactory::createTime(msg->header.timestamp));}));
-//  this->coordinator->onEngineHeartbeat(senderId, RosTimeFactory::createTime(msg->header.timestamp));
 }
 
 void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr& msg)
 {
-  if (false == this->engine.lock()->isRunning())
-    return;
   identifier senderId = msg->header.senderId.value;
 
-  if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)
+  if (false == this->checkReceiverIds(msg->header) || senderId == this->iceId)
     return;
 
-  _log->info("Coordination command '%v' received from engine '%v'",
-             std::to_string(msg->command), IDGenerator::toString(senderId));
+  std::string sid = std::to_string(msg->header.senderId.value);
+  auto entity = this->directory->lookup(EntityDirectory::ID_SERVAL, sid, false);
 
-  switch (msg->command)
+  if (entity == nullptr)
   {
-    case RosCoordinationCommand::SYSTEM_SPEC_REQUEST:
-      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-      {
-        return this->coordinator->onSystemSpecRequest(senderId);
-      }));
-      break;
-    case RosCoordinationCommand::SYSTEM_SPEC_RESPONSE:
-      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-      {
-        std::stringstream ss;
-        ss.str(std::string(msg->bytes.data(), msg->bytes.data() + msg->bytes.size()));
-        boost::archive::text_iarchive ar(ss);
-        std::string str;
-        std::vector<std::string> vec1;
-        std::vector<std::string> vec2;
-        ar >> str;
-        ar >> vec1;
-        ar >> vec2;
+    this->_log->info("Received message from unknown serval node '%v'", sid);
 
-        return this->coordinator->onSystemSpec(senderId, std::make_tuple(str, vec1, vec2));
-      }
-      ));
-      break;
-    case RosCoordinationCommand::SUB_MODEL_REQUEST:
-      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-      {
-        std::stringstream ss;
-        ss.str(std::string(msg->bytes.data(), msg->bytes.data() + msg->bytes.size()));
-        boost::archive::text_iarchive ar(ss);
-        SubModelDesc desc;
-        ar >> desc;
-
-        return this->coordinator->onSubModelRequest(senderId, desc);
-      }
-      ));
-      break;
-    case RosCoordinationCommand::SUB_MODEL_RESPONSE:
-      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-      {
-        std::stringstream ss;
-        ss.str(std::string(msg->bytes.data(), msg->bytes.data() + msg->bytes.size()));
-        boost::archive::text_iarchive ar(ss);
-
-        int value;
-        ar >> value;
-        bool value2;
-        ar >> value2;
-
-        return this->coordinator->onSubModelResponse(senderId, value, value2);
-      }
-      ));
-      break;
-    case RosCoordinationCommand::NEGOTIATION_FINISHED:
-      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-      { return this->coordinator->onNegotiationFinished(senderId);}));
-      break;
-    case RosCoordinationCommand::STOP_COOPERATION:
-      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-      { return this->coordinator->onStopCooperation(senderId);}));
-      break;
-//    case RosCoordinationCommand::REQUEST_INFORMATION_MODEL:
-//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-//      { return this->coordinator->onInformationModelRequest(senderId);}));
-//      break;
-//    case RosCoordinationCommand::COOPERATION_ACCEPT:
-//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-//      { return this->coordinator->onCooperationAccept(senderId);}));
-//      break;
-//    case RosCoordinationCommand::COOPERATION_REFUSE:
-//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-//      { return this->coordinator->onCooperationRefuse(senderId);}));
-//      break;
-//    case RosCoordinationCommand::NEGOTIATION_FINISHED:
-//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-//      { return this->coordinator->onNegotiationFinished(senderId);}));
-//      break;
-//    case RosCoordinationCommand::NEGOTIATION_RETRY:
-//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-//      { return this->coordinator->onRetryNegotiation(senderId);}));
-//      break;
-//    case RosCoordinationCommand::STOP_COOPERATION:
-//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-//      { return this->coordinator->onStopCooperation(senderId);}));
-//      break;
-//    case RosCoordinationCommand::COOPERATION_STOPPED:
-//      this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-//      { return this->coordinator->onCooperationStopped(senderId);}));
-//      break;
-    default:
-      _log->error("Unknown coordination command from engine %v with command %v",
-                  IDGenerator::toString(senderId), msg->command);
+    // Create new instance and request ids
+    entity = this->directory->create(EntityDirectory::ID_SERVAL, sid);
+    // At the beginning each discovered node is expected to be an ice node
+    entity->setAvailable(true);
+    this->discoveredEntity(entity);
   }
-}
 
-void RosCommunication::onInformationModel(const ice_msgs::InformationModel::ConstPtr& msg)
-{
-//  identifier senderId = IDGenerator::getInstance()->getIdentifier(msg->header.senderId.id);
-//
-//  if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)
-//    return;
-//
-//  _log->debug("Information model received from engine %v",
-//              IDGenerator::toString(senderId));
-//
-//  auto model = std::make_shared<InformationModel>();
-//
-//// Stream descriptions
-//  for (auto stream : msg->streamDescriptions)
-//  {
-//    identifier streamId = IDGenerator::getInstance()->getIdentifier(stream.informationIdentifier.id);
-//    auto desc = std::make_shared<StreamDescription>(streamId, stream.shared);
-//    model->getStreams()->push_back(desc);
-//  }
-//
-//// Stream template descriptions
-//  for (auto streamTemplate : msg->streamTemplateDescriptions)
-//  {
-//    identifier streamTemplateId = IDGenerator::getInstance()->getIdentifier(streamTemplate.informationIdentifier.id);
-//    auto desc = std::make_shared<StreamTemplateDescription>(streamTemplateId);
-//    model->getStreamTemplates()->push_back(desc);
-//  }
-//
-//// Node descriptions
-//  for (auto node : msg->nodeDescription)
-//  {
-//    int inputSize = node.inputInformation.size();
-//    int inputTemplateSize = node.inputTemplateInformation.size();
-//    int outputSize = node.outputInformation.size();
-//
-//    identifier * inputUuids = new boost::uuids::uuid[inputSize];
-//
-//    for (int i = 0; i < inputSize; ++i)
-//    {
-//      identifier id = IDGenerator::getInstance()->getIdentifier(node.inputInformation.at(i).id);
-//      inputUuids[i] = id;
-//    }
-//
-//    identifier * inputTeamplateUuids = new boost::uuids::uuid[inputTemplateSize];
-//
-//    for (int i = 0; i < inputTemplateSize; ++i)
-//    {
-//      identifier id = IDGenerator::getInstance()->getIdentifier(node.inputTemplateInformation.at(i).id);
-//      inputTeamplateUuids[i] = id;
-//    }
-//
-//    identifier * outputUuids = new boost::uuids::uuid[outputSize];
-//
-//    for (int i = 0; i < outputSize; ++i)
-//    {
-//      identifier id = IDGenerator::getInstance()->getIdentifier(node.outputInformation.at(i).id);
-//      outputUuids[i] = id;
-//    }
-//
-//    auto desc = std::make_shared<NodeDescription>(node.className, inputUuids, inputTeamplateUuids, outputUuids,
-//                                                  inputSize, inputTemplateSize, outputSize);
-//
-//    model->getNodeDescriptions()->push_back(desc);
-//  }
-//
-//  this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-//        { return this->coordinator->onInformationModel(senderId, model);}));
-}
+  std::string json(msg->bytes.begin(), msg->bytes.end());
 
-void RosCommunication::onCooperationRequest(const ice_msgs::CooperationRequest::ConstPtr& msg)
-{
-//  identifier senderId = IDGenerator::getInstance()->getIdentifier(msg->header.senderId.id);
-//
-//  if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)
-//    return;
-//
-//  _log->debug("Cooperation request received from engine %v",
-//              IDGenerator::toString(senderId));
-//
-//  auto request = std::make_shared<CooperationRequest>(senderId);
-//
-//// Stream offers
-//  for (auto stream : msg->offers)
-//  {
-//    identifier streamId = IDGenerator::getInstance()->getIdentifier(stream.informationIdentifier.id);
-//    auto desc = std::make_shared<StreamDescription>(streamId, stream.shared);
-//    request->getOffers()->push_back(desc);
-//  }
-//
-//// Stream template requests
-//  for (auto streamTemplate : msg->requests)
-//  {
-//    identifier streamTemplateId = IDGenerator::getInstance()->getIdentifier(streamTemplate.informationIdentifier.id);
-//    auto desc = std::make_shared<StreamTemplateDescription>(streamTemplateId);
-//    request->getRequests()->push_back(desc);
-//  }
-//
-//  this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-//        { return  this->coordinator->onCooperationRequest(senderId, request);}));
-}
+  auto message = Message::parse(json, this->gcontainerFactory);
 
-void RosCommunication::onCooperationResponse(const ice_msgs::CooperationResponse::ConstPtr& msg)
-{
-//  identifier senderId = IDGenerator::getInstance()->getIdentifier(msg->header.senderId.id);
-//
-//  if (false == this->checkReceiverIds(msg->header) || senderId == this->engineId)
-//    return;
-//
-//  _log->debug("Cooperation response received from engine %v",
-//              IDGenerator::toString(senderId));
-//
-//  auto response = std::make_shared<CooperationResponse>(senderId);
-//
-//// Stream offers
-//  for (auto stream : msg->offers)
-//  {
-//    identifier streamId = IDGenerator::getInstance()->getIdentifier(stream.informationIdentifier.id);
-//    auto desc = std::make_shared<StreamDescription>(streamId, stream.shared);
-//    response->getOffersAccepted()->push_back(desc);
-//  }
-//
-//// Stream template requests
-//  for (auto streamTemplate : msg->requests)
-//  {
-//    identifier streamTemplateId = IDGenerator::getInstance()->getIdentifier(streamTemplate.informationIdentifier.id);
-//    auto desc = std::make_shared<StreamTemplateDescription>(streamTemplateId);
-//    response->getRequestsAccepted()->push_back(desc);
-//  }
-//
-//  this->eventHandler->addTask(std::make_shared<LambdaTask>([=] ()
-//        { return this->coordinator->onCooperationResponse(senderId, response);}));
+  if (message == nullptr)
+  {
+    this->_log->info("Received unknown or broken message from serval node '%v'", sid);
+
+    return;
+  }
+
+  message->setJobId(msg->jobId);
+  message->setJobIndex(msg->jobIndex);
+
+  message->setEntity(entity);
+
+  this->handleMessage(message);
 }
 
 bool RosCommunication::checkReceiverIds(ice_msgs::ICEHeader header)
 {
   for (auto id : header.receiverIds)
   {
-    identifier receiverId = id.value;//IDGenerator::getInstance()->getIdentifier(id.value);
+    identifier receiverId = id.value;
 
-    if (receiverId == this->engineId)
+    if (receiverId == this->iceId)
       return true;
   }
 

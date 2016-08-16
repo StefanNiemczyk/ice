@@ -17,11 +17,12 @@ namespace ice
 int CooperationRequest::ID = 3;
 int CooperationRequestCreator::val = CooperationRequestCreator::init();
 
-CooperationRequest::CooperationRequest(ICEngine* const engine, std::shared_ptr<Entity> const &entity) :
+CooperationRequest::CooperationRequest(std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity) :
         ComJob(CooperationRequest::ID, engine, entity, el::Loggers::getLogger("CooperationRequest")), tryCount(0),
         stateCR(CooperationRequestState::CRS_UNKNOWN)
 {
-  //
+  auto e = engine.lock();
+  this->updateStrategy = e->getUpdateStrategie();
 }
 
 CooperationRequest::~CooperationRequest()
@@ -143,7 +144,7 @@ void CooperationRequest::onSubModel(std::shared_ptr<SubModelMessage> message)
     return;
   }
 
-  sharedSubModel.accepted = this->engine->getUpdateStrategie()->handleSubModel(entity, message->getSubModel());
+  sharedSubModel.accepted = this->updateStrategy->handleSubModel(entity, message->getSubModel());
 
   if (sharedSubModel.accepted)
   {
@@ -195,7 +196,7 @@ void CooperationRequest::onSubModelResponse(std::shared_ptr<SubModelResponseMess
 
   if (sharedSubModel.accepted)
   {
-    bool result = this->engine->getUpdateStrategie()->handleSubModelResponse(entity, index);
+    bool result = this->updateStrategy->handleSubModelResponse(entity, index);
 
     if (result)
     {

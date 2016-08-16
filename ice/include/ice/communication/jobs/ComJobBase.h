@@ -28,14 +28,14 @@ enum CJState
   CJ_CREATED, CJ_INITIALIZED, CJ_ACTIVE, CJ_WAITING, CJ_FINISHED, CJ_ABORTED
 };
 
-typedef std::function<std::shared_ptr<ComJobBase>(ICEngine* const engine, std::shared_ptr<Entity> const &entity)> jobCreator;
+typedef std::function<std::shared_ptr<ComJobBase>(std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity)> jobCreator;
 
 class ComJobRegistry
 {
   static std::map<uint8_t, jobCreator> jobs;
 
 public:
-  static std::shared_ptr<ComJobBase> makeInstance(uint8_t id, ICEngine* const engine,
+  static std::shared_ptr<ComJobBase> makeInstance(uint8_t id, std::weak_ptr<ICEngine> engine,
                                                   std::shared_ptr<Entity> const &entity)
   {
     auto func = ComJobRegistry::jobs.find(id);
@@ -61,13 +61,14 @@ public:
 class ComJobBase
 {
 public:
-  ComJobBase(uint8_t id, ICEngine* const engine, std::shared_ptr<Entity> const &entity, el::Logger *log) :
+  ComJobBase(uint8_t id, std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity, el::Logger *log) :
       id(id), engine(engine), entity(entity), timeout(0), timestampLastActive(0), _log(log), state(CJ_CREATED), ownJob(true)
   {
     this->index = 0; //entity->getNextRequestId();
-    this->self = engine->getSelf();
-    this->com = engine->getCommunicationInterface();
-    this->timeFactory = engine->getTimeFactory();
+    auto e = engine.lock();
+    this->self = e->getSelf();
+    this->com = e->getCommunicationInterface();
+    this->timeFactory = e->getTimeFactory();
   }
 
   virtual ~ComJobBase()
@@ -216,7 +217,7 @@ protected:
   virtual void callCallbackAborted() = 0;
 
 protected:
-  ICEngine                              *engine;
+  std::weak_ptr<ICEngine>               engine;
   bool                                  ownJob;
   std::shared_ptr<Entity>               self;
   std::shared_ptr<Entity>               entity;

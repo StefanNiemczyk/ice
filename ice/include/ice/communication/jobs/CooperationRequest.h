@@ -16,6 +16,7 @@ namespace ice
 struct SubModelDesc;
 class SubModelMessage;
 class SubModelResponseMessage;
+class UpdateStrategie;
 
 enum CooperationRequestState
 {
@@ -30,7 +31,7 @@ public:
   static int ID;
 
 public:
-  CooperationRequest(ICEngine* const engine, std::shared_ptr<Entity> const &entity);
+  CooperationRequest(std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity);
   virtual ~CooperationRequest();
 
   virtual void init();
@@ -46,16 +47,17 @@ private:
   void onFinished(std::shared_ptr<SubModelResponseMessage> message);
 
 private:
-  std::shared_ptr<SubModelDesc> subModel;
-  CooperationRequestState       stateCR;
-  int                           tryCount;
+  std::shared_ptr<UpdateStrategie>      updateStrategy;
+  std::shared_ptr<SubModelDesc>         subModel;
+  CooperationRequestState               stateCR;
+  int                                   tryCount;
 };
 
 class CooperationRequestCreator
 {
   static int val;
 
-  static std::shared_ptr<ComJobBase> makeInstance(ICEngine* const engine, std::shared_ptr<Entity> const &entity)
+  static std::shared_ptr<ComJobBase> makeInstance(std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity)
   {
     return std::make_shared<CooperationRequest>(engine, entity);
   }

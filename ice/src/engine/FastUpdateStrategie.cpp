@@ -114,7 +114,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> model)
   // sending sub models
   for (auto &subModel : model->getSubModels())
   {
-    auto job = std::make_shared<CooperationRequest>(this->engine.lock().get(), subModel->entity);
+    auto job = std::make_shared<CooperationRequest>(this->engine, subModel->entity);
     job->setSubModelDesc(subModel->model);
     // TODO
 //    this->communication->sendSubModelRequest(subModel->entity, subModel->model);

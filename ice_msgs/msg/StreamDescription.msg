@@ -1,2 +1,0 @@
-Identifier informationIdentifier
-bool shared

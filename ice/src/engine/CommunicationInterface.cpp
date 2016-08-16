@@ -30,7 +30,7 @@
 namespace ice
 {
 
-CommunicationInterface::CommunicationInterface(ICEngine * engine) :
+CommunicationInterface::CommunicationInterface(std::weak_ptr<ICEngine> engine) :
     running(false), engine(engine)
 {
   _log = el::Loggers::getLogger("CommunicationInterface");
@@ -47,9 +47,10 @@ CommunicationInterface::~CommunicationInterface()
 
 void CommunicationInterface::init()
 {
-  this->directory = this->engine->getEntityDirector();
-  this->self = this->engine->getSelf();
-  this->timeFactory = this->engine->getTimeFactory();
+  auto e = this->engine.lock();
+  this->directory = e->getEntityDirector();
+  this->self = e->getSelf();
+  this->timeFactory = e->getTimeFactory();
   this->initInternal();
 
   this->running = true;

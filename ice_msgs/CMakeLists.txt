@@ -50,12 +50,6 @@ add_message_files(
   ICEHeader.msg
   Heartbeat.msg
   ICECoordination.msg
-  StreamDescription.msg
-  StreamTemplateDescription.msg
-  NodeDescription.msg
-  InformationModel.msg
-  CooperationRequest.msg
-  CooperationResponse.msg
   Position.msg
   Positions.msg 
 )

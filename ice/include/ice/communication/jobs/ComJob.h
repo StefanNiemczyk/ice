@@ -17,7 +17,7 @@ template<typename T>
   class ComJob : public ComJobBase, public std::enable_shared_from_this<ComJob<T>>
   {
   public:
-    ComJob(uint8_t id, ICEngine* const engine, std::shared_ptr<Entity> const &entity, el::Logger *log) :
+    ComJob(uint8_t id, std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity, el::Logger *log) :
       ComJobBase(id, engine, entity, log), callbackAborted(nullptr), callbackFinished(nullptr) {}
     virtual ~ComJob(){}
 

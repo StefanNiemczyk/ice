@@ -15,6 +15,7 @@ namespace ice
 
 class IdMessage;
 class OntologyIdMessage;
+class OntologyInterface;
 
 enum IdentityRequestState
 {
@@ -30,7 +31,7 @@ public:
   static int ID;
 
 public:
-  IdentityRequest(ICEngine* const engine, std::shared_ptr<Entity> const &entity);
+  IdentityRequest(std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity);
   virtual ~IdentityRequest();
 
   virtual void init();
@@ -46,16 +47,17 @@ private:
   void checkOntologyIris();
 
 private:
-  IdentityRequestState          stateIR;
-  std::string                   iri;
-  int                           tryCount;
+  std::shared_ptr<OntologyInterface>    ontologyInterface;
+  IdentityRequestState                  stateIR;
+  std::string                           iri;
+  int                                   tryCount;
 };
 
 class IdentityRequestCreator
 {
   static int val;
 
-  static std::shared_ptr<ComJobBase> makeInstance(ICEngine* const engine, std::shared_ptr<Entity> const &entity)
+  static std::shared_ptr<ComJobBase> makeInstance(std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity)
   {
     return std::make_shared<IdentityRequest>(engine, entity);
   }

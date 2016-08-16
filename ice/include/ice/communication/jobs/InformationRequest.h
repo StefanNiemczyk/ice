@@ -15,6 +15,7 @@ namespace ice
 
 class RequestMessage;
 class InformationMessage;
+class InformationStore;
 class IntMessage;
 
 class InformationRequest : public ComJob<InformationRequest>
@@ -23,7 +24,7 @@ public:
   static int ID;
 
 public:
-  InformationRequest(ICEngine* const engine, std::shared_ptr<Entity> const &entity);
+  InformationRequest(std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity);
   virtual ~InformationRequest();
 
   virtual void init();
@@ -42,6 +43,7 @@ private:
   void onInformation(std::shared_ptr<InformationMessage> const &message);
 
 private:
+  std::shared_ptr<InformationStore>                             informationStore;
   int                                                           tryCount;
   int                                                           currentIndex;
   bool                                                          receivedAck;
@@ -54,7 +56,7 @@ class InformationRequestCreator
 {
   static int val;
 
-  static std::shared_ptr<ComJobBase> makeInstance(ICEngine* const engine, std::shared_ptr<Entity> const &entity)
+  static std::shared_ptr<ComJobBase> makeInstance(std::weak_ptr<ICEngine> const engine, std::shared_ptr<Entity> const &entity)
   {
     return std::make_shared<InformationRequest>(engine, entity);
   }
