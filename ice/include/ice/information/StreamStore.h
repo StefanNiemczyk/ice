@@ -160,16 +160,6 @@ public:
    */
   std::shared_ptr<BaseInformationStream> getBaseStream(const std::shared_ptr<StreamDescription> streamDescription);
 
-  /*!
-   * \brief Adds the stream description and stream template description to the information model.
-   *
-   * Adds the stream description and stream template description  to the information model. Returns
-   * true if add least one stream descriiption or stream template description was added, else false.
-   *
-   * @param informationModel The information model.
-   */
-  bool addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel);
-
   void cleanUpStreams();
 
   ont::entityType getEntityType(ont::entity entity);
@@ -180,15 +170,14 @@ private:
   std::shared_ptr<BaseInformationStream> selectBestStream(std::vector<std::shared_ptr<BaseInformationStream>> *streams);
 
 private:
-  std::weak_ptr<ICEngine> engine; /**< Weak pointer to the engine */
-//  std::shared_ptr<Configuration> config; /**< The configuration object */
-  std::vector<std::shared_ptr<BaseInformationStream>> streams; /**< The information steams */
-  std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute events asynchronously */
-  std::shared_ptr<StreamFactory> streamFactory; /**< Stream factory to create streams */
-  std::shared_ptr<OntologyInterface> ontology; /**< Interface to access the ontology */
-  std::map<ont::entity, ont::entityType> entityTypeMap; /**< Maps the entity type to each known entity */
-  std::mutex _mtx; /**< Mutex */
-  el::Logger* _log; /**< Logger */
+  std::weak_ptr<ICEngine>                               engine;         /**< Weak pointer to the engine */
+  std::vector<std::shared_ptr<BaseInformationStream>>   streams;        /**< The information steams */
+  std::shared_ptr<EventHandler>                         eventHandler;   /**< Handler to execute events asynchronously */
+  std::shared_ptr<StreamFactory>                        streamFactory;  /**< Stream factory to create streams */
+  std::shared_ptr<OntologyInterface>                    ontology;       /**< Interface to access the ontology */
+  std::map<ont::entity, ont::entityType>                entityTypeMap;  /**< Maps the entity type to each known entity */
+  std::mutex                                            _mtx;           /**< Mutex */
+  el::Logger*                                           _log;           /**< Logger */
 };
 
 } /* namespace ice */

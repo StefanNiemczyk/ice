@@ -20,11 +20,13 @@
 namespace ice
 {
 
+class BaseInformationSender;
 class ComJobBase;
 class Entity;
 class ICEngine;
 template<typename T>
 class InformationElement;
+class InformationReceiver;
 class InformationStore;
 class GContainer;
 class GContainerFactory;
@@ -43,6 +45,8 @@ public:
   void addComJob(std::shared_ptr<ComJobBase> const &job);
   void removeComJob(std::shared_ptr<ComJobBase> const &job);
   void discoveredEntity(std::shared_ptr<Entity> const &entity);
+  std::shared_ptr<BaseInformationSender> registerStreamAsSender(std::shared_ptr<BaseInformationStream> stream);
+  std::shared_ptr<InformationReceiver> registerStreamAsReceiver(std::shared_ptr<BaseInformationStream> stream);
 
   // Get/Set
   std::shared_ptr<GContainerFactory> getGContainerFactory();
@@ -57,6 +61,8 @@ protected:
   virtual void discover() = 0;
   virtual int readMessage(std::vector<std::shared_ptr<Message>> &outMessages) = 0;
   virtual void sendMessage(std::shared_ptr<Message> msg) = 0;
+  virtual std::shared_ptr<BaseInformationSender> createSender(std::shared_ptr<BaseInformationStream> stream) = 0;
+  virtual std::shared_ptr<InformationReceiver> createReceiver(std::shared_ptr<BaseInformationStream> stream) = 0;
   virtual void initInternal() = 0;
   virtual void cleanUpInternal() = 0;
 

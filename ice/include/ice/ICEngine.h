@@ -22,9 +22,7 @@
 #include "ice/Identifier.h"
 #include "ice/Time.h"
 #include "ice/XMLReader.h"
-#include "ice/communication/Communication.h"
 #include "ice/communication/CommunicationInterface.h"
-#include "ice/coordination/Coordinator.h"
 #include "ice/coordination/InformationModel.h"
 #include "ice/coordination/ModelComperator.h"
 #include "ice/information/BaseInformationStream.h"
@@ -152,23 +150,9 @@ public:
    *
    * Returns the communication interface.
    */
-  std::shared_ptr<Communication> getCommunication();
-
-  /*!
-   * \brief Returns the communication interface.
-   *
-   * Returns the communication interface.
-   */
   std::shared_ptr<CommunicationInterface> getCommunicationInterface();
 
   void setCommunicationInterface(std::shared_ptr<CommunicationInterface> &communication);
-
-  /*!
-   * \brief Returns the coordinator.
-   *
-   * Returns the coordinator.
-   */
-  std::shared_ptr<Coordinator> getCoordinator();
 
   /*!
    * \brief Returns the stream factory.
@@ -209,27 +193,25 @@ private:
   int readXMLInformation(XMLInformation* information, const std::string namePrefix);
 
 protected:
-  bool initialized; /**< True if the engine is initialized, else false */
-  bool running; /**< True if the engine is running, alse false */
-  std::shared_ptr<TimeFactory> timeFactory; /**< time factory to create time stamps */
-  std::shared_ptr<Configuration> config; /**< The configuration object */
-  std::shared_ptr<EventHandler> eventHandler; /**< Handler to execute asynchronous tasks */
-  std::shared_ptr<StreamStore> streamStore; /**< The Stream store */
-  std::shared_ptr<InformationStore> informationStore; /**< The information store */
-  std::shared_ptr<NodeStore> nodeStore; /**< The node store */
-  std::shared_ptr<Communication> communication; /**< The communication interface */
-  std::shared_ptr<CommunicationInterface> communicationInterface; /**< The communication interface */
-  std::shared_ptr<Coordinator> coordinator; /**< Coordinator object which coordinates the cooperation */
-  std::shared_ptr<StreamFactory> streamFactory; /**< Factory to create InformationStream objects */
-  std::shared_ptr<ModelComperator> modelComperator; /**< Comparator to find similarities in different information model */
-  std::shared_ptr<OntologyInterface> ontologyInterface; /*< Interface to access the ontology */
-  std::shared_ptr<ProcessingModelGenerator> modelGenerator; /*< Processing model generator */
-  std::shared_ptr<UpdateStrategie> updateStrategie; /**< Update strategie to modify the information processing */
-  std::shared_ptr<GContainerFactory> gcontainerFactory; /**< Factory to create generic containers */
-  std::shared_ptr<ASPTransformationGeneration> aspTransformationGenerator; /**< Component to create transformations based on an asp programm */
-  std::shared_ptr<EntityDirectory> entityDirectory; /**< The directory for known entities */
-  std::shared_ptr<Entity> self; /**< This engine */
-  std::mutex mtx_; /**< Mutex */
+  bool                                          initialized;                    /**< True if the engine is initialized, else false */
+  bool                                          running;                        /**< True if the engine is running, alse false */
+  std::shared_ptr<TimeFactory>                  timeFactory;                    /**< time factory to create time stamps */
+  std::shared_ptr<Configuration>                config;                         /**< The configuration object */
+  std::shared_ptr<EventHandler>                 eventHandler;                   /**< Handler to execute asynchronous tasks */
+  std::shared_ptr<StreamStore>                  streamStore;                    /**< The Stream store */
+  std::shared_ptr<InformationStore>             informationStore;               /**< The information store */
+  std::shared_ptr<NodeStore>                    nodeStore;                      /**< The node store */
+  std::shared_ptr<CommunicationInterface>       communicationInterface;         /**< The communication interface */
+  std::shared_ptr<StreamFactory>                streamFactory;                  /**< Factory to create InformationStream objects */
+  std::shared_ptr<ModelComperator>              modelComperator;                /**< Comparator to find similarities in different information model */
+  std::shared_ptr<OntologyInterface>            ontologyInterface;              /**< Interface to access the ontology */
+  std::shared_ptr<ProcessingModelGenerator>     modelGenerator;                 /**< Processing model generator */
+  std::shared_ptr<UpdateStrategie>              updateStrategie;                /**< Update strategie to modify the information processing */
+  std::shared_ptr<GContainerFactory>            gcontainerFactory;              /**< Factory to create generic containers */
+  std::shared_ptr<ASPTransformationGeneration>  aspTransformationGenerator;     /**< Component to create transformations based on an asp programm */
+  std::shared_ptr<EntityDirectory>              entityDirectory;                /**< The directory for known entities */
+  std::shared_ptr<Entity>                       self;                           /**< This engine */
+  std::mutex                                    mtx_;                           /**< Mutex */
 };
 
 } /* namespace ice */

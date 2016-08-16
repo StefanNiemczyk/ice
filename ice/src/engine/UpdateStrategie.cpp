@@ -39,8 +39,7 @@ void UpdateStrategie::init()
   this->ontology = en->getOntologyInterface();
   this->nodeStore = en->getNodeStore();
   this->streamStore = en->getStreamStore();
-  this->coordinator = en->getCoordinator();
-  this->communication = en->getCommunication();
+  this->communication = en->getCommunicationInterface();
   this->modelGenerator = en->getProcessingModelGenerator();
   this->worker = std::thread(&UpdateStrategie::workerTask, this);
 
@@ -54,7 +53,6 @@ void UpdateStrategie::cleanUp()
   this->ontology.reset();
   this->nodeStore.reset();
   this->streamStore.reset();
-  this->coordinator.reset();
   this->communication.reset();
   this->modelGenerator.reset();
 
@@ -294,16 +292,6 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<Entity> &entity, i
   if (false == valid)
   {
     return false;
-  }
-
-  for (auto stream : streamsSend)
-  {
-    stream->registerSender(this->communication);
-  }
-
-  for (auto stream : streamsReceived)
-  {
-    stream->registerReceiver(this->communication);
   }
 
   return true;

@@ -21,8 +21,7 @@
 namespace ice
 {
 class BaseInformationStream;
-class Communication;
-class Coordinator;
+class CommunicationInterface;
 class Entity;
 class ICEngine;
 class StreamStore;
@@ -75,8 +74,7 @@ protected:
   std::weak_ptr<ICEngine>                       engine;                 /**< The main engine */
   std::shared_ptr<NodeStore>                    nodeStore;              /**< The node store */
   std::shared_ptr<StreamStore>                  streamStore;            /**< The information store */
-  std::shared_ptr<Coordinator>                  coordinator;            /**< Coordinator of engines */
-  std::shared_ptr<Communication>                communication;          /**< Communication interface */
+  std::shared_ptr<CommunicationInterface>       communication;          /**< Communication interface */
   std::shared_ptr<OntologyInterface>            ontology;               /**< Shared pointer to access the ontology */
   std::shared_ptr<ProcessingModelGenerator>     modelGenerator;         /**< The model generator */
   bool                                          valid;                  /**< True if the current model is valid, else false */

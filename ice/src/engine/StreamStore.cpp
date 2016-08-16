@@ -164,14 +164,6 @@ std::shared_ptr<BaseInformationStream> StreamStore::getBaseStream(
                              streamDescription->getSourceSystem());
 }
 
-bool ice::StreamStore::addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel)
-{
-  std::lock_guard<std::mutex> guard(this->_mtx);
-  bool returnValue = false;
-
-  return returnValue;
-}
-
 void StreamStore::cleanUpStreams()
 {
   std::lock_guard<std::mutex> guard(this->_mtx);

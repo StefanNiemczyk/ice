@@ -568,7 +568,7 @@ void Entity::updateReceived(std::vector<std::shared_ptr<Node>> &nodes,
  {
    auto ths = this->shared_from_this();
    auto engine = this->engine.lock();
-   auto communication = engine->getCommunication();
+   auto communication = engine->getCommunicationInterface();
 
    // update nodes
    for (auto node : this->nodes)
@@ -629,7 +629,7 @@ void Entity::updateReceived(std::vector<std::shared_ptr<Node>> &nodes,
  {
    auto ths = this->shared_from_this();
    auto engine = this->engine.lock();
-   auto communication = engine->getCommunication();
+   auto communication = engine->getCommunicationInterface();
 
    // clear sub model
    container.subModel.reset();

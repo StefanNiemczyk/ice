@@ -44,7 +44,7 @@ void Coordinator::init()
   _log->verbose(1, "Init called");
 
   auto e = engine.lock();
-  this->communication = e->getCommunication();
+//  this->communication = e->getCommunication();
   this->streamStore = e->getStreamStore();
   this->config = e->getConfig();
   this->timeFactory = e->getTimeFactory();

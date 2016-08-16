@@ -32,7 +32,7 @@ namespace ice
 class BaseInformationSender;
 template<typename T>
   class AbstractInformationListener;
-class Communication;
+class CommunicationInterface;
 class InformationReceiver;
 template<typename T>
   class InformationSender;
@@ -91,15 +91,6 @@ template<typename T>
      */
     std::shared_ptr<InformationElement<T>> getLast(int n);
 
-    /*!
-     * \brief Adds a new information to the stream and returns the identifier.
-     *
-     * Adds a new information to the stream and returns the identifier. An asynchronous event
-     * is triggered for each registered listener.
-     *
-     * \param information The Information to add.
-     */
-    //int add(std::shared_ptr<InformationElement<T>> information);
     /*!
      * \brief Creates and adds a new information to the stream and returns the identifier.
      *
@@ -173,14 +164,14 @@ template<typename T>
      *
      * Registers this stream in the communication class as sending stream.
      */
-    virtual std::shared_ptr<BaseInformationSender> registerSender(std::shared_ptr<Communication> &communication);
+    virtual std::shared_ptr<BaseInformationSender> registerSender(std::shared_ptr<CommunicationInterface> &communication);
 
     /*!
      * \brief Registers this stream in the communication class as receiving stream.
      *
      * Registers this stream in the communication class as receiving stream.
      */
-    virtual std::shared_ptr<InformationReceiver> registerReceiver(std::shared_ptr<Communication> &communication);
+    virtual std::shared_ptr<InformationReceiver> registerReceiver(std::shared_ptr<CommunicationInterface> &communication);
 
     /*!
      * \brief Removes the receiver of this stream.
@@ -208,7 +199,7 @@ template<typename T>
 /* namespace ice */
 
 //Include after forward declaration
-#include "ice/communication/Communication.h"
+#include "ice/communication/CommunicationInterface.h"
 #include "ice/communication/InformationSender.h"
 #include "ice/coordination/EngineState.h"
 #include "ice/information/AbstractInformationListener.h"
@@ -310,7 +301,7 @@ template<typename T>
 
 template<typename T>
   std::shared_ptr<ice::BaseInformationSender> ice::InformationStream<T>::registerSender(
-      std::shared_ptr<Communication> &communication)
+      std::shared_ptr<CommunicationInterface> &communication)
   {
     if (this->sender)
     {
@@ -347,7 +338,7 @@ template<typename T>
 
 template<typename T>
   std::shared_ptr<ice::InformationReceiver> ice::InformationStream<T>::registerReceiver(
-      std::shared_ptr<Communication> &communication)
+      std::shared_ptr<CommunicationInterface> &communication)
   {
     std::lock_guard<std::mutex> guard(_mtx);
     auto comResult = communication->registerStreamAsReceiver(this->shared_from_this());

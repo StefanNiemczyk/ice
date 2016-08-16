@@ -27,7 +27,6 @@ void ProcessingModelGenerator::init()
 {
   auto en = this->engine.lock();
   this->nodeStore = en->getNodeStore();
-  this->coordinator = en->getCoordinator();
   this->ontology = en->getOntologyInterface();
   this->initInternal();
 }
@@ -35,7 +34,6 @@ void ProcessingModelGenerator::init()
 void ProcessingModelGenerator::cleanUp()
 {
   this->ontology.reset();
-  this->coordinator.reset();
   this->nodeStore.reset();
   this->cleanUpInternal();
 }

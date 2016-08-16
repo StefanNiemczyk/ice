@@ -20,7 +20,7 @@
 namespace ice
 {
 class BaseInformationSender;
-class Communication;
+class CommunicationInterface;
 class InformationReceiver;
 class InformationStreamTemplate;
 class InformationType;
@@ -141,7 +141,7 @@ public:
    *
    *  Registers an engine state. Returns 1 if the task is already registered, else 0.
    */
-  int registerRemoteListener(std::shared_ptr<Entity> &entity, std::shared_ptr<Communication> &communication);
+  int registerRemoteListener(std::shared_ptr<Entity> &entity, std::shared_ptr<CommunicationInterface> &communication);
 
   /*!
    * \brief Unregisters a engine state.
@@ -150,7 +150,7 @@ public:
    */
   int unregisterRemoteListener(std::shared_ptr<Entity> &entity);
 
-  int setRemoteSource(std::shared_ptr<Entity> entity, std::shared_ptr<Communication> &communication);
+  int setRemoteSource(std::shared_ptr<Entity> entity, std::shared_ptr<CommunicationInterface> &communication);
 
   /*!
    * \brief Returns true if this stream can be shared, else false.
@@ -197,14 +197,14 @@ protected:
    *
    * Registers this stream in the communication class as sending stream.
    */
-  virtual std::shared_ptr<BaseInformationSender> registerSender(std::shared_ptr<Communication> &communication) = 0;
+  virtual std::shared_ptr<BaseInformationSender> registerSender(std::shared_ptr<CommunicationInterface> &communication) = 0;
 
   /*!
    * \brief Registers this stream in the communication class as receiving stream.
    *
    * Registers this stream in the communication class as receiving stream.
    */
-  virtual std::shared_ptr<InformationReceiver> registerReceiver(std::shared_ptr<Communication> &communication) = 0;
+  virtual std::shared_ptr<InformationReceiver> registerReceiver(std::shared_ptr<CommunicationInterface> &communication) = 0;
 
   /*!
    * \brief Removes the receiver of this stream.

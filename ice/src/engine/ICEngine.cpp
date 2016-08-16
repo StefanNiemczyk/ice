@@ -45,10 +45,8 @@ void ICEngine::init()
   std::string path = ros::package::getPath("ice");
 
   this->eventHandler = std::make_shared<EventHandler>(this->shared_from_this());
-  this->communication = std::make_shared<RosCommunication>(this->shared_from_this());
   this->streamStore = std::make_shared<StreamStore>(this->shared_from_this());
   this->nodeStore = std::make_shared<NodeStore>(this->shared_from_this());
-  this->coordinator = std::make_shared<Coordinator>(this->shared_from_this());
   this->modelGenerator = std::make_shared<ASPModelGenerator>(this->shared_from_this());
   this->updateStrategie = std::make_shared<FastUpdateStrategie>(this->shared_from_this());
   this->gcontainerFactory = std::make_shared<GContainerFactory>(this->shared_from_this());
@@ -62,8 +60,6 @@ void ICEngine::init()
 
   // Initialize components
   this->eventHandler->init();
-  this->coordinator->init();
-  this->communication->init();
   this->modelGenerator->init();
   this->streamStore->init();
   this->updateStrategie->init();
@@ -91,12 +87,6 @@ void ICEngine::cleanUp()
 
   if (this->eventHandler)
     this->eventHandler->cleanUp();
-
-  if (this->coordinator)
-    this->coordinator->cleanUp();
-
-  if (this->communication)
-    this->communication->cleanUp();
 
   if (this->streamStore)
     this->streamStore->cleanUp();
@@ -157,11 +147,6 @@ std::shared_ptr<NodeStore> ICEngine::getNodeStore()
   return this->nodeStore;
 }
 
-std::shared_ptr<Communication> ICEngine::getCommunication()
-{
-  return this->communication;
-}
-
 std::shared_ptr<CommunicationInterface> ICEngine::getCommunicationInterface()
 {
   return this->communicationInterface;
@@ -170,11 +155,6 @@ std::shared_ptr<CommunicationInterface> ICEngine::getCommunicationInterface()
 void ICEngine::setCommunicationInterface(std::shared_ptr<CommunicationInterface> &communication)
 {
   this->communicationInterface = communication;
-}
-
-std::shared_ptr<Coordinator> ICEngine::getCoordinator()
-{
-  return this->coordinator;
 }
 
 std::shared_ptr<StreamFactory> ICEngine::getStreamFactory()

@@ -10,6 +10,8 @@
 #include <iostream>
 #include <map>
 
+#include "ice/communication/BaseInformationSender.h"
+#include "ice/communication/InformationReceiver.h"
 #include "ice/communication/messages/Message.h"
 #include "ice/communication/messages/CommandMessage.h"
 #include "ice/communication/messages/IdMessage.h"
@@ -121,6 +123,36 @@ void CommunicationInterface::discoveredEntity(std::shared_ptr<Entity> const &ent
 //
 //  this->send(m);
 //}
+
+std::shared_ptr<BaseInformationSender> CommunicationInterface::registerStreamAsSender(
+    std::shared_ptr<BaseInformationStream> stream)
+{
+  std::shared_ptr<BaseInformationSender> ptr;
+
+  ptr = this->createSender(stream);
+
+  if (ptr == nullptr)
+  {
+    _log->error("Sender could not be created for stream %v with type string %v",
+                stream->getName(), stream->getSpecification()->getTypeString());
+  }
+
+  return ptr;
+}
+
+std::shared_ptr<InformationReceiver> CommunicationInterface::registerStreamAsReceiver(
+    std::shared_ptr<BaseInformationStream> stream)
+{
+  std::shared_ptr<InformationReceiver> ptr = this->createReceiver(stream);
+
+  if (ptr == nullptr)
+  {
+    _log->error("Receiver could not be created for stream %v with type string %v",
+                stream->getName(), stream->getSpecification()->getTypeString());
+  }
+
+  return ptr;
+}
 
 void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
 {

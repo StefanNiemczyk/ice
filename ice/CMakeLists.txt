@@ -93,8 +93,6 @@ include_directories(
 add_library(${PROJECT_NAME}
   src/engine/CommunicationInterface.cpp
   src/engine/Communication.cpp
-  src/engine/InformationSender.cpp
-  src/engine/InformationReceiver.cpp
   
   src/engine/Message.cpp
   src/engine/CommandMessage.cpp

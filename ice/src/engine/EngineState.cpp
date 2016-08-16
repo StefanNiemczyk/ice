@@ -29,7 +29,7 @@ EngineState::EngineState(identifier engineId, std::weak_ptr<ICEngine> engine) :
   auto e = engine.lock();
   this->timeFactory = e->getTimeFactory();
   this->config = e->getConfig();
-  this->communication = e->getCommunication();
+//  this->communication = e->getCommunication();
 
   this->timeLastActivity = this->timeFactory->createTime();
   this->timeLastStateUpdate = NO_TIME;

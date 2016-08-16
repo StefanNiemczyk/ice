@@ -15,6 +15,7 @@
 
 #include "ice/communication/InformationSender.h"
 #include "ice/Entity.h"
+#include "ice/EntityDirectory.h"
 
 #include "ice_msgs/Identifier.h"
 
@@ -32,7 +33,7 @@ template<typename ICEType, typename ROSType>
                          transformC2M<ICEType, ROSType> &messageTransform);
     virtual ~RosInformationSender();
 
-    virtual void sendInformationElement(std::vector<Entity> &sendTo,
+    virtual void sendInformationElement(std::vector<std::shared_ptr<Entity>> &sendTo,
                                         std::shared_ptr<InformationElement<ICEType>> informationElement);
 
     /*!
@@ -70,18 +71,18 @@ template<typename ICEType, typename ROSType>
 
 template<typename ICEType, typename ROSType>
   inline void RosInformationSender<ICEType, ROSType>::sendInformationElement(
-      std::vector<Entity> &sendTo,
+      std::vector<std::shared_ptr<Entity>> &sendTo,
       std::shared_ptr<InformationElement<ICEType> > informationElement)
   {
     auto msg = this->messageTransform(informationElement);
 
     msg->header.senderId.value = this->engineId;
 
-    for (auto entity : sendTo)
+    for (auto &entity : sendTo)
     {
       ice_msgs::Identifier receiver;
       std::string id;
-      entity.getId(EntityDirectory::ID_ICE, id);
+      entity->getId(EntityDirectory::ID_ICE, id);
       receiver.value = std::stoi(id);
       msg->header.receiverIds.push_back(receiver);
     }

@@ -29,7 +29,7 @@ template<typename T>
     InformationSender() {};
     virtual ~InformationSender() {};
 
-    virtual void sendInformationElement(std::vector<Entity> &sendTo,
+    virtual void sendInformationElement(std::vector<std::shared_ptr<Entity>> &sendTo,
                                         std::shared_ptr<InformationElement<T>> informationElement) = 0;
 
     /*!

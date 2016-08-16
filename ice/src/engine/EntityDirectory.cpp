@@ -8,6 +8,7 @@
 #include "ice/EntityDirectory.h"
 
 #include <iostream>
+#include <vector>
 
 #include "ice/ontology/OntologyInterface.h"
 #include "ice/ICEngine.h"
@@ -16,10 +17,10 @@
 namespace ice
 {
 
-const std::string EntityDirectory::ID_ICE = "id_ice";
-const std::string EntityDirectory::ID_SERVAL = "id_serval";
-const std::string EntityDirectory::ID_ONTOLOGY = "id_ontology";
-const std::string EntityDirectory::ID_ONTOLOGY_SHORT = "id_ontology_short";
+const std::string EntityDirectory::ID_ICE               = "id_ice";
+const std::string EntityDirectory::ID_SERVAL            = "id_serval";
+const std::string EntityDirectory::ID_ONTOLOGY          = "id_ontology";
+const std::string EntityDirectory::ID_ONTOLOGY_SHORT    = "id_ontology_short";
 
 EntityDirectory::EntityDirectory(std::weak_ptr<ICEngine> const &engine) : engine(engine)
 {
@@ -34,16 +35,16 @@ EntityDirectory::~EntityDirectory()
 void EntityDirectory::init()
 {
   auto e = this->engine.lock();
-
   this->timeFactory = e->getTimeFactory();
-  this->self = std::make_shared<Entity>(this->shared_from_this(), this->engine, this->timeFactory,
-		                                {{ID_SERVAL, ""}, {ID_ONTOLOGY, ""}});
+
+  std::initializer_list<Id> ids = {{ID_SERVAL, ""}, {ID_ONTOLOGY, ""}};
+  this->self = std::make_shared<Entity>(this->shared_from_this(), this->engine, this->timeFactory, ids);
   this->self->setIceIdentity(true);
 }
 
 void EntityDirectory::cleanUp()
 {
-
+  //
 }
 
 int EntityDirectory::initializeFromOntology(std::shared_ptr<OntologyInterface> const &ontologyInterface)

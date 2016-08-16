@@ -120,7 +120,7 @@ int ice::BaseInformationStream::unregisterTaskSync(std::shared_ptr<AsynchronousT
 }
 
 int BaseInformationStream::registerRemoteListener(std::shared_ptr<Entity> &entity,
-                                                  std::shared_ptr<Communication> &communication)
+                                                  std::shared_ptr<CommunicationInterface> &communication)
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
 
@@ -157,7 +157,7 @@ int BaseInformationStream::unregisterRemoteListener(std::shared_ptr<Entity> &ent
 }
 
 int BaseInformationStream::setRemoteSource(std::shared_ptr<Entity> entity,
-                                           std::shared_ptr<Communication> &communication)
+                                           std::shared_ptr<CommunicationInterface> &communication)
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
 

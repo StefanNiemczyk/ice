@@ -33,6 +33,11 @@ ASPModelGenerator::ASPModelGenerator(std::weak_ptr<ICEngine> engine) :
   this->subModelIndex = 0;
 }
 
+ASPModelGenerator::~ASPModelGenerator()
+{
+  // nothing to do here
+}
+
 void ASPModelGenerator::initInternal()
 {
   std::string path = ros::package::getPath("ice") + "/asp/informationProcessing/";
@@ -61,12 +66,7 @@ void ASPModelGenerator::initInternal()
 
 void ASPModelGenerator::cleanUpInternal()
 {
-
-}
-
-ASPModelGenerator::~ASPModelGenerator()
-{
-  // nothing to do here
+  //
 }
 
 void ASPModelGenerator::readOntology()

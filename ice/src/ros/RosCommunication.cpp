@@ -400,9 +400,7 @@ std::shared_ptr<BaseInformationSender> RosCommunication::registerStreamAsSender(
 std::shared_ptr<InformationReceiver> RosCommunication::registerStreamAsReceiver(
     std::shared_ptr<BaseInformationStream> stream)
 {
-  std::shared_ptr<InformationReceiver> ptr;
-
-  ptr = this->createReceiver(stream);
+  std::shared_ptr<InformationReceiver> ptr = this->createReceiver(stream);
 
   if (false == ptr)
   {
@@ -433,8 +431,7 @@ std::shared_ptr<BaseInformationSender> RosCommunication::createSender(std::share
     return this->_createSender<std::vector<Position>, ice_msgs::Positions>(stream, method);
   }
 
-  std::shared_ptr<BaseInformationSender> ptr;
-  return ptr;
+  return nullptr;
 }
 
 std::shared_ptr<InformationReceiver> RosCommunication::createReceiver(std::shared_ptr<BaseInformationStream> stream)
@@ -456,8 +453,7 @@ std::shared_ptr<InformationReceiver> RosCommunication::createReceiver(std::share
     return this->_createReceiver<std::vector<Position>, ice_msgs::Positions>(stream, method);
   }
 
-  std::shared_ptr<InformationReceiver> ptr;
-  return ptr;
+  return nullptr;
 }
 
 void RosCommunication::sendCommand(const identifier receiverId, const RosCoordinationCommand command) const
@@ -470,12 +466,8 @@ void RosCommunication::sendCommand(const identifier receiverId, const RosCoordin
 
   ice_msgs::ICECoordination coordinationMsg;
   coordinationMsg.header.senderId.value = this->engineId;
-//  coordinationMsg.header.senderId.id.resize(16);
-//  std::copy(this->engineId.begin(), this->engineId.end(), coordinationMsg.header.senderId.id.begin());
 
   ice_msgs::Identifier receiver;
-//  receiver.id.resize(16);
-//  std::copy(receiverId.begin(), receiverId.end(), receiver.id.begin());
   receiver.value = receiverId;
   coordinationMsg.header.receiverIds.push_back(receiver);
 

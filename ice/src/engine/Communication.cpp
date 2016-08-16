@@ -34,7 +34,7 @@ Communication::~Communication()
 void Communication::init()
 {
   auto e = engine.lock();
-  this->coordinator = e->getCoordinator();
+//  this->coordinator = e->getCoordinator();
   this->eventHandler = e->getEventHandler();
 }
 

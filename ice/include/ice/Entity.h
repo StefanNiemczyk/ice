@@ -87,6 +87,8 @@ struct ASPElement
       case ASPElementType::ASP_MAP_NODE:
         return NodeType::MAP;
     }
+
+    return NodeType::PROCESSING;
   }
 };
 

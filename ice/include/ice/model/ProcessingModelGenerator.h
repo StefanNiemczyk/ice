@@ -45,11 +45,10 @@ protected:
   virtual void cleanUpInternal() = 0;
 
 protected:
-  std::weak_ptr<ICEngine> engine; /*< Weak pointer to ice engine */
-  std::shared_ptr<NodeStore> nodeStore; /**< The node store */
-  std::shared_ptr<Coordinator> coordinator; /**< Coordinator of engines */
-  std::shared_ptr<OntologyInterface> ontology; /**< Shared pointer to access the ontology */
-  std::mutex mtx_; /**< Mutex */
+  std::weak_ptr<ICEngine>               engine;         /*< Weak pointer to ice engine */
+  std::shared_ptr<NodeStore>            nodeStore;      /**< The node store */
+  std::shared_ptr<OntologyInterface>    ontology;       /**< Shared pointer to access the ontology */
+  std::mutex                            mtx_;           /**< Mutex */
 };
 
 } /* namespace ice */
