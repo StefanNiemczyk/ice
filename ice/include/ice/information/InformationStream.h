@@ -36,7 +36,6 @@ class CommunicationInterface;
 class InformationReceiver;
 template<typename T>
   class InformationSender;
-class InformationType;
 } /* namespace ice */
 
 namespace ice
@@ -201,7 +200,6 @@ template<typename T>
 //Include after forward declaration
 #include "ice/communication/CommunicationInterface.h"
 #include "ice/communication/InformationSender.h"
-#include "ice/coordination/EngineState.h"
 #include "ice/information/AbstractInformationListener.h"
 
 //Implementing methods here

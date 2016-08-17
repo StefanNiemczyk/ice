@@ -15,7 +15,6 @@
 #include <string>
 
 #include "ice/information/InformationSpecification.h"
-#include "ice/model/aspModel/ASPSystem.h"
 #include "ice/processing/NodeDescription.h"
 #include "ice/Time.h"
 #include "easylogging++.h"

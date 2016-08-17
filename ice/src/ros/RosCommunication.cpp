@@ -12,7 +12,6 @@
 #include <boost/archive/text_iarchive.hpp>
 
 #include "ice/container/Position.h"
-#include "ice/coordination/Coordinator.h"
 #include "ice/processing/LambdaTask.h"
 #include "ice/processing/NodeDescription.h"
 #include "ice/ros/RosTimeFactory.h"

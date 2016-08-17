@@ -11,7 +11,6 @@
 #include "ice/information/InformationSpecification.h"
 #include "ice/information/InformationStream.h"
 #include "ice/information/StreamStore.h"
-#include "ice/information/InformationType.h"
 #include "ice/information/StreamDescription.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/TypeDefs.h"

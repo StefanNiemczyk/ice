@@ -22,8 +22,6 @@ namespace ice
 class BaseInformationSender;
 class CommunicationInterface;
 class InformationReceiver;
-class InformationStreamTemplate;
-class InformationType;
 class Entity;
 class EventHandler;
 }

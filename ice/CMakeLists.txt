@@ -92,7 +92,6 @@ include_directories(
 ## Declare a cpp library
 add_library(${PROJECT_NAME}
   src/engine/CommunicationInterface.cpp
-  src/engine/Communication.cpp
   
   src/engine/Message.cpp
   src/engine/CommandMessage.cpp
@@ -113,14 +112,8 @@ add_library(${PROJECT_NAME}
   src/engine/Position.cpp
   src/engine/RingBuffer.cpp
   
-  src/engine/Coordinator.cpp
-  src/engine/EngineState.cpp
-#  src/engine/InformationModel.cpp
-#  src/engine/IntersectionInformationModel.cpp
-#  src/engine/ModelComperator.cpp
   src/engine/NodeDescription.cpp
   src/engine/StreamDescription.cpp
-#  src/engine/StreamTemplateDescription.cpp
   
   src/engine/AutoIRONode.cpp
   src/engine/AsynchronousTask.cpp
@@ -131,9 +124,7 @@ add_library(${PROJECT_NAME}
   
   src/engine/BaseInformationStream.cpp
   src/engine/InformationSpecification.cpp
-#  src/engine/InformationStreamTemplate.cpp
   src/engine/InformationStore.cpp
-#  src/engine/InformationType.cpp
   src/engine/StreamFactory.cpp
   src/engine/StreamStore.cpp
   
@@ -141,7 +132,6 @@ add_library(${PROJECT_NAME}
   
   src/engine/ProcessingModel.cpp
   src/engine/ProcessingModelGenerator.cpp
-  src/engine/ASPSystem.cpp
   src/engine/ASPModelGenerator.cpp
   src/engine/FastUpdateStrategie.cpp
   src/engine/UpdateStrategie.cpp
@@ -212,12 +202,6 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/test_NodeStore.cpp
   test/test_CallbackList.cpp
 
- 
- ## should be fixed...  
- # test/test_XMLReader
- # test/test_ModelComperator.cpp
- # test/test_ICEngine.cpp
- 
   test/test_main.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
 )

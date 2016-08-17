@@ -23,6 +23,8 @@
 #include "ice/communication/messages/SubModelResponseMessage.h"
 #include "ice/Entity.h"
 
+INITIALIZE_EASYLOGGINGPP
+
 namespace ice
 {
 

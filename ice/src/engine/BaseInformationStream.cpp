@@ -9,7 +9,6 @@
 
 #include <sstream>
 
-#include "ice/information/InformationType.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/Entity.h"
 #include "easylogging++.h"

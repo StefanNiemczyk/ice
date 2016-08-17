@@ -9,8 +9,6 @@
 
 #include <sstream>
 
-#include "ice/coordination/StreamTemplateDescription.h"
-
 namespace ice
 {
 

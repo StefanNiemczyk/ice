@@ -16,7 +16,6 @@
 
 #include "ice/Configuration.h"
 #include "ice/information/StreamDescription.h"
-#include "ice/coordination/StreamTemplateDescription.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/information/InformationSpecification.h"
 #include "easylogging++.h"
