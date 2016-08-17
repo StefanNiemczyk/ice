@@ -147,7 +147,6 @@ add_library(${PROJECT_NAME}
   src/engine/EntityDirectory.cpp
   src/engine/Identifier.cpp
   src/engine/ICEngine.cpp 
-  src/engine/XMLReader.cpp  
 
   src/ros/RosCommunication.cpp
   src/ros/RosInformationSender.cpp

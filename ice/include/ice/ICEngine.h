@@ -21,7 +21,6 @@
 #include "ice/EntityDirectory.h"
 #include "ice/Identifier.h"
 #include "ice/Time.h"
-#include "ice/XMLReader.h"
 #include "ice/communication/CommunicationInterface.h"
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationStream.h"
@@ -184,9 +183,6 @@ public:
   std::shared_ptr<GContainerFactory> getGContainerFactory();
 
   std::shared_ptr<ASPTransformationGeneration> getASPTransformationGeneration();
-
-private:
-  int readXMLInformation(XMLInformation* information, const std::string namePrefix);
 
 protected:
   bool                                          initialized;                    /**< True if the engine is initialized, else false */
