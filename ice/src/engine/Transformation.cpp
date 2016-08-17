@@ -196,6 +196,7 @@ double Transformation::convertDouble(void *data, BasicRepresentationType type)
       break;
     default:
       std::cerr << "Error: Unsupported formula datatype!" << std::endl;
+      return 0.0;
       break;
   }
 }

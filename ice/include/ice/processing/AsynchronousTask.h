@@ -25,14 +25,14 @@ public:
    *
    * Default constructor
    */
-  AsynchronousTask();
+  AsynchronousTask() {}
 
   /*!
    * \brief Default destructor
    *
    * Default destructor
    */
-  virtual ~AsynchronousTask();
+  virtual ~AsynchronousTask() {}
 
   /*!
    * \brief Executes the asynchronous task.

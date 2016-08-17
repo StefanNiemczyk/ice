@@ -108,15 +108,11 @@ add_library(${PROJECT_NAME}
   src/engine/IdentityRequest.cpp
   src/engine/InformationRequest.cpp
   src/engine/CooperationRequest.cpp
-
-  src/engine/Position.cpp
-  src/engine/RingBuffer.cpp
   
   src/engine/NodeDescription.cpp
   src/engine/StreamDescription.cpp
   
   src/engine/AutoIRONode.cpp
-  src/engine/AsynchronousTask.cpp
   src/engine/EventHandler.cpp
   src/engine/LambdaTask.cpp
   src/engine/Node.cpp

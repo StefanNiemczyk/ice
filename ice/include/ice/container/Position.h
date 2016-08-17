@@ -14,8 +14,8 @@ namespace ice
 class Position
 {
 public:
-  Position();
-  virtual ~Position();
+  Position() : x(0), y(0), z(0) {}
+  virtual ~Position() {}
 
   int x;
   int y;
