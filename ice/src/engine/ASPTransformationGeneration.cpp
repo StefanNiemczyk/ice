@@ -19,6 +19,7 @@ namespace ice
 
 ASPTransformationGeneration::ASPTransformationGeneration()
 {
+  std::cout << "constructor trans" << std::endl;
   _log = el::Loggers::getLogger("ASPTransformationGeneration");
   _log->verbose(1, "Constructor called");
 }
@@ -26,13 +27,14 @@ ASPTransformationGeneration::ASPTransformationGeneration()
 ASPTransformationGeneration::ASPTransformationGeneration(std::weak_ptr<ICEngine> engine) :
     engine(engine)
 {
+  std::cout << "constructor trans" << std::endl;
   _log = el::Loggers::getLogger("ASPTransformationGeneration");
   _log->verbose(1, "Constructor called");
 }
 
 ASPTransformationGeneration::~ASPTransformationGeneration()
 {
-  //
+  std::cout << "destructor trans" << std::endl;
 }
 
 void ASPTransformationGeneration::init()
@@ -42,11 +44,13 @@ void ASPTransformationGeneration::init()
   auto e = this->engine.lock();
 
   this->ontology = e->getOntologyInterface();
+  this->containerFactory = e->getGContainerFactory();
 }
 
 void ASPTransformationGeneration::cleanUp()
 {
   this->ontology.reset();
+  this->containerFactory.reset();
 }
 
 void ASPTransformationGeneration::readInfoStructureFromOntology()

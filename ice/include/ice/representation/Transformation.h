@@ -101,7 +101,7 @@ struct TransformationOperation
 class Transformation
 {
 public:
-  Transformation(std::shared_ptr<GContainerFactory> factory, std::string name, std::string scope,
+  Transformation(std::weak_ptr<ice::GContainerFactory> factory, std::string name, std::string scope,
                  std::shared_ptr<Representation> targetRepresentation);
   virtual ~Transformation();
 
@@ -115,12 +115,12 @@ public:
   std::unique_ptr<std::vector<std::string>> getASPRepreentation(std::string system);
 
 private:
-  const std::string name;
-  const std::string scope;
-  std::shared_ptr<Representation> targetRepresentation;
-  std::vector<std::shared_ptr<Representation>> inputs;
-  std::vector<TransformationOperation*> operations;
-  std::shared_ptr<ice::GContainerFactory> factory;
+  const std::string                             name;
+  const std::string                             scope;
+  std::shared_ptr<Representation>               targetRepresentation;
+  std::vector<std::shared_ptr<Representation>>  inputs;
+  std::vector<TransformationOperation*>         operations;
+  std::weak_ptr<ice::GContainerFactory>         factory;
 
   // Converts the void pointers data from the type given by the parameter
   // type to a double value.

@@ -19,6 +19,8 @@ namespace ice
 {
 
 class GContainer;
+class GContainerFactory;
+class ICEngine;
 template<typename T>
 class InformationElement;
 class InformationSpecification;
@@ -29,7 +31,7 @@ typedef std::function<void (std::shared_ptr<InformationSpecification>&, std::sha
 class InformationStore
 {
 public:
-  InformationStore(std::shared_ptr<OntologyInterface> ontology);
+  InformationStore(std::weak_ptr<ICEngine> engine);
   virtual ~InformationStore();
 
   bool init();
@@ -39,7 +41,8 @@ public:
                       std::shared_ptr<GContainer> info);
   void addInformation(std::shared_ptr<InformationElement<GContainer>> &info);
   int getInformation(std::shared_ptr<InformationSpecification> request,
-                     std::vector<std::shared_ptr<InformationElement<GContainer>>> &outInfo);
+                     std::vector<std::shared_ptr<InformationElement<GContainer>>> &outInfo,
+                     bool useTransfromation = false);
 
   void registerCallback(std::shared_ptr<InformationSpecification> request,
                         InfoCallback callback);
@@ -47,13 +50,15 @@ public:
                           InfoCallback callback);
 
 private:
-  std::shared_ptr<OntologyInterface>                            ontology;       /**< Interface to access the ontology */
+  std::weak_ptr<ICEngine>                                       engine;                 /**< ICEngine weak pointer */
+  std::shared_ptr<OntologyInterface>                            ontology;               /**< Interface to access the ontology */
+  std::shared_ptr<GContainerFactory>                            gcontainerFactory;      /**< Interface to access the transformations */
   std::map<std::shared_ptr<InformationSpecification>,
-           std::shared_ptr<InformationElement<GContainer>>>     information;    /**< Map to store information */
+           std::shared_ptr<InformationElement<GContainer>>>     information;            /**< Map to store information */
   std::vector<std::pair<std::shared_ptr<InformationSpecification>,
-              InfoCallback>>                                    infoCallbacks;  /**< Vector to store callbacks */
-  std::mutex                                                    _mtx;           /**< Mutex */
-  el::Logger*                                                   _log;           /**< Logger */
+              InfoCallback>>                                    infoCallbacks;          /**< Vector to store callbacks */
+  std::mutex                                                    _mtx;                   /**< Mutex */
+  el::Logger*                                                   _log;                   /**< Logger */
 };
 
 } /* namespace ice */

@@ -28,6 +28,7 @@ namespace ice
 
 GContainerFactory::GContainerFactory()
 {
+  std::cout << "constructor factory" << std::endl;
   _log = el::Loggers::getLogger("GContainerFactory");
 
   typeMap.insert( {"booleanRep", BasicRepresentationType::BOOL});
@@ -52,7 +53,8 @@ GContainerFactory::GContainerFactory(std::weak_ptr<ICEngine> engine) :
 
 GContainerFactory::~GContainerFactory()
 {
-  //
+  std::cout << "destructor factory" << std::endl;
+  this->cleanUp();
 }
 
 void GContainerFactory::init()
@@ -68,6 +70,7 @@ void GContainerFactory::init()
 void GContainerFactory::cleanUp()
 {
   this->ontologyInterface.reset();
+  this->transformations.clear();
 }
 
 void GContainerFactory::setOntologyInterface(std::shared_ptr<OntologyInterface> ontology)
@@ -909,7 +912,7 @@ bool GContainerFactory::addTransformation(std::string &name, std::shared_ptr<Tra
   return true;
 }
 
-std::shared_ptr<Transformation> GContainerFactory::getTransformation(std::string &sourceRep, std::string &targetRep)
+std::shared_ptr<Transformation> GContainerFactory::getTransformation(std::string const &sourceRep, std::string const &targetRep)
 {
   for (auto &trans : this->transformations)
   {

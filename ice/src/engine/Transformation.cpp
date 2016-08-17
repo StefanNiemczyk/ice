@@ -15,7 +15,7 @@
 namespace ice
 {
 
-Transformation::Transformation(std::shared_ptr<ice::GContainerFactory> factory, std::string name, std::string scope,
+Transformation::Transformation(std::weak_ptr<ice::GContainerFactory> factory, std::string name, std::string scope,
                                std::shared_ptr<Representation> targetRepresentation) :
     factory(factory), name(name), scope(scope), targetRepresentation(targetRepresentation)
 {
@@ -31,7 +31,7 @@ Transformation::~Transformation()
 
 std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer>* inputs)
 {
-  auto target = this->factory->makeInstance(this->targetRepresentation);
+  auto target = this->factory.lock()->makeInstance(this->targetRepresentation);
 
   for (auto operation : this->operations)
   {

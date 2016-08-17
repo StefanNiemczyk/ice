@@ -129,31 +129,26 @@ bool InformationSpecification::checkRequest(std::shared_ptr<InformationSpecifica
 {
   if (request->getEntity() != "*" && request->getEntity() != this->getEntity())
   {
-    std::cout << "r1" << std::endl;
     return false;
   }
   if (request->getEntityType() != this->getEntityType())
   {
-    std::cout << "r2" << std::endl;
     return false;
   }
   if (request->getScope() != this->getScope())
   {
-    std::cout << "r3" << std::endl;
     return false;
   }
   if (request->getRepresentation() != this->getRepresentation())
   {
-    std::cout << "r4" << std::endl;
     return false;
   }
   if (request->getRelatedEntity() != this->getRelatedEntity())
   {
-    std::cout << "r5" << std::endl;
     return false;
   }
 
-    return true;
+  return true;
 }
 
 std::string InformationSpecification::toString()

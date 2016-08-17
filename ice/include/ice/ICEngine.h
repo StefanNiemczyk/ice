@@ -38,6 +38,7 @@
 // Forward declarations
 namespace ice
 {
+class InformationStore;
 class UpdateStrategie;
 } /* namespace ice */
 

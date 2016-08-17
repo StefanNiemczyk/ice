@@ -9,6 +9,7 @@
 
 #include <ros/package.h>
 
+#include "ice/information/InformationStore.h"
 #include "ice/model/aspModel/ASPModelGenerator.h"
 #include "ice/model/updateStrategie/FastUpdateStrategie.h"
 
@@ -41,6 +42,7 @@ void ICEngine::init()
   this->entityDirectory = std::make_shared<EntityDirectory>(this->shared_from_this());
   this->communicationInterface = std::make_shared<RosCommunication>(this->shared_from_this());
   this->eventHandler = std::make_shared<EventHandler>(this->shared_from_this());
+//  this->informationStore = std::make_shared<InformationStore>(this->shared_from_this());
   this->streamStore = std::make_shared<StreamStore>(this->shared_from_this());
   this->nodeStore = std::make_shared<NodeStore>(this->shared_from_this());
   this->modelGenerator = std::make_shared<ASPModelGenerator>(this->shared_from_this());
@@ -63,6 +65,7 @@ void ICEngine::init()
   // Initialize components
   this->communicationInterface->init();
   this->eventHandler->init();
+//  this->informationStore->init();
   this->modelGenerator->init();
   this->streamStore->init();
   this->gcontainerFactory->init();
@@ -91,11 +94,17 @@ void ICEngine::cleanUp()
 {
   this->running = false;
 
+  if (this->entityDirectory)
+    this->entityDirectory->cleanUp();
+
   if (this->communicationInterface)
     this->communicationInterface->cleanUp();
 
   if (this->eventHandler)
     this->eventHandler->cleanUp();
+
+  if (this->informationStore)
+    this->informationStore->cleanUp();
 
   if (this->streamStore)
     this->streamStore->cleanUp();

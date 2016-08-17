@@ -67,7 +67,7 @@ public:
   void printReps();
 
   bool addTransformation(std::string &name, std::shared_ptr<Transformation> &transformation);
-  std::shared_ptr<Transformation> getTransformation(std::string &sourceRep, std::string &targetRep);
+  std::shared_ptr<Transformation> getTransformation(std::string const &sourceRep, std::string const &targetRep);
   std::shared_ptr<Transformation> getTransformation(std::vector<std::string> &sourceReps, std::string &targetRep);
   std::shared_ptr<Transformation> getTransformationTo(std::string &targetRep);
   std::shared_ptr<Transformation> getTransformationByName(std::string &name);

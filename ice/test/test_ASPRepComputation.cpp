@@ -277,5 +277,4 @@ TEST(ASPRepComp, ontology2)
       ASSERT_ANY_THROW("Unknown string " + s);
     }
   }
-
 }

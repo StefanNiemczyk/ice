@@ -58,7 +58,6 @@ private:
   void readMetadata(std::map<std::string, int> &metadata, const Gringo::Value &element);
   void readMetadata(std::string name, std::map<std::string, int> &metadata, const Gringo::Value &element);
 
-
 private:
   std::shared_ptr<supplementary::ClingWrapper>  asp;                    /**< Interface to access the asp solver */
   std::shared_ptr<EntityDirectory>              directory;              /**< Directory of entities */

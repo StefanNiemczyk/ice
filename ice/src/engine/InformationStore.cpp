@@ -7,34 +7,41 @@
 
 #include <ice/information/InformationStore.h>
 
+#include "ice/ICEngine.h"
 #include "ice/information/InformationElement.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/representation/GContainer.h"
+#include "ice/representation/GContainerFactory.h"
+#include "ice/representation/Transformation.h"
 #include "ice/ontology/OntologyInterface.h"
 
 
 namespace ice
 {
 
-InformationStore::InformationStore(std::shared_ptr<OntologyInterface> ontology)
+InformationStore::InformationStore(std::weak_ptr<ICEngine> engine) : engine(engine)
 {
   _log = el::Loggers::getLogger("InformationStore");
-  this->ontology = ontology;
-
 }
 
 InformationStore::~InformationStore()
 {
-  // TODO Auto-generated destructor stub
+  //
 }
 
 bool InformationStore::init()
 {
+  auto e = this->engine.lock();
+  this->gcontainerFactory = e->getGContainerFactory();
+  this->ontology = e->getOntologyInterface();
+
   return true;
 }
 
 bool InformationStore::cleanUp()
 {
+  this->gcontainerFactory.reset();
+  this->ontology.reset();
   return true;
 }
 
@@ -60,17 +67,63 @@ void InformationStore::addInformation(std::shared_ptr<InformationElement<GContai
 }
 
 int InformationStore::getInformation(std::shared_ptr<InformationSpecification> request,
-                   std::vector<std::shared_ptr<InformationElement<GContainer>>> &outInfo)
+                   std::vector<std::shared_ptr<InformationElement<GContainer>>> &outInfo,
+                   bool useTransfromation)
 {
   int count = 0;
 
   for (auto &info : this->information)
   {
-    if (info.first->checkRequest(request))
+    if (request->getEntity() != "*" && request->getEntity() != info.first->getEntity())
     {
-      outInfo.push_back(info.second);
-      ++count;
+      continue;
     }
+    if (request->getEntityType() != info.first->getEntityType())
+    {
+      continue;
+    }
+    if (request->getScope() != info.first->getScope())
+    {
+      continue;
+    }
+    if (request->getRepresentation() != info.first->getRepresentation())
+    {
+      if (useTransfromation && request->getRelatedEntity() == ""
+          && info.first->getRelatedEntity() == "")
+      {
+        // check if transformation exists
+        auto rep = this->gcontainerFactory->getTransformation(info.first->getRepresentation(),
+                                                              request->getRepresentation());
+
+        if (rep == nullptr)
+          continue;
+
+        std::shared_ptr<GContainer> input[1];
+        input[1] = info.second->getInformation();
+        auto transInfo = rep->transform(input);
+
+        if (transInfo == nullptr)
+          continue;
+
+        auto spec = std::make_shared<InformationSpecification>(info.first->getEntity(),
+                                                               info.first->getEntityType(),
+                                                               info.first->getScope(),
+                                                               request->getRepresentation(),
+                                                               info.first->getRelatedEntity());
+        auto element = std::make_shared<InformationElement<GContainer>>(spec, transInfo);
+        outInfo.push_back(element);
+        ++count;
+      }
+
+      continue;
+    }
+    if (request->getRelatedEntity() != info.first->getRelatedEntity())
+    {
+      continue;
+    }
+
+    outInfo.push_back(info.second);
+    ++count;
   }
 
   return count;
