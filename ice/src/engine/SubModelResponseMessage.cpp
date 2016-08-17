@@ -80,7 +80,7 @@ bool SubModelResponseMessage::parsePayload(rapidjson::Value& value, std::shared_
   }
 
   this->index = index->GetInt();
-  this->result = index->GetBool();
+  this->result = result->GetBool();
 
   return true;
 }

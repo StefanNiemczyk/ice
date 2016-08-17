@@ -82,7 +82,10 @@ void CooperationRequest::handleMessage(std::shared_ptr<Message> const &message)
     case (IMI_FINISH):
     {
       if (false == this->ownJob)
+      {
+        _log->info("Received finished from '%v'", entity->toString());
         this->finish();//onFinished(message);
+      }
 
       break;
     }
@@ -183,7 +186,7 @@ void CooperationRequest::onSubModelResponse(std::shared_ptr<SubModelResponseMess
   auto &sharedSubModel = entity->getSendSubModel();
 
   // check index
-  if(sharedSubModel.subModel == nullptr || sharedSubModel.subModel->index != message->getIndex())
+  if(sharedSubModel.subModel != nullptr && sharedSubModel.subModel->index != message->getIndex())
   {
     _log->info("Received submodel response from '%v' for index '%v' instead of '%v'", entity->toString(),
                message->getIndex(), (sharedSubModel.subModel != nullptr ? sharedSubModel.subModel->index : -1));
@@ -212,8 +215,7 @@ void CooperationRequest::onSubModelResponse(std::shared_ptr<SubModelResponseMess
   else
   {
     _log->info("Submodel request from '%v' was denied, sending finished", entity->toString());
-    this->sendCommand(IceMessageIds::IMI_FINISH);
-    this->state = CJState::CJ_FINISHED;
+    this->finish();
     // TODO
   }
 }

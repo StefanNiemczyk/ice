@@ -308,7 +308,7 @@ template<typename T>
       return this->sender;
     }
 
-    std::lock_guard<std::mutex> guard(_mtx);
+//    std::lock_guard<std::mutex> guard(_mtx);
     if (this->sender)
     {
       return this->sender;
@@ -340,7 +340,7 @@ template<typename T>
   std::shared_ptr<ice::InformationReceiver> ice::InformationStream<T>::registerReceiver(
       std::shared_ptr<CommunicationInterface> &communication)
   {
-    std::lock_guard<std::mutex> guard(_mtx);
+//    std::lock_guard<std::mutex> guard(_mtx);
     auto comResult = communication->registerStreamAsReceiver(this->shared_from_this());
 
     if (false == comResult)

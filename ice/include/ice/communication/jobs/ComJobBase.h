@@ -208,6 +208,7 @@ public:
   virtual void finish()
   {
     this->state = CJState::CJ_FINISHED;
+    this->sendCommand(IceMessageIds::IMI_FINISH);
     this->callCallbackFinished();
   }
 

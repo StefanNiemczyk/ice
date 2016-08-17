@@ -39,7 +39,7 @@ Entity::Entity(const std::initializer_list<Id> ids)
 
 Entity::Entity(std::shared_ptr<EntityDirectory> const &directory, std::weak_ptr<ICEngine> engine,
 		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id> ids)
-      : iceIdentity(false), directory(directory), timeFactory(factory), available(false), _log(
+      : iceIdentity(false), directory(directory), engine(engine), timeFactory(factory), available(false), _log(
 				el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000)
 {
   if (ids.size() == 0)

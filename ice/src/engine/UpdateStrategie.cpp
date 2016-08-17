@@ -157,21 +157,18 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shar
 
     return false;
   }
-  else
+
+  _log->info("Finished processing of received sub model from '%v'", entity->toString());
+  entity->updateReceived(createdNodes, streamsSend, streamsReceived);
+
+  for (auto node : createdNodes)
   {
-    _log->info("Processed sub model received from system '%v'", entity->toString());
-
-    entity->updateReceived(createdNodes, streamsSend, streamsReceived);
-
-    for (auto node : createdNodes)
-    {
-      node->activate();
-    }
-
-    this->nodeStore->cleanUpNodes();
-    this->streamStore->cleanUpStreams();
-    return true;
+    node->activate();
   }
+
+  this->nodeStore->cleanUpNodes();
+  this->streamStore->cleanUpStreams();
+  return true;
 }
 
 std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)

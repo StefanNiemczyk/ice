@@ -130,15 +130,18 @@ int BaseInformationStream::registerRemoteListener(std::shared_ptr<Entity> &entit
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
 
-  if (std::find(this->remoteListeners.begin(), this->remoteListeners.end(), entity) == this->remoteListeners.end())
+  if (std::find(this->remoteListeners.begin(), this->remoteListeners.end(), entity) != this->remoteListeners.end())
   {
     return 1;
   }
 
   this->remoteListeners.push_back(entity);
 
-  if (this->remoteListeners.size() > 1)
+  if (this->remoteListeners.size() > 0)
+  {
+    _log->info("Register sender for stream '%v'", this->toString());
     this->registerSender(communication);
+  }
 
   return 0;
 }

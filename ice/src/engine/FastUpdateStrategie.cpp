@@ -60,7 +60,7 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> const &model)
 
     nodes.push_back(node);
   }
-  std::cout << 1 << std::endl;
+
   // sending streams
   for (auto &send : model->getSend())
   {
@@ -78,7 +78,6 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> const &model)
       stream->registerRemoteListener(send->entity, this->communication);
     }
   }
-  std::cout << 2 << std::endl;
 
   // receiving streams
   for (auto &receive : model->getReceive())
@@ -94,11 +93,9 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> const &model)
         break;
       }
 
-//      stream->registerEngineState(receive->engine);
       stream->setRemoteSource(receive->entity, this->communication);
     }
   }
-  std::cout << 3 << std::endl;
 
   if (false == valid)
   {
@@ -110,12 +107,10 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> const &model)
     node->activate();
     node->registerEntity(this->self);
   }
-  std::cout << 4 << std::endl;
 
   this->nodeStore->cleanUpNodes();
   this->streamStore->cleanUpStreams();
 
-  std::cout << 5 << std::endl;
   // sending sub models
   for (auto &subModel : model->getSubModels())
   {
@@ -123,12 +118,11 @@ void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> const &model)
     job->setSubModelDesc(subModel->model);
     this->communication->addComJob(job);
   }
-  std::cout << 6 << std::endl;
 }
 
 bool FastUpdateStrategie::handleSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel)
 {
-  entity->getReceivedSubModel().subModel =  subModel;
+  entity->getReceivedSubModel().subModel = subModel;
   return this->processSubModel(entity, subModel);
 }
 
