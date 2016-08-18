@@ -59,34 +59,21 @@ public:
    */
   std::shared_ptr<Node> getNode(const std::string nodeName, const ont::entity entity);
 
-  /*!
-   * \brief Adds the node description to the information model.
-   *
-   * Adds the node description to the information model. Returns true if add least one node
-   * description was added, else false.
-   *
-   * @param informationModel The information model.
-   */
-//  bool addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel);
   std::shared_ptr<Node> registerNode(const NodeType type, const std::string className, const std::string name,
                                      const ont::entity entity, const ont::entity entityRelated,
                                      std::map<std::string, std::string> config, const std::string source = "");
 
   bool existNodeCreator(const std::string className);
-
-//  void cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes);
   void unregisterAndCleanUp(std::shared_ptr<Entity> &entity,
                                  std::vector<std::shared_ptr<Node>> &nodesToCleanUp);
-
   void cleanUpNodes();
-
   void cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp);
 
 private:
-  std::weak_ptr<ICEngine> engine; /**< Weak ptr to the engine */
-  std::vector<std::shared_ptr<Node>> nodes; /**< Nodes registered in this store */
-  std::mutex mtx_; /** Mutex */
-  el::Logger* _log; /**< Logger */
+  std::weak_ptr<ICEngine>               engine;         /**< Weak ptr to the engine */
+  std::vector<std::shared_ptr<Node>>    nodes;          /**< Nodes registered in this store */
+  std::mutex                            mtx_;           /** Mutex */
+  el::Logger*                           _log;           /**< Logger */
 };
 
 } /* namespace ice */

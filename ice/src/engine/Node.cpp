@@ -24,7 +24,6 @@ int Node::registerNodeCreator(const std::string& className, const creatorFunc& c
     return 1;
 
   auto p = std::pair<std::string, const creatorFunc&>(className, creator);
-
   Node::creators.insert(p);
 
   return 0;
@@ -32,10 +31,8 @@ int Node::registerNodeCreator(const std::string& className, const creatorFunc& c
 
 std::shared_ptr<Node> Node::createNode(const std::string& className)
 {
-  std::shared_ptr<Node> node;
-
   if (Node::creators.find(className) == Node::creators.end())
-    return node;
+    return nullptr;
 
   return (*Node::creators[className])();
 }
@@ -119,11 +116,6 @@ int Node::addInput(std::shared_ptr<BaseInformationStream> stream, bool trigger)
     stream->registerTaskAsync(this->shared_from_this());
   }
 
-//  if (base)
-//  {
-//    this->baseInputs.push_back(stream);
-//  }
-
   return 0;
 }
 
@@ -144,15 +136,6 @@ int Node::removeInput(std::shared_ptr<BaseInformationStream> stream)
 
   if (returnVel != 0)
     return returnVel;
-
-//  for (int i = 0; i < this->baseInputs.size(); ++i)
-//  {
-//    auto streamItr = this->baseInputs[i];
-//    if (streamItr == stream)
-//    {
-//      this->baseInputs.erase(this->baseInputs.begin() + i);
-//    }
-//  }
 
   for (int i = 0; i < this->triggeredByInputs.size(); ++i)
   {
@@ -200,13 +183,11 @@ int Node::removeOutput(std::shared_ptr<BaseInformationStream> stream)
 
 int Node::init()
 {
-  //
   return 0;
 }
 
 int Node::cleanUp()
 {
-  //
   return 0;
 }
 

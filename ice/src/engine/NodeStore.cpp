@@ -98,40 +98,6 @@ bool NodeStore::existNodeCreator(const std::string className)
   return Node::existNodeCreator(className);
 }
 
-//void NodeStore::cleanUpUnusedNodes(std::vector<std::shared_ptr<Node>> &usedNodes)
-//{
-//  _log->verbose(1, "Start removing unused nodes");
-//  int counter = 0;
-//
-//  for (int i = 0; i < this->nodes.size(); ++i)
-//  {
-//    auto node = this->nodes.at(i);
-//    bool found = false;
-//
-//    for (auto usedNode : usedNodes)
-//    {
-//      if (usedNode == node)
-//      {
-//        found = true;
-//        break;
-//      }
-//    }
-//
-//    if (found)
-//      continue;
-//
-//    _log->info("Remove unused node %v", node->toString());
-//    counter++;
-//
-//    node->deactivate();
-//    node->destroy();
-//
-//    --i;
-//  }
-//
-//  _log->info("Clean up node store: '%v' nodes are removed", counter);
-//}
-
 void NodeStore::unregisterAndCleanUp(std::shared_ptr<Entity> &entity,
                                      std::vector<std::shared_ptr<Node>> &nodesToCleanUp)
 {
@@ -188,19 +154,5 @@ void NodeStore::cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp)
 
   _log->info("Clean up node store: '%v' nodes are removed", counter);
 }
-
-//bool NodeStore::addDescriptionsToInformationModel(std::shared_ptr<InformationModel> informationModel)
-//{
-//  std::lock_guard<std::mutex> guard(this->mtx_);
-//  bool returnValue = false;
-//
-//  for (auto node : this->nodes)
-//  {
-//    informationModel->getNodeDescriptions()->push_back(node->getNodeDescription());
-//    returnValue = true;
-//  }
-//
-//  return returnValue;
-//}
 
 } /* namespace ice */
