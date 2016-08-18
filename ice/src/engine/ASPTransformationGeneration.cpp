@@ -19,22 +19,18 @@ namespace ice
 
 ASPTransformationGeneration::ASPTransformationGeneration()
 {
-  std::cout << "constructor trans" << std::endl;
   _log = el::Loggers::getLogger("ASPTransformationGeneration");
-  _log->verbose(1, "Constructor called");
 }
 
 ASPTransformationGeneration::ASPTransformationGeneration(std::weak_ptr<ICEngine> engine) :
     engine(engine)
 {
-  std::cout << "constructor trans" << std::endl;
   _log = el::Loggers::getLogger("ASPTransformationGeneration");
-  _log->verbose(1, "Constructor called");
 }
 
 ASPTransformationGeneration::~ASPTransformationGeneration()
 {
-  std::cout << "destructor trans" << std::endl;
+  //
 }
 
 void ASPTransformationGeneration::init()
@@ -134,7 +130,7 @@ void ASPTransformationGeneration::extractTransformations()
                 representation1, representation2);
 
     auto rep1 = this->containerFactory->getRepresentation(representation1);
-    auto rep2 = this->containerFactory->getRepresentation(representation1);
+    auto rep2 = this->containerFactory->getRepresentation(representation2);
 
     if (false == rep1)
     {

@@ -33,7 +33,6 @@ const std::string OntologyInterface::ICE_IRI = "http://www.semanticweb.org/sni/o
 OntologyInterface::OntologyInterface(std::string const p_jarPath)
 {
   this->_log = el::Loggers::getLogger("OntologyInterface");
-  std::cout << "constructor affe" << std::endl;
 
   this->error = false;
   this->informationDirty = true;
@@ -192,7 +191,6 @@ OntologyInterface::~OntologyInterface()
 {
   this->env->DeleteLocalRef(this->javaInterface);
 //  jvm->DetachCurrentThread();
-  std::cout << "destructor affe" << std::endl;
 }
 
 bool OntologyInterface::errorOccurred()

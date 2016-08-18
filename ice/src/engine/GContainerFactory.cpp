@@ -28,7 +28,6 @@ namespace ice
 
 GContainerFactory::GContainerFactory()
 {
-  std::cout << "constructor factory" << std::endl;
   _log = el::Loggers::getLogger("GContainerFactory");
 
   typeMap.insert( {"booleanRep", BasicRepresentationType::BOOL});
@@ -53,7 +52,6 @@ GContainerFactory::GContainerFactory(std::weak_ptr<ICEngine> engine) :
 
 GContainerFactory::~GContainerFactory()
 {
-  std::cout << "destructor factory" << std::endl;
   this->cleanUp();
 }
 
@@ -717,12 +715,6 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
       case (XML_DEFAULT):
       {
         auto pathDim = split(operation.path.c_str(), ';');
-
-//        for (int i = 0; i < pathDim->size(); ++i)
-//        {
-//          pathDim->at(i) = pathDim->at(i);
-//        }
-
         void* value = this->convertStringToBasic(repDim->type, operation.value);
 
         if (nullptr == value)
@@ -767,13 +759,8 @@ bool GContainerFactory::extractOperations(std::shared_ptr<Transformation> transf
           }
 
           auto pathDim = split(path.c_str(), ';');
-
-//          for (int i = 0; i < pathDim->size(); ++i)
-//          {
-//            pathDim->at(i) = this->ontologyInterface->toShortIri(pathDim->at(i));
-//          }
-
           auto pathSource = repSource->accessPath(pathDim.get());
+
           if (nullptr == pathSource)
           {
             _log->error(

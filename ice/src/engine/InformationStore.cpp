@@ -19,6 +19,11 @@
 namespace ice
 {
 
+InformationStore::InformationStore()
+{
+  _log = el::Loggers::getLogger("InformationStore");
+}
+
 InformationStore::InformationStore(std::weak_ptr<ICEngine> engine) : engine(engine)
 {
   _log = el::Loggers::getLogger("InformationStore");
@@ -43,6 +48,11 @@ bool InformationStore::cleanUp()
   this->gcontainerFactory.reset();
   this->ontology.reset();
   return true;
+}
+
+void InformationStore::setGContainerFactory(std::shared_ptr<GContainerFactory> &factory)
+{
+  this->gcontainerFactory = factory;
 }
 
 void InformationStore::addInformation(std::shared_ptr<InformationSpecification> specification,
@@ -99,7 +109,7 @@ int InformationStore::getInformation(std::shared_ptr<InformationSpecification> r
           continue;
 
         std::shared_ptr<GContainer> input[1];
-        input[1] = info.second->getInformation();
+        input[0] = info.second->getInformation();
         auto transInfo = rep->transform(input);
 
         if (transInfo == nullptr)

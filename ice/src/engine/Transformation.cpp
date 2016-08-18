@@ -41,8 +41,11 @@ std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer
         target->set(operation->targetDimension, operation->value);
         break;
       case (USE):
-        target->set(operation->targetDimension, inputs[operation->sourceIndex]->get(operation->sourceDimension));
+      {
+        auto value = inputs[operation->sourceIndex]->get(operation->sourceDimension);
+        target->set(operation->targetDimension, value);
         break;
+      }
       case (FORMULA):
       {
 	int nvars = operation->varmap.size();

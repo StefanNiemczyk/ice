@@ -31,11 +31,14 @@ typedef std::function<void (std::shared_ptr<InformationSpecification>&, std::sha
 class InformationStore
 {
 public:
+  InformationStore();
   InformationStore(std::weak_ptr<ICEngine> engine);
   virtual ~InformationStore();
 
   bool init();
   bool cleanUp();
+
+  void setGContainerFactory(std::shared_ptr<GContainerFactory> &factory);
 
   void addInformation(std::shared_ptr<InformationSpecification> infoSpec,
                       std::shared_ptr<GContainer> info);

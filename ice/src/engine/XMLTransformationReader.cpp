@@ -12,7 +12,6 @@ namespace ice
 
 XMLTransformationReader::XMLTransformationReader()
 {
-  // TODO Auto-generated constructor stub
   _log = el::Loggers::getLogger("XMLTransformationReader");
 }
 
