@@ -7,18 +7,21 @@
 
 #include "InformationMap.h"
 
+#include <ice/ICEngine.h>
+#include <ice/EntityDirectory.h>
+#include <ice/communication/CommunicationInterface.h>
+
 namespace ice
 {
 
-InformationMap::InformationMap()
+InformationMap::InformationMap(std::weak_ptr<ICEngine> engine) : engine(engine)
 {
-  // TODO Auto-generated constructor stub
-
+  //
 }
 
 InformationMap::~InformationMap()
 {
-  // TODO Auto-generated destructor stub
+  //
 }
 
 } /* namespace ice */

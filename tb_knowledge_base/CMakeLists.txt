@@ -1,8 +1,19 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tb_knowledge_base)
 
-find_package(catkin REQUIRED ice)
+find_package(catkin REQUIRED 
+  roscpp
+  roslib
+  ice
+  serval_wrapper
+  cmake_modules
+  )
 
+## Use c++ 11x std
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+
+#find_package(TBB REQUIRED)
+add_definitions(-DWITH_THREADS=0)
 
 ###################################
 ## catkin specific configuration ##
@@ -24,31 +35,23 @@ catkin_package(
 ## Build ##
 ###########
 
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-# include_directories(include)
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${TinyXML_INCLUDE_DIRS}
+)  
 
-## Declare a C++ library
-# add_library(tb_knowledge_base
-#   src/${PROJECT_NAME}/tb_knowledge_base.cpp
-# )
+add_library(${PROJECT_NAME}
+  src/InformationMap.cpp
+)
 
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(tb_knowledge_base ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} ice)
+add_dependencies(${PROJECT_NAME} serval_wrapper)
 
-## Declare a C++ executable
-# add_executable(tb_knowledge_base_node src/tb_knowledge_base_node.cpp)
-
-## Add cmake target dependencies of the executable
-## same as for the library above
-# add_dependencies(tb_knowledge_base_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Specify libraries to link a library or executable target against
-# target_link_libraries(tb_knowledge_base_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${TinyXML_LIBRARIES}
+)
 
 #############
 ## Testing ##
