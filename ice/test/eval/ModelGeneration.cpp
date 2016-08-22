@@ -3,10 +3,10 @@
 #include <gringo/value.hh>
 #include <chrono>
 
+#include "ice/Entity.h"
+#include "ice/EntityDirectory.h"
 #include "ice/TypeDefs.h"
-#include "ice/coordination/EngineState.h"
 #include "ice/ontology/OntologyInterface.h"
-#include "ice/model/aspModel/ASPSystem.h"
 
 #include "ClingWrapper.h"
 #include "External.h"
@@ -418,142 +418,148 @@ public:
 //    if (false == warmUp)
 //    std::cout << "Ontology 2 ASP" << std::endl;
     startOntologyToASP = std::chrono::system_clock::now();
-    const char* infoStructure = ontology.readInformationStructureAsASP();
-    //this->entityTypeMap.clear();
 
     std::string programPart = "ontology" + 1;
+    std::string item, noIri;
     std::stringstream ss;
-    std::string item;
-
-    ss << infoStructure;
-//    delete infoStructure;
+    ss.str(ontology.readInformationStructureAsASP());
 
     while (std::getline(ss, item, '\n'))
     {
-      if (item.find("entity(") == 0)
+      noIri = ontology.toShortIriAll(item);
+      if (std::find(entities.begin(), entities.end(), noIri) == entities.end())
       {
-        int index1 = item.find(",");
-        int index2 = item.find(")");
-        auto entity = item.substr(7, index1 - 7);
-        auto entityType = item.substr(index1 + 1, index2 - index1 - 1);
-
-//            this->entityTypeMap[entity] = entityType;
-      }
-
-      if (std::find(entities.begin(), entities.end(), item) == entities.end())
-      {
-        entities.push_back(item);
-        asp.add(programPart, {}, item);
+        entities.push_back(noIri);
+        asp.add(programPart, {}, noIri);
       }
     }
 
     if (false == this->testRepresentations)
     {
-    auto ontSystems = ontology.getSystems();
+    //
+      auto ontSystems = ontology.getSystems();
 
-    for (auto ontSystem : *ontSystems)
-    {
-      std::string aspStr = ontology.toShortIri(ontSystem);
+//       std::string iriSelf;
+//       self->getId(EntityDirectory::ID_ONTOLOGY, iriSelf);
+//       iriSelf = ontology.toShortIri(iriSelf);
 
+       std::shared_ptr<ice::Entity> entity;
 
-      auto external = asp.getExternal("system", {Gringo::Value(aspStr), "default"}, "system", {Gringo::Value(aspStr)}, true);
+       for (auto ontSystem : *ontSystems)
+       {
+//         entity = directory->lookup(EntityDirectory::ID_ONTOLOGY, ontSystem, true);
+//
+//         if (entity->getExternal() == nullptr)
+//         {
+//           std::string iri = ontology.toShortIri(ontSystem);
+//           auto ext = asp.getExternal("system", {Gringo::Value(iri), "default"}, "system", {Gringo::Value(iri)}, true);
+//           entity->setExternal(ext);
+//
+//           asp.add("base", {}, "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ",default).");
+//         }
 
-      auto nodes = ontology.readNodesAndIROsAsASP(ontSystem);
+         auto nodes = ontology.readNodesAndIROsAsASP(ontSystem);
 
-      std::vector<const char*>* types = nodes->at(0);
-      std::vector<const char*>* names = nodes->at(1);
-      std::vector<const char*>* strings = nodes->at(2);
-      std::vector<const char*>* aspStrings = nodes->at(3);
-      std::vector<const char*>* cppStrings = nodes->at(4);
+         auto &types = nodes->at(0);
+         auto &names = nodes->at(1);
+         auto &strings = nodes->at(2);
+         auto &aspStrings = nodes->at(3);
+         auto &cppStrings = nodes->at(4);
 
-      for (int i = 0; i < names->size(); ++i)
-      {
-        const char* name = names->at(i);
-        const char* elementStr = strings->at(i);
-        const char* aspStr = aspStrings->at(i);
-        const char* cppStr = cppStrings->at(i);
-        const char* typeStr = types->at(i);
-        ice::ASPElementType type;
+         for (int i = 0; i < names.size(); ++i)
+         {
+           std::string &name = names.at(i);
+           std::string &elementStr = strings.at(i);
+           std::string &aspStr = aspStrings.at(i);
+           std::string &cppStr = cppStrings.at(i);
+           std::string &typeStr = types.at(i);
+           ice::ASPElementType type;
 
-        if (typeStr == nullptr)
-        {
-          delete name;
-          delete elementStr;
-          delete aspStr;
-          delete cppStr;
-          delete typeStr;
+           if (typeStr == "" || name == "" || elementStr == "")
+           {
+             continue;
+           }
 
-          continue;
-        }
-        else if (std::strcmp(typeStr, "COMPUTATION_NODE") == 0)
-        {
-          type = ice::ASPElementType::ASP_COMPUTATION_NODE;
-        }
-        else if (std::strcmp(typeStr, "SOURCE_NODE") == 0)
-        {
-          type = ice::ASPElementType::ASP_SOURCE_NODE;
-        }
-        else if (std::strcmp(typeStr, "REQUIRED_STREAM") == 0)
-        {
-          type = ice::ASPElementType::ASP_REQUIRED_STREAM;
-        }
-        else if (std::strcmp(typeStr, "MAP_NODE") == 0)
-        {
-          type = ice::ASPElementType::ASP_MAP_NODE;
-        }
-        else if (std::strcmp(typeStr, "IRO_NODE") == 0)
-        {
-          type = ice::ASPElementType::ASP_IRO_NODE;
-        }
-        else if (std::strcmp(typeStr, "REQUIRED_MAP") == 0)
-        {
-          type = ice::ASPElementType::ASP_REQUIRED_MAP;
-        }
-        else
-        {
-          delete name;
-          delete elementStr;
-          delete aspStr;
-          delete cppStr;
-          delete typeStr;
+           if (typeStr == "COMPUTATION_NODE")
+           {
+             type = ice::ASPElementType::ASP_COMPUTATION_NODE;
+           }
+           else if (typeStr == "SOURCE_NODE")
+           {
+             type = ice::ASPElementType::ASP_SOURCE_NODE;
+           }
+           else if (typeStr == "REQUIRED_STREAM")
+           {
+             type = ice::ASPElementType::ASP_REQUIRED_STREAM;
+           }
+           else if (typeStr == "MAP_NODE")
+           {
+             type = ice::ASPElementType::ASP_MAP_NODE;
+           }
+           else if (typeStr == "IRO_NODE")
+           {
+             type = ice::ASPElementType::ASP_IRO_NODE;
+           }
+           else if (typeStr == "REQUIRED_MAP")
+           {
+             type = ice::ASPElementType::ASP_REQUIRED_MAP;
+           }
+           else
+           {
+//             _log->error("Unknown asp element type '%v' for element '%v', element will be skipped", typeStr, name);
+             continue;
+           }
 
-          continue;
-        }
+           auto node = std::make_shared<ice::ASPElement>();
 
-        auto external = asp.getExternal(elementStr);
-        externals.push_back(external);
+//             _log->info("ASP element '%v' not found, creating new element", std::string(name));
+             auto element = std::make_shared<ice::ASPElement>();
+             element->aspString = ontology.toShortIriAll(aspStr);
+             element->name = ontology.toShortIri(name);
+             element->state = ice::ASPElementState::ADDED_TO_ASP;
+             element->type = type;
 
-        switch (type)
-        {
-          case ice::ASPElementType::ASP_COMPUTATION_NODE:
-          case ice::ASPElementType::ASP_SOURCE_NODE:
-          case ice::ASPElementType::ASP_MAP_NODE:
-          case ice::ASPElementType::ASP_IRO_NODE:
-            external->assign(true);
-            break;
-          default:
-            external->assign(true);
-            break;
-        }
+             if (cppStr != "")
+             {
+               int index = cppStr.find('\n');
 
-        asp.add(name, {}, aspStr);
+               if (index == std::string::npos)
+                 continue;
 
-        asp.ground(name, {});
+               element->className = cppStr.substr(0, index);
+               element->configAsString = cppStr.substr(index + 1);
+               //element->config = "";//this->readConfiguration(element->configAsString);
+             }
 
-        delete name;
-        delete elementStr;
-        delete aspStr;
-        delete cppStr;
-        delete typeStr;
-      }
-      delete types;
-      delete names;
-      delete strings;
-      delete aspStrings;
-      delete cppStrings;
+             std::string shortIris = ontology.toShortIriAll(elementStr);
+             auto value = supplementary::ClingWrapper::stringToValue(shortIris.c_str());
 
-    //  delete ontSystem;
-    }
+//             switch (type)
+//             {
+//               case ice::ASPElementType::ASP_COMPUTATION_NODE:
+//               case ice::ASPElementType::ASP_SOURCE_NODE:
+//               case ice::ASPElementType::ASP_MAP_NODE:
+//               case ice::ASPElementType::ASP_IRO_NODE:
+//                 if (false == this->nodeStore->existNodeCreator(element->className))
+//                 {
+////                   _log->warn("Missing creator for node '%v' of type '%v', cpp grounding '%v', asp external set to false",
+////                              element->name, ASPElementTypeNames[type],
+////                              element->className == "" ? "NULL" : element->className);
+//                   continue;
+//                 }
+//                 break;
+//               default:
+//                 break;
+//             }
+
+             element->external = asp.getExternal(*value.name(), value.args());
+             element->external->assign(true);
+
+             asp.add(element->name, {}, element->aspString);
+             asp.ground(element->name, {});
+         }
+       }
+      //
     }
 
     endOntologyToASP = std::chrono::system_clock::now();

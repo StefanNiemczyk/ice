@@ -14,7 +14,7 @@ TEST(EvalModelGeneration, simpleEvalTests)
 //    asp->setRandomize("20,15");
   });
   //                                 global      verbose gnuplot         runs
-  scenarios2.fuseVictimsScenario(    true,       false,  true,            runs,      false, 6, 20, 2);
+//  scenarios2.fuseVictimsScenario(    true,       false,  true,            runs,      false, 6, 20, 2);
 //  scenarios2.representationScenario( true,       true,  true,          runs,      2, 12, 1);
 //  scenarios2.chainScenario(          true,       true,  true,          runs,      2, 12, 1, 10, 10, 1);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 10, 10, 10);
@@ -45,13 +45,13 @@ TEST(EvalModelGeneration, simpleEvalTests)
   });
 
   //std::vector<int> v = {10,200};
-//  TConf conf;
-//  conf.parallelGroupsMin = 1;
-//  conf.parallelGroupsMax = 10;
-//  conf.parallelGrounsStep = 1;
-//  conf.levels = {3,10,100};
-//  conf.inputsMin = 2;
-//  conf.inputsMax = 2;
-//  conf.skipLevel = false;
-//  scenariosT.transformation(false, true, runs, 1, conf);
+  TConf conf;
+  conf.parallelGroupsMin = 1;
+  conf.parallelGroupsMax = 10;
+  conf.parallelGrounsStep = 1;
+  conf.levels = {3,10,100};
+  conf.inputsMin = 2;
+  conf.inputsMax = 2;
+  conf.skipLevel = false;
+  scenariosT.transformation(false, true, runs, 1, conf);
 }
