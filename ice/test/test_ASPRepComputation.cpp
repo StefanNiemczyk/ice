@@ -263,7 +263,7 @@ TEST(ASPRepComp, ontology2)
       // fine
     }
     else if (s
-        == "output(system,autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2,http://vs.uni-kassel.de/IceTest#TestScope1,http://vs.uni-kassel.de/IceTest#TestTransformation1,none).")
+        == "output(system,autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2,http://vs.uni-kassel.de/IceTest#TestScope1,http://vs.uni-kassel.de/IceTest#TestTransformation2,none).")
     {
       // fine
     }
@@ -274,7 +274,7 @@ TEST(ASPRepComp, ontology2)
     }
     else
     {
-      ASSERT_ANY_THROW("Unknown string " + s);
+      ASSERT_ANY_THROW() << "Unknown string " + s;
     }
   }
 }
