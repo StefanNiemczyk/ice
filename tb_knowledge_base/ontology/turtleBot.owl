@@ -6,18 +6,232 @@
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY Ice "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#" >
+    <!ENTITY units "http://www.semanticweb.org/sni/ontologies/2013/7/units#" >
 ]>
+
 
 <rdf:RDF xmlns="http://vs.uni-kassel.de/TurtleBot#"
      xml:base="http://vs.uni-kassel.de/TurtleBot"
+     xmlns:Ice="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
-     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:units="http://www.semanticweb.org/sni/ontologies/2013/7/units#">
     <owl:Ontology rdf:about="http://vs.uni-kassel.de/TurtleBot">
         <owl:versionInfo rdf:datatype="&xsd;string">0.7</owl:versionInfo>
         <owl:imports rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/Ice"/>
     </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#ChargeStation -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#ChargeStation">
+        <rdfs:subClassOf rdf:resource="&Ice;EntityType"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasScope"/>
+                <owl:someValuesFrom rdf:resource="&Ice;Position"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#Identifier -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#Identifier">
+        <rdfs:subClassOf rdf:resource="&Ice;EntityScope"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#IdentifierValueScope -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#IdentifierValueScope">
+        <rdfs:subClassOf rdf:resource="&Ice;ValueScope"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#Landmark -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#Landmark">
+        <rdfs:subClassOf rdf:resource="&Ice;EntityType"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasScope"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkId"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasScope"/>
+                <owl:someValuesFrom rdf:resource="&Ice;Position"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#LandmarkId -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#LandmarkId">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#IdentifierValueScope"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                <owl:allValuesFrom rdf:resource="&Ice;LongRep"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                <owl:onClass rdf:resource="&Ice;LongRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark">
+        <rdfs:subClassOf rdf:resource="&Ice;PositionRepresentation"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasRelatedDimension"/>
+                        <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkId"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                        <owl:onClass rdf:resource="&Ice;XCoordinate"/>
+                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                        <owl:onClass rdf:resource="&Ice;YCoordinate"/>
+                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                        <owl:onClass rdf:resource="&Ice;ZCoordinate"/>
+                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRelatedDimension"/>
+                <owl:allValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkId"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;ValueScope"/>
+                            <rdf:Description rdf:about="&Ice;XCoordinate"/>
+                            <rdf:Description rdf:about="&Ice;YCoordinate"/>
+                            <rdf:Description rdf:about="&Ice;ZCoordinate"/>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#TurtleBot -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#TurtleBot">
+        <rdfs:subClassOf rdf:resource="&Ice;Robot"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasScope"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#Identifier"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#TurtleBotId -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#TurtleBotId">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#IdentifierValueScope"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                <owl:onClass rdf:resource="&Ice;LongRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                <owl:allValuesFrom rdf:resource="&Ice;LongRep"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#Leonardo -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#Leonardo">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBot"/>
+        <Ice:hasScope rdf:resource="http://vs.uni-kassel.de/TurtleBot#LeonardoId"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#LeonardoId -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LeonardoId">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBotId"/>
+        <Ice:hasRepresentation rdf:resource="http://vs.uni-kassel.de/TurtleBot#LeonardoIdRep"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#LeonardoIdRep -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LeonardoIdRep">
+        <rdf:type rdf:resource="&Ice;LongRep"/>
+        <units:hasValue rdf:datatype="&xsd;long">666</units:hasValue>
+    </owl:NamedIndividual>
 </rdf:RDF>
 
 
