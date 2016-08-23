@@ -42,15 +42,15 @@ TEST(GMessagePublisher, simpleTest)
 
   bridge.init();
 
-  std::string repStr = "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep";
+  std::string repStr = "http://vs.uni-kassel.de/Ice#CoordinatePositionRep";
   auto rep = bridge.gcontainerFactory->getRepresentation(repStr);
   std::shared_ptr<ice::RequiredInfo> reqInfo = bridge.getRequiredInfors()[0]; // TODO
 
   ASSERT_NE(nullptr, rep);
 
-  auto x = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
-  auto y = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
-  auto z = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
+  auto x = rep->accessPath({"http://vs.uni-kassel.de/Ice#XCoordinate"});
+  auto y = rep->accessPath({"http://vs.uni-kassel.de/Ice#YCoordinate"});
+  auto z = rep->accessPath({"http://vs.uni-kassel.de/Ice#ZCoordinate"});
 
   ASSERT_NE(nullptr, x);
   ASSERT_NE(nullptr, y);

@@ -31,7 +31,7 @@ TEST(InformationStore, simpleTest)
 
   ASSERT_FALSE(oi->errorOccurred());
 
-  result = oi->addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  result = oi->addOntologyIRI("http://vs.uni-kassel.de/Ice");
 
   ASSERT_FALSE(oi->errorOccurred());
   ASSERT_TRUE(result);
@@ -50,14 +50,14 @@ TEST(InformationStore, simpleTest)
   fac.setOntologyInterface(oi);
   fac.init();
 
-  auto rep = fac.getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DefaultMovementRep");
+  auto rep = fac.getRepresentation("http://vs.uni-kassel.de/Ice#DefaultMovementRep");
 
   ASSERT_TRUE(rep != false);
 
   auto movement = fac.makeInstance(rep);
 
   const double testVal = 4.2f;
-  auto pos = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Translation"});
+  auto pos = rep->accessPath({"http://vs.uni-kassel.de/Ice#Translation"});
 
   ASSERT_TRUE(pos != nullptr);
 
@@ -115,24 +115,24 @@ TEST(InformationStore, ontology1)
   asp.extractTransformations();
 
   // Test transformation
-  std::string name = "autoTrans_http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position_http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep_http://vs.uni-kassel.de/IceTest#Pos3D";
+  std::string name = "autoTrans_http://vs.uni-kassel.de/Ice#Position_http://vs.uni-kassel.de/Ice#CoordinatePositionRep_http://vs.uni-kassel.de/IceTest#Pos3D";
   auto trans = factory->getTransformationByName(name);
 
   ASSERT_TRUE(trans != false);
 
-  auto repIn = factory->getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep");
+  auto repIn = factory->getRepresentation("http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
   auto repOut = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");
 
   ASSERT_TRUE(repIn != false);
   ASSERT_TRUE(repOut != false);
 
-  auto inX = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
-  auto inY = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
-  auto inZ = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
+  auto inX = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#XCoordinate"});
+  auto inY = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#YCoordinate"});
+  auto inZ = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#ZCoordinate"});
 
-  auto outX = repOut->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
-  auto outY = repOut->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
-  auto outZ = repOut->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
+  auto outX = repOut->accessPath( {"http://vs.uni-kassel.de/Ice#XCoordinate"});
+  auto outY = repOut->accessPath( {"http://vs.uni-kassel.de/Ice#YCoordinate"});
+  auto outZ = repOut->accessPath( {"http://vs.uni-kassel.de/Ice#ZCoordinate"});
 
   ASSERT_TRUE(inX != nullptr);
   ASSERT_TRUE(inY != nullptr);
@@ -155,7 +155,7 @@ TEST(InformationStore, ontology1)
   auto store = std::make_shared<ice::InformationStore>();
   store->setGContainerFactory(factory);
 
-  auto specIn = std::make_shared<ice::InformationSpecification>("entity", "entityType", "spec", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep");
+  auto specIn = std::make_shared<ice::InformationSpecification>("entity", "entityType", "spec", "http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
   auto specOut = std::make_shared<ice::InformationSpecification>("entity", "entityType", "spec", "http://vs.uni-kassel.de/IceTest#Pos3D");
 
   store->addInformation(specIn, in);

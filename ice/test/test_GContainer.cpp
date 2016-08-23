@@ -27,7 +27,7 @@ TEST(GContainerTest, simpleTest)
 
   ASSERT_FALSE(oi->errorOccurred());
 
-  result = oi->addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  result = oi->addOntologyIRI("http://vs.uni-kassel.de/Ice");
 
   ASSERT_FALSE(oi->errorOccurred());
   ASSERT_TRUE(result);
@@ -46,14 +46,14 @@ TEST(GContainerTest, simpleTest)
   fac.setOntologyInterface(oi);
   fac.init();
 
-  auto rep = fac.getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DefaultMovementRep");
+  auto rep = fac.getRepresentation("http://vs.uni-kassel.de/Ice#DefaultMovementRep");
 
   ASSERT_TRUE(rep != false);
 
   auto movement = fac.makeInstance(rep);
 
   const double testVal = 4.2f;
-  auto pos = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Translation"});
+  auto pos = rep->accessPath({"http://vs.uni-kassel.de/Ice#Translation"});
 
   ASSERT_TRUE(pos != nullptr);
 
@@ -76,7 +76,7 @@ TEST(GContainerTest, serialize)
 
   ASSERT_FALSE(oi->errorOccurred());
 
-  result = oi->addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  result = oi->addOntologyIRI("http://vs.uni-kassel.de/Ice");
 
   ASSERT_FALSE(oi->errorOccurred());
   ASSERT_TRUE(result);
@@ -95,7 +95,7 @@ TEST(GContainerTest, serialize)
   fac.setOntologyInterface(oi);
   fac.init();
 
-  auto rep = fac.getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DefaultMovementRep");
+  auto rep = fac.getRepresentation("http://vs.uni-kassel.de/Ice#DefaultMovementRep");
 
   ASSERT_TRUE(rep != false);
 
@@ -103,7 +103,7 @@ TEST(GContainerTest, serialize)
   auto movement2 = fac.makeInstance(rep);
 
   const double testVal = 4.2f;
-  auto pos = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Translation"});
+  auto pos = rep->accessPath({"http://vs.uni-kassel.de/Ice#Translation"});
 
   ASSERT_TRUE(pos != nullptr);
 

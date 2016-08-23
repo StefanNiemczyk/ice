@@ -8,22 +8,22 @@
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
-    <!ENTITY Ice "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#" >
+    <!ENTITY Ice "http://vs.uni-kassel.de/Ice#" >
 ]>
 
 
-<rdf:RDF xmlns="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#"
-     xml:base="http://www.semanticweb.org/sni/ontologies/2013/7/Ice"
-     xmlns:Ice="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#"
+<rdf:RDF xmlns="http://vs.uni-kassel.de/Ice#"
+     xml:base="http://vs.uni-kassel.de/Ice"
+     xmlns:Ice="http://vs.uni-kassel.de/Ice#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:swrl="http://www.w3.org/2003/11/swrl#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:swrlb="http://www.w3.org/2003/11/swrlb#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-    <owl:Ontology rdf:about="http://www.semanticweb.org/sni/ontologies/2013/7/Ice">
+    <owl:Ontology rdf:about="http://vs.uni-kassel.de/Ice">
         <owl:imports rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/units"/>
-        <owl:versionIRI rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/Ice/0.7.0"/>
+        <owl:versionIRI rdf:resource="http://vs.uni-kassel.de/Ice/0.7.0"/>
     </owl:Ontology>
     
 
@@ -39,7 +39,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#aboutEntity -->
+    <!-- http://vs.uni-kassel.de/Ice#aboutEntity -->
 
     <owl:ObjectProperty rdf:about="&Ice;aboutEntity">
         <rdfs:range rdf:resource="&Ice;EntityType"/>
@@ -47,13 +47,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#aboutRelatedEntity -->
+    <!-- http://vs.uni-kassel.de/Ice#aboutRelatedEntity -->
 
     <owl:ObjectProperty rdf:about="&Ice;aboutRelatedEntity"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasDimension -->
+    <!-- http://vs.uni-kassel.de/Ice#hasDimension -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasDimension">
         <rdfs:domain rdf:resource="&Ice;CompositeRepresentation"/>
@@ -62,13 +62,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#hasGrounding -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasGrounding"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasInput -->
+    <!-- http://vs.uni-kassel.de/Ice#hasInput -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasInput">
         <rdfs:range rdf:resource="&Ice;Stream"/>
@@ -76,7 +76,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasInputMap -->
+    <!-- http://vs.uni-kassel.de/Ice#hasInputMap -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasInputMap">
         <rdfs:range rdf:resource="&Ice;Map"/>
@@ -84,13 +84,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasMetadata -->
+    <!-- http://vs.uni-kassel.de/Ice#hasMetadata -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasMetadata"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasOutput -->
+    <!-- http://vs.uni-kassel.de/Ice#hasOutput -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasOutput">
         <rdfs:range rdf:resource="&Ice;Stream"/>
@@ -98,7 +98,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasOutputMap -->
+    <!-- http://vs.uni-kassel.de/Ice#hasOutputMap -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasOutputMap">
         <rdfs:range rdf:resource="&Ice;Map"/>
@@ -106,7 +106,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasRelatedDimension -->
+    <!-- http://vs.uni-kassel.de/Ice#hasRelatedDimension -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasRelatedDimension">
         <rdfs:domain rdf:resource="&Ice;Representation"/>
@@ -115,7 +115,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasRelatedInput -->
+    <!-- http://vs.uni-kassel.de/Ice#hasRelatedInput -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasRelatedInput">
         <rdfs:range rdf:resource="&Ice;Stream"/>
@@ -123,7 +123,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#hasRepresentation -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasRepresentation">
         <rdfs:range rdf:resource="&Ice;Representation"/>
@@ -132,7 +132,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasScope -->
+    <!-- http://vs.uni-kassel.de/Ice#hasScope -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasScope">
         <rdfs:domain rdf:resource="&Ice;EntityType"/>
@@ -141,7 +141,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasSystem -->
+    <!-- http://vs.uni-kassel.de/Ice#hasSystem -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasSystem">
         <rdfs:range rdf:resource="&Ice;System"/>
@@ -149,13 +149,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasType -->
+    <!-- http://vs.uni-kassel.de/Ice#hasType -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasType"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasUnit -->
+    <!-- http://vs.uni-kassel.de/Ice#hasUnit -->
 
     <owl:ObjectProperty rdf:about="&Ice;hasUnit">
         <rdfs:domain rdf:resource="&Ice;BasicRepresentation"/>
@@ -164,7 +164,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#impairInformationMetadata -->
+    <!-- http://vs.uni-kassel.de/Ice#impairInformationMetadata -->
 
     <owl:ObjectProperty rdf:about="&Ice;impairInformationMetadata">
         <rdfs:range rdf:resource="&Ice;InformationMetadata"/>
@@ -172,7 +172,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#improveInformationMetadata -->
+    <!-- http://vs.uni-kassel.de/Ice#improveInformationMetadata -->
 
     <owl:ObjectProperty rdf:about="&Ice;improveInformationMetadata">
         <rdfs:range rdf:resource="&Ice;InformationMetadata"/>
@@ -180,25 +180,25 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#isGroundingOf -->
+    <!-- http://vs.uni-kassel.de/Ice#isGroundingOf -->
 
     <owl:ObjectProperty rdf:about="&Ice;isGroundingOf"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#isMapOf -->
+    <!-- http://vs.uni-kassel.de/Ice#isMapOf -->
 
     <owl:ObjectProperty rdf:about="&Ice;isMapOf"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#isMetadataOf -->
+    <!-- http://vs.uni-kassel.de/Ice#isMetadataOf -->
 
     <owl:ObjectProperty rdf:about="&Ice;isMetadataOf"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#isStreamOf -->
+    <!-- http://vs.uni-kassel.de/Ice#isStreamOf -->
 
     <owl:ObjectProperty rdf:about="&Ice;isStreamOf">
         <rdfs:range rdf:resource="&Ice;Scope"/>
@@ -207,7 +207,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#isSystemOf -->
+    <!-- http://vs.uni-kassel.de/Ice#isSystemOf -->
 
     <owl:ObjectProperty rdf:about="&Ice;isSystemOf">
         <rdfs:domain rdf:resource="&Ice;System"/>
@@ -226,13 +226,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasConfiguration -->
+    <!-- http://vs.uni-kassel.de/Ice#hasConfiguration -->
 
     <owl:DatatypeProperty rdf:about="&Ice;hasConfiguration"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasGroundingValue -->
+    <!-- http://vs.uni-kassel.de/Ice#hasGroundingValue -->
 
     <owl:DatatypeProperty rdf:about="&Ice;hasGroundingValue">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -241,7 +241,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasMetadataValue -->
+    <!-- http://vs.uni-kassel.de/Ice#hasMetadataValue -->
 
     <owl:DatatypeProperty rdf:about="&Ice;hasMetadataValue">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
@@ -251,7 +251,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasMetadataValue2 -->
+    <!-- http://vs.uni-kassel.de/Ice#hasMetadataValue2 -->
 
     <owl:DatatypeProperty rdf:about="&Ice;hasMetadataValue2">
         <rdfs:domain rdf:resource="&Ice;Metadata"/>
@@ -260,7 +260,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#hasSize -->
+    <!-- http://vs.uni-kassel.de/Ice#hasSize -->
 
     <owl:DatatypeProperty rdf:about="&Ice;hasSize">
         <rdfs:range rdf:resource="&xsd;integer"/>
@@ -268,7 +268,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#operationClass -->
+    <!-- http://vs.uni-kassel.de/Ice#operationClass -->
 
     <owl:DatatypeProperty rdf:about="&Ice;operationClass">
         <rdfs:domain rdf:resource="&Ice;Grounding"/>
@@ -288,7 +288,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#ASPGrounding -->
 
     <owl:Class rdf:about="&Ice;ASPGrounding">
         <rdfs:subClassOf rdf:resource="&Ice;Grounding"/>
@@ -296,7 +296,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ASPMetadataGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#ASPMetadataGrounding -->
 
     <owl:Class rdf:about="&Ice;ASPMetadataGrounding">
         <rdfs:subClassOf rdf:resource="&Ice;ASPGrounding"/>
@@ -304,7 +304,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Accuracy -->
+    <!-- http://vs.uni-kassel.de/Ice#Accuracy -->
 
     <owl:Class rdf:about="&Ice;Accuracy">
         <rdfs:subClassOf rdf:resource="&Ice;InformationMetadata"/>
@@ -312,7 +312,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#AccuracyASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#AccuracyASPGrounding -->
 
     <owl:Class rdf:about="&Ice;AccuracyASPGrounding">
         <rdfs:subClassOf rdf:resource="&Ice;ASPMetadataGrounding"/>
@@ -320,7 +320,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#AddressRep -->
+    <!-- http://vs.uni-kassel.de/Ice#AddressRep -->
 
     <owl:Class rdf:about="&Ice;AddressRep">
         <rdfs:subClassOf rdf:resource="&Ice;PositionRepresentation"/>
@@ -328,7 +328,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Alpha -->
+    <!-- http://vs.uni-kassel.de/Ice#Alpha -->
 
     <owl:Class rdf:about="&Ice;Alpha">
         <rdfs:subClassOf rdf:resource="&Ice;OrientationValueScope"/>
@@ -369,7 +369,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Altitude -->
+    <!-- http://vs.uni-kassel.de/Ice#Altitude -->
 
     <owl:Class rdf:about="&Ice;Altitude">
         <rdfs:subClassOf rdf:resource="&Ice;PositionValueScope"/>
@@ -410,7 +410,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#BasicRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#BasicRepresentation -->
 
     <owl:Class rdf:about="&Ice;BasicRepresentation">
         <rdfs:subClassOf rdf:resource="&Ice;Representation"/>
@@ -418,7 +418,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Beta -->
+    <!-- http://vs.uni-kassel.de/Ice#Beta -->
 
     <owl:Class rdf:about="&Ice;Beta">
         <rdfs:subClassOf rdf:resource="&Ice;OrientationValueScope"/>
@@ -459,7 +459,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#BooleanRep -->
+    <!-- http://vs.uni-kassel.de/Ice#BooleanRep -->
 
     <owl:Class rdf:about="&Ice;BooleanRep">
         <rdfs:subClassOf rdf:resource="&Ice;NonNumericalRepresentation"/>
@@ -467,7 +467,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ByteRep -->
+    <!-- http://vs.uni-kassel.de/Ice#ByteRep -->
 
     <owl:Class rdf:about="&Ice;ByteRep">
         <rdfs:subClassOf rdf:resource="&Ice;NonNumericalRepresentation"/>
@@ -475,7 +475,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CompositeRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#CompositeRepresentation -->
 
     <owl:Class rdf:about="&Ice;CompositeRepresentation">
         <rdfs:subClassOf rdf:resource="&Ice;Representation"/>
@@ -490,7 +490,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ComputationNode -->
+    <!-- http://vs.uni-kassel.de/Ice#ComputationNode -->
 
     <owl:Class rdf:about="&Ice;ComputationNode">
         <rdfs:subClassOf rdf:resource="&Ice;Node"/>
@@ -498,7 +498,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep -->
+    <!-- http://vs.uni-kassel.de/Ice#CoordinatePositionRep -->
 
     <owl:Class rdf:about="&Ice;CoordinatePositionRep">
         <rdfs:subClassOf rdf:resource="&Ice;PositionRepresentation"/>
@@ -542,7 +542,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Cost -->
+    <!-- http://vs.uni-kassel.de/Ice#Cost -->
 
     <owl:Class rdf:about="&Ice;Cost">
         <rdfs:subClassOf rdf:resource="&Ice;ProcessingMetadata"/>
@@ -556,7 +556,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CostASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#CostASPGrounding -->
 
     <owl:Class rdf:about="&Ice;CostASPGrounding">
         <rdfs:subClassOf rdf:resource="&Ice;ASPMetadataGrounding"/>
@@ -564,7 +564,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CppGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#CppGrounding -->
 
     <owl:Class rdf:about="&Ice;CppGrounding">
         <rdfs:subClassOf rdf:resource="&Ice;Grounding"/>
@@ -572,7 +572,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DefaultMovementRep -->
+    <!-- http://vs.uni-kassel.de/Ice#DefaultMovementRep -->
 
     <owl:Class rdf:about="&Ice;DefaultMovementRep">
         <rdfs:subClassOf rdf:resource="&Ice;MovementRepresentation"/>
@@ -628,7 +628,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Delay -->
+    <!-- http://vs.uni-kassel.de/Ice#Delay -->
 
     <owl:Class rdf:about="&Ice;Delay">
         <rdfs:subClassOf rdf:resource="&Ice;InformationMetadata"/>
@@ -642,7 +642,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DelayASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#DelayASPGrounding -->
 
     <owl:Class rdf:about="&Ice;DelayASPGrounding">
         <rdfs:subClassOf rdf:resource="&Ice;ASPMetadataGrounding"/>
@@ -650,7 +650,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Density -->
+    <!-- http://vs.uni-kassel.de/Ice#Density -->
 
     <owl:Class rdf:about="&Ice;Density">
         <rdfs:subClassOf rdf:resource="&Ice;MapMetadata"/>
@@ -658,7 +658,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DensityASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#DensityASPGrounding -->
 
     <owl:Class rdf:about="&Ice;DensityASPGrounding">
         <rdfs:subClassOf rdf:resource="&Ice;ASPMetadataGrounding"/>
@@ -666,7 +666,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep -->
+    <!-- http://vs.uni-kassel.de/Ice#DoubleRep -->
 
     <owl:Class rdf:about="&Ice;DoubleRep">
         <rdfs:subClassOf rdf:resource="&Ice;FloatNumericalRepresentation"/>
@@ -674,7 +674,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#EntityScope -->
+    <!-- http://vs.uni-kassel.de/Ice#EntityScope -->
 
     <owl:Class rdf:about="&Ice;EntityScope">
         <rdfs:subClassOf rdf:resource="&Ice;Scope"/>
@@ -683,13 +683,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#EntityType -->
+    <!-- http://vs.uni-kassel.de/Ice#EntityType -->
 
     <owl:Class rdf:about="&Ice;EntityType"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#EulerAnglesRep -->
+    <!-- http://vs.uni-kassel.de/Ice#EulerAnglesRep -->
 
     <owl:Class rdf:about="&Ice;EulerAnglesRep">
         <rdfs:subClassOf rdf:resource="&Ice;OrientationRepresentation"/>
@@ -732,7 +732,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#FloatNumericalRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#FloatNumericalRepresentation -->
 
     <owl:Class rdf:about="&Ice;FloatNumericalRepresentation">
         <rdfs:subClassOf rdf:resource="&Ice;NumericalRepresentation"/>
@@ -740,7 +740,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#FloatRep -->
+    <!-- http://vs.uni-kassel.de/Ice#FloatRep -->
 
     <owl:Class rdf:about="&Ice;FloatRep">
         <rdfs:subClassOf rdf:resource="&Ice;FloatNumericalRepresentation"/>
@@ -748,7 +748,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Frequency -->
+    <!-- http://vs.uni-kassel.de/Ice#Frequency -->
 
     <owl:Class rdf:about="&Ice;Frequency">
         <rdfs:subClassOf rdf:resource="&Ice;StreamMetadata"/>
@@ -756,7 +756,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Gamma -->
+    <!-- http://vs.uni-kassel.de/Ice#Gamma -->
 
     <owl:Class rdf:about="&Ice;Gamma">
         <rdfs:subClassOf rdf:resource="&Ice;OrientationValueScope"/>
@@ -797,13 +797,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Grounding -->
+    <!-- http://vs.uni-kassel.de/Ice#Grounding -->
 
     <owl:Class rdf:about="&Ice;Grounding"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#IRONode -->
+    <!-- http://vs.uni-kassel.de/Ice#IRONode -->
 
     <owl:Class rdf:about="&Ice;IRONode">
         <rdfs:subClassOf rdf:resource="&Ice;Node"/>
@@ -811,7 +811,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#InformationMetadata -->
+    <!-- http://vs.uni-kassel.de/Ice#InformationMetadata -->
 
     <owl:Class rdf:about="&Ice;InformationMetadata">
         <rdfs:subClassOf rdf:resource="&Ice;Metadata"/>
@@ -819,7 +819,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#IntegerNumericalRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#IntegerNumericalRepresentation -->
 
     <owl:Class rdf:about="&Ice;IntegerNumericalRepresentation">
         <rdfs:subClassOf rdf:resource="&Ice;NumericalRepresentation"/>
@@ -827,7 +827,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#IntegerRep -->
+    <!-- http://vs.uni-kassel.de/Ice#IntegerRep -->
 
     <owl:Class rdf:about="&Ice;IntegerRep">
         <rdfs:subClassOf rdf:resource="&Ice;IntegerNumericalRepresentation"/>
@@ -835,7 +835,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Latitude -->
+    <!-- http://vs.uni-kassel.de/Ice#Latitude -->
 
     <owl:Class rdf:about="&Ice;Latitude">
         <rdfs:subClassOf rdf:resource="&Ice;PositionValueScope"/>
@@ -856,7 +856,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#LongRep -->
+    <!-- http://vs.uni-kassel.de/Ice#LongRep -->
 
     <owl:Class rdf:about="&Ice;LongRep">
         <rdfs:subClassOf rdf:resource="&Ice;IntegerNumericalRepresentation"/>
@@ -864,7 +864,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Longitude -->
+    <!-- http://vs.uni-kassel.de/Ice#Longitude -->
 
     <owl:Class rdf:about="&Ice;Longitude">
         <rdfs:subClassOf rdf:resource="&Ice;PositionValueScope"/>
@@ -885,13 +885,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Map -->
+    <!-- http://vs.uni-kassel.de/Ice#Map -->
 
     <owl:Class rdf:about="&Ice;Map"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapMetadata -->
+    <!-- http://vs.uni-kassel.de/Ice#MapMetadata -->
 
     <owl:Class rdf:about="&Ice;MapMetadata">
         <rdfs:subClassOf rdf:resource="&Ice;Metadata"/>
@@ -899,7 +899,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapNode -->
+    <!-- http://vs.uni-kassel.de/Ice#MapNode -->
 
     <owl:Class rdf:about="&Ice;MapNode">
         <owl:equivalentClass>
@@ -913,13 +913,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Metadata -->
+    <!-- http://vs.uni-kassel.de/Ice#Metadata -->
 
     <owl:Class rdf:about="&Ice;Metadata"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Millisecond -->
+    <!-- http://vs.uni-kassel.de/Ice#Millisecond -->
 
     <owl:Class rdf:about="&Ice;Millisecond">
         <rdfs:subClassOf rdf:resource="&Ice;TimestampScope"/>
@@ -960,7 +960,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Movement -->
+    <!-- http://vs.uni-kassel.de/Ice#Movement -->
 
     <owl:Class rdf:about="&Ice;Movement">
         <rdfs:subClassOf rdf:resource="&Ice;EntityScope"/>
@@ -974,7 +974,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MovementRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#MovementRepresentation -->
 
     <owl:Class rdf:about="&Ice;MovementRepresentation">
         <rdfs:subClassOf rdf:resource="&Ice;CompositeRepresentation"/>
@@ -982,7 +982,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MovementValueScope -->
+    <!-- http://vs.uni-kassel.de/Ice#MovementValueScope -->
 
     <owl:Class rdf:about="&Ice;MovementValueScope">
         <rdfs:subClassOf rdf:resource="&Ice;ValueScope"/>
@@ -990,7 +990,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#NamedMap -->
+    <!-- http://vs.uni-kassel.de/Ice#NamedMap -->
 
     <owl:Class rdf:about="&Ice;NamedMap">
         <rdfs:subClassOf rdf:resource="&Ice;Map"/>
@@ -998,7 +998,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#NamedStream -->
+    <!-- http://vs.uni-kassel.de/Ice#NamedStream -->
 
     <owl:Class rdf:about="&Ice;NamedStream">
         <rdfs:subClassOf rdf:resource="&Ice;Stream"/>
@@ -1006,13 +1006,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Node -->
+    <!-- http://vs.uni-kassel.de/Ice#Node -->
 
     <owl:Class rdf:about="&Ice;Node"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#NonNumericalRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#NonNumericalRepresentation -->
 
     <owl:Class rdf:about="&Ice;NonNumericalRepresentation">
         <rdfs:subClassOf rdf:resource="&Ice;BasicRepresentation"/>
@@ -1021,7 +1021,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#NumericalRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#NumericalRepresentation -->
 
     <owl:Class rdf:about="&Ice;NumericalRepresentation">
         <rdfs:subClassOf rdf:resource="&Ice;BasicRepresentation"/>
@@ -1029,7 +1029,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation -->
+    <!-- http://vs.uni-kassel.de/Ice#Orientation -->
 
     <owl:Class rdf:about="&Ice;Orientation">
         <rdfs:subClassOf rdf:resource="&Ice;EntityScope"/>
@@ -1043,7 +1043,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#OrientationRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#OrientationRepresentation -->
 
     <owl:Class rdf:about="&Ice;OrientationRepresentation">
         <rdfs:subClassOf rdf:resource="&Ice;CompositeRepresentation"/>
@@ -1051,7 +1051,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#OrientationValueScope -->
+    <!-- http://vs.uni-kassel.de/Ice#OrientationValueScope -->
 
     <owl:Class rdf:about="&Ice;OrientationValueScope">
         <rdfs:subClassOf rdf:resource="&Ice;ValueScope"/>
@@ -1059,7 +1059,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Pitch -->
+    <!-- http://vs.uni-kassel.de/Ice#Pitch -->
 
     <owl:Class rdf:about="&Ice;Pitch">
         <rdfs:subClassOf rdf:resource="&Ice;OrientationValueScope"/>
@@ -1100,7 +1100,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position -->
+    <!-- http://vs.uni-kassel.de/Ice#Position -->
 
     <owl:Class rdf:about="&Ice;Position">
         <rdfs:subClassOf rdf:resource="&Ice;EntityScope"/>
@@ -1114,7 +1114,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#PositionRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#PositionRepresentation -->
 
     <owl:Class rdf:about="&Ice;PositionRepresentation">
         <rdfs:subClassOf rdf:resource="&Ice;CompositeRepresentation"/>
@@ -1122,7 +1122,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#PositionValueScope -->
+    <!-- http://vs.uni-kassel.de/Ice#PositionValueScope -->
 
     <owl:Class rdf:about="&Ice;PositionValueScope">
         <rdfs:subClassOf rdf:resource="&Ice;ValueScope"/>
@@ -1130,7 +1130,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ProcessingMetadata -->
+    <!-- http://vs.uni-kassel.de/Ice#ProcessingMetadata -->
 
     <owl:Class rdf:about="&Ice;ProcessingMetadata">
         <rdfs:subClassOf rdf:resource="&Ice;Metadata"/>
@@ -1138,7 +1138,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#PysicalEntity -->
+    <!-- http://vs.uni-kassel.de/Ice#PysicalEntity -->
 
     <owl:Class rdf:about="&Ice;PysicalEntity">
         <owl:equivalentClass>
@@ -1156,7 +1156,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RelatedRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#RelatedRepresentation -->
 
     <owl:Class rdf:about="&Ice;RelatedRepresentation">
         <owl:equivalentClass>
@@ -1170,7 +1170,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RelativeCoordinatePositionRep -->
+    <!-- http://vs.uni-kassel.de/Ice#RelativeCoordinatePositionRep -->
 
     <owl:Class rdf:about="&Ice;RelativeCoordinatePositionRep">
         <rdfs:subClassOf rdf:resource="&Ice;PositionRepresentation"/>
@@ -1246,13 +1246,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Representation -->
+    <!-- http://vs.uni-kassel.de/Ice#Representation -->
 
     <owl:Class rdf:about="&Ice;Representation"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RequiredMap -->
+    <!-- http://vs.uni-kassel.de/Ice#RequiredMap -->
 
     <owl:Class rdf:about="&Ice;RequiredMap">
         <rdfs:subClassOf rdf:resource="&Ice;Map"/>
@@ -1260,7 +1260,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RequiredStream -->
+    <!-- http://vs.uni-kassel.de/Ice#RequiredStream -->
 
     <owl:Class rdf:about="&Ice;RequiredStream">
         <rdfs:subClassOf rdf:resource="&Ice;Stream"/>
@@ -1268,7 +1268,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot -->
+    <!-- http://vs.uni-kassel.de/Ice#Robot -->
 
     <owl:Class rdf:about="&Ice;Robot">
         <rdfs:subClassOf rdf:resource="&Ice;EntityType"/>
@@ -1288,7 +1288,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Roll -->
+    <!-- http://vs.uni-kassel.de/Ice#Roll -->
 
     <owl:Class rdf:about="&Ice;Roll">
         <rdfs:subClassOf rdf:resource="&Ice;OrientationValueScope"/>
@@ -1329,7 +1329,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RollPitchYawRep -->
+    <!-- http://vs.uni-kassel.de/Ice#RollPitchYawRep -->
 
     <owl:Class rdf:about="&Ice;RollPitchYawRep">
         <rdfs:subClassOf rdf:resource="&Ice;OrientationRepresentation"/>
@@ -1372,13 +1372,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Scope -->
+    <!-- http://vs.uni-kassel.de/Ice#Scope -->
 
     <owl:Class rdf:about="&Ice;Scope"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ShortRep -->
+    <!-- http://vs.uni-kassel.de/Ice#ShortRep -->
 
     <owl:Class rdf:about="&Ice;ShortRep">
         <rdfs:subClassOf rdf:resource="&Ice;IntegerNumericalRepresentation"/>
@@ -1386,7 +1386,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#SinkNode -->
+    <!-- http://vs.uni-kassel.de/Ice#SinkNode -->
 
     <owl:Class rdf:about="&Ice;SinkNode">
         <rdfs:subClassOf rdf:resource="&Ice;Node"/>
@@ -1394,7 +1394,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#SmoothingNode -->
+    <!-- http://vs.uni-kassel.de/Ice#SmoothingNode -->
 
     <owl:Class rdf:about="&Ice;SmoothingNode">
         <owl:equivalentClass>
@@ -1416,7 +1416,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#SourceNode -->
+    <!-- http://vs.uni-kassel.de/Ice#SourceNode -->
 
     <owl:Class rdf:about="&Ice;SourceNode">
         <rdfs:subClassOf rdf:resource="&Ice;Node"/>
@@ -1424,13 +1424,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Stream -->
+    <!-- http://vs.uni-kassel.de/Ice#Stream -->
 
     <owl:Class rdf:about="&Ice;Stream"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#StreamMetadata -->
+    <!-- http://vs.uni-kassel.de/Ice#StreamMetadata -->
 
     <owl:Class rdf:about="&Ice;StreamMetadata">
         <rdfs:subClassOf rdf:resource="&Ice;Metadata"/>
@@ -1438,7 +1438,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#StreamPositionCoordinateRep -->
+    <!-- http://vs.uni-kassel.de/Ice#StreamPositionCoordinateRep -->
 
     <owl:Class rdf:about="&Ice;StreamPositionCoordinateRep">
         <rdfs:subClassOf rdf:resource="&Ice;NamedStream"/>
@@ -1462,7 +1462,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#StreamSize -->
+    <!-- http://vs.uni-kassel.de/Ice#StreamSize -->
 
     <owl:Class rdf:about="&Ice;StreamSize">
         <rdfs:subClassOf rdf:resource="&Ice;StreamMetadata"/>
@@ -1470,7 +1470,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#StringRep -->
+    <!-- http://vs.uni-kassel.de/Ice#StringRep -->
 
     <owl:Class rdf:about="&Ice;StringRep">
         <rdfs:subClassOf rdf:resource="&Ice;NonNumericalRepresentation"/>
@@ -1478,13 +1478,13 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#System -->
+    <!-- http://vs.uni-kassel.de/Ice#System -->
 
     <owl:Class rdf:about="&Ice;System"/>
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Timestamp -->
+    <!-- http://vs.uni-kassel.de/Ice#Timestamp -->
 
     <owl:Class rdf:about="&Ice;Timestamp">
         <rdfs:subClassOf rdf:resource="&Ice;EntityScope"/>
@@ -1498,7 +1498,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TimestampRepresentation -->
+    <!-- http://vs.uni-kassel.de/Ice#TimestampRepresentation -->
 
     <owl:Class rdf:about="&Ice;TimestampRepresentation">
         <rdfs:subClassOf rdf:resource="&Ice;CompositeRepresentation"/>
@@ -1506,7 +1506,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TimestampScope -->
+    <!-- http://vs.uni-kassel.de/Ice#TimestampScope -->
 
     <owl:Class rdf:about="&Ice;TimestampScope">
         <rdfs:subClassOf rdf:resource="&Ice;ValueScope"/>
@@ -1514,7 +1514,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Translation -->
+    <!-- http://vs.uni-kassel.de/Ice#Translation -->
 
     <owl:Class rdf:about="&Ice;Translation">
         <rdfs:subClassOf rdf:resource="&Ice;MovementValueScope"/>
@@ -1555,7 +1555,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#UnixTimeRep -->
+    <!-- http://vs.uni-kassel.de/Ice#UnixTimeRep -->
 
     <owl:Class rdf:about="&Ice;UnixTimeRep">
         <rdfs:subClassOf rdf:resource="&Ice;TimestampRepresentation"/>
@@ -1583,7 +1583,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#UnsignedByteRep -->
+    <!-- http://vs.uni-kassel.de/Ice#UnsignedByteRep -->
 
     <owl:Class rdf:about="&Ice;UnsignedByteRep">
         <rdfs:subClassOf rdf:resource="&Ice;NonNumericalRepresentation"/>
@@ -1591,7 +1591,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#UnsignedIntegerRep -->
+    <!-- http://vs.uni-kassel.de/Ice#UnsignedIntegerRep -->
 
     <owl:Class rdf:about="&Ice;UnsignedIntegerRep">
         <rdfs:subClassOf rdf:resource="&Ice;IntegerNumericalRepresentation"/>
@@ -1599,7 +1599,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#UnsignedLongRep -->
+    <!-- http://vs.uni-kassel.de/Ice#UnsignedLongRep -->
 
     <owl:Class rdf:about="&Ice;UnsignedLongRep">
         <rdfs:subClassOf rdf:resource="&Ice;IntegerNumericalRepresentation"/>
@@ -1607,7 +1607,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#UnsignedShortRep -->
+    <!-- http://vs.uni-kassel.de/Ice#UnsignedShortRep -->
 
     <owl:Class rdf:about="&Ice;UnsignedShortRep">
         <rdfs:subClassOf rdf:resource="&Ice;IntegerNumericalRepresentation"/>
@@ -1615,7 +1615,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ValueScope -->
+    <!-- http://vs.uni-kassel.de/Ice#ValueScope -->
 
     <owl:Class rdf:about="&Ice;ValueScope">
         <rdfs:subClassOf rdf:resource="&Ice;Scope"/>
@@ -1623,7 +1623,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#WGS84Rep -->
+    <!-- http://vs.uni-kassel.de/Ice#WGS84Rep -->
 
     <owl:Class rdf:about="&Ice;WGS84Rep">
         <rdfs:subClassOf rdf:resource="&Ice;PositionRepresentation"/>
@@ -1666,7 +1666,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate -->
+    <!-- http://vs.uni-kassel.de/Ice#XCoordinate -->
 
     <owl:Class rdf:about="&Ice;XCoordinate">
         <rdfs:subClassOf rdf:resource="&Ice;PositionValueScope"/>
@@ -1707,7 +1707,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate -->
+    <!-- http://vs.uni-kassel.de/Ice#YCoordinate -->
 
     <owl:Class rdf:about="&Ice;YCoordinate">
         <rdfs:subClassOf rdf:resource="&Ice;PositionValueScope"/>
@@ -1748,7 +1748,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Yaw -->
+    <!-- http://vs.uni-kassel.de/Ice#Yaw -->
 
     <owl:Class rdf:about="&Ice;Yaw">
         <rdfs:subClassOf rdf:resource="&Ice;OrientationValueScope"/>
@@ -1789,7 +1789,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate -->
+    <!-- http://vs.uni-kassel.de/Ice#ZCoordinate -->
 
     <owl:Class rdf:about="&Ice;ZCoordinate">
         <rdfs:subClassOf rdf:resource="&Ice;PositionValueScope"/>
@@ -1841,7 +1841,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#IROAccuracyAvgASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#IROAccuracyAvgASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;IROAccuracyAvgASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -1850,7 +1850,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#IROAccuracyMaxASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#IROAccuracyMaxASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;IROAccuracyMaxASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -1859,7 +1859,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#IROAccuracyMinASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#IROAccuracyMinASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;IROAccuracyMinASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -1868,7 +1868,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#IROCostASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#IROCostASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;IROCostASPGrounding">
         <rdf:type rdf:resource="&Ice;CostASPGrounding"/>
@@ -1877,7 +1877,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#IRODelayASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#IRODelayASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;IRODelayASPGrounding">
         <rdf:type rdf:resource="&Ice;DelayASPGrounding"/>
@@ -1886,7 +1886,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapAccuracyAvgASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#MapAccuracyAvgASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;MapAccuracyAvgASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -1895,7 +1895,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapAccuracyFixASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#MapAccuracyFixASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;MapAccuracyFixASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -1904,7 +1904,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapAccuracyMaxASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#MapAccuracyMaxASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;MapAccuracyMaxASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -1913,7 +1913,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapAccuracyMinASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#MapAccuracyMinASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;MapAccuracyMinASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -1922,7 +1922,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapCostASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#MapCostASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;MapCostASPGrounding">
         <rdf:type rdf:resource="&Ice;CostASPGrounding"/>
@@ -1931,7 +1931,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapDelayASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#MapDelayASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;MapDelayASPGrounding">
         <rdf:type rdf:resource="&Ice;DelayASPGrounding"/>
@@ -1940,7 +1940,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapDensityAvgASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#MapDensityAvgASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;MapDensityAvgASPGrounding">
         <rdf:type rdf:resource="&Ice;DensityASPGrounding"/>
@@ -1949,7 +1949,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapDensityFixASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#MapDensityFixASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;MapDensityFixASPGrounding">
         <rdf:type rdf:resource="&Ice;DensityASPGrounding"/>
@@ -1958,7 +1958,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapDensityMaxASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#MapDensityMaxASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;MapDensityMaxASPGrounding">
         <rdf:type rdf:resource="&Ice;DensityASPGrounding"/>
@@ -1967,7 +1967,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapDensityMinASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#MapDensityMinASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;MapDensityMinASPGrounding">
         <rdf:type rdf:resource="&Ice;DensityASPGrounding"/>
@@ -1976,7 +1976,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#MapDensitySumASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#MapDensitySumASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;MapDensitySumASPGrounding">
         <rdf:type rdf:resource="&Ice;DensityASPGrounding"/>
@@ -1985,7 +1985,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#NodeAccuracyAvgASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#NodeAccuracyAvgASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;NodeAccuracyAvgASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -1994,7 +1994,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#NodeAccuracyFixASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#NodeAccuracyFixASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;NodeAccuracyFixASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -2003,7 +2003,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#NodeAccuracyMaxASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#NodeAccuracyMaxASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;NodeAccuracyMaxASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -2012,7 +2012,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#NodeAccuracyMinASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#NodeAccuracyMinASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;NodeAccuracyMinASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -2021,7 +2021,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#NodeCostASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#NodeCostASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;NodeCostASPGrounding">
         <rdf:type rdf:resource="&Ice;CostASPGrounding"/>
@@ -2030,7 +2030,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#NodeDelayASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#NodeDelayASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;NodeDelayASPGrounding">
         <rdf:type rdf:resource="&Ice;DelayASPGrounding"/>
@@ -2039,7 +2039,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#NodeDelayFixASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#NodeDelayFixASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;NodeDelayFixASPGrounding">
         <rdf:type rdf:resource="&Ice;DelayASPGrounding"/>
@@ -2048,7 +2048,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RequiredMapAccuracyASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#RequiredMapAccuracyASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;RequiredMapAccuracyASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -2057,7 +2057,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RequiredMapDelayASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#RequiredMapDelayASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;RequiredMapDelayASPGrounding">
         <rdf:type rdf:resource="&Ice;DelayASPGrounding"/>
@@ -2066,7 +2066,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RequiredStreamAccuracyASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#RequiredStreamAccuracyASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;RequiredStreamAccuracyASPGrounding">
         <rdf:type rdf:resource="&Ice;AccuracyASPGrounding"/>
@@ -2075,7 +2075,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RequiredStreamDelayASPGrounding -->
+    <!-- http://vs.uni-kassel.de/Ice#RequiredStreamDelayASPGrounding -->
 
     <owl:NamedIndividual rdf:about="&Ice;RequiredStreamDelayASPGrounding">
         <rdf:type rdf:resource="&Ice;DelayASPGrounding"/>
@@ -2084,7 +2084,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Self -->
+    <!-- http://vs.uni-kassel.de/Ice#Self -->
 
     <owl:NamedIndividual rdf:about="&Ice;Self">
         <rdf:type rdf:resource="&Ice;EntityType"/>

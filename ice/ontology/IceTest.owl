@@ -6,20 +6,20 @@
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
-    <!ENTITY Ice "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#" >
+    <!ENTITY Ice "http://vs.uni-kassel.de/Ice#" >
 ]>
 
 
 <rdf:RDF xmlns="http://vs.uni-kassel.de/IceTest#"
      xml:base="http://vs.uni-kassel.de/IceTest"
-     xmlns:Ice="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#"
+     xmlns:Ice="http://vs.uni-kassel.de/Ice#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <owl:Ontology rdf:about="http://vs.uni-kassel.de/IceTest">
         <owl:versionInfo rdf:datatype="&xsd;string">0.7</owl:versionInfo>
-        <owl:imports rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/Ice"/>
+        <owl:imports rdf:resource="http://vs.uni-kassel.de/Ice"/>
     </owl:Ontology>
     
 
@@ -678,7 +678,7 @@
     
 
 
-    <!-- http://www.semanticweb.org/sni/ontologies/2013/7/Ice#StreamPositionCoordinateRep -->
+    <!-- http://vs.uni-kassel.de/Ice#StreamPositionCoordinateRep -->
 
     <owl:Class rdf:about="&Ice;StreamPositionCoordinateRep">
         <rdfs:subClassOf rdf:resource="&Ice;NamedStream"/>

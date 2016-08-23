@@ -16,7 +16,7 @@ public class RepresentationVisitorTest {
 		oi = new IceOntologyInterface();
 		final String path = RepresentationVisitorTest.class.getResource("Ice.owl").getPath().replace("/Ice.owl", "");
 		oi.addIRIMapper(path);
-		assertTrue(oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice"));
+		assertTrue(oi.addOntologyIRI("http://vs.uni-kassel.de/Ice"));
 		assertTrue(oi.loadOntologies());
 		assertTrue(oi.isConsistent());
 	}

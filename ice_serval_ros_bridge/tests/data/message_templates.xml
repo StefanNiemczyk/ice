@@ -1,13 +1,13 @@
 <templates>
-	<template message="geometry_msgs/Vector3" representation="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep">
-<![CDATA[x: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate}
-y: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate}
-z: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate}]]>
+	<template message="geometry_msgs/Vector3" representation="http://vs.uni-kassel.de/Ice#CoordinatePositionRep">
+<![CDATA[x: {http://vs.uni-kassel.de/Ice#XCoordinate}
+y: {http://vs.uni-kassel.de/Ice#YCoordinate}
+z: {http://vs.uni-kassel.de/Ice#ZCoordinate}]]>
 	</template>
 	<template message="geometry_msgs/Vector3">
-<![CDATA[x: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate}
-y: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate}
-angle: {http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate}
+<![CDATA[x: {http://vs.uni-kassel.de/Ice#XCoordinate}
+y: {http://vs.uni-kassel.de/Ice#YCoordinate}
+angle: {http://vs.uni-kassel.de/Ice#ZCoordinate}
 certainty: 0.9]]>
 	</template>
 </templates>

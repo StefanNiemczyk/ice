@@ -78,7 +78,7 @@ void GContainerFactory::setOntologyInterface(std::shared_ptr<OntologyInterface> 
 
 void GContainerFactory::readFromOntology()
 {
-  std::string iri = "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#";
+  std::string iri = "http://vs.uni-kassel.de/Ice#";
 
   auto csv = ontologyInterface->readRepresentations();
 

@@ -7,7 +7,7 @@ import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 
 public class IceIris {
-	public static final String ICE_IRI = "http://www.semanticweb.org/sni/ontologies/2013/7/Ice";
+	public static final String ICE_IRI = "http://vs.uni-kassel.de/Ice";
 	public static final String ICE_IRI_PREFIX = ICE_IRI + "#";
 
 	public final OWLClass node;

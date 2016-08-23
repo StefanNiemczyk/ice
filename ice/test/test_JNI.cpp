@@ -35,7 +35,7 @@ TEST(JNITest, loadOntology)
 
   ASSERT_FALSE(oi.errorOccurred());
 
-  result = oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  result = oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
@@ -62,7 +62,7 @@ TEST(JNITest, getOntologyIDs)
 
   ASSERT_FALSE(oi.errorOccurred());
 
-  result = oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  result = oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
@@ -92,7 +92,7 @@ TEST(JNITest, addSystem)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   result = oi.addSystem("TestSystem");
@@ -113,7 +113,7 @@ TEST(JNITest, addInfoStructure)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   result = oi.addValueScope("TestValueScope", "TestValueScope1", "DoubleRep");
@@ -152,16 +152,16 @@ TEST(JNITest, addInfoStructure)
 
   std::vector<std::string> toSearch;
 
-  EXPECT_TRUE(str.find("entityType(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).") != std::string::npos);
-  EXPECT_TRUE(str.find("scope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope).") != std::string::npos);
-  EXPECT_TRUE(str.find("valueScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope1).") != std::string::npos);
-  EXPECT_TRUE(str.find("valueScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope2).") != std::string::npos);
-  EXPECT_TRUE(str.find("representation(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1).") != std::string::npos);
+  EXPECT_TRUE(str.find("entityType(http://vs.uni-kassel.de/Ice#TestEntity).") != std::string::npos);
+  EXPECT_TRUE(str.find("scope(http://vs.uni-kassel.de/Ice#TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(http://vs.uni-kassel.de/Ice#TestValueScope1).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(http://vs.uni-kassel.de/Ice#TestValueScope2).") != std::string::npos);
+  EXPECT_TRUE(str.find("representation(http://vs.uni-kassel.de/Ice#TestRep1).") != std::string::npos);
 
-  EXPECT_TRUE(str.find("hasScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasRepresentation(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasScope(http://vs.uni-kassel.de/Ice#TestEntity,http://vs.uni-kassel.de/Ice#TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasRepresentation(http://vs.uni-kassel.de/Ice#TestScope,http://vs.uni-kassel.de/Ice#TestRep1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope1,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope2,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
 }
 
 TEST(JNITest, addDimension)
@@ -176,7 +176,7 @@ TEST(JNITest, addDimension)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   result = oi.addValueScope("TestValueScope", "TestValueScope1", "DoubleRep");
@@ -236,19 +236,19 @@ TEST(JNITest, addDimension)
 
   std::cout << str << std::endl;
 
-  EXPECT_TRUE(str.find("entityType(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).") != std::string::npos);
-  EXPECT_TRUE(str.find("scope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope).") != std::string::npos);
-  EXPECT_TRUE(str.find("valueScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope1).") != std::string::npos);
-  EXPECT_TRUE(str.find("valueScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope2).") != std::string::npos);
-  EXPECT_TRUE(str.find("representation(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1).") != std::string::npos);
+  EXPECT_TRUE(str.find("entityType(http://vs.uni-kassel.de/Ice#TestEntity).") != std::string::npos);
+  EXPECT_TRUE(str.find("scope(http://vs.uni-kassel.de/Ice#TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(http://vs.uni-kassel.de/Ice#TestValueScope1).") != std::string::npos);
+  EXPECT_TRUE(str.find("valueScope(http://vs.uni-kassel.de/Ice#TestValueScope2).") != std::string::npos);
+  EXPECT_TRUE(str.find("representation(http://vs.uni-kassel.de/Ice#TestRep1).") != std::string::npos);
 
-  EXPECT_TRUE(str.find("hasScope(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasRepresentation(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestScope,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#EulerAnglesRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestValueScope3,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestRep1,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasScope(http://vs.uni-kassel.de/Ice#TestEntity,http://vs.uni-kassel.de/Ice#TestScope).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasRepresentation(http://vs.uni-kassel.de/Ice#TestScope,http://vs.uni-kassel.de/Ice#TestRep1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope1,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope2,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#Orientation,http://vs.uni-kassel.de/Ice#EulerAnglesRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope3,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#XCoordinate,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
 }
 
 TEST(JNITest, addStreamClass)
@@ -259,7 +259,7 @@ TEST(JNITest, addStreamClass)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   oi.addSystem("TestSystem");
@@ -284,7 +284,7 @@ TEST(JNITest, addRequiredStream)
   oi.setLogLevel(ice::Info);
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   oi.addSystem("TestSystem");
@@ -323,8 +323,8 @@ TEST(JNITest, addRequiredStream)
     ASSERT_EQ(returnValues->at(4).size(), 1);
 
     EXPECT_EQ("REQUIRED_STREAM", returnValues->at(0).at(0));
-    EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestReqStream", returnValues->at(1).at(0));
-    EXPECT_EQ("requiredStream(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,information(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none)).\n", returnValues->at(2).at(0));
+    EXPECT_EQ("http://vs.uni-kassel.de/Ice#TestReqStream", returnValues->at(1).at(0));
+    EXPECT_EQ("requiredStream(http://vs.uni-kassel.de/Ice#TestSystem,information(http://vs.uni-kassel.de/Ice#TestEntity,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none)).\n", returnValues->at(2).at(0));
 
     EXPECT_EQ(0, returnValues->at(4).at(0).length());
 }
@@ -347,7 +347,7 @@ TEST(JNITest, addSourceNode)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   oi.addSystem("TestSystem");
@@ -398,15 +398,15 @@ TEST(JNITest, addSourceNode)
   ASSERT_EQ(returnValues->at(4).size(), 1);
 
   EXPECT_EQ("SOURCE_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("sourceNode(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("http://vs.uni-kassel.de/Ice#TestSourceNodeInd", returnValues->at(1).at(0));
+  EXPECT_EQ("sourceNode(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestSourceNodeInd,http://vs.uni-kassel.de/Ice#TestEntity).\n", returnValues->at(2).at(0));
 
   std::string toTest = returnValues->at(3).at(0);
-  EXPECT_TRUE(toTest.find("#external sourceNode(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,fix,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,fix,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external sourceNode(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestSourceNodeInd,http://vs.uni-kassel.de/Ice#TestEntity).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestSourceNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestSourceNodeInd,fix,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestSourceNodeInd,fix,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestSourceNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
 
   EXPECT_EQ(0, returnValues->at(4).at(0).length());
 }
@@ -429,7 +429,7 @@ TEST(JNITest, addComputationNode)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   oi.addSystem("TestSystem");
@@ -478,18 +478,18 @@ TEST(JNITest, addComputationNode)
   ASSERT_EQ(returnValues->at(4).size(), 1);
 
   EXPECT_EQ("COMPUTATION_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("nodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("http://vs.uni-kassel.de/Ice#TestNodeInd", returnValues->at(1).at(0));
+  EXPECT_EQ("nodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,any).\n", returnValues->at(2).at(0));
 
 
   std::string toTest = returnValues->at(3).at(0);
-  EXPECT_TRUE(toTest.find("#external nodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external nodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,any).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,max,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,max,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
 
   EXPECT_EQ(0, returnValues->at(4).at(0).length());
 }
@@ -516,7 +516,7 @@ TEST(JNITest, addIroNode)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   oi.addSystem("TestSystem");
@@ -569,17 +569,17 @@ TEST(JNITest, addIroNode)
   ASSERT_EQ(returnValues->at(4).size(), 1);
 
   EXPECT_EQ("IRO_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("iro(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any,none).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("http://vs.uni-kassel.de/Ice#TestNodeInd", returnValues->at(1).at(0));
+  EXPECT_EQ("iro(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,any,none).\n", returnValues->at(2).at(0));
 
   std::string toTest = returnValues->at(3).at(0);
-  EXPECT_TRUE(toTest.find("#external iro(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any,none).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input2(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external iro(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,any,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input2(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,max,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,max,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
 
   EXPECT_EQ(0, returnValues->at(4).at(0).length());
 }
@@ -603,7 +603,7 @@ TEST(JNITest, addNodeToSystem)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   oi.addSystem("TestSystem");
@@ -656,14 +656,14 @@ TEST(JNITest, addNodeToSystem)
   ASSERT_EQ(returnValues->at(4).size(), 1);
 
   EXPECT_EQ("SOURCE_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("sourceNode(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("http://vs.uni-kassel.de/Ice#TestSourceNodeInd", returnValues->at(1).at(0));
+  EXPECT_EQ("sourceNode(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestSourceNodeInd,http://vs.uni-kassel.de/Ice#TestEntity).\n", returnValues->at(2).at(0));
 
   std::string toTest = returnValues->at(3).at(0);
-  EXPECT_TRUE(toTest.find("#external sourceNode(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,fix,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSourceNodeInd,fix,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external sourceNode(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestSourceNodeInd,http://vs.uni-kassel.de/Ice#TestEntity).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestSourceNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestSourceNodeInd,fix,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestSourceNodeInd,fix,-1,-1).") != std::string::npos);
 
   EXPECT_EQ(0, returnValues->at(4).at(0).length());
 }
@@ -694,7 +694,7 @@ TEST(JNITest, addMapNodeToSystem1)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   oi.addSystem("TestSystem");
@@ -757,17 +757,17 @@ TEST(JNITest, addMapNodeToSystem1)
   ASSERT_EQ(returnValues->at(4).size(), 1);
 
   EXPECT_EQ("MAP_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("mapNodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,any).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("http://vs.uni-kassel.de/Ice#TestMapNodeInd", returnValues->at(1).at(0));
+  EXPECT_EQ("mapNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any).\n", returnValues->at(2).at(0));
 
   std::string toTest = returnValues->at(3).at(0);
 
-  EXPECT_TRUE(toTest.find("#external mapNodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,any)") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("outputMap(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,fix,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,fix,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external mapNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any)") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("outputMap(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,fix,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,fix,-1,-1).") != std::string::npos);
 
   EXPECT_EQ(0, returnValues->at(4).at(0).length());
 }
@@ -797,7 +797,7 @@ TEST(JNITest, addMapNodeToSystem2)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   oi.addSystem("TestSystem");
@@ -865,18 +865,18 @@ TEST(JNITest, addMapNodeToSystem2)
   ASSERT_EQ(returnValues->at(4).size(), 1);
 
   EXPECT_EQ("MAP_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("mapNodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,any).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("http://vs.uni-kassel.de/Ice#TestMapNodeInd", returnValues->at(1).at(0));
+  EXPECT_EQ("mapNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any).\n", returnValues->at(2).at(0));
 
   std::string toTest = returnValues->at(3).at(0);
 
-  EXPECT_TRUE(toTest.find("#external mapNodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,any)") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("inputMap(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("outputMap(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,fix,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem2,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestMapNodeInd,fix,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external mapNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any)") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("inputMap(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("outputMap(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,fix,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,fix,-1,-1).") != std::string::npos);
 
   EXPECT_EQ(0, returnValues->at(4).at(0).length());
 }
@@ -906,7 +906,7 @@ TEST(JNITest, addRequiredMap)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   oi.addSystem("TestSystem");
@@ -932,12 +932,12 @@ TEST(JNITest, addRequiredMap)
   ASSERT_EQ(returnValues->at(4).size(), 1);
 
   EXPECT_EQ("REQUIRED_MAP", returnValues->at(0).at(0));
-  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ReqMap", returnValues->at(1).at(0));
-  EXPECT_EQ("requiredMap(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,informationType(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none)).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("http://vs.uni-kassel.de/Ice#ReqMap", returnValues->at(1).at(0));
+  EXPECT_EQ("requiredMap(http://vs.uni-kassel.de/Ice#TestSystem,informationType(http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none)).\n", returnValues->at(2).at(0));
 
   std::string toTest = returnValues->at(3).at(0);
 
-  EXPECT_TRUE(toTest.find("#external requiredMap(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,informationType(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none))") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external requiredMap(http://vs.uni-kassel.de/Ice#TestSystem,informationType(http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none))") != std::string::npos);
 
   EXPECT_EQ(0, returnValues->at(4).at(0).length());
 }
@@ -961,7 +961,7 @@ TEST(JNITest, save)
   ice::OntologyInterface oi(path + "/java/lib/");
 
   oi.addIRIMapper(path + "/ontology/");
-  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
   oi.loadOntologies();
 
   oi.addSystem("TestSystem");
@@ -1029,17 +1029,17 @@ TEST(JNITest, save)
   ASSERT_EQ(1, returnValues->at(4).size());
 
   EXPECT_EQ("COMPUTATION_NODE", returnValues->at(0).at(0));
-  EXPECT_EQ("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("nodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("http://vs.uni-kassel.de/Ice#TestNodeInd", returnValues->at(1).at(0));
+  EXPECT_EQ("nodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,any).\n", returnValues->at(2).at(0));
 
   std::string toTest = returnValues->at(3).at(0);
-  EXPECT_TRUE(toTest.find("#external nodeTemplate(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,any).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("input(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,5,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,5).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,max,-1,-1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("output(http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestSystem,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestNodeInd,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position,http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external nodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,any).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("input(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(delay,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,max,5,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,5).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,max,-1,-1).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("output(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
 
   EXPECT_EQ(0, returnValues->at(4).at(0).length());
 }
@@ -1066,7 +1066,7 @@ TEST(JNITest, save)
 //  ASSERT_FALSE(oi.errorOccurred());
 //
 //  result = oi.addOntologyIRI(
-//      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//      "http://vs.uni-kassel.de/Ice");
 //
 //  ASSERT_FALSE(oi.errorOccurred());
 //  ASSERT_TRUE(result);
@@ -1090,7 +1090,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  result = oi.addSystem("TestSystem");
@@ -1111,7 +1111,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  result = oi.addValueScope("TestValueScope", "TestValueScope1");
@@ -1170,7 +1170,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  oi.addSystem("TestSystem");
@@ -1195,7 +1195,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  oi.addSystem("TestSystem");
@@ -1262,7 +1262,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  oi.addSystem("TestSystem");
@@ -1360,7 +1360,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  oi.addSystem("TestSystem");
@@ -1464,7 +1464,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  oi.addSystem("TestSystem");
@@ -1570,7 +1570,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  oi.addSystem("TestSystem");
@@ -1674,7 +1674,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  oi.addSystem("TestSystem");
@@ -1794,7 +1794,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  oi.addSystem("TestSystem");
@@ -1922,7 +1922,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  oi.addSystem("TestSystem");
@@ -1982,7 +1982,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  oi.addSystem("TestSystem");
@@ -2096,7 +2096,7 @@ TEST(JNITest, save)
 //  ice::OntologyInterface oi(path + "/java/lib/");
 //
 //  oi.addIRIMapper(path + "/ontology/");
-//  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+//  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  oi.loadOntologies();
 //
 //  result = oi.addSystem("TestSystem");
@@ -2146,7 +2146,7 @@ TEST(JNITest, save)
 //
 //  ASSERT_FALSE(oi.errorOccurred());
 //
-////  result =  oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+////  result =  oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
 //  result =  oi.addOntologyIRI("http://vs.uni-kassel.de/IceTest");
 //
 //  ASSERT_FALSE(oi.errorOccurred());
@@ -2245,7 +2245,7 @@ TEST(JNITest, readBaseRepresentationsAsCSV)
   ASSERT_FALSE(oi.errorOccurred());
 
   result = oi.addOntologyIRI(
-      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+      "http://vs.uni-kassel.de/Ice");
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
@@ -2266,7 +2266,7 @@ TEST(JNITest, readBaseRepresentationsAsCSV)
   // Sample testing of integer representation
   int index =
       read_csv_res.find(
-          "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DefaultMovementRep;http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation;http://www.semanticweb.org/sni/ontologies/2013/7/Ice#EulerAnglesRep");
+          "http://vs.uni-kassel.de/Ice#DefaultMovementRep;http://vs.uni-kassel.de/Ice#Orientation;http://vs.uni-kassel.de/Ice#EulerAnglesRep");
   ASSERT_FALSE(index == std::string::npos);
 }
 
@@ -2284,7 +2284,7 @@ TEST(JNITest, iriMapping)
   ASSERT_FALSE(oi.errorOccurred());
 
   result = oi.addOntologyIRI(
-      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+      "http://vs.uni-kassel.de/Ice");
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
@@ -2300,7 +2300,7 @@ TEST(JNITest, iriMapping)
   ASSERT_TRUE(result);
 
   // The csv string with the right reps is returned
-  const std::string longIri = "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#TestEntity";
+  const std::string longIri = "http://vs.uni-kassel.de/Ice#TestEntity";
   const std::string shortIri = "o0_TestEntity";
 
   std::string convertedLongIri = oi.toShortIri(longIri);

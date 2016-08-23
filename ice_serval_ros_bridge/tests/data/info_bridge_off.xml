@@ -2,9 +2,9 @@
 	<offered>
 		<information>
 			<entity>http://vs.uni-kassel.de/IceServalBridgeTest#Zwerg</entity>
-			<entityType>http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot</entityType>
-			<scope>http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position</scope>
-			<representation>http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep</representation>
+			<entityType>http://vs.uni-kassel.de/Ice#Robot</entityType>
+			<scope>http://vs.uni-kassel.de/Ice#Position</scope>
+			<representation>http://vs.uni-kassel.de/Ice#CoordinatePositionRep</representation>
 		</information>
 	</offered>
 </ice_serval_bridge>

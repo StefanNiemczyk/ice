@@ -96,7 +96,7 @@ public:
         ice::OntologyInterface oi(path + "/java/lib/");
 
         oi.addIRIMapper(path + "/ontology/");
-        oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+        oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
         oi.loadOntologies();
 
         std::string entityType = "EvalEntityType";
@@ -357,7 +357,7 @@ public:
         ice::OntologyInterface oi(path + "/java/lib/");
 
         oi.addIRIMapper(path + "/ontology/");
-        oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+        oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
         oi.loadOntologies();
 
         std::vector<std::string> scopes;
@@ -644,7 +644,7 @@ public:
       ice::OntologyInterface oi(path + "/java/lib/");
 
       oi.addIRIMapper(path + "/ontology/");
-      oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+      oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
       oi.loadOntologies();
 
       std::vector<std::string> scopes;
@@ -926,7 +926,7 @@ public:
         ice::OntologyInterface oi(path + "/java/lib/");
 
         oi.addIRIMapper(path + "/ontology/");
-        oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+        oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
         oi.loadOntologies();
         oi.setLogLevel(ice::LogLevel::Debug);
 
@@ -1296,7 +1296,7 @@ public:
         ice::OntologyInterface oi(path + "/java/lib/");
 
         oi.addIRIMapper(path + "/ontology/");
-        oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+        oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
         oi.loadOntologies();
 
         // add information structure
@@ -1643,7 +1643,7 @@ public:
         ice::OntologyInterface oi(path + "/java/lib/");
 
         oi.addIRIMapper(path + "/ontology/");
-        oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+        oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
         oi.loadOntologies();
 
         // add information structure
@@ -2007,7 +2007,7 @@ public:
         ice::OntologyInterface oi(path + "/java/lib/");
 
         oi.addIRIMapper(path + "/ontology/");
-        oi.addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+        oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
         oi.loadOntologies();
 
         // add information structure

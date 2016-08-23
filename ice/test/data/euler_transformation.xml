@@ -1,38 +1,38 @@
 <transformations>
-	<transformation name="RollPitchYawToEuler" scope="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RollPitchYawRep">
-		<input id="1" representation="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RollPitchYawRep" />
+	<transformation name="RollPitchYawToEuler" scope="http://vs.uni-kassel.de/Ice#RollPitchYawRep">
+		<input id="1" representation="http://vs.uni-kassel.de/Ice#RollPitchYawRep" />
 
-		<output representation="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#EulerAnglesRep" />
+		<output representation="http://vs.uni-kassel.de/Ice#EulerAnglesRep" />
 
 		<operations>
-			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Alpha">
+			<dimension name="http://vs.uni-kassel.de/Ice#Alpha">
 				<formula formula="
 						(cos(Y)*cos(P)) * Y +
 						(cos(Y)*sin(P)*sin(R) - sin(Y)*cos(R)) * P +
 						(cos(Y)*sin(P)*cos(R) + sin(Y)*sin(R)) * R">
-					<variable name="Y" id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Yaw"/>
-					<variable name="P" id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Pitch"/>
-					<variable name="R" id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Roll"/>
+					<variable name="Y" id="1" path="http://vs.uni-kassel.de/Ice#Yaw"/>
+					<variable name="P" id="1" path="http://vs.uni-kassel.de/Ice#Pitch"/>
+					<variable name="R" id="1" path="http://vs.uni-kassel.de/Ice#Roll"/>
 				</formula>
 			</dimension>
-			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Beta">
+			<dimension name="http://vs.uni-kassel.de/Ice#Beta">
 				<formula formula="
 						(sin(Y)*cos(P)) * Y +
 						(sin(Y)*sin(P)*sin(R) + cos(Y)*cos(R)) * P +
 						(sin(Y)*sin(P)*cos(R) - cos(Y)*sin(R)) * R">
-					<variable name="Y" id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Yaw"/>
-					<variable name="P" id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Pitch"/>
-					<variable name="R" id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Roll"/>
+					<variable name="Y" id="1" path="http://vs.uni-kassel.de/Ice#Yaw"/>
+					<variable name="P" id="1" path="http://vs.uni-kassel.de/Ice#Pitch"/>
+					<variable name="R" id="1" path="http://vs.uni-kassel.de/Ice#Roll"/>
 				</formula>
 			</dimension>
-			<dimension name="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Gamma">
+			<dimension name="http://vs.uni-kassel.de/Ice#Gamma">
 				<formula formula="
 						(-sin(P)) * Y +
 						(cos(P)*sin(Y)) * P +
 						(cos(P)*cos(R)) * R">
-					<variable name="Y" id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Yaw"/>
-					<variable name="P" id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Pitch"/>
-					<variable name="R" id="1" path="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Roll"/>
+					<variable name="Y" id="1" path="http://vs.uni-kassel.de/Ice#Yaw"/>
+					<variable name="P" id="1" path="http://vs.uni-kassel.de/Ice#Pitch"/>
+					<variable name="R" id="1" path="http://vs.uni-kassel.de/Ice#Roll"/>
 				</formula>
 			</dimension>
 		</operations>

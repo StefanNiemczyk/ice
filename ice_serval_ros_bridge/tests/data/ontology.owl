@@ -17,7 +17,7 @@
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <owl:Ontology rdf:about="http://vs.uni-kassel.de/IceServalBridgeTest">
         <owl:versionInfo rdf:datatype="&xsd;string">0.7</owl:versionInfo>
-        <owl:imports rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/Ice"/>
+        <owl:imports rdf:resource="http://vs.uni-kassel.de/Ice"/>
     </owl:Ontology>
     
 
@@ -36,7 +36,7 @@
     <!-- http://vs.uni-kassel.de/IceServalBridgeTest#Mops -->
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceServalBridgeTest#Mops">
-        <rdf:type rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot"/>
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Robot"/>
     </owl:NamedIndividual>
     
 
@@ -44,7 +44,7 @@
     <!-- http://vs.uni-kassel.de/IceServalBridgeTest#Zwerg -->
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceServalBridgeTest#Zwerg">
-        <rdf:type rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot"/>
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Robot"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 

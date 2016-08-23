@@ -32,7 +32,7 @@ TEST(RepresentationTransformationTest, rollPitchYawToEulerAngles)
 
   ASSERT_FALSE(oi->errorOccurred());
 
-  result = oi->addOntologyIRI("http://www.semanticweb.org/sni/ontologies/2013/7/Ice");
+  result = oi->addOntologyIRI("http://vs.uni-kassel.de/Ice");
 
   ASSERT_FALSE(oi->errorOccurred());
   ASSERT_TRUE(result);
@@ -57,18 +57,18 @@ TEST(RepresentationTransformationTest, rollPitchYawToEulerAngles)
 
   ASSERT_TRUE(result);
 
-  auto rollPitchYawRep = factory->getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#RollPitchYawRep");
-  auto eulerRep = factory->getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#EulerAnglesRep");
+  auto rollPitchYawRep = factory->getRepresentation("http://vs.uni-kassel.de/Ice#RollPitchYawRep");
+  auto eulerRep = factory->getRepresentation("http://vs.uni-kassel.de/Ice#EulerAnglesRep");
 
   ASSERT_TRUE(rollPitchYawRep != false);
 
-  auto roll = rollPitchYawRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Roll"});
-  auto pitch = rollPitchYawRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Pitch"});
-  auto yaw = rollPitchYawRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Yaw"});
+  auto roll = rollPitchYawRep->accessPath({"http://vs.uni-kassel.de/Ice#Roll"});
+  auto pitch = rollPitchYawRep->accessPath({"http://vs.uni-kassel.de/Ice#Pitch"});
+  auto yaw = rollPitchYawRep->accessPath({"http://vs.uni-kassel.de/Ice#Yaw"});
 
-  auto alpha = eulerRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Alpha"});
-  auto beta = eulerRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Beta"});
-  auto gamma = eulerRep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Gamma"});
+  auto alpha = eulerRep->accessPath({"http://vs.uni-kassel.de/Ice#Alpha"});
+  auto beta = eulerRep->accessPath({"http://vs.uni-kassel.de/Ice#Beta"});
+  auto gamma = eulerRep->accessPath({"http://vs.uni-kassel.de/Ice#Gamma"});
 
   bool foundRollPitchYawRep = false;
 

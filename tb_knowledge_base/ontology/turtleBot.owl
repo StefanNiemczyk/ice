@@ -6,14 +6,14 @@
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
-    <!ENTITY Ice "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#" >
+    <!ENTITY Ice "http://vs.uni-kassel.de/Ice#" >
     <!ENTITY units "http://www.semanticweb.org/sni/ontologies/2013/7/units#" >
 ]>
 
 
 <rdf:RDF xmlns="http://vs.uni-kassel.de/TurtleBot#"
      xml:base="http://vs.uni-kassel.de/TurtleBot"
-     xmlns:Ice="http://www.semanticweb.org/sni/ontologies/2013/7/Ice#"
+     xmlns:Ice="http://vs.uni-kassel.de/Ice#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
@@ -21,7 +21,7 @@
      xmlns:units="http://www.semanticweb.org/sni/ontologies/2013/7/units#">
     <owl:Ontology rdf:about="http://vs.uni-kassel.de/TurtleBot">
         <owl:versionInfo rdf:datatype="&xsd;string">0.7</owl:versionInfo>
-        <owl:imports rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/Ice"/>
+        <owl:imports rdf:resource="http://vs.uni-kassel.de/Ice"/>
     </owl:Ontology>
     
 

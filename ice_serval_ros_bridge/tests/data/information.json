@@ -1,16 +1,16 @@
 [
 	{
-		"spec":["http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Mops",
-		"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot",
-		"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position",
-		"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep",""],
+		"spec":["http://vs.uni-kassel.de/Ice#Mops",
+		"http://vs.uni-kassel.de/Ice#Robot",
+		"http://vs.uni-kassel.de/Ice#Position",
+		"http://vs.uni-kassel.de/Ice#CoordinatePositionRep",""],
 		"info":
 		{
-			"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep":
+			"http://vs.uni-kassel.de/Ice#CoordinatePositionRep":
 			{
-				"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate":{"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep":1.2},
-				"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate":{"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep":2.0},
-				"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate":{"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#DoubleRep":3.0}
+				"http://vs.uni-kassel.de/Ice#XCoordinate":{"http://vs.uni-kassel.de/Ice#DoubleRep":1.2},
+				"http://vs.uni-kassel.de/Ice#YCoordinate":{"http://vs.uni-kassel.de/Ice#DoubleRep":2.0},
+				"http://vs.uni-kassel.de/Ice#ZCoordinate":{"http://vs.uni-kassel.de/Ice#DoubleRep":3.0}
 			}
 		}
 	}

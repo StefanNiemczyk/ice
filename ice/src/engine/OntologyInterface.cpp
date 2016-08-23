@@ -28,7 +28,7 @@ void OntologyInterface::callJniGc()
   }
 }
 
-const std::string OntologyInterface::ICE_IRI = "http://www.semanticweb.org/sni/ontologies/2013/7/Ice";
+const std::string OntologyInterface::ICE_IRI = "http://vs.uni-kassel.de/Ice";
 
 OntologyInterface::OntologyInterface(std::string const p_jarPath)
 {

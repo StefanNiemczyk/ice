@@ -72,14 +72,14 @@ TEST(Bridge, discovery)
   mops->init();
 
   // store information in information store
-  std::string repStr = "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep";
+  std::string repStr = "http://vs.uni-kassel.de/Ice#CoordinatePositionRep";
   auto rep = mops->getGContainerFactory()->getRepresentation(repStr);
 
   ASSERT_NE(nullptr, rep);
 
-  auto x = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
-  auto y = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
-  auto z = rep->accessPath({"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
+  auto x = rep->accessPath({"http://vs.uni-kassel.de/Ice#XCoordinate"});
+  auto y = rep->accessPath({"http://vs.uni-kassel.de/Ice#YCoordinate"});
+  auto z = rep->accessPath({"http://vs.uni-kassel.de/Ice#ZCoordinate"});
 
   double xVal = 1.2;
   double yVal = 2.0;
@@ -87,9 +87,9 @@ TEST(Bridge, discovery)
 
   auto requ = std::make_shared<ice::InformationSpecification>(
       "*",
-      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Robot",
-      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position",
-      "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep"
+      "http://vs.uni-kassel.de/Ice#Robot",
+      "http://vs.uni-kassel.de/Ice#Position",
+      "http://vs.uni-kassel.de/Ice#CoordinatePositionRep"
       );
 
   // sleep some time and let the discovery happen

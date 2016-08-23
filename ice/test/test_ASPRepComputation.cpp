@@ -95,24 +95,24 @@ TEST(ASPRepComp, ontology1)
   asp.extractTransformations();
 
   // Test transformation
-  std::string name = "autoTrans_http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position_http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep_http://vs.uni-kassel.de/IceTest#Pos3D";
+  std::string name = "autoTrans_http://vs.uni-kassel.de/Ice#Position_http://vs.uni-kassel.de/Ice#CoordinatePositionRep_http://vs.uni-kassel.de/IceTest#Pos3D";
   auto trans = factory->getTransformationByName(name);
 
   ASSERT_TRUE(trans != false);
 
-  auto repIn = factory->getRepresentation("http://www.semanticweb.org/sni/ontologies/2013/7/Ice#CoordinatePositionRep");
+  auto repIn = factory->getRepresentation("http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
   auto repOut = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");
 
   ASSERT_TRUE(repIn != false);
   ASSERT_TRUE(repOut != false);
 
-  auto inX = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
-  auto inY = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
-  auto inZ = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
+  auto inX = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#XCoordinate"});
+  auto inY = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#YCoordinate"});
+  auto inZ = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#ZCoordinate"});
 
-  auto outX = repOut->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
-  auto outY = repOut->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
-  auto outZ = repOut->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
+  auto outX = repOut->accessPath( {"http://vs.uni-kassel.de/Ice#XCoordinate"});
+  auto outY = repOut->accessPath( {"http://vs.uni-kassel.de/Ice#YCoordinate"});
+  auto outZ = repOut->accessPath( {"http://vs.uni-kassel.de/Ice#ZCoordinate"});
 
   ASSERT_TRUE(inX != nullptr);
   ASSERT_TRUE(inY != nullptr);
@@ -187,15 +187,15 @@ TEST(ASPRepComp, ontology2)
   ASSERT_TRUE(repIn != false);
   ASSERT_TRUE(repOut != false);
 
-  auto inO = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation"});
-  auto inP = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position"});
-  auto inX = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
-  auto inY = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
-  auto inZ = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
+  auto inO = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Orientation"});
+  auto inP = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Position"});
+  auto inX = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Position", "http://vs.uni-kassel.de/Ice#XCoordinate"});
+  auto inY = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Position", "http://vs.uni-kassel.de/Ice#YCoordinate"});
+  auto inZ = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Position", "http://vs.uni-kassel.de/Ice#ZCoordinate"});
 
-  auto inOa = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Alpha"});
-  auto inOb = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Beta"});
-  auto inOc = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Gamma"});
+  auto inOa = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Orientation", "http://vs.uni-kassel.de/Ice#Alpha"});
+  auto inOb = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Orientation", "http://vs.uni-kassel.de/Ice#Beta"});
+  auto inOc = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Orientation", "http://vs.uni-kassel.de/Ice#Gamma"});
 
   ASSERT_TRUE(inO != nullptr);
   ASSERT_TRUE(inP != nullptr);
@@ -207,15 +207,15 @@ TEST(ASPRepComp, ontology2)
   ASSERT_TRUE(inOb != nullptr);
   ASSERT_TRUE(inOc != nullptr);
 
-  auto outO = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation"});
-  auto outP = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position"});
-  auto outX = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#XCoordinate"});
-  auto outY = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#YCoordinate"});
-  auto outZ = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Position", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#ZCoordinate"});
+  auto outO = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Orientation"});
+  auto outP = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Position"});
+  auto outX = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Position", "http://vs.uni-kassel.de/Ice#XCoordinate"});
+  auto outY = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Position", "http://vs.uni-kassel.de/Ice#YCoordinate"});
+  auto outZ = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Position", "http://vs.uni-kassel.de/Ice#ZCoordinate"});
 
-  auto outOa = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Alpha"});
-  auto outOb = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Beta"});
-  auto outOc = repIn->accessPath( {"http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Orientation", "http://www.semanticweb.org/sni/ontologies/2013/7/Ice#Gamma"});
+  auto outOa = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Orientation", "http://vs.uni-kassel.de/Ice#Alpha"});
+  auto outOb = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Orientation", "http://vs.uni-kassel.de/Ice#Beta"});
+  auto outOc = repIn->accessPath( {"http://vs.uni-kassel.de/Ice#Orientation", "http://vs.uni-kassel.de/Ice#Gamma"});
 
   ASSERT_TRUE(outO != nullptr);
   ASSERT_TRUE(outP != nullptr);
