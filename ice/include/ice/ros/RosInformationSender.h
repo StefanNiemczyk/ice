@@ -89,12 +89,6 @@ template<typename ICEType, typename ROSType>
 
     this->publisher.publish(*msg);
   }
-
-template<typename ICEType, typename ROSType>
-  const std::type_info* RosInformationSender<ICEType, ROSType>::getTypeInfo() const
-  {
-    return &typeid(ICEType);
-  }
 } /* namespace ice */
 
 #endif /* ROSINFORMATIONSENDER_H_ */
