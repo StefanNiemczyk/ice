@@ -8,21 +8,28 @@
 #ifndef INFORMATIONRECEIVER_H_
 #define INFORMATIONRECEIVER_H_
 
+#include <memory>
+
 namespace ice
 {
+
+class BaseInformationStream;
 
 class InformationReceiver
 {
 public:
-  InformationReceiver() {};
-  virtual ~InformationReceiver() {};
+  InformationReceiver(std::shared_ptr<BaseInformationStream> const &stream);
+  virtual ~InformationReceiver();
 
   /*!
    * \brief Returns the type_info of the template type.
    *
    * Returns the type_info of the template type.
    */
-  virtual const std::type_info* getTypeInfo() const = 0;
+  virtual const std::type_info* getTypeInfo();
+
+private:
+  std::shared_ptr<BaseInformationStream>        stream;
 };
 
 } /* namespace ice */

@@ -39,29 +39,22 @@ template<typename ICEType, typename ROSType>
 
     virtual void onMessage(const boost::shared_ptr<ROSType const> msg);
 
-    /*!
-     * \brief Returns the type_info of the template type.
-     *
-     * Returns the type_info of the template type.
-     */
-    virtual const std::type_info* getTypeInfo() const;
-
     bool checkReceiverIds(ice_msgs::ICEHeader header);
 
   private:
-    identifier engineId; /**< ID of this engine, used as sender id */
-    const std::string topic; /**< Topic of the ros channel */
-    int bufferSize; /**< Size of the buffer */
-    transformM2C<ICEType, ROSType> messageTransform; /**< Function pointer to message Transform method */
-    ros::Subscriber subscriber; /**< Subscriber */
-    std::shared_ptr<InformationStream<ICEType>> informationStream; /**< The stream which listenen to the channel */
+    identifier                                  engineId;               /**< ID of this engine, used as sender id */
+    const std::string                           topic;                  /**< Topic of the ros channel */
+    int                                         bufferSize;             /**< Size of the buffer */
+    transformM2C<ICEType, ROSType>              messageTransform;       /**< Function pointer to message Transform method */
+    ros::Subscriber                             subscriber;             /**< Subscriber */
+    std::shared_ptr<InformationStream<ICEType>> informationStream;      /**< The stream which listenen to the channel */
   };
 
 template<typename ICEType, typename ROSType>
   inline RosInformationReceiver<ICEType, ROSType>::RosInformationReceiver(
       identifier engineId, std::shared_ptr<BaseInformationStream> stream, ros::NodeHandle* nodeHandel,
       const std::string topic, int bufferSize, transformM2C<ICEType, ROSType> &messageTransform) :
-      topic(topic)
+      InformationReceiver(stream), topic(topic)
   {
     this->engineId = engineId;
     this->bufferSize = bufferSize;
@@ -86,13 +79,7 @@ template<typename ICEType, typename ROSType>
   }
 
 template<typename ICEType, typename ROSType>
-  const std::type_info* RosInformationReceiver<ICEType, ROSType>::getTypeInfo() const
-  {
-    return &typeid(ICEType);
-  }
-
-template<typename ICEType, typename ROSType>
-  inline bool ice::RosInformationReceiver<ICEType, ROSType>::checkReceiverIds(ice_msgs::ICEHeader header)
+  inline bool RosInformationReceiver<ICEType, ROSType>::checkReceiverIds(ice_msgs::ICEHeader header)
   {
     for (auto id : header.receiverIds)
     {
