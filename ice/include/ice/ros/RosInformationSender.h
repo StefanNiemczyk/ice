@@ -36,13 +36,6 @@ template<typename ICEType, typename ROSType>
     virtual void sendInformationElement(std::vector<std::shared_ptr<Entity>> &sendTo,
                                         std::shared_ptr<InformationElement<ICEType>> informationElement);
 
-    /*!
-     * \brief Returns the type_info of the template type.
-     *
-     * Returns the type_info of the template type.
-     */
-    virtual const std::type_info* getTypeInfo() const;
-
   private:
     identifier engineId; /**< ID of this engine, used as sender id */
     const std::string topic; /**< Topic of the ros channel */

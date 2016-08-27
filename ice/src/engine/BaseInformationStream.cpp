@@ -12,6 +12,7 @@
 #include "ice/processing/EventHandler.h"
 #include "ice/Entity.h"
 #include "easylogging++.h"
+#include "fnv.h"
 
 namespace ice
 {
@@ -22,7 +23,7 @@ BaseInformationStream::BaseInformationStream(std::shared_ptr<StreamDescription> 
                                              std::shared_ptr<EventHandler> eventHandler,
                                              int sharingMaxCount) :
     streamDescription(streamDescription), iid(IDENTIFIER_COUNTER++), eventHandler(eventHandler),
-    sharingMaxCount(sharingMaxCount)
+    sharingMaxCount(sharingMaxCount), hash(0)
 {
   this->_log = el::Loggers::getLogger("InformationStream");
 }
@@ -45,6 +46,16 @@ const int BaseInformationStream::getIID() const
 const std::string BaseInformationStream::getName() const
 {
   return this->streamDescription->getName();
+}
+
+const uint32_t BaseInformationStream::getHash()
+{
+  if (this->hash == 0)
+  {
+    this->hash = FNV::fnv1a(this->streamDescription->getName());
+  }
+
+  return this->hash;
 }
 
 const std::string BaseInformationStream::getProvider() const
