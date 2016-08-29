@@ -209,38 +209,6 @@ public:
       }
 
       std::vector<std::string> toCheck;
-
-    //    if (global)
-    //    {
-    //      ss.str("");
-    //      ss << "metadataStream(1,accuracy,stream(1,o0_EvalSystem,node(1,o0_EvalSystem,o0_EvalNode0_" << chainSize - 1
-    //          << "Ind,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope" << chainSize << "_" << chainSize - 1
-    //          << ",o0_EvalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
-    //          << chainSize * nodesMax << ")";
-    //      toCheck.push_back(ss.str());
-    //
-    //      ss.str("");
-    //      ss << "metadataStream(1,delay,stream(1,o0_EvalSystem,node(1,o0_EvalSystem,o0_EvalNode0_" << chainSize - 1
-    //          << "Ind,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope" << chainSize << "_" << chainSize - 1
-    //          << ",o0_EvalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << "),"
-    //          << (chainSize) << ")";
-    //      toCheck.push_back(ss.str());
-    //    }
-    //
-    //    ss.str("");
-    //    ss << "selectedStream(1,o0_EvalSystem,node(1,o0_EvalSystem,o0_EvalNode0_" << chainSize - 1
-    //        << "Ind,o0_EvalEntity,none),information(o0_EvalEntity,o0_EvalScope" << chainSize << "_" << chainSize - 1
-    //        << ",o0_EvalRepresentation" << chainSize << "_" << chainSize - 1 << ",none)," << chainSize << ")";
-    //    toCheck.push_back(ss.str());
-    //
-    //    ss.str("");
-    //    ss << "node(1,o0_EvalSystem,o0_EvalNode0_" << chainSize - 1 << "Ind,o0_EvalEntity,none)";
-    //    toCheck.push_back(ss.str());
-
-    //      ss.str("");
-    //      ss << "sumCost(1," << chainSize << ")";
-    //      toCheck.push_back(ss.str());
-
       ModelGeneration mg(path, true);
 
       auto result = mg.testSeries(owlPath, &toCheck, runs, true, true, verbose, 3, 10,

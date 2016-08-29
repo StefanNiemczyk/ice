@@ -127,37 +127,13 @@ fixCost(SIM_REP,fix(SIM_REP,DIM,DIM_REP,default),10) :-
 	fix(SIM_REP,DIM,DIM_REP,default).
 
 
-% resulting auto iros
-%autoIRO(SCOPE,REP1,REP2) :-
-%	tryFix(simRep(SCOPE,REP1,REP2)),
-%	not dimensionDeviation(simRep(SCOPE,REP1,REP2),_,_,_).
-
-%1 { fix(SIM_REP,DIM,DIM_REP,TYPE) : pfix(SIM_REP,DIM,DIM_REP,TYPE) } 1 :-
-%	dimensionDeviation(SIM_REP,DIM,DIM_REP,TYPE_D),
-%	pfix(SIM_REP,DIM,DIM_REP,_).
-
-
 -fixed(SIM_REP) :-
 	not fix(SIM_REP,DIM,DIM_REP,_), 
 	dimensionDeviation(SIM_REP,DIM,DIM_REP,_).
 
-%*
-fixed(simRep(SCOPE,REP1,REP2)) :-
-	tryFix(simRep(SCOPE,REP1,REP2)),
-	fix(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,_) : dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,_).
-*%
 autoIRO(SCOPE,REP1,REP2) :- 
 	tryFix(simRep(SCOPE,REP1,REP2)),
 	not -fixed(simRep(SCOPE,REP1,REP2)).
-
-
-% prevent constraints 
-%sumFixCost(SIM_REP,SUM) :-
-%	tryFix(SIM_REP),
-%	SUM = #sum{COST,FIX : fixCost(SIM_REP,FIX,COST)},
-%	SUM > 0.
-%:- tryFix(SIM_REP,MATCHING), sumFixCost(SIM_REP,SUM), SUM >= 10 * MATCHING.
-
 
 % maximize the number of created auto iros
 #maximize{ 1@2,SCOPE,REP1,REP2 : autoIRO(SCOPE,REP1,REP2) }.

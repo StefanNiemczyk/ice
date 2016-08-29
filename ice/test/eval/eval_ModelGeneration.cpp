@@ -9,10 +9,10 @@ TEST(EvalModelGeneration, simpleEvalTests)
   std::string path = "/home/sni/Desktop/eval";
   int runs = 50;
 
-  EvalScenarios scenarios2(path + "", [&] (supplementary::ClingWrapper *asp){
-    asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
+//  EvalScenarios scenarios2(path + "", [&] (supplementary::ClingWrapper *asp){
+//    asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
 //    asp->setRandomize("20,15");
-  });
+//  });
   //                                 global      verbose gnuplot         runs
 //  scenarios2.fuseVictimsScenario(    true,       false,  true,            runs,      false, 6, 20, 2);
 //  scenarios2.representationScenario( true,       true,  true,          runs,      2, 12, 1);
@@ -27,10 +27,10 @@ TEST(EvalModelGeneration, simpleEvalTests)
 //  scenarios2.systemsFullMashScenario(true,       false,  false,          runs,      10, 100, 10, 10, 20, 10);
 
 
-  runs = 1;
-  EvalScenarios scenarios(path + "", [&] (supplementary::ClingWrapper *asp){
-    asp->setPredefConfiguration(supplementary::PredefinedConfigurations::crafty);
-  });
+//  runs = 1;
+//  EvalScenarios scenarios(path + "", [&] (supplementary::ClingWrapper *asp){
+//    asp->setPredefConfiguration(supplementary::PredefinedConfigurations::crafty);
+//  });
   //                                 global      verbose gnuplot         runs
 //  scenarios.representationScenario(  false,      false,  false,          runs,      9, 9, 1);
 //  scenarios.systemsStarMashScenario( false,      false,  false,          runs,      true, 10, 150, 1, 1, 149, 1);
@@ -43,15 +43,26 @@ TEST(EvalModelGeneration, simpleEvalTests)
   EvalScenarios scenariosT(path + "", [&] (supplementary::ClingWrapper *asp){
     asp->setPredefConfiguration(supplementary::PredefinedConfigurations::trendy);
   });
-
-  //std::vector<int> v = {10,200};
   TConf conf;
-  conf.parallelGroupsMin = 1;
-  conf.parallelGroupsMax = 10;
-  conf.parallelGrounsStep = 1;
-  conf.levels = {3,10,100};
+//  for (int i=50; i<=400; i+=50)
+//  {
+//    conf.parallelGroupsMin = 1;
+//    conf.parallelGroupsMax = 1;
+//    conf.parallelGrounsStep = 1;
+//    conf.levels = {10,i};
+//    conf.inputsMin = 1;
+//    conf.inputsMax = 4;
+//    conf.skipLevel = false;
+//    scenariosT.transformation(false, false, runs, 5, conf);
+//  }
+
+//  TConf conf;
+  conf.parallelGroupsMin = 150;
+  conf.parallelGroupsMax = 150;
+  conf.parallelGrounsStep = 20;
+  conf.levels = {5,5};
   conf.inputsMin = 2;
   conf.inputsMax = 2;
   conf.skipLevel = false;
-  scenariosT.transformation(false, true, runs, 1, conf);
+  scenariosT.transformation(false, true, runs, 5, conf);
 }
