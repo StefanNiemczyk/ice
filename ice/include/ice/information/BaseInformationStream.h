@@ -88,6 +88,8 @@ public:
    */
   const std::string getName() const;
 
+  const uint32_t getHash();
+
   /*!
    * \brief Returns the provider of the information stored in this stream.
    *
@@ -221,6 +223,7 @@ protected:
 protected:
   const long                                            iid;                    /**< The internal id */
   int                                                   sharingMaxCount;        /**< Max number of sharing this stream */
+  uint32_t                                              hash;                   /**< Hash of this stream */
   std::shared_ptr<EventHandler>                         eventHandler;           /**< Handler to execute events asynchronously */
   std::vector<std::shared_ptr<AsynchronousTask>>        taskAsynchronous;       /**< List of events which are fired asynchronous if a new element is addes */
   std::vector<std::shared_ptr<AsynchronousTask>>        taskSynchronous;        /**< List of events which are executed synchronous if a new element is addes */

@@ -92,6 +92,7 @@ include_directories(
 ## Declare a cpp library
 add_library(${PROJECT_NAME}
   src/engine/CommunicationInterface.cpp
+  src/engine/InformationReceiver.cpp
   
   src/engine/Message.cpp
   src/engine/CommandMessage.cpp

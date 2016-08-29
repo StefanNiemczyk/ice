@@ -37,7 +37,10 @@ template<typename T>
      *
      * Returns the type_info of the template type.
      */
-    virtual const std::type_info* getTypeInfo() const = 0;
+    const std::type_info* getTypeInfo() const
+    {
+      return &typeid(T);
+    }
   };
 
 } /* namespace ice */
