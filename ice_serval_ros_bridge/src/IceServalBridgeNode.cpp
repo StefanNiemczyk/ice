@@ -19,10 +19,9 @@ int main(int argc, char **argv)
 
   ros::NodeHandle nh_("");
   ros::NodeHandle pnh_("~");
-//  serval_ros_bridge::ImageToServal hd(nh_, pnh_);
 
-  ice::IceServalBridge node(nh_, pnh_);
-  node.init();
+  auto node = std::make_shared<ice::IceServalBridge>(nh_, pnh_);
+  node->init();
 
   ros::spin();
 

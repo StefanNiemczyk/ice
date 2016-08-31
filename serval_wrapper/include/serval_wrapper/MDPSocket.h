@@ -20,20 +20,27 @@ namespace ice
 class MDPSocket
 {
 public:
-  MDPSocket(int socket, int port, std::string const &senderSid);
+  MDPSocket(int port, std::string const &senderSid);
   virtual ~MDPSocket();
 
   void send(uint8_t *recipientSid, uint8_t *payload, size_t size);
   void send(std::string const &recipientSid, uint8_t *payload, size_t size);
   int receive(std::string &senderSid, uint8_t *buffer, size_t size, unsigned long timeoutMs = 1000);
   void close();
+  bool isValid();
 
 private:
-  int socket;
-  int port;
-  std::string const senderSid;
-  bool closed;
-  std::mutex _mtx;
+  void checkSendCounter();
+
+private:
+  bool                  valid;
+  int                   socketSend;
+  int                   socketReceive;
+  int                   sendCounter;
+  int                   port;
+  std::string   const   senderSid;
+  bool                  closed;
+  std::mutex            _mtx;
 };
 
 } /* namespace ice */

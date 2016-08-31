@@ -15,10 +15,38 @@
 namespace ice
 {
 
-MDPSocket::MDPSocket(int socket, int port, std::string const &senderSid)
-  : socket(socket), port(port), senderSid(senderSid), closed(false)
+MDPSocket::MDPSocket(int port, std::string const &senderSid)
+  : port(port), senderSid(senderSid), closed(false), sendCounter(0)
 {
+  // send
+  if ((this->socketSend = mdp_socket()) < 0)
+  {
+    std::cerr << "Error creating send socket" << std::endl;
+    this->valid = false;
+    return;
+  }
 
+  // receive
+  if ((this->socketReceive = mdp_socket()) < 0)
+  {
+    std::cerr << "Error creating receive socket" << std::endl;
+    this->valid = false;
+    return;
+  }
+
+  // binding socket to port
+  struct mdp_sockaddr sockaddr;
+  sockaddr.port = port;
+  serval_interface::sidToArray(senderSid, sockaddr.sid.binary);
+
+  if (mdp_bind(this->socketReceive, &sockaddr) != 0)
+  {
+    std::cerr << "Error binding socket to port '" << std::to_string(port) << std::endl;
+    this->valid = false;
+    return;
+  }
+
+  this->valid = true;
 }
 
 MDPSocket::~MDPSocket()
@@ -29,6 +57,7 @@ MDPSocket::~MDPSocket()
 void MDPSocket::send(uint8_t *recipientSid, uint8_t *payload, size_t size)
 {
   std::lock_guard<std::mutex>(this->_mtx);
+  this->checkSendCounter();
 
   struct mdp_header header;
   bzero(&header, sizeof(header));
@@ -40,12 +69,13 @@ void MDPSocket::send(uint8_t *recipientSid, uint8_t *payload, size_t size)
   header.ttl = PAYLOAD_TTL_DEFAULT;
   header.flags |= MDP_FLAG_BIND | MDP_FLAG_NO_CRYPT;
 
-  mdp_send(this->socket, &header, payload, size);
+  mdp_send(this->socketSend, &header, payload, size);
 }
 
-void  MDPSocket::send(std::string const &recipientSid, uint8_t *payload, size_t size)
+void MDPSocket::send(std::string const &recipientSid, uint8_t *payload, size_t size)
 {
   std::lock_guard<std::mutex>(this->_mtx);
+  this->checkSendCounter();
 
   struct mdp_header header;
   bzero(&header, sizeof(header));
@@ -57,17 +87,17 @@ void  MDPSocket::send(std::string const &recipientSid, uint8_t *payload, size_t 
   header.ttl = PAYLOAD_TTL_DEFAULT;
   header.flags |= MDP_FLAG_BIND | MDP_FLAG_NO_CRYPT;
 
-  mdp_send(this->socket, &header, payload, size);
+  mdp_send(this->socketSend, &header, payload, size);
 }
 
 int MDPSocket::receive(std::string &senderSid, uint8_t *buffer, size_t size, unsigned long timeoutMs)
 {
   struct mdp_header header;
-  struct timeval tim;
-  gettimeofday(&tim, NULL);
-  uint64_t timeout = (tim.tv_sec * (uint64_t)1000) + (tim.tv_usec / 1000) + timeoutMs;
+//  struct timeval tim;
+//  gettimeofday(&tim, NULL);
+//  uint64_t timeout = (tim.tv_sec * (uint64_t)1000) + (tim.tv_usec / 1000) + timeoutMs;
 
-  int count = mdp_recv(this->socket, &header, buffer, size);
+  int count = mdp_recv(this->socketReceive, &header, buffer, size);
 //  int count = mdp_poll_recv(this->socket, timeoutMs, &header, buffer, size);
   senderSid = serval_interface::arrayToSid(header.remote.sid.binary);
 
@@ -76,11 +106,34 @@ int MDPSocket::receive(std::string &senderSid, uint8_t *buffer, size_t size, uns
 
 void MDPSocket::close()
 {
-  if (this->closed)
+  if (this->closed || false == this->valid)
     return;
   this->closed = true;
 
-  mdp_close(this->socket);
+  mdp_close(this->socketSend);
+  mdp_close(this->socketReceive);
+}
+
+bool MDPSocket::isValid()
+{
+  return this->valid;
+}
+
+void MDPSocket::checkSendCounter()
+{
+  this->sendCounter++;
+
+  if (this->sendCounter >= 75)
+  {
+    mdp_close(this->socketSend);
+
+    if ((this->socketSend = mdp_socket()) < 0)
+    {
+      std::cerr << "Error creating send socket" << std::endl;
+      this->valid = false;
+      return;
+    }
+  }
 }
 
 } /* namespace ice */

@@ -63,6 +63,13 @@ void InformationRequest::tick()
     // request ack again
     if (false == this->receivedAck)
     {
+      if (this->tryCount >= 5)
+      {
+        _log->warn("Abort requesting information from '%v', max try count reached", entity->toString());
+        this->abort();
+        return;
+      }
+
       this->requestInformation();
 
       return;
@@ -87,6 +94,12 @@ void InformationRequest::tick()
     {
       this->sendCommand(IceMessageIds::IMI_FINISH);
       this->finish();
+      return;
+    }
+    else if (this->tryCount >= 5)
+    {
+      _log->warn("Abort requesting information from '%v', max try count reached", entity->toString());
+      this->abort();
       return;
     }
 
@@ -165,7 +178,7 @@ void InformationRequest::requestInformation()
 
 void InformationRequest::requestInformation(int index)
 {
-  _log->info("Requesting information for index '%v' from '%v'", entity->toString());
+  _log->info("Requesting information for index '%v' from '%v'", index, entity->toString());
   auto m = std::make_shared<IntMessage>(IceMessageIds::IMI_INFORMATION_REQUEST_INDEX);
   m->setValue(index);
   this->send(m);
@@ -235,6 +248,7 @@ void InformationRequest::onInformation(std::shared_ptr<InformationMessage> const
 
   for (auto &info : message->getInformations())
   {
+    _log->info("Information received for index '%v' from '%v'", info.first, entity->toString());
     if (this->received.size() < info.first)
     {
       this->received.resize(info.first * 2, false);
@@ -246,7 +260,7 @@ void InformationRequest::onInformation(std::shared_ptr<InformationMessage> const
       continue;
     }
 
-    this->received.at(info.first) = true;
+    this->received[info.first] = true;
     this->informationStore->addInformation(info.second);
     this->information.push_back(info.second);
   }

@@ -50,6 +50,7 @@ private:
   std::shared_ptr<MDPSocket>                    socket;
   std::thread                                   worker;
   bool                                          running;
+  unsigned char                                 buffer[1024];
 
   std::string                           const   configPath;
   std::string                           const   host;
@@ -58,6 +59,7 @@ private:
   std::string                           const   authPass;
   bool                                  const   local;
   el::Logger                                    *_log;
+  std::mutex                                    _mtxSend;
 };
 
 } /* namespace ice */

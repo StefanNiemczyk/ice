@@ -63,6 +63,15 @@ serval_interface::serval_interface(std::string configPath, std::string const hos
 serval_interface::~serval_interface()
 {
   delete this->auth;
+  this->cleanUp();
+}
+
+void serval_interface::cleanUp()
+{
+  for(auto &socket : this->sockets)
+  {
+    socket->close();
+  }
 }
 
 bool serval_interface::startDeamon()
@@ -128,9 +137,6 @@ int serval_interface::exec(std::string const &cmd, std::stringstream &output) {
 
 std::shared_ptr<MDPSocket> serval_interface::createSocket(int port, std::string const &senderSid)
 {
-  int sock;
-
-  // TODO log
   std::cout << "Creating socket for sid " << senderSid << std::endl;
 
   // override the SERVAL_INSTANCEPATH environment variable so enable the support of multiple serval instances in one process
@@ -153,23 +159,11 @@ std::shared_ptr<MDPSocket> serval_interface::createSocket(int port, std::string 
     sid = senderSid;
   }
 
-  if ((sock = mdp_socket()) < 0)
-  {
-    std::cerr << "Error creating socket with port '" << std::to_string(port) << "' for sid " << sid << std::endl;
-    return nullptr;
-  }
+  auto socket = std::make_shared<MDPSocket>(port, sid);
 
-  // binding socket to port
-  struct mdp_sockaddr sockaddr;
-  sockaddr.port = port;
-  serval_interface::sidToArray(sid, sockaddr.sid.binary);
-  if (mdp_bind(sock, &sockaddr) != 0)
-  {
-    std::cerr << "Error binding socket to port '" << std::to_string(port) << "' for sid " << sid << std::endl;
+  if (false == socket->isValid())
     return nullptr;
-  }
-
-  auto socket = std::make_shared<MDPSocket>(sock, port, sid);
+  this->sockets.push_back(socket);
 
   if (this->instancePath != "")
   {
@@ -183,7 +177,6 @@ std::shared_ptr<MSPSocket> serval_interface::createMSPSocket(int port, std::stri
 {
   int sock;
 
-  // TODO log
   std::cout << "Creating MSP socket for sid " << senderSid << std::endl;
 
   // override the SERVAL_INSTANCEPATH environment variable so enable the support of multiple serval instances in one process

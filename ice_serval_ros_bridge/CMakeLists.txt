@@ -84,8 +84,19 @@ target_link_libraries(${PROJECT_NAME}
 add_executable(${PROJECT_NAME}_node
   src/IceServalBridgeNode.cpp
 )
-
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
+
+
+add_executable(knowledge_base_node
+  eval/KnowledgeBaseNode.cpp
+)
+target_link_libraries(knowledge_base_node ${PROJECT_NAME})
+
+
+add_executable(agent_node
+  eval/AgentNode.cpp
+)
+target_link_libraries(agent_node ${PROJECT_NAME})
 
 #############
 ## Testing ##

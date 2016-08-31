@@ -107,6 +107,7 @@ void ServalCommunication::cleanUpInternal()
 
   if (this->serval != nullptr)
   {
+    this->serval->cleanUp();
     this->serval = nullptr;
   }
 }
@@ -118,8 +119,6 @@ void ServalCommunication::read()
 
   while (this->running)
   {
-    int count;
-
     int recCount = this->socket->receive(sid, buffer, 4096);
 
     if (false == this->running)
@@ -235,8 +234,8 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
     return;
   }
 
-  unsigned char buffer[size];
-  std::copy(json.begin(), json.end(), buffer + 2);
+  std::lock_guard<std::mutex> guard(_mtxSend);
+  std::copy(json.begin(), json.end(), this->buffer + 2);
 
   buffer[0] = msg->getJobId();
   buffer[1] = msg->getJobIndex();

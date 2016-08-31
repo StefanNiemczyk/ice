@@ -163,6 +163,7 @@ public:
 public:
   serval_interface(std::string configPath, std::string const host, int const port, std::string const authName, std::string const authPass);
   virtual ~serval_interface();
+  void cleanUp();
   bool startDeamon();
   bool stopDeamon();
 
@@ -176,18 +177,19 @@ public:
   std::shared_ptr<MSPSocket> createMSPSocket(int port, std::string const &senderSid);
 
 public:
-  serval_wrapper::keyring               keyring;
-  serval_wrapper::meshms                meshms;
-  serval_wrapper::rhizome               rhizome;
+  serval_wrapper::keyring                               keyring;
+  serval_wrapper::meshms                                meshms;
+  serval_wrapper::rhizome                               rhizome;
 
 private:
-  std::string                   const   host;
-  int                           const   port;
-  int                                   timeout;
-  std::string                           address;
-  std::string                           servalBin;
-  std::string                           instancePath;
-  cpr::Authentication                   *auth;
+  std::vector<std::shared_ptr<MDPSocket>>               sockets;
+  std::string                                   const   host;
+  int                                           const   port;
+  int                                                   timeout;
+  std::string                                           address;
+  std::string                                           servalBin;
+  std::string                                           instancePath;
+  cpr::Authentication                                   *auth;
 };
 
 } /* namespace ice */

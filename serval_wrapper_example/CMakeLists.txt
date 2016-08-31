@@ -15,19 +15,14 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_executable(client-mdp src/client_mdp.cpp)
+add_executable(server-mdp src/server_mdp.cpp)
 
-add_executable(serval-wrapper-client src/client.cpp)
-add_executable(serval-wrapper-server src/server.cpp)
+target_link_libraries(server-mdp ${catkin_LIBRARIES})
+target_link_libraries(client-mdp ${catkin_LIBRARIES})
 
-# link against precompiled serval library
-#target_link_libraries(serval-wrapper-client
-#  ${catkin_LIBRARIES}
-#)
+add_executable(client-msp src/client.cpp)
+add_executable(server-msp src/server.cpp)
 
-target_link_libraries(serval-wrapper-server
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(serval-wrapper-client
-  ${catkin_LIBRARIES}
-)
+target_link_libraries(server-msp ${catkin_LIBRARIES})
+target_link_libraries(client-msp ${catkin_LIBRARIES})
