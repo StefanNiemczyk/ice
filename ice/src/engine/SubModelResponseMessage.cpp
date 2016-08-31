@@ -41,20 +41,18 @@ void SubModelResponseMessage::setResult(bool &result)
   this->result = result;
 }
 
-rapidjson::Value SubModelResponseMessage::payloadToJson(rapidjson::Document &document)
+void SubModelResponseMessage::payloadToJson(rapidjson::Document &document)
 {
-  rapidjson::Value value, index, result;
-  value.SetArray();
+  rapidjson::Value index, result;
+  document.SetArray();
   index.SetInt(this->index);
   result.SetBool(this->result);
 
-  value.PushBack(index, document.GetAllocator());
-  value.PushBack(result, document.GetAllocator());
-
-  return value;
+  document.PushBack(index, document.GetAllocator());
+  document.PushBack(result, document.GetAllocator());
 }
 
-bool SubModelResponseMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
+bool SubModelResponseMessage::parsePayload(rapidjson::Document& value, std::shared_ptr<GContainerFactory> factory)
 {
   if (false == value.IsArray())
   {

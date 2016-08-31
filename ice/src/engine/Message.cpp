@@ -30,31 +30,12 @@ namespace ice
 
 el::Logger* Message::_logFactory = el::Loggers::getLogger("Message");
 
-std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr<GContainerFactory> factory)
+std::shared_ptr<Message> Message::parse(uint8_t id, std::string &jsonString, std::shared_ptr<GContainerFactory> factory)
 {
-  rapidjson::Document document;
 
-  document.Parse(jsonString.c_str());
-
-  if (document.GetType() == 0)
-  {
-    _logFactory->error("Message could not be parsed, Json is broken '%v'", jsonString.c_str());
-    return nullptr;
-  }
-
-  auto id = document.FindMember("id");
-  auto payload = document.FindMember("pl");
-
-  if (false == id->value.IsInt())
-  {
-    _logFactory->error("Message could not be parsed, ID is missig in JSON '%v'", jsonString.c_str());
-    return nullptr;
-  }
-
-  int command = id->value.GetInt();
   std::shared_ptr<Message> message;
 
-  switch(command)
+  switch(id)
   {
     case(IMI_IDS_REQUEST):
     case(IMI_ID_REQUEST):
@@ -62,7 +43,7 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr
     case(IMI_OFFERS_REQUEST):
     case(IMI_FINISH):
     case(IMI_CANCLE_JOB):
-        return std::make_shared<CommandMessage>(command);
+        return std::make_shared<CommandMessage>(id);
         break;
     case(IMI_IDS_RESPONSE):
         message = std::make_shared<IdMessage>();
@@ -81,7 +62,7 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr
         break;
     case(IMI_ACK):
     case(IMI_INFORMATION_REQUEST_INDEX):
-        message = std::make_shared<IntMessage>(command);
+        message = std::make_shared<IntMessage>(id);
         break;
     case(IMI_SUBMODEL):
         message = std::make_shared<SubModelMessage>();
@@ -91,15 +72,28 @@ std::shared_ptr<Message> Message::parse(std::string &jsonString, std::shared_ptr
         break;
 
     default:
-      _logFactory->error("Message could not be parsed, unknown ID '%v'", command);
+      _logFactory->error("Message could not be parsed, unknown ID '%v'", id);
       return nullptr;
       break;
   }
 
-  if (false == message->parsePayload(payload->value, factory))
+  if (message->isPayload())
   {
-    _logFactory->error("Message could not be parsed, Error while parsing payload for Message ID '%v'", command);
-    return nullptr;
+    rapidjson::Document document;
+
+    document.Parse(jsonString.c_str());
+
+    if (document.GetType() == 0)
+    {
+      _logFactory->error("Message '%v' could not be parsed, Json is broken '%v'", std::to_string(id), jsonString.c_str());
+      return nullptr;
+    }
+
+    if (false == message->parsePayload(document, factory))
+    {
+      _logFactory->error("Message could not be parsed, Error while parsing payload for Message ID '%v'", std::to_string(id));
+      return nullptr;
+    }
   }
 
   return message;
@@ -118,22 +112,25 @@ Message::~Message()
 std::string Message::toJson()
 {
   rapidjson::Document document;
-  rapidjson::Value name("id");
-  rapidjson::Value value(this->id);
-
-  // set id
-  document.SetObject();
-  document.AddMember(name, value, document.GetAllocator());
+//  rapidjson::Value name("id");
+//  rapidjson::Value value(this->id);
+//
+//  // set id
+//  document.SetObject();
+//  document.AddMember(name, value, document.GetAllocator());
 
   // add payload
-  if (this->payload)
+  if (this->payload == false)
   {
-    rapidjson::Value name("pl");
-    rapidjson::Value value = this->payloadToJson(document);
-    document.AddMember(name, value, document.GetAllocator());
+    return "";
   }
 
+//  rapidjson::Value name("pl");
+//  rapidjson::Value value = this->payloadToJson(document);
+//  document.AddMember(name, value, document.GetAllocator());
+
   // to string
+  this->payloadToJson(document);
   rapidjson::StringBuffer buffer;
   rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 
@@ -177,5 +174,11 @@ void Message::setEntity(std::shared_ptr<Entity> entity)
 {
   this->entity = entity;
 }
+
+bool Message::isPayload()
+{
+  return this->payload;
+}
+
 
 } /* namespace ice */

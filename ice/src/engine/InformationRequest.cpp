@@ -7,6 +7,8 @@
 
 #include <ice/communication/jobs/InformationRequest.h>
 
+#include <algorithm>
+
 #include "ice/communication/messages/InformationMessage.h"
 #include "ice/communication/messages/IntMessage.h"
 #include "ice/communication/messages/RequestMessage.h"
@@ -36,6 +38,7 @@ void InformationRequest::init()
 {
   // call init from super class
   ComJobBase::init();
+  this->currentIndex = 0;
   this->requestInformation();
   this->state = CJState::CJ_WAITING;
   this->updateActiveTime();
@@ -92,11 +95,10 @@ void InformationRequest::tick()
 
     if (count == this->received.size())
     {
-      this->sendCommand(IceMessageIds::IMI_FINISH);
       this->finish();
       return;
     }
-    else if (this->tryCount >= 5)
+    else if (this->tryCount >= 10)
     {
       _log->warn("Abort requesting information from '%v', max try count reached", entity->toString());
       this->abort();
@@ -105,19 +107,27 @@ void InformationRequest::tick()
 
     return;
   }
-
-  if (this->currentIndex < 0)
+  else
   {
-    return;
-  }
+    if (this->currentIndex < 0)
+    {
+      return;
+    }
 
-  if (this->currentIndex >= this->information.size())
-  {
-    this->state == CJState::CJ_WAITING;
-    return;
-  }
+    if (this->currentIndex >= this->information.size())
+    {
+      this->state == CJState::CJ_WAITING;
+      return;
+    }
 
-  this->sendInformation(this->currentIndex++);
+    int send = 10;
+    int max = std::min((int)(this->currentIndex + send), (int) this->information.size());
+    for (int i=this->currentIndex; i < max; ++i)
+    {
+      this->sendInformation(i);
+    }
+    this->currentIndex += send;
+  }
 }
 
 void InformationRequest::handleMessage(std::shared_ptr<Message> const &message)
@@ -263,6 +273,12 @@ void InformationRequest::onInformation(std::shared_ptr<InformationMessage> const
     this->received[info.first] = true;
     this->informationStore->addInformation(info.second);
     this->information.push_back(info.second);
+    this->currentIndex++;
+  }
+
+  if (this->receivedAck && this->currentIndex == this->received.size())
+  {
+    this->finish();
   }
 }
 

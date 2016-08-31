@@ -21,12 +21,12 @@ CommandMessage::~CommandMessage()
   //
 }
 
-rapidjson::Value CommandMessage::payloadToJson(rapidjson::Document &document)
+void CommandMessage::payloadToJson(rapidjson::Document &document)
 {
-  return rapidjson::Value("");
+  //
 }
 
-bool CommandMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
+bool CommandMessage::parsePayload(rapidjson::Document& value, std::shared_ptr<GContainerFactory> factory)
 {
   return true;
 }

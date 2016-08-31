@@ -49,7 +49,7 @@ enum IceMessageIds
 class Message
 {
 public:
-  static std::shared_ptr<Message> parse(std::string &jsonString, std::shared_ptr<GContainerFactory> factory);
+  static std::shared_ptr<Message> parse(uint8_t id, std::string &jsonString, std::shared_ptr<GContainerFactory> factory);
 private:
   static el::Logger*            _logFactory;
 
@@ -66,10 +66,11 @@ public:
   void setJobIndex(uint8_t jobIndex);
   std::shared_ptr<Entity> getEntity();
   void setEntity(std::shared_ptr<Entity> entity);
+  bool isPayload();
 
 protected:
-  virtual rapidjson::Value payloadToJson(rapidjson::Document &document) = 0;
-  virtual bool parsePayload(rapidjson::Value& value,  std::shared_ptr<GContainerFactory> factory) = 0;
+  virtual void payloadToJson(rapidjson::Document &document) = 0;
+  virtual bool parsePayload(rapidjson::Document& value,  std::shared_ptr<GContainerFactory> factory) = 0;
 
 protected:
   const int                     id;

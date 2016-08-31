@@ -156,11 +156,11 @@ void ServalCommunication::read()
       continue;
     }
 
-    std::string json(buffer+2, buffer+recCount);
+    std::string json(buffer+3, buffer+recCount);
 
-    auto message = Message::parse(json, this->containerFactory);
-    message->setJobId(buffer[0]);
-    message->setJobIndex(buffer[1]);
+    auto message = Message::parse(buffer[0], json, this->containerFactory);
+    message->setJobId(buffer[1]);
+    message->setJobIndex(buffer[2]);
 
     if (message == nullptr)
     {
@@ -225,20 +225,25 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
     return;
   }
 
-  std::string json = msg->toJson();
-  int size = json.size() + 2;
-
-  if (size > 1024)
+  int size = 3;
+  if (msg->isPayload())
   {
-    this->_log->error("Message could not be send to instance '%v', to large '%v' byte", msg->getEntity()->toString(), size);
-    return;
+    std::string json = msg->toJson();
+    size = json.size() + 3;
+
+    if (size > 1024)
+    {
+      this->_log->error("Message could not be send to instance '%v', to large '%v' byte", msg->getEntity()->toString(), size);
+      return;
+    }
+
+    std::lock_guard<std::mutex> guard(_mtxSend);
+    std::copy(json.begin(), json.end(), this->buffer + 3);
   }
 
-  std::lock_guard<std::mutex> guard(_mtxSend);
-  std::copy(json.begin(), json.end(), this->buffer + 2);
-
-  buffer[0] = msg->getJobId();
-  buffer[1] = msg->getJobIndex();
+  buffer[0] = msg->getId();
+  buffer[1] = msg->getJobId();
+  buffer[2] = msg->getJobIndex();
 
   this->socket->send(sid, buffer, size);
 }

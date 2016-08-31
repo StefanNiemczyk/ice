@@ -27,10 +27,9 @@ std::vector<InformationSpecification>& OffersMessage::getOfferes()
   return this->offeres;
 }
 
-rapidjson::Value OffersMessage::payloadToJson(rapidjson::Document &document)
+void OffersMessage::payloadToJson(rapidjson::Document &document)
 {
-  rapidjson::Value value;
-  value.SetArray();
+  document.SetArray();
 
   for (auto &offer : this->offeres)
   {
@@ -49,13 +48,11 @@ rapidjson::Value OffersMessage::payloadToJson(rapidjson::Document &document)
     n.PushBack(r, document.GetAllocator());
     n.PushBack(re, document.GetAllocator());
 
-    value.PushBack(n, document.GetAllocator());
+    document.PushBack(n, document.GetAllocator());
   }
-
-  return value;
 }
 
-bool OffersMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
+bool OffersMessage::parsePayload(rapidjson::Document& value, std::shared_ptr<GContainerFactory> factory)
 {
   if (false == value.IsArray())
   {

@@ -38,19 +38,16 @@ void SubModelMessage::setSubModel(std::shared_ptr<SubModelDesc> &desc)
   this->subModel = desc;
 }
 
-rapidjson::Value SubModelMessage::payloadToJson(rapidjson::Document &document)
+void SubModelMessage::payloadToJson(rapidjson::Document &document)
 {
   std::stringstream ss;
   boost::archive::text_oarchive ar(ss);
   ar << this->subModel;
 
-  rapidjson::Value value;
-  value.SetString(ss.str().c_str(), document.GetAllocator());
-
-  return value;
+  document.SetString(ss.str().c_str(), document.GetAllocator());
 }
 
-bool SubModelMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
+bool SubModelMessage::parsePayload(rapidjson::Document& value, std::shared_ptr<GContainerFactory> factory)
 {
   if (false == value.IsString())
   {

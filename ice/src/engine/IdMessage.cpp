@@ -25,10 +25,9 @@ std::vector<std::tuple<std::string, std::string>>& IdMessage::getIds()
   return this->ids;
 }
 
-rapidjson::Value IdMessage::payloadToJson(rapidjson::Document &document)
+void IdMessage::payloadToJson(rapidjson::Document &document)
 {
-  rapidjson::Value value;
-  value.SetObject();
+  document.SetObject();
 
   for (auto &id : this->ids)
   {
@@ -37,13 +36,11 @@ rapidjson::Value IdMessage::payloadToJson(rapidjson::Document &document)
     n.SetString(std::get<0>(id).c_str(), document.GetAllocator());
     v.SetString(std::get<1>(id).c_str(), document.GetAllocator());
 
-    value.AddMember(n, v, document.GetAllocator());
+    document.AddMember(n, v, document.GetAllocator());
   }
-
-  return value;
 }
 
-bool IdMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
+bool IdMessage::parsePayload(rapidjson::Document& value, std::shared_ptr<GContainerFactory> factory)
 {
   if (false == value.IsObject())
   {

@@ -25,8 +25,8 @@ public:
   void setSubModel(std::shared_ptr<SubModelDesc> &desc);
 
 protected:
-  virtual rapidjson::Value payloadToJson(rapidjson::Document &document);
-  virtual bool parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory);
+  virtual void payloadToJson(rapidjson::Document &document);
+  virtual bool parsePayload(rapidjson::Document& value, std::shared_ptr<GContainerFactory> factory);
 
 private:
   std::shared_ptr<SubModelDesc> subModel;

@@ -30,10 +30,9 @@ std::vector<std::pair<int,std::shared_ptr<InformationElement<GContainer>>>>& Inf
   return this->informations;
 }
 
-rapidjson::Value InformationMessage::payloadToJson(rapidjson::Document &document)
+void InformationMessage::payloadToJson(rapidjson::Document &document)
 {
-  rapidjson::Value value;
-  value.SetArray();
+  document.SetArray();
 
   for (auto &infoElement : this->informations)
   {
@@ -75,13 +74,11 @@ rapidjson::Value InformationMessage::payloadToJson(rapidjson::Document &document
 
     element.AddMember(infoName, info, document.GetAllocator());
 
-    value.PushBack(element, document.GetAllocator());
+    document.PushBack(element, document.GetAllocator());
   }
-
-  return value;
 }
 
-bool InformationMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
+bool InformationMessage::parsePayload(rapidjson::Document& value, std::shared_ptr<GContainerFactory> factory)
 {
   if (false == value.IsArray())
   {

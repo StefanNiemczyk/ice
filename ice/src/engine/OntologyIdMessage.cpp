@@ -26,10 +26,9 @@ std::vector<std::pair<std::string, std::string>>& OntologyIdMessage::getIds()
   return this->ids;
 }
 
-rapidjson::Value OntologyIdMessage::payloadToJson(rapidjson::Document &document)
+void OntologyIdMessage::payloadToJson(rapidjson::Document &document)
 {
-  rapidjson::Value value;
-  value.SetArray();
+  document.SetArray();
 
   for (auto &p : this->ids)
   {
@@ -43,13 +42,11 @@ rapidjson::Value OntologyIdMessage::payloadToJson(rapidjson::Document &document)
     pair.PushBack(id, document.GetAllocator());
     pair.PushBack(version, document.GetAllocator());
 
-    value.PushBack(pair, document.GetAllocator());
+    document.PushBack(pair, document.GetAllocator());
   }
-
-  return value;
 }
 
-bool OntologyIdMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
+bool OntologyIdMessage::parsePayload(rapidjson::Document& value, std::shared_ptr<GContainerFactory> factory)
 {
   if (false == value.IsArray())
   {

@@ -7,12 +7,20 @@
 
 
 #include <ros/ros.h>
+#include <signal.h>
 #include "easylogging++.h"
 #include "IceServalBridge.h"
 #include <ice/information/InformationStore.h>
 
 INITIALIZE_EASYLOGGINGPP
 
+std::shared_ptr<ice::IceServalBridge> node;
+
+void mySigintHandler(int sig)
+{
+  node->cleanUp();
+  ros::shutdown();
+}
 
 int main(int argc, char **argv)
 {
@@ -21,8 +29,9 @@ int main(int argc, char **argv)
   ros::NodeHandle nh_("");
   ros::NodeHandle pnh_("~");
 
-  auto node = std::make_shared<ice::IceServalBridge>(nh_, pnh_);
+  node = std::make_shared<ice::IceServalBridge>(nh_, pnh_);
   node->init();
+  signal(SIGINT, mySigintHandler);
 
   // stuff
   auto infoStore = node->getInformationStore();
@@ -38,7 +47,7 @@ int main(int argc, char **argv)
   assert(z != nullptr);
   assert(lid != nullptr);
 
-  for (int i=0; i < 500; ++i)
+  for (int i=0; i < 1000; ++i)
   {
     auto spec = std::make_shared<ice::InformationSpecification>("http://vs.uni-kassel.de/TurtleBot#CS" + i,
                                                                 "http://vs.uni-kassel.de/TurtleBot#ChargeStation",
@@ -48,10 +57,10 @@ int main(int argc, char **argv)
 
     auto instance = node->getGContainerFactory()->makeInstance(rep);
 
-    double xv = rand();
-    double yv = rand();
-    double zv = rand();
-    long lidv = rand();
+    double xv = 1000;//rand();
+    double yv = 2000;//rand();
+    double zv = 3000;//rand();
+    long lidv = 4000;//rand();
     instance->set(x, &xv);
     instance->set(y, &yv);
     instance->set(z, &zv);

@@ -30,14 +30,12 @@ void IntMessage::setValue(int &value)
   this->value = value;
 }
 
-rapidjson::Value IntMessage::payloadToJson(rapidjson::Document &document)
+void IntMessage::payloadToJson(rapidjson::Document &document)
 {
-  rapidjson::Value value;
-  value.SetInt(this->value);
-  return value;
+  document.SetInt(this->value);
 }
 
-bool IntMessage::parsePayload(rapidjson::Value& value, std::shared_ptr<GContainerFactory> factory)
+bool IntMessage::parsePayload(rapidjson::Document& value, std::shared_ptr<GContainerFactory> factory)
 {
   if (false == value.IsInt())
   {

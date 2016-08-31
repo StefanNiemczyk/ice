@@ -94,16 +94,6 @@ void RosCommunication::sendMessage(std::shared_ptr<Message> msg)
     this->_log->error("Trying to send message with ROS to none ice instance %v", msg->getEntity()->toString());
     return;
   }
-
-  std::string json = msg->toJson();
-  int size = json.size();
-
-  if (size > 1024)
-  {
-    this->_log->error("Message could not be send to instance '%v', to large '%v' byte", msg->getEntity()->toString(), size);
-    return;
-  }
-
   ice_msgs::ICECoordination coordinationMsg;
   coordinationMsg.header.senderId.value = this->iceId;
 
@@ -111,10 +101,23 @@ void RosCommunication::sendMessage(std::shared_ptr<Message> msg)
   receiver.value = std::stoi(sid);
   coordinationMsg.header.receiverIds.push_back(receiver);
 
+  coordinationMsg.id = msg->getId();
   coordinationMsg.jobId = msg->getJobId();
   coordinationMsg.jobIndex = msg->getJobIndex();
-  coordinationMsg.bytes.resize(size);
-  std::copy(json.begin(), json.end(), coordinationMsg.bytes.begin());
+
+  if (msg->isPayload())
+  {
+    std::string json = msg->toJson();
+    int size = json.size();
+
+    if (size > 1024)
+    {
+      this->_log->error("Message could not be send to instance '%v', to large '%v' byte", msg->getEntity()->toString(), size);
+      return;
+    }
+    coordinationMsg.bytes.resize(size);
+    std::copy(json.begin(), json.end(), coordinationMsg.bytes.begin());
+  }
 
   this->coordinationPublisher.publish(coordinationMsg);
 }
@@ -225,7 +228,7 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
 
   std::string json(msg->bytes.begin(), msg->bytes.end());
 
-  auto message = Message::parse(json, this->containerFactory);
+  auto message = Message::parse(msg->id, json, this->containerFactory);
 
   if (message == nullptr)
   {
