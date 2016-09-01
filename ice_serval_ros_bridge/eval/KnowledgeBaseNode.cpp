@@ -29,6 +29,15 @@ int main(int argc, char **argv)
   ros::NodeHandle nh_("");
   ros::NodeHandle pnh_("~");
 
+  int number;
+  pnh_.param("infos", number, 0);
+
+  if (number == 0)
+  {
+    std::cerr << "Define the number of information in knowledgebase 'infos:=[number]'" << std::endl;
+    return 1;
+  }
+
   node = std::make_shared<ice::IceServalBridge>(nh_, pnh_);
   node->init();
   signal(SIGINT, mySigintHandler);
@@ -47,7 +56,7 @@ int main(int argc, char **argv)
   assert(z != nullptr);
   assert(lid != nullptr);
 
-  for (int i=0; i < 1000; ++i)
+  for (int i=0; i < number; ++i)
   {
     auto spec = std::make_shared<ice::InformationSpecification>("http://vs.uni-kassel.de/TurtleBot#CS" + i,
                                                                 "http://vs.uni-kassel.de/TurtleBot#ChargeStation",

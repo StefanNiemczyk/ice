@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <launch>
+  <arg name="infos"/>
 
   <node pkg="ice_serval_ros_bridge" type="knowledge_base_node" name="knowledge_base_node" output="screen">
     <param name="ontology_path" value="$(find tb_knowledge_base)/ontology/"/>
@@ -15,6 +16,7 @@
     <param name="xml_info_file" value=""/>
     <param name="json_information_file" value=""/>
     <param name="xml_template_file" value=""/>
+    <param name="infos" value="$(arg infos)"/>
   </node>
 
 </launch>
