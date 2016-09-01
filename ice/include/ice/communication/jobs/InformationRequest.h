@@ -32,6 +32,7 @@ public:
   virtual void handleMessage(std::shared_ptr<Message> const &message);
 
   std::vector<std::shared_ptr<InformationSpecification>>& getRequests();
+  int getResendCount();
 
 private:
   void requestInformation();
@@ -44,6 +45,7 @@ private:
 
 private:
   std::shared_ptr<InformationStore>                             informationStore;
+  int                                                           resendCount;
   int                                                           tryCount;
   int                                                           currentIndex;
   bool                                                          receivedAck;

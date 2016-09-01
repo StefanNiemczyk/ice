@@ -22,7 +22,7 @@ int InformationRequestCreator::val = InformationRequestCreator::init();
 
 InformationRequest::InformationRequest(std::weak_ptr<ICEngine> engine, std::shared_ptr<Entity> const &entity) :
     ComJob(InformationRequest::ID, engine, entity, el::Loggers::getLogger("InformationRequest")), currentIndex(-1), tryCount(
-        0), receivedAck(false)
+        0), receivedAck(false), resendCount(0)
 {
   this->timeout = 2000;
   auto e = this->engine.lock();
@@ -90,6 +90,7 @@ void InformationRequest::tick()
       else
       {
         this->requestInformation(i);
+        ++this->resendCount;
       }
     }
 
@@ -285,6 +286,11 @@ void InformationRequest::onInformation(std::shared_ptr<InformationMessage> const
 std::vector<std::shared_ptr<InformationSpecification>>& InformationRequest::getRequests()
 {
   return this->requests;
+}
+
+int InformationRequest::getResendCount()
+{
+  return this->resendCount;
 }
 
 } /* namespace ice */

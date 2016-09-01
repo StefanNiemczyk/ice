@@ -246,6 +246,7 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
   buffer[2] = msg->getJobIndex();
 
   this->socket->send(sid, buffer, size);
+//  std::cout << size << std::endl;
 }
 
 std::shared_ptr<BaseInformationSender> ServalCommunication::createSender(std::shared_ptr<BaseInformationStream> stream)
