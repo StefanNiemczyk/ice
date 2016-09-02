@@ -69,7 +69,10 @@ void MDPSocket::send(uint8_t *recipientSid, uint8_t *payload, size_t size)
   header.ttl = PAYLOAD_TTL_DEFAULT;
   header.flags |= MDP_FLAG_BIND | MDP_FLAG_NO_CRYPT;
 
-  mdp_send(this->socketSend, &header, payload, size);
+  if (mdp_send(this->socketSend, &header, payload, size) < 0)
+  {
+    std::cerr << "Error sending message" << std::endl;
+  }
 }
 
 void MDPSocket::send(std::string const &recipientSid, uint8_t *payload, size_t size)
@@ -87,7 +90,10 @@ void MDPSocket::send(std::string const &recipientSid, uint8_t *payload, size_t s
   header.ttl = PAYLOAD_TTL_DEFAULT;
   header.flags |= MDP_FLAG_BIND | MDP_FLAG_NO_CRYPT;
 
-  mdp_send(this->socketSend, &header, payload, size);
+  if (mdp_send(this->socketSend, &header, payload, size))
+  {
+    std::cerr << "Error sending message" << std::endl;
+  }
 }
 
 int MDPSocket::receive(std::string &senderSid, uint8_t *buffer, size_t size, unsigned long timeoutMs)
