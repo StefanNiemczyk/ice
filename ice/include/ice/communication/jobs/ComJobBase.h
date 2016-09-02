@@ -189,7 +189,8 @@ public:
   {
     if (message->getId() == IceMessageIds::IMI_CANCLE_JOB)
     {
-      this->abort();
+      this->state = CJState::CJ_ABORTED;
+      this->callCallbackAborted();
     }
     else
     {

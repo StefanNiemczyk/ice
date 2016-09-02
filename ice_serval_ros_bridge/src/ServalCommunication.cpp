@@ -156,6 +156,9 @@ void ServalCommunication::read()
       continue;
     }
 
+
+    this->traffic.receivedBytes += recCount;
+    ++this->traffic.messageReceivedCount;
     std::string json(buffer+3, buffer+recCount);
 
     auto message = Message::parse(buffer[0], json, this->containerFactory);
@@ -245,6 +248,8 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
   buffer[1] = msg->getJobId();
   buffer[2] = msg->getJobIndex();
 
+  this->traffic.sendBytes += size;
+  ++this->traffic.messageSendCount;
   this->socket->send(sid, buffer, size);
 //  std::cout << size << std::endl;
 }

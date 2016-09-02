@@ -90,7 +90,6 @@ void InformationRequest::tick()
       else
       {
         this->requestInformation(i);
-        ++this->resendCount;
       }
     }
 
@@ -163,7 +162,8 @@ void InformationRequest::handleMessage(std::shared_ptr<Message> const &message)
       if (this->ownJob == false)
       {
         _log->info("Job finished from '%v'", entity->toString());
-        this->finish();
+       // this->finish();
+        this->state = CJState::CJ_FINISHED;
       }
       break;
     }
@@ -190,6 +190,7 @@ void InformationRequest::requestInformation()
 void InformationRequest::requestInformation(int index)
 {
   _log->info("Requesting information for index '%v' from '%v'", index, entity->toString());
+  ++this->resendCount;
   auto m = std::make_shared<IntMessage>(IceMessageIds::IMI_INFORMATION_REQUEST_INDEX);
   m->setValue(index);
   this->send(m);
@@ -255,7 +256,7 @@ void InformationRequest::sendInformation(int index)
 
 void InformationRequest::onInformation(std::shared_ptr<InformationMessage> const &message)
 {
-  _log->info("Information received from '%v'", entity->toString());
+  _log->info("Information message received from '%v'", entity->toString());
 
   for (auto &info : message->getInformations())
   {

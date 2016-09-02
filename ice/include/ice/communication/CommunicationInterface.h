@@ -32,6 +32,14 @@ class GContainer;
 class GContainerFactory;
 class TimeFactory;
 
+struct Traffic
+{
+  unsigned long long sendBytes;
+  unsigned long long receivedBytes;
+  unsigned long long messageSendCount;
+  unsigned long long messageReceivedCount;
+};
+
 class CommunicationInterface
 {
 public:
@@ -55,6 +63,8 @@ public:
   void setInformationStore(std::shared_ptr<InformationStore> store);
   std::shared_ptr<OntologyInterface> getOntologyInterface();
   void setOntologyInterface(std::shared_ptr<OntologyInterface> ontology);
+  Traffic& getTraffic();
+  void resetTraffic();
 
 protected:
   // methodes which need to be implemented by child class
@@ -80,6 +90,7 @@ protected:
   std::shared_ptr<EntityDirectory>            directory;
   std::shared_ptr<Entity>                     self;
 
+  Traffic                                     traffic;
   std::vector<std::shared_ptr<Message>>       messages;
   std::vector<std::shared_ptr<ComJobBase>>    comJobsOwn;
   std::vector<std::shared_ptr<ComJobBase>>    comJobsOwnNew;

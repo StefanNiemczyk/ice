@@ -84,7 +84,8 @@ void CooperationRequest::handleMessage(std::shared_ptr<Message> const &message)
       if (false == this->ownJob)
       {
         _log->info("Received finished from '%v'", entity->toString());
-        this->finish();//onFinished(message);
+        this->state = CJState::CJ_FINISHED;
+//        this->finish();
       }
 
       break;

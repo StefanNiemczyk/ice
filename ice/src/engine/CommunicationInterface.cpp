@@ -359,4 +359,17 @@ void CommunicationInterface::setOntologyInterface(std::shared_ptr<OntologyInterf
   this->ontology = ontology;
 }
 
+Traffic& CommunicationInterface::getTraffic()
+{
+  return this->traffic;
+}
+
+void CommunicationInterface::resetTraffic()
+{
+  this->traffic.sendBytes = 0;
+  this->traffic.receivedBytes = 0;
+  this->traffic.messageSendCount = 0;
+  this->traffic.messageReceivedCount = 0;
+}
+
 } /* namespace ice */

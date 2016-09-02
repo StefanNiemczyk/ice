@@ -29,12 +29,19 @@ void callback(std::shared_ptr<ice::InformationRequest> request)
   auto end = std::chrono::system_clock::now();
   auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
+  sleep(5);
+
+  auto &traffic = node->getCommunicationInterface()->getTraffic();
+  unsigned long long trafficSum = traffic.sendBytes + traffic.receivedBytes;
+
   if (count++ < 100)
   {
-    fprintf(stderr, "%d3:   %7d   %5d\n", count, dur, request->getResendCount());
+    fprintf(stderr, "%3d: %7d ms, %5d lost, %12d b, %5d send, %5d received\n",
+            count, dur, request->getResendCount(), trafficSum, traffic.messageSendCount, traffic.messageReceivedCount);
 //    std::cerr << count << ":\t\t" << dur << "\t" << request->getResendCount() << std::endl;
 
-    file << dur << "\t" << request->getResendCount() << std::endl;
+    file << dur << "\t" << request->getResendCount() << "\t"
+        << trafficSum << "\t" << traffic.messageSendCount << "\t" << traffic.messageReceivedCount << std::endl;
 
     auto spec = std::make_shared<ice::InformationSpecification>("*",
                                                                   "http://vs.uni-kassel.de/TurtleBot#ChargeStation",
@@ -43,11 +50,11 @@ void callback(std::shared_ptr<ice::InformationRequest> request)
                                                                   "http://vs.uni-kassel.de/TurtleBot#Landmark");
 
     auto r = std::make_shared<ice::InformationRequest>(node, mops);
+    r->setTimeout(100);
     r->getRequests().push_back(spec);
     r->setCallbackFinished(&callback);
 
-    sleep(5);
-
+    node->getCommunicationInterface()->resetTraffic();
     start = std::chrono::system_clock::now();
     node->getCommunicationInterface()->addComJob(r);
   }
@@ -99,6 +106,7 @@ int main(int argc, char **argv)
                                                               "http://vs.uni-kassel.de/TurtleBot#Landmark");
 
   auto request = std::make_shared<ice::InformationRequest>(node, mops);
+  request->setTimeout(100);
   request->getRequests().push_back(spec);
   request->setCallbackFinished(&callback);
 
@@ -107,6 +115,7 @@ int main(int argc, char **argv)
   std::cerr << "Start" << std::endl;
   std::cerr << "#########################################################################" << std::endl;
 
+  node->getCommunicationInterface()->resetTraffic();
   start = std::chrono::system_clock::now();
   node->getCommunicationInterface()->addComJob(request);
 

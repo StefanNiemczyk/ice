@@ -85,7 +85,7 @@ void IdentityRequest::handleMessage(std::shared_ptr<Message> const &message)
     case (IMI_FINISH):
     {
       if (false == this->ownJob)
-        this->finish();
+        this->state = CJState::CJ_FINISHED;
 
       break;
     }
