@@ -31,7 +31,7 @@ namespace ice
 {
 
 CommunicationInterface::CommunicationInterface(std::weak_ptr<ICEngine> engine) :
-    running(false), engine(engine)
+    running(false), engine(engine), maxMessageSend(10)
 {
   _log = el::Loggers::getLogger("CommunicationInterface");
 }
@@ -68,7 +68,7 @@ void CommunicationInterface::cleanUp()
 void CommunicationInterface::send(std::shared_ptr<Message> message)
 {
   std::lock_guard<std::mutex> guard(this->_messageMtx);
-  this->messages.push_back(message);
+  this->messages.push(message);
 }
 
 void CommunicationInterface::addComJob(std::shared_ptr<ComJobBase> const &job)
@@ -310,17 +310,17 @@ void CommunicationInterface::workerTask()
     {
       std::lock_guard<std::mutex> guard(this->_messageMtx);
 
-      for (auto &msg : this->messages)
+      int count = std::min(this->maxMessageSend, (int) this->messages.size());
+      for (int i = 0; i < count; ++i)
       {
         if (false == this->running)
         {
           return;
         }
 
-        this->sendMessage(msg);
+        this->sendMessage(this->messages.front());
+        this->messages.pop();
       }
-
-      this->messages.clear();
     }
 
     ++counter;

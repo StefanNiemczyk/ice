@@ -23,6 +23,14 @@ template<typename T>
   class RingBuffer
   {
   public:
+
+  inline RingBuffer()
+  {
+    this->bufferSize = 0;
+    this->identifierCounter = 0;
+    this->index = -1;
+  }
+
   /*!
    * \brief Default constructor.
    *
@@ -46,6 +54,14 @@ template<typename T>
     inline virtual ~RingBuffer()
     {
       //nothing to do
+    }
+
+    void setSize(const int bufferSize)
+    {
+      this->bufferSize = bufferSize;
+      this->identifierCounter = 0;
+      this->index = -1;
+      this->ringBuffer = std::unique_ptr<std::shared_ptr<T>[]>(new std::shared_ptr<T>[this->bufferSize]);
     }
 
     /*!

@@ -10,6 +10,7 @@
 
 #include <map>
 #include <memory>
+#include <queue>
 
 #include <ice/information/InformationSpecification.h>
 #include <easylogging++.h>
@@ -91,7 +92,8 @@ protected:
   std::shared_ptr<Entity>                     self;
 
   Traffic                                     traffic;
-  std::vector<std::shared_ptr<Message>>       messages;
+  int                                         maxMessageSend;
+  std::queue<std::shared_ptr<Message>>        messages;
   std::vector<std::shared_ptr<ComJobBase>>    comJobsOwn;
   std::vector<std::shared_ptr<ComJobBase>>    comJobsOwnNew;
   std::vector<std::shared_ptr<ComJobBase>>    comJobsIncomming;

@@ -111,13 +111,6 @@ Message::~Message()
 
 std::string Message::toJson()
 {
-  rapidjson::Document document;
-//  rapidjson::Value name("id");
-//  rapidjson::Value value(this->id);
-//
-//  // set id
-//  document.SetObject();
-//  document.AddMember(name, value, document.GetAllocator());
 
   // add payload
   if (this->payload == false)
@@ -125,11 +118,7 @@ std::string Message::toJson()
     return "";
   }
 
-//  rapidjson::Value name("pl");
-//  rapidjson::Value value = this->payloadToJson(document);
-//  document.AddMember(name, value, document.GetAllocator());
-
-  // to string
+  rapidjson::Document document;
   this->payloadToJson(document);
   rapidjson::StringBuffer buffer;
   rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);

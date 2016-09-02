@@ -73,6 +73,7 @@ void InformationRequest::tick()
         return;
       }
 
+      ++this->resendCount;
       this->requestInformation();
 
       return;
@@ -144,7 +145,9 @@ void InformationRequest::handleMessage(std::shared_ptr<Message> const &message)
     }
     case (IMI_INFORMATION_REQUEST_INDEX):
     {
-      this->sendInformation(std::static_pointer_cast<IntMessage>(message)->getValue());
+      int index = std::static_pointer_cast<IntMessage>(message)->getValue();
+      if (this->currentIndex > index)
+        this->sendInformation(index);
       break;
     }
     case (IMI_ACK):
@@ -226,17 +229,18 @@ void InformationRequest::onRequestInformation(std::shared_ptr<RequestMessage> co
 void InformationRequest::onAcc(std::shared_ptr<IntMessage> const &message)
 {
   int value = message->getValue();
-  receivedAck = true;
 
   if (value == 0)
   {
     _log->info("No information received from engine '%v'", entity->toString());
+    receivedAck = true;
     this->finish();
   }
 
   _log->info("'%v' information will be send by engine '%v'", std::to_string(value), entity->toString());
 
   this->received.resize(value, false);
+  receivedAck = true;
 }
 
 void InformationRequest::sendInformation(int index)
@@ -261,7 +265,7 @@ void InformationRequest::onInformation(std::shared_ptr<InformationMessage> const
   for (auto &info : message->getInformations())
   {
     _log->info("Information received for index '%v' from '%v'", info.first, entity->toString());
-    if (this->received.size() < info.first)
+    if (this->received.size() <= info.first)
     {
       this->received.resize(info.first * 2, false);
     }

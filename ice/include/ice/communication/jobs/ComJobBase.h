@@ -16,6 +16,7 @@
 #include "ice/communication/messages/Message.h"
 #include "ice/communication/messages/CommandMessage.h"
 #include "ice/communication/CommunicationInterface.h"
+#include "ice/processing/EventHandler.h"
 #include "ice/ICEngine.h"
 #include "ice/Entity.h"
 #include "ice/Time.h"
@@ -69,6 +70,7 @@ public:
     this->self = e->getSelf();
     this->com = e->getCommunicationInterface();
     this->timeFactory = e->getTimeFactory();
+    this->eventHandler = e->getEventHandler();
   }
 
   virtual ~ComJobBase()
@@ -224,6 +226,7 @@ protected:
   std::shared_ptr<Entity>               self;
   std::shared_ptr<Entity>               entity;
   std::shared_ptr<TimeFactory>          timeFactory;
+  std::shared_ptr<EventHandler>         eventHandler;
   uint8_t                               id;
   uint8_t                               index;
   CJState                               state;
