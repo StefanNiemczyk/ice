@@ -21,13 +21,10 @@ public:
                                                            int streamSize,
                                                            int sharingMaxCount) const
   {
-    auto stream = ice::StreamFactory::createStream(className, streamDescription, eventHandler, streamSize,
-                                                   sharingMaxCount);
-    if (stream)
-      return stream;
-
     if (className == "")
-      return stream;
+      return nullptr;
+
+    std::shared_ptr<ice::BaseInformationStream> stream;
 
     if ("Position" == className)
     {
@@ -49,6 +46,12 @@ public:
       stream = std::make_shared<ice::InformationStream<std::vector<ice::Position>>>(streamDescription, eventHandler, streamSize,
           sharingMaxCount);
     }
+
+    if (stream == nullptr)
+      stream = ice::StreamFactory::createStream(className, streamDescription, eventHandler, streamSize, sharingMaxCount);
+
+    if (stream)
+      return stream;
 
     return stream;
   }

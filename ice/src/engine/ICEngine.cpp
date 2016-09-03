@@ -23,7 +23,7 @@ ICEngine::ICEngine(std::shared_ptr<Configuration> config) :
 
 ICEngine::~ICEngine()
 {
-//  if (this->running)
+  if (this->initialized)
     this->cleanUp();
 }
 
@@ -95,7 +95,15 @@ void ICEngine::start()
 
 void ICEngine::cleanUp()
 {
+  if (this->running == false && this->initialized == false)
+    return;
+
+  std::lock_guard<std::mutex> guard(this->mtx_);
+  if (this->running == false && this->initialized == false)
+    return;
+
   this->running = false;
+  this->initialized = false;
 
   if (this->entityDirectory)
     this->entityDirectory->cleanUp();

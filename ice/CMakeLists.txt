@@ -198,6 +198,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/test_NodeStore.cpp
   test/test_CallbackList.cpp
   test/test_InformationStore.cpp
+  test/test_TransformationNode.cpp
 
   test/test_main.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test

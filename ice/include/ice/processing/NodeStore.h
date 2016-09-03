@@ -61,7 +61,7 @@ public:
 
   std::shared_ptr<Node> registerNode(const NodeType type, const std::string className, const std::string name,
                                      const ont::entity entity, const ont::entity entityRelated,
-                                     std::map<std::string, std::string> config, const std::string source = "");
+                                     std::map<std::string, std::string> &config, const std::string source = "");
 
   bool existNodeCreator(const std::string className);
   void unregisterAndCleanUp(std::shared_ptr<Entity> &entity,

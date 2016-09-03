@@ -32,7 +32,8 @@ public:
   virtual std::string getClassName();
 
 private:
-  std::vector<std::shared_ptr<InformationStream<GContainer>>>   inputStream;
+  std::vector<std::shared_ptr<InformationStream<GContainer>>>   inputStreams;
+  std::shared_ptr<InformationStream<GContainer>>                outputStream;
   std::vector<std::shared_ptr<GContainer>>                      inputElements;
   int                                                           inputSize;
   std::shared_ptr<Transformation>                               transformation;

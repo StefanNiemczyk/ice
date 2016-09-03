@@ -69,7 +69,7 @@ public:
   std::shared_ptr<GContainer> fromJSON(Value& jsonValue);
   std::shared_ptr<GContainer> fromJSON(Value& name, Value& value);
 
-  int addXMLTransformation(std::string &fileName);
+  int readXMLTransformation(std::string fileName);
   std::shared_ptr<Transformation> fromXMLDesc(TransDesc* desc);
   void* convertStringToBasic(BasicRepresentationType type, std::string value);
 

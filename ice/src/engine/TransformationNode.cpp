@@ -17,6 +17,7 @@ TransformationNode::TransformationNode(std::shared_ptr<Transformation> const &tr
 {
   this->inputSize = transformation->getInputs().size();
   this->inputElements.resize(this->inputSize);
+  this->inputStreams.resize(this->inputSize);
 }
 
 TransformationNode::~TransformationNode()
@@ -32,7 +33,7 @@ int TransformationNode::init()
 
   for (int i = 0; i < this->inputSize; ++i)
   {
-    this->inputStream.at(i) = nullptr;
+    this->inputStreams.at(i) = nullptr;
 
     for (auto &stream : this->inputs)
     {
@@ -42,7 +43,7 @@ int TransformationNode::init()
 
         if (gstream->getSpecification()->getRepresentation() == tinput.at(i)->name)
         {
-          this->inputStream.at(i) = gstream;
+          this->inputStreams.at(i) = gstream;
           break;
         }
       }
@@ -52,7 +53,7 @@ int TransformationNode::init()
                     stream->toString(),this->toString());
       }
 
-      if (this->inputStream.at(i) == nullptr)
+      if (this->inputStreams.at(i) == nullptr)
       {
         _log->error("No input stream found with representation '%v', node '%v' is invalid",
                     tinput.at(i)->name, this->toString());
@@ -60,6 +61,27 @@ int TransformationNode::init()
         return 1;
       }
     }
+  }
+
+  if (this->outputs.size() != 1)
+  {
+    _log->error("Invalid output size '%v', node '%v' is invalid",
+                this->outputs.size(), this->toString());
+    this->valid = false;
+    return 1;
+  }
+
+  if (typeid(GContainer) == *this->outputs[0]->getTypeInfo())
+  {
+    auto gstream = std::static_pointer_cast<InformationStream<GContainer>>(this->outputs[0]);
+
+    if (gstream->getSpecification()->getRepresentation() != this->transformation->getTargetRepresentation()->name)
+    {
+      _log->error("Invalid GContainer representation '%v', node '%v' is invalid",
+                  gstream->getSpecification()->getRepresentation(), this->toString());
+    }
+
+    this->outputStream = gstream;
   }
 
   return 0;
@@ -83,12 +105,12 @@ int TransformationNode::performNode()
 
   for (int i=0; i < this->inputSize; ++i)
   {
-    auto element = this->inputStream.at(i)->getLast();
+    auto element = this->inputStreams.at(i)->getLast();
 
     if (element == nullptr)
     {
       _log->warn("Performing auto iro node aborted, no input element for '%v' of node '%v'",
-                 this->inputStream.at(i)->toString(),this->toString());
+                 this->inputStreams.at(i)->toString(),this->toString());
       return 1;
     }
 
@@ -96,7 +118,8 @@ int TransformationNode::performNode()
   }
 
   auto input = const_cast<std::shared_ptr<GContainer>*>(this->inputElements.data());
-  this->transformation->transform(input);
+  auto output = this->transformation->transform(input);
+  this->outputStream->add(output);
 
   return 0;
 }

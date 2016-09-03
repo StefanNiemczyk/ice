@@ -8,7 +8,7 @@
 TEST(NodeStoreTest, create)
 {
   ice::Node::registerNodeCreator("SimpleSourceNode", &SimpleSourceNode::createNode);
-  ice::Node::registerNodeCreator("smothing", &SmothingNode::createNode);
+  ice::Node::registerNodeCreator("smoothing", &SmothingNode::createNode);
 
 
   auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
@@ -27,7 +27,7 @@ TEST(NodeStoreTest, create)
 //  const NodeType type, const std::string className, const std::string name,
 //                                       const ont::entity entity, const ont::entity entityRelated,
 //                                       std::map<std::string, std::string> config,
-  auto node = engine->getNodeStore()->registerNode(ice::NodeType::PROCESSING, "smothing", "SmothingProcessingNode", "testEntity1", "none", configNode);
+  auto node = engine->getNodeStore()->registerNode(ice::NodeType::PROCESSING, "smoothing", "SmothingProcessingNode", "testEntity1", "none", configNode);
 
   ASSERT_TRUE(node ? true : false);
 }

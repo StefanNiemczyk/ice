@@ -518,15 +518,17 @@ GContainer* GContainerFactory::makeGContainerInstance(std::shared_ptr<Representa
   }
 }
 
-int GContainerFactory::addXMLTransformation(std::string &fileName)
+int GContainerFactory::readXMLTransformation(std::string fileName)
 {
   ice::XMLTransformationReader reader;
 
-  if (false == reader.readFile("data/transformation_example_1.xml"))
+  if (false == reader.readFile(fileName))
   {
     _log->error("Could not read XML Transformation file '%v'", fileName);
     return 0;
   }
+
+  int count = 0;
 
   for (auto desc : reader.getTransformations())
   {
@@ -538,8 +540,18 @@ int GContainerFactory::addXMLTransformation(std::string &fileName)
       continue;
     }
 
-    this->addTransformation(trans->getName(), trans);
+    if (this->addTransformation(trans->getName(), trans))
+    {
+      _log->info("Added transformation '%v'", trans->getName());
+      ++count;
+    }
+    else
+    {
+      _log->error("Failed to add transformation '%v'", trans->getName());
+    }
   }
+
+  return count;
 }
 
 std::shared_ptr<Transformation> GContainerFactory::fromXMLDesc(TransDesc* desc)
@@ -1009,6 +1021,7 @@ bool GContainerFactory::registerNodeForTransformation(std::shared_ptr<Transforma
 
   if (Node::registerNodeCreator(tn.name, tn.creator))
   {
+    _log->warn("Could not create node creator for node '%v'", tn.name);
     return false;
   }
 
