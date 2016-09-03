@@ -19,7 +19,7 @@
 #include "ice/processing/EventHandler.h"
 #include "ice/processing/NodeDescription.h"
 
-#include "boost/uuid/uuid.hpp"
+#include "easylogging++.h"
 
 namespace ice
 {
@@ -111,6 +111,7 @@ public:
 
 protected:
   long                                                  cyclicTriggerTime;      /**< period time of triggering this node */
+  bool                                                  valid;                  /**< True if node is valid, false otherwise */
   bool                                                  active;                 /**< True if the current node is active, else false */
   std::set<std::shared_ptr<Entity>>                     registeredEngines;      /**< Engines which are using this node */
   std::vector<std::shared_ptr<BaseInformationStream>>   inputs;                 /**< Input streams */
@@ -120,6 +121,7 @@ protected:
   std::map<std::string, std::string>                    configuration;          /**< Node Configuration */
   std::shared_ptr<NodeDescription>                      nodeDescription;        /**< Description of the node, used communication with others */
   std::mutex                                            mtx_;                   /**< Mutex */
+  el::Logger                                            *_log;                  /**< Logger */
 };
 
 } /* namespace ice */

@@ -113,11 +113,11 @@ add_library(${PROJECT_NAME}
   src/engine/NodeDescription.cpp
   src/engine/StreamDescription.cpp
   
-  src/engine/AutoIRONode.cpp
   src/engine/EventHandler.cpp
   src/engine/LambdaTask.cpp
   src/engine/Node.cpp
   src/engine/NodeStore.cpp
+  src/engine/TransformationNode.cpp
   
   src/engine/BaseInformationStream.cpp
   src/engine/InformationSpecification.cpp
