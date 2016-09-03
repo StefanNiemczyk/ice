@@ -49,6 +49,8 @@ void ICEngine::init()
   this->updateStrategie = std::make_shared<FastUpdateStrategie>(this->shared_from_this());
   this->gcontainerFactory = std::make_shared<GContainerFactory>(this->shared_from_this());
   this->aspTransformationGenerator = std::make_shared<ASPTransformationGeneration>(this->shared_from_this());
+  if (this->streamFactory == nullptr)
+    this->streamFactory = std::make_shared<StreamFactory>(this->shared_from_this());
 
   // Initialize entity directory
   this->entityDirectory->init();
@@ -70,6 +72,7 @@ void ICEngine::init()
   this->streamStore->init();
   this->gcontainerFactory->init();
   this->aspTransformationGenerator->init();
+  this->streamFactory->init();
 
   // Initialize update strategy
   this->updateStrategie->init();
@@ -122,6 +125,9 @@ void ICEngine::cleanUp()
 
   if (this->aspTransformationGenerator)
     this->aspTransformationGenerator->cleanUp();
+
+  if (this->streamStore)
+    this->streamStore->cleanUp();
 }
 
 

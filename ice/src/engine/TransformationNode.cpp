@@ -76,7 +76,8 @@ int TransformationNode::performNode()
 {
   if (this->valid == false)
   {
-// TODO
+    _log->error("Aborted performing invalid transformation node '%v'",
+                this->toString());
     return 1;
   }
 
@@ -98,6 +99,11 @@ int TransformationNode::performNode()
   this->transformation->transform(input);
 
   return 0;
+}
+
+std::string TransformationNode::getClassName()
+{
+  return this->transformation->getName();
 }
 
 } /* namespace ice */

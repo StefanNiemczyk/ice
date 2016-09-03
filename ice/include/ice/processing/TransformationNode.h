@@ -29,6 +29,7 @@ public:
   virtual int cleanUp();
 
   virtual int performNode();
+  virtual std::string getClassName();
 
 private:
   std::vector<std::shared_ptr<InformationStream<GContainer>>>   inputStream;

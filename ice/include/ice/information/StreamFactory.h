@@ -17,6 +17,8 @@
 namespace ice
 {
 
+class ICEngine;
+
 //* StreamFactory
 /**
  * Factory class to create InformationStreams by a type name.
@@ -30,7 +32,7 @@ public:
    *
    * Default constructor
    */
-  StreamFactory();
+  StreamFactory(std::weak_ptr<ICEngine> engine);
 
   /*!
    * \brief Default destructor
@@ -38,6 +40,9 @@ public:
    * Default destructor
    */
   virtual ~StreamFactory();
+
+  virtual void init();
+  virtual void cleanUp();
 
   /*!
    * \brief Creates a information stream for a given class name and returns a base information
@@ -58,6 +63,10 @@ public:
                                                               std::shared_ptr<EventHandler> eventHandler,
                                                               int streamSize,
                                                               int sharingMaxCount = 0) const;
+
+  protected:
+  std::weak_ptr<ICEngine>               engine;
+  std::shared_ptr<GContainerFactory>    gcontainerFactory;
 };
 
 } /* namespace ice */

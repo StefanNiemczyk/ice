@@ -34,7 +34,8 @@ class Node : public AsynchronousTask, public std::enable_shared_from_this<Node>
 {
   // static part
 public:
-  typedef std::shared_ptr<Node> (*creatorFunc)();
+  using creatorFunc = std::function<std::shared_ptr<Node>()>;
+//  typedef std::shared_ptr<Node> (*creatorFunc)();
   static int registerNodeCreator(const std::string &className, const creatorFunc &creator);
   static std::shared_ptr<Node> createNode(const std::string &className);
   static bool existNodeCreator(const std::string &className);

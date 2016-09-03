@@ -7,10 +7,14 @@
 
 #include "ice/information/StreamFactory.h"
 
+#include "ice/ICEngine.h"
+#include "ice/representation/GContainer.h"
+#include "ice/representation/GContainerFactory.h"
+
 namespace ice
 {
 
-StreamFactory::StreamFactory()
+StreamFactory::StreamFactory(std::weak_ptr<ICEngine> engine) : engine(engine)
 {
   //
 }
@@ -18,6 +22,17 @@ StreamFactory::StreamFactory()
 StreamFactory::~StreamFactory()
 {
   //
+}
+
+void StreamFactory::init()
+{
+  auto e = this->engine.lock();
+  this->gcontainerFactory = e->getGContainerFactory();
+}
+
+void StreamFactory::cleanUp()
+{
+  this->gcontainerFactory.reset();
 }
 
 std::shared_ptr<BaseInformationStream> StreamFactory::createStream(const std::string& className,
@@ -79,6 +94,16 @@ std::shared_ptr<BaseInformationStream> StreamFactory::createStream(const std::st
   {
     stream = std::make_shared<InformationStream<std::vector<bool>>>(streamDescription, eventHandler, streamSize,
     sharingMaxCount);
+  }
+  else
+  {
+    auto rep = this->gcontainerFactory->getRepresentation(className);
+
+    if (rep != nullptr)
+    {
+      stream = std::make_shared<InformationStream<GContainer>>(streamDescription, eventHandler, streamSize,
+      sharingMaxCount);
+    }
   }
 
   return stream;

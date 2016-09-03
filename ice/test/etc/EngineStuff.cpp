@@ -8,9 +8,13 @@
 #include "ice/information/InformationStream.h"
 #include "ice/information/StreamFactory.h"
 #include "ice/processing/Node.h"
+#include "ice/ICEngine.h"
 
 class TestFactory : public ice::StreamFactory
 {
+public:
+  TestFactory(std::weak_ptr<ice::ICEngine> engine) : ice::StreamFactory(engine) {}
+
   std::shared_ptr<ice::BaseInformationStream> createStream(const std::string& className,
                                                            std::shared_ptr<ice::StreamDescription> streamDescription,
                                                            std::shared_ptr<ice::EventHandler> eventHandler,

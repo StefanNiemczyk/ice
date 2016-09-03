@@ -34,7 +34,7 @@ std::shared_ptr<Node> Node::createNode(const std::string& className)
   if (Node::creators.find(className) == Node::creators.end())
     return nullptr;
 
-  return (*Node::creators[className])();
+  return (Node::creators[className])();
 }
 
 bool Node::existNodeCreator(const std::string &className)
