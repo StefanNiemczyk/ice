@@ -224,7 +224,7 @@ void CommunicationInterface::workerTask()
   while (this->running)
   {
     // check all n iterations for new peers
-    if (counter >= 100)
+    if (counter >= 10)
     {
       this->discover();
       this->directory->checkTimeout();
@@ -258,6 +258,17 @@ void CommunicationInterface::workerTask()
       for (int i = 0; i < this->comJobsOwn.size(); ++i)
       {
         auto &job = this->comJobsOwn.at(i);
+
+        if (false == job->getEntity()->isAvailable())
+        {
+          // pause job
+          auto time = job->getEntity()->getActiveTimestamp();
+          if (this->timeFactory->checkTimeout(time, 60000))
+          {
+            job->abort();
+          }
+        }
+
         switch (job->getState())
         {
           case (CJ_CREATED):
@@ -280,6 +291,16 @@ void CommunicationInterface::workerTask()
       for (int i = 0; i < this->comJobsIncomming.size(); ++i)
       {
         auto &job = this->comJobsIncomming.at(i);
+
+        if (false == job->getEntity()->isAvailable())
+        {
+          // pause job
+          auto time = job->getEntity()->getActiveTimestamp();
+          if (this->timeFactory->checkTimeout(time, 60000))
+          {
+            job->abort();
+          }
+        }
 
         switch (job->getState())
         {

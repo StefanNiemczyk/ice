@@ -53,16 +53,16 @@ TEST(EvalModelGeneration, simpleEvalTests)
 //    conf.inputsMin = 1;
 //    conf.inputsMax = 4;
 //    conf.skipLevel = false;
-//    scenariosT.transformation(false, false, runs, 5, conf);
+//    scenariosT.transformation(false, false, runs, 50, conf);
 //  }
 
 //  TConf conf;
-  conf.parallelGroupsMin = 150;
+  conf.parallelGroupsMin = 10;
   conf.parallelGroupsMax = 150;
   conf.parallelGrounsStep = 20;
-  conf.levels = {5,5};
-  conf.inputsMin = 2;
-  conf.inputsMax = 2;
+  conf.levels = {10,20};
+  conf.inputsMin = 1;
+  conf.inputsMax = 4;
   conf.skipLevel = false;
-  scenariosT.transformation(false, true, runs, 5, conf);
+  scenariosT.transformation(false, true, runs, 50, conf);
 }

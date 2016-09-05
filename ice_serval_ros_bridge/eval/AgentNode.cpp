@@ -29,7 +29,7 @@ void callback(std::shared_ptr<ice::InformationRequest> request)
   auto end = std::chrono::system_clock::now();
   auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-  sleep(2);
+  sleep(10);
 
   auto &traffic = node->getCommunicationInterface()->getTraffic();
   unsigned long long trafficSum = traffic.sendBytes + traffic.receivedBytes;
@@ -50,7 +50,7 @@ void callback(std::shared_ptr<ice::InformationRequest> request)
                                                                   "http://vs.uni-kassel.de/TurtleBot#Landmark");
 
     auto r = std::make_shared<ice::InformationRequest>(node, mops);
-    r->setTimeout(500);
+    r->setTimeout(3000);
     r->getRequests().push_back(spec);
     r->setCallbackFinished(&callback);
 
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
                                                               "http://vs.uni-kassel.de/TurtleBot#Landmark");
 
   auto request = std::make_shared<ice::InformationRequest>(node, mops);
-  request->setTimeout(500);
+  request->setTimeout(3000);
   request->getRequests().push_back(spec);
   request->setCallbackFinished(&callback);
 
