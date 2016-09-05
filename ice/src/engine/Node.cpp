@@ -42,6 +42,11 @@ bool Node::existNodeCreator(const std::string &className)
   return Node::creators.find(className) != Node::creators.end();
 }
 
+void Node::clearNodeStore()
+{
+  Node::creators.clear();
+}
+
 // object part
 Node::Node() : active(false), cyclicTriggerTime(-1), valid(true)
 {

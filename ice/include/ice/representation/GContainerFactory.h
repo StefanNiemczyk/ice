@@ -43,6 +43,7 @@ namespace ice
 struct TransNode
 {
   std::string                                   name;
+  std::string                                   shortName;
   std::shared_ptr<Transformation>               transformation;
   std::function<std::shared_ptr<Node>()>        creator;
 };
@@ -71,6 +72,7 @@ public:
 
   int readXMLTransformation(std::string fileName);
   std::shared_ptr<Transformation> fromXMLDesc(TransDesc* desc);
+  std::unique_ptr<std::vector<std::vector<std::string>>> getASPRepresentation(std::string system);
   void* convertStringToBasic(BasicRepresentationType type, std::string value);
 
   void printReps();
@@ -80,6 +82,7 @@ public:
   std::shared_ptr<Transformation> getTransformation(std::vector<std::string> &sourceReps, std::string &targetRep);
   std::shared_ptr<Transformation> getTransformationTo(std::string &targetRep);
   std::shared_ptr<Transformation> getTransformationByName(std::string &name);
+  std::shared_ptr<TransNode> getTransNode(std::string &name);
 
 private:
   GContainer* makeGContainerInstance(std::shared_ptr<Representation> representation);
@@ -95,7 +98,7 @@ private:
                                            std::map<std::string, std::shared_ptr<Representation>> *tmpMap);
   bool fromJSONValue(const Value &value, std::shared_ptr<GContainer> gc,
                         std::shared_ptr<Representation> rep, std::vector<int>* ap);
-  bool registerNodeForTransformation(std::shared_ptr<Transformation> const &transformation);
+  bool registerNodeForTransformation(std::shared_ptr<TransNode> &transformation);
 
 private:
   el::Logger                                                    *_log;
@@ -103,8 +106,8 @@ private:
   std::shared_ptr<OntologyInterface>                            ontologyInterface;
   std::map<std::string, std::shared_ptr<Representation>>        repMap;
   std::map<std::string, BasicRepresentationType>                typeMap;
-  std::map<std::string, std::shared_ptr<Transformation>>        transformations;
-  std::vector<TransNode>                                        tNodes;
+  int                                                           transIter;
+  std::map<std::string, std::shared_ptr<TransNode>>             transformations;
 };
 
 }  // namespace ice

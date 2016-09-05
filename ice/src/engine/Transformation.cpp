@@ -89,6 +89,11 @@ const std::string Transformation::getName() const
   return this->name;
 }
 
+const std::string Transformation::getScope() const
+{
+  return this->scope;
+}
+
 std::shared_ptr<Representation> Transformation::getTargetRepresentation()
 {
   return this->targetRepresentation;
@@ -134,36 +139,6 @@ void Transformation::print()
         break;
     }
   }
-}
-
-std::unique_ptr<std::vector<std::string>> Transformation::getASPRepreentation(std::string system)
-{
-  // example
-//  iro(system1,allo2ego,any,any).
-//  input2(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).
-//  input(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).
-//  output(system1,allo2ego,position,egoCoords,any).
-//  metadataOutput(delay,system1,allo2ego,max,0,0).
-//  metadataOutput(accuracy,system1,allo2ego,avg,0,1).
-//  iroCost(system1,allo2ego,1).
-
-  auto vec = std::unique_ptr<std::vector<std::string>>(new std::vector<std::string>());
-  std::string iro = "iro(" + system + "," + this->name + ",any,none).";
-
-  vec->push_back(iro);
-
-  std::string output = "output(" + system + "," + this->name + "," + this->scope + "," + this->targetRepresentation->name + ",none).";
-  vec->push_back(output);
-
-  for (auto input : this->inputs)
-  {
-    std::string inStr = "input(" + system + "," + this->name + "," + this->scope + "," + input->name + ",none,1,1) :- " + iro;
-    vec->push_back(inStr);
-  }
-
-  // TODO metadata?
-
-  return std::move(vec);
 }
 
 double Transformation::convertDouble(void *data, BasicRepresentationType type)

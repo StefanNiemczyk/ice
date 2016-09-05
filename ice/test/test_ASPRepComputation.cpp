@@ -10,6 +10,7 @@
 #include <ros/package.h>
 
 #include "ice/ontology/OntologyInterface.h"
+#include "ice/processing/Node.h"
 #include "ice/representation/ASPTransformationGeneration.h"
 #include "ice/representation/Representation.h"
 #include "ice/representation/GContainer.h"
@@ -141,6 +142,8 @@ TEST(ASPRepComp, ontology1)
 
 TEST(ASPRepComp, ontology2)
 {
+  ice::Node::clearNodeStore();
+
   std::string path = ros::package::getPath("ice");
   bool result;
 
@@ -255,26 +258,45 @@ TEST(ASPRepComp, ontology2)
   EXPECT_EQ(out->getValue<double>(outOb), b);
   EXPECT_EQ(out->getValue<double>(outOc), c);
 
-  auto aspStr = trans->getASPRepreentation("system");
-  for (auto s : *aspStr)
+  auto tnode = factory->getTransNode(name);
+
+  ASSERT_NE(nullptr, tnode);
+
+  auto aspStr = factory->getASPRepresentation("system");
+
+  std::string iroStr = "iro(system," + tnode->shortName + ",any,none).";
+  std::string outStr = "output(system," + tnode->shortName + ",o0_TestScope1,o0_TestTransformation2,none).";
+  std::string inStr = "input(system," + tnode->shortName + ",o0_TestScope1,o0_TestTransformation1,none,1,1) :- iro(system," + tnode->shortName + ",any,none).";
+
+  bool found = false;
+
+  for (auto str : *aspStr)
   {
-    if (s == "iro(system,autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2,any,none).")
+    if (str.at(0).find(tnode->shortName) == std::string::npos)
+      continue;
+
+    found = true;
+
+    for (auto s : str)
     {
-      // fine
-    }
-    else if (s
-        == "output(system,autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2,http://vs.uni-kassel.de/IceTest#TestScope1,http://vs.uni-kassel.de/IceTest#TestTransformation2,none).")
-    {
-      // fine
-    }
-    else if (s
-        == "input(system,autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2,http://vs.uni-kassel.de/IceTest#TestScope1,http://vs.uni-kassel.de/IceTest#TestTransformation1,none,1,1) :- iro(system,autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2,any,none).")
-    {
-      // fine
-    }
-    else
-    {
-      ASSERT_ANY_THROW() << "Unknown string " + s;
+      if (s == iroStr)
+      {
+        // fine
+      }
+      else if (s == inStr)
+      {
+        // fine
+      }
+      else if (s == outStr)
+      {
+        // fine
+      }
+      else
+      {
+        ASSERT_ANY_THROW() << "Unknown string " + s;
+      }
     }
   }
+
+  ASSERT_TRUE(found);
 }

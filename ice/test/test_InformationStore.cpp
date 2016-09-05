@@ -20,9 +20,12 @@
 #include "ice/information/InformationElement.h"
 #include "ice/information/InformationStore.h"
 #include "ice/information/InformationSpecification.h"
+#include "ice/processing/Node.h"
 
 TEST(InformationStore, simpleTest)
 {
+  ice::Node::clearNodeStore();
+
   std::string path = ros::package::getPath("ice");
   bool result;
 
@@ -80,6 +83,8 @@ TEST(InformationStore, simpleTest)
 
 TEST(InformationStore, ontology1)
 {
+  ice::Node::clearNodeStore();
+
   std::string path = ros::package::getPath("ice");
   bool result;
 

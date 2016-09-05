@@ -22,7 +22,7 @@
 namespace ice
 {
 
-GContainerFactory::GContainerFactory()
+GContainerFactory::GContainerFactory() : transIter(0)
 {
   _log = el::Loggers::getLogger("GContainerFactory");
 
@@ -41,7 +41,7 @@ GContainerFactory::GContainerFactory()
 }
 
 GContainerFactory::GContainerFactory(std::weak_ptr<ICEngine> engine) :
-    engine(engine)
+    engine(engine), transIter(0)
 {
   _log = el::Loggers::getLogger("GContainerFactory");
 }
@@ -926,8 +926,12 @@ bool GContainerFactory::addTransformation(std::string name, std::shared_ptr<Tran
   if (this->transformations.end() != it)
     return false;
 
-  this->transformations[name] = transformation;
-  this->registerNodeForTransformation(transformation);
+  auto tn = std::make_shared<TransNode>();
+  tn->transformation = transformation;
+  tn->name = transformation->getName();
+  tn->shortName = "iro" + std::to_string(++this->transIter);
+  this->registerNodeForTransformation(tn);
+  this->transformations[name] = tn;
 
   return true;
 }
@@ -936,12 +940,12 @@ std::shared_ptr<Transformation> GContainerFactory::getTransformation(std::string
 {
   for (auto &trans : this->transformations)
   {
-    if (trans.second->getTargetRepresentation()->name != targetRep)
+    if (trans.second->transformation->getTargetRepresentation()->name != targetRep)
       continue;
 
-    auto &v = trans.second->getInputs();
+    auto &v = trans.second->transformation->getInputs();
     if (v.size() == 1 && v[0]->name == sourceRep)
-      return trans.second;
+      return trans.second->transformation;
   }
 
   return nullptr;
@@ -952,10 +956,10 @@ std::shared_ptr<Transformation> GContainerFactory::getTransformation(std::vector
 {
   for (auto &trans : this->transformations)
   {
-    if (trans.second->getTargetRepresentation()->name != targetRep)
+    if (trans.second->name != targetRep)
       continue;
 
-    auto &v = trans.second->getInputs();
+    auto &v = trans.second->transformation->getInputs();
     if (v.size() != sourceReps.size())
       continue;
 
@@ -980,7 +984,7 @@ std::shared_ptr<Transformation> GContainerFactory::getTransformation(std::vector
     }
 
     if (match)
-      return trans.second;
+      return trans.second->transformation;
   }
 
   return nullptr;
@@ -990,8 +994,8 @@ std::shared_ptr<Transformation> GContainerFactory::getTransformationTo(std::stri
 {
   for (auto &trans : this->transformations)
   {
-    if (trans.second->getTargetRepresentation()->name == targetRep)
-      return trans.second;
+    if (trans.second->name == targetRep)
+      return trans.second->transformation;
   }
 
   return nullptr;
@@ -1004,30 +1008,75 @@ std::shared_ptr<Transformation> GContainerFactory::getTransformationByName(std::
   if (this->transformations.end() == it)
     return nullptr;
 
+  return it->second->transformation;
+}
+
+std::shared_ptr<TransNode> GContainerFactory::getTransNode(std::string &name)
+{
+  auto it = this->transformations.find(name);
+
+  if (this->transformations.end() == it)
+    return nullptr;
+
   return it->second;
 }
 
-bool GContainerFactory::registerNodeForTransformation(std::shared_ptr<Transformation> const &transformation)
+bool GContainerFactory::registerNodeForTransformation(std::shared_ptr<TransNode> &transNode)
 {
-  TransNode tn;
-
-  tn.creator = [transformation](){
-    auto node = std::make_shared<TransformationNode>(transformation);
+  transNode->creator = [transNode](){
+    auto node = std::make_shared<TransformationNode>(transNode->transformation);
 
     return node;
   };
-  tn.transformation = transformation;
-  tn.name = transformation->getName();
 
-  if (Node::registerNodeCreator(tn.name, tn.creator))
+  if (Node::registerNodeCreator(transNode->name, transNode->creator))
   {
-    _log->warn("Could not create node creator for node '%v'", tn.name);
+    _log->warn("Could not create node creator for node '%v'", transNode->name);
     return false;
   }
-
-  tNodes.push_back(tn);
 
   return true;
 }
 
+std::unique_ptr<std::vector<std::vector<std::string>>> GContainerFactory::getASPRepresentation(std::string system)
+{
+  // example
+//  iro(system1,allo2ego,any,any).
+//  input2(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).
+//  input(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).
+//  output(system1,allo2ego,position,egoCoords,any).
+//  metadataOutput(delay,system1,allo2ego,max,0,0).
+//  metadataOutput(accuracy,system1,allo2ego,avg,0,1).
+//  iroCost(system1,allo2ego,1).
+
+  auto returnVec = std::unique_ptr<std::vector<std::vector<std::string>>>(new std::vector<std::vector<std::string>>());
+
+  for(auto &transNode : this->transformations)
+  {
+    std::vector<std::string> vec;
+    auto &trans = transNode.second->transformation;
+    auto &name = transNode.second->shortName;
+    auto scope = this->ontologyInterface->toShortIri(trans->getScope());
+    std::string iro = "iro(" + system + "," + name + ",any,none).";
+
+    vec.push_back(iro);
+
+    std::string output = "output(" + system + "," + name + "," + scope + ","
+        + this->ontologyInterface->toShortIri(trans->getTargetRepresentation()->name) + ",none).";
+    vec.push_back(output);
+
+    for (auto &input : trans->getInputs())
+    {
+      std::string inStr = "input(" + system + "," + name + "," + scope + ","
+          + this->ontologyInterface->toShortIri(input->name) + ",none,1,1) :- " + iro;
+      vec.push_back(inStr);
+    }
+
+    returnVec->push_back(vec);
+  }
+
+  // TODO metadata?
+
+  return std::move(returnVec);
+}
 }
