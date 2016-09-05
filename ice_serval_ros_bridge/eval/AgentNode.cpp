@@ -29,7 +29,7 @@ void callback(std::shared_ptr<ice::InformationRequest> request)
   auto end = std::chrono::system_clock::now();
   auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-  sleep(10);
+  sleep(1);
 
   auto &traffic = node->getCommunicationInterface()->getTraffic();
   unsigned long long trafficSum = traffic.sendBytes + traffic.receivedBytes;
