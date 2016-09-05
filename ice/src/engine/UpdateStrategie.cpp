@@ -175,12 +175,13 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
 {
   _log->debug("Look up node '%v' to process entity '%v'", nodeDesc.aspName, nodeDesc.entity);
 
+  auto config = this->readConfiguration(nodeDesc.config);
   auto node = this->nodeStore->registerNode(static_cast<NodeType>(nodeDesc.type),
                                             nodeDesc.className,
                                             nodeDesc.aspName,
                                             nodeDesc.entity,
                                             nodeDesc.relatedEntity,
-                                            this->readConfiguration(nodeDesc.config));
+                                            config);
 
   if (node == nullptr)
   {

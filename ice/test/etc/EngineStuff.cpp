@@ -8,22 +8,23 @@
 #include "ice/information/InformationStream.h"
 #include "ice/information/StreamFactory.h"
 #include "ice/processing/Node.h"
+#include "ice/ICEngine.h"
 
 class TestFactory : public ice::StreamFactory
 {
+public:
+  TestFactory(std::weak_ptr<ice::ICEngine> engine) : ice::StreamFactory(engine) {}
+
   std::shared_ptr<ice::BaseInformationStream> createStream(const std::string& className,
                                                            std::shared_ptr<ice::StreamDescription> streamDescription,
                                                            std::shared_ptr<ice::EventHandler> eventHandler,
                                                            int streamSize,
                                                            int sharingMaxCount) const
   {
-    auto stream = ice::StreamFactory::createStream(className, streamDescription, eventHandler, streamSize,
-                                                   sharingMaxCount);
-    if (stream)
-      return stream;
-
     if (className == "")
-      return stream;
+      return nullptr;
+
+    std::shared_ptr<ice::BaseInformationStream> stream;
 
     if ("Position" == className)
     {
@@ -45,6 +46,12 @@ class TestFactory : public ice::StreamFactory
       stream = std::make_shared<ice::InformationStream<std::vector<ice::Position>>>(streamDescription, eventHandler, streamSize,
           sharingMaxCount);
     }
+
+    if (stream == nullptr)
+      stream = ice::StreamFactory::createStream(className, streamDescription, eventHandler, streamSize, sharingMaxCount);
+
+    if (stream)
+      return stream;
 
     return stream;
   }

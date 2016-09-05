@@ -42,8 +42,7 @@ std::shared_ptr<Node> NodeStore::getNode(const std::string nodeName, const ont::
 {
   if ("" == nodeName || entity == "")
   {
-    std::shared_ptr<Node> ptr;
-    return ptr;
+    return nullptr;
   }
 
   std::lock_guard<std::mutex> guard(this->mtx_);
@@ -55,13 +54,14 @@ std::shared_ptr<Node> NodeStore::getNode(const std::string nodeName, const ont::
       return node;
   }
 
-  std::shared_ptr<Node> ptr;
-  return ptr;
+  _log->info("No node found for nodename '%v'", nodeName);
+
+  return nullptr;
 }
 
 std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::string className, const std::string name,
-                                              const ont::entity entity, const ont::entity entityRelated, std::map<std::string, std::string> config,
-                                              const std::string source)
+                                              const ont::entity entity, const ont::entity entityRelated,
+                                              std::map<std::string, std::string> &config, const std::string source)
 {
   auto node = this->getNode(name, entity);
 

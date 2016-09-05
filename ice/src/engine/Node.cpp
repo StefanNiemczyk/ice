@@ -34,7 +34,7 @@ std::shared_ptr<Node> Node::createNode(const std::string& className)
   if (Node::creators.find(className) == Node::creators.end())
     return nullptr;
 
-  return (*Node::creators[className])();
+  return (Node::creators[className])();
 }
 
 bool Node::existNodeCreator(const std::string &className)
@@ -43,11 +43,9 @@ bool Node::existNodeCreator(const std::string &className)
 }
 
 // object part
-Node::Node()
+Node::Node() : active(false), cyclicTriggerTime(-1), valid(true)
 {
-  this->eventHandler = eventHandler;
-  this->active = false;
-  this->cyclicTriggerTime = cyclicTriggerTime;
+  _log = el::Loggers::getLogger("Node");
 }
 
 Node::~Node()
@@ -231,7 +229,7 @@ void Node::deactivate()
 
 bool Node::isValid()
 {
-  return true;
+  return this->valid;
 }
 
 long Node::getCyclicTriggerTime() const

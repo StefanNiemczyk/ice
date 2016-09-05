@@ -113,11 +113,11 @@ add_library(${PROJECT_NAME}
   src/engine/NodeDescription.cpp
   src/engine/StreamDescription.cpp
   
-  src/engine/AutoIRONode.cpp
   src/engine/EventHandler.cpp
   src/engine/LambdaTask.cpp
   src/engine/Node.cpp
   src/engine/NodeStore.cpp
+  src/engine/TransformationNode.cpp
   
   src/engine/BaseInformationStream.cpp
   src/engine/InformationSpecification.cpp
@@ -198,6 +198,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/test_NodeStore.cpp
   test/test_CallbackList.cpp
   test/test_InformationStore.cpp
+  test/test_TransformationNode.cpp
 
   test/test_main.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test

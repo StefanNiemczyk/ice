@@ -5,15 +5,11 @@
  *      Author: paspartout
  */
 
-//#include <cctype>
-//#include <cerrno>
-//#include <cstdlib>
-//#include <cstring>
 #include <iostream>
 #include <map>
 #include <stack>
-//#include <stddef.h>
 
+#include "ice/processing/TransformationNode.h"
 #include "ice/representation/GContainer.h"
 #include "ice/representation/GContainerFactory.h"
 #include "ice/representation/split.h"
@@ -522,6 +518,42 @@ GContainer* GContainerFactory::makeGContainerInstance(std::shared_ptr<Representa
   }
 }
 
+int GContainerFactory::readXMLTransformation(std::string fileName)
+{
+  ice::XMLTransformationReader reader;
+
+  if (false == reader.readFile(fileName))
+  {
+    _log->error("Could not read XML Transformation file '%v'", fileName);
+    return 0;
+  }
+
+  int count = 0;
+
+  for (auto desc : reader.getTransformations())
+  {
+    auto trans = this->fromXMLDesc(desc);
+
+    if (trans == nullptr)
+    {
+      _log->error("Transformation failed to extract from file '%v'", fileName);
+      continue;
+    }
+
+    if (this->addTransformation(trans->getName(), trans))
+    {
+      _log->info("Added transformation '%v'", trans->getName());
+      ++count;
+    }
+    else
+    {
+      _log->error("Failed to add transformation '%v'", trans->getName());
+    }
+  }
+
+  return count;
+}
+
 std::shared_ptr<Transformation> GContainerFactory::fromXMLDesc(TransDesc* desc)
 {
   auto rep = this->getRepresentation(desc->output);
@@ -887,7 +919,7 @@ void GContainerFactory::printReps(std::shared_ptr<Representation> representation
 
 }
 
-bool GContainerFactory::addTransformation(std::string &name, std::shared_ptr<Transformation> &transformation)
+bool GContainerFactory::addTransformation(std::string name, std::shared_ptr<Transformation> &transformation)
 {
   auto it = this->transformations.find(name);
 
@@ -895,6 +927,7 @@ bool GContainerFactory::addTransformation(std::string &name, std::shared_ptr<Tra
     return false;
 
   this->transformations[name] = transformation;
+  this->registerNodeForTransformation(transformation);
 
   return true;
 }
@@ -972,6 +1005,29 @@ std::shared_ptr<Transformation> GContainerFactory::getTransformationByName(std::
     return nullptr;
 
   return it->second;
+}
+
+bool GContainerFactory::registerNodeForTransformation(std::shared_ptr<Transformation> const &transformation)
+{
+  TransNode tn;
+
+  tn.creator = [transformation](){
+    auto node = std::make_shared<TransformationNode>(transformation);
+
+    return node;
+  };
+  tn.transformation = transformation;
+  tn.name = transformation->getName();
+
+  if (Node::registerNodeCreator(tn.name, tn.creator))
+  {
+    _log->warn("Could not create node creator for node '%v'", tn.name);
+    return false;
+  }
+
+  tNodes.push_back(tn);
+
+  return true;
 }
 
 }
