@@ -39,6 +39,7 @@ public:
   static int registerNodeCreator(const std::string &className, const creatorFunc &creator);
   static std::shared_ptr<Node> createNode(const std::string &className);
   static bool existNodeCreator(const std::string &className);
+  static void clearNodeStore();
 
 private:
   static std::map<std::string, creatorFunc> creators;

@@ -108,6 +108,7 @@ public:
   std::shared_ptr<GContainer> transform(std::shared_ptr<GContainer>* inputs);
 
   const std::string getName() const;
+  const std::string getScope() const;
   std::shared_ptr<Representation> getTargetRepresentation();
   std::vector<TransformationOperation*>& getOperations();
   std::vector<std::shared_ptr<Representation>>& getInputs();
