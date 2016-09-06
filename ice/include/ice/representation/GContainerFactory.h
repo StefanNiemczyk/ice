@@ -44,6 +44,7 @@ struct TransNode
 {
   std::string                                   name;
   std::string                                   shortName;
+  bool                                          autoTransformation;
   std::shared_ptr<Transformation>               transformation;
   std::function<std::shared_ptr<Node>()>        creator;
 };
@@ -72,12 +73,13 @@ public:
 
   int readXMLTransformation(std::string fileName);
   std::shared_ptr<Transformation> fromXMLDesc(TransDesc* desc);
-  std::unique_ptr<std::vector<std::vector<std::string>>> getASPRepresentation(std::string system);
+  std::unique_ptr<std::vector<std::vector<std::string>>> getASPRepresentation(std::string system, bool autoTransformation);
   void* convertStringToBasic(BasicRepresentationType type, std::string value);
 
   void printReps();
 
-  bool addTransformation(std::string name, std::shared_ptr<Transformation> &transformation);
+  bool addTransformation(std::string name, std::shared_ptr<Transformation> &transformation, bool autoTransformation);
+  std::map<std::string, std::shared_ptr<TransNode>>& getTransformations();
   std::shared_ptr<Transformation> getTransformation(std::string const &sourceRep, std::string const &targetRep);
   std::shared_ptr<Transformation> getTransformation(std::vector<std::string> &sourceReps, std::string &targetRep);
   std::shared_ptr<Transformation> getTransformationTo(std::string &targetRep);
@@ -97,7 +99,7 @@ private:
   std::shared_ptr<Representation> addOrGet(std::string name,
                                            std::map<std::string, std::shared_ptr<Representation>> *tmpMap);
   bool fromJSONValue(const Value &value, std::shared_ptr<GContainer> gc,
-                        std::shared_ptr<Representation> rep, std::vector<int>* ap);
+                     std::shared_ptr<Representation> rep, std::vector<int>* ap);
   bool registerNodeForTransformation(std::shared_ptr<TransNode> &transformation);
 
 private:

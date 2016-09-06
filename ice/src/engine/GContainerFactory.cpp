@@ -540,7 +540,7 @@ int GContainerFactory::readXMLTransformation(std::string fileName)
       continue;
     }
 
-    if (this->addTransformation(trans->getName(), trans))
+    if (this->addTransformation(trans->getName(), trans, false))
     {
       _log->info("Added transformation '%v'", trans->getName());
       ++count;
@@ -919,7 +919,8 @@ void GContainerFactory::printReps(std::shared_ptr<Representation> representation
 
 }
 
-bool GContainerFactory::addTransformation(std::string name, std::shared_ptr<Transformation> &transformation)
+bool GContainerFactory::addTransformation(std::string name, std::shared_ptr<Transformation> &transformation,
+                                          bool autoTransformation)
 {
   auto it = this->transformations.find(name);
 
@@ -930,10 +931,16 @@ bool GContainerFactory::addTransformation(std::string name, std::shared_ptr<Tran
   tn->transformation = transformation;
   tn->name = transformation->getName();
   tn->shortName = "iro" + std::to_string(++this->transIter);
+  tn->autoTransformation = autoTransformation;
   this->registerNodeForTransformation(tn);
   this->transformations[name] = tn;
 
   return true;
+}
+
+std::map<std::string, std::shared_ptr<TransNode>>& GContainerFactory::getTransformations()
+{
+  return this->transformations;
 }
 
 std::shared_ptr<Transformation> GContainerFactory::getTransformation(std::string const &sourceRep, std::string const &targetRep)
@@ -1036,47 +1043,5 @@ bool GContainerFactory::registerNodeForTransformation(std::shared_ptr<TransNode>
   }
 
   return true;
-}
-
-std::unique_ptr<std::vector<std::vector<std::string>>> GContainerFactory::getASPRepresentation(std::string system)
-{
-  // example
-//  iro(system1,allo2ego,any,any).
-//  input2(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).
-//  input(system1,allo2ego,position,coords,none,1,1) :- iro(system1,allo2ego,any,any).
-//  output(system1,allo2ego,position,egoCoords,any).
-//  metadataOutput(delay,system1,allo2ego,max,0,0).
-//  metadataOutput(accuracy,system1,allo2ego,avg,0,1).
-//  iroCost(system1,allo2ego,1).
-
-  auto returnVec = std::unique_ptr<std::vector<std::vector<std::string>>>(new std::vector<std::vector<std::string>>());
-
-  for(auto &transNode : this->transformations)
-  {
-    std::vector<std::string> vec;
-    auto &trans = transNode.second->transformation;
-    auto &name = transNode.second->shortName;
-    auto scope = this->ontologyInterface->toShortIri(trans->getScope());
-    std::string iro = "iro(" + system + "," + name + ",any,none).";
-
-    vec.push_back(iro);
-
-    std::string output = "output(" + system + "," + name + "," + scope + ","
-        + this->ontologyInterface->toShortIri(trans->getTargetRepresentation()->name) + ",none).";
-    vec.push_back(output);
-
-    for (auto &input : trans->getInputs())
-    {
-      std::string inStr = "input(" + system + "," + name + "," + scope + ","
-          + this->ontologyInterface->toShortIri(input->name) + ",none,1,1) :- " + iro;
-      vec.push_back(inStr);
-    }
-
-    returnVec->push_back(vec);
-  }
-
-  // TODO metadata?
-
-  return std::move(returnVec);
 }
 }

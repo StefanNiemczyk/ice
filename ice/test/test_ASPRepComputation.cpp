@@ -257,46 +257,4 @@ TEST(ASPRepComp, ontology2)
   EXPECT_EQ(out->getValue<double>(outOa), a);
   EXPECT_EQ(out->getValue<double>(outOb), b);
   EXPECT_EQ(out->getValue<double>(outOc), c);
-
-  auto tnode = factory->getTransNode(name);
-
-  ASSERT_NE(nullptr, tnode);
-
-  auto aspStr = factory->getASPRepresentation("system");
-
-  std::string iroStr = "iro(system," + tnode->shortName + ",any,none).";
-  std::string outStr = "output(system," + tnode->shortName + ",o0_TestScope1,o0_TestTransformation2,none).";
-  std::string inStr = "input(system," + tnode->shortName + ",o0_TestScope1,o0_TestTransformation1,none,1,1) :- iro(system," + tnode->shortName + ",any,none).";
-
-  bool found = false;
-
-  for (auto str : *aspStr)
-  {
-    if (str.at(0).find(tnode->shortName) == std::string::npos)
-      continue;
-
-    found = true;
-
-    for (auto s : str)
-    {
-      if (s == iroStr)
-      {
-        // fine
-      }
-      else if (s == inStr)
-      {
-        // fine
-      }
-      else if (s == outStr)
-      {
-        // fine
-      }
-      else
-      {
-        ASSERT_ANY_THROW() << "Unknown string " + s;
-      }
-    }
-  }
-
-  ASSERT_TRUE(found);
 }

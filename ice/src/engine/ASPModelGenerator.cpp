@@ -7,13 +7,17 @@
 
 #include "ice/model/aspModel/ASPModelGenerator.h"
 
+#include <sstream>
+
 #include "ice/ICEngine.h"
 #include "ice/Entity.h"
 #include "ice/EntityDirectory.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/information/StreamStore.h"
-#include "ice/processing/NodeStore.h"
 #include "ice/ontology/OntologyInterface.h"
+#include "ice/processing/NodeStore.h"
+#include "ice/representation/GContainerFactory.h"
+#include "ice/representation/Transformation.h"
 
 using namespace std;
 
@@ -26,10 +30,8 @@ ASPModelGenerator::ASPModelGenerator(std::weak_ptr<ICEngine> engine) :
 {
   _log = el::Loggers::getLogger("ASPModelGenerator");
 
-  this->maxChainLength = 10;
   this->queryIndex = 0;
   this->groundingDirty = true;
-  this->globalOptimization = true;
   this->subModelIndex = 0;
 }
 
@@ -45,16 +47,17 @@ void ASPModelGenerator::initInternal()
 
   std::lock_guard<std::mutex> guard(mtxModelGen_);
   auto en = this->engine.lock();
+  this->gcontainerFactory = en->getGContainerFactory();
 
   // Initializing ASP
   this->asp = std::make_shared<supplementary::ClingWrapper>();
   this->asp->addKnowledgeFile(path + "processing.lp");
   this->asp->addKnowledgeFile(path + "searchBottomUp.lp");
 
-  if (this->globalOptimization)
+  if (this->config.globalOptimization)
     this->asp->addKnowledgeFile(path + "globalOptimization.lp");
   else
-    this->asp->addKnowledgeFile(path + "localOptimization.lp"); //DO NOT USE
+    this->asp->addKnowledgeFile(path + "localOptimization.lp");
 
   this->asp->setNoWarnings(true);
   this->asp->init();
@@ -117,7 +120,27 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
     }
 
     this->lastQuery = this->asp->getExternal("query", {this->queryIndex}, "query",
-                                             {this->queryIndex, 3, this->maxChainLength}, true);
+                                             {this->queryIndex, this->config.maxHopCount,
+                                              this->config.maxChainLength}, true);
+  }
+
+  // Transformations
+  this->readTransformations();
+
+  for (auto &trans : this->transformations)
+  {
+    if (trans.node->autoTransformation && this->config.useAutoTransformation)
+    {
+      trans.asp->external->assign(true);
+    }
+    else if (false == trans.node->autoTransformation && this->config.useXMLTransformation)
+    {
+      trans.asp->external->assign(true);
+    }
+    else
+    {
+      trans.asp->external->assign(false);
+    }
   }
 
   // activate and deactivate systems
@@ -511,113 +534,175 @@ void ASPModelGenerator::readSystemsFromOntology()
 
     auto nodes = this->ontology->readNodesAndIROsAsASP(ontSystem);
 
-    auto &types = nodes->at(0);
-    auto &names = nodes->at(1);
-    auto &strings = nodes->at(2);
-    auto &aspStrings = nodes->at(3);
-    auto &cppStrings = nodes->at(4);
+    this->toASP(nodes, entity);
+  }
+}
 
-    for (int i = 0; i < names.size(); ++i)
+void ASPModelGenerator::toASP(std::unique_ptr<std::vector<std::vector<std::string>>> &nodes,
+                              std::shared_ptr<Entity> &entity)
+{
+  auto &types = nodes->at(0);
+  auto &names = nodes->at(1);
+  auto &strings = nodes->at(2);
+  auto &aspStrings = nodes->at(3);
+  auto &cppStrings = nodes->at(4);
+
+  for (int i = 0; i < names.size(); ++i)
+  {
+    std::string &name = names.at(i);
+    std::string &elementStr = strings.at(i);
+    std::string &aspStr = aspStrings.at(i);
+    std::string &cppStr = cppStrings.at(i);
+    std::string &typeStr = types.at(i);
+    ASPElementType type;
+
+    if (typeStr == "" || name == "" || elementStr == "")
     {
-      std::string &name = names.at(i);
-      std::string &elementStr = strings.at(i);
-      std::string &aspStr = aspStrings.at(i);
-      std::string &cppStr = cppStrings.at(i);
-      std::string &typeStr = types.at(i);
-      ASPElementType type;
+      _log->error("Empty string for element '%v': '%v' (elementStr), '%v' (typeStr), element will be skipped",
+                  name, elementStr, typeStr);
 
-      if (typeStr == "" || name == "" || elementStr == "")
-      {
-        _log->error("Empty string for element '%v': '%v' (elementStr), '%v' (typeStr), element will be skipped",
-                    name, elementStr, typeStr);
+      continue;
+    }
 
-        continue;
+    if (typeStr == "COMPUTATION_NODE")
+    {
+      type = ASPElementType::ASP_COMPUTATION_NODE;
+    }
+    else if (typeStr == "SOURCE_NODE")
+    {
+      type = ASPElementType::ASP_SOURCE_NODE;
+    }
+    else if (typeStr == "REQUIRED_STREAM")
+    {
+      type = ASPElementType::ASP_REQUIRED_STREAM;
+    }
+    else if (typeStr == "MAP_NODE")
+    {
+      type = ASPElementType::ASP_MAP_NODE;
+    }
+    else if (typeStr == "IRO_NODE")
+    {
+      type = ASPElementType::ASP_IRO_NODE;
+    }
+    else if (typeStr == "REQUIRED_MAP")
+    {
+      type = ASPElementType::ASP_REQUIRED_MAP;
+    }
+    else
+    {
+      _log->error("Unknown asp element type '%v' for element '%v', element will be skipped", typeStr, name);
+      continue;
+    }
+
+    auto node = entity->getASPElementByName(type, this->ontology->toShortIri(name));
+
+    if (node == nullptr)
+    {
+      _log->info("ASP element '%v' not found, creating new element", std::string(name));
+      auto element = std::make_shared<ASPElement>();
+      element->aspString = this->ontology->toShortIriAll(aspStr);
+      element->name = this->ontology->toShortIri(name);
+      element->state = ASPElementState::ADDED_TO_ASP;
+      element->type = type;
+
+      if (cppStr != "")
+      {
+        int index = cppStr.find('\n');
+
+        if (index == std::string::npos)
+          continue;
+
+        element->className = cppStr.substr(0, index);
+        element->configAsString = cppStr.substr(index + 1);
+        element->config = this->readConfiguration(element->configAsString);
       }
 
-      if (typeStr == "COMPUTATION_NODE")
-      {
-        type = ASPElementType::ASP_COMPUTATION_NODE;
-      }
-      else if (typeStr == "SOURCE_NODE")
-      {
-        type = ASPElementType::ASP_SOURCE_NODE;
-      }
-      else if (typeStr == "REQUIRED_STREAM")
-      {
-        type = ASPElementType::ASP_REQUIRED_STREAM;
-      }
-      else if (typeStr == "MAP_NODE")
-      {
-        type = ASPElementType::ASP_MAP_NODE;
-      }
-      else if (typeStr == "IRO_NODE")
-      {
-        type = ASPElementType::ASP_IRO_NODE;
-      }
-      else if (typeStr == "REQUIRED_MAP")
-      {
-        type = ASPElementType::ASP_REQUIRED_MAP;
-      }
-      else
-      {
-        _log->error("Unknown asp element type '%v' for element '%v', element will be skipped", typeStr, name);
-        continue;
-      }
+      std::string shortIris = this->ontology->toShortIriAll(elementStr);
+      auto value = supplementary::ClingWrapper::stringToValue(shortIris.c_str());
 
-      auto node = entity->getASPElementByName(type, this->ontology->toShortIri(name));
-
-      if (node == nullptr)
+      switch (type)
       {
-        _log->info("ASP element '%v' not found, creating new element", std::string(name));
-        auto element = std::make_shared<ASPElement>();
-        element->aspString = this->ontology->toShortIriAll(aspStr);
-        element->name = this->ontology->toShortIri(name);
-        element->state = ASPElementState::ADDED_TO_ASP;
-        element->type = type;
-
-        if (cppStr != "")
-        {
-          int index = cppStr.find('\n');
-
-          if (index == std::string::npos)
+        case ASPElementType::ASP_COMPUTATION_NODE:
+        case ASPElementType::ASP_SOURCE_NODE:
+        case ASPElementType::ASP_MAP_NODE:
+        case ASPElementType::ASP_IRO_NODE:
+          if (false == this->nodeStore->existNodeCreator(element->className))
+          {
+            _log->warn("Missing creator for node '%v' of type '%v', cpp grounding '%v', asp external set to false",
+                       element->name, ASPElementTypeNames[type],
+                       element->className == "" ? "NULL" : element->className);
             continue;
+          }
+          break;
+        default:
+          break;
+      }
 
-          element->className = cppStr.substr(0, index);
-          element->configAsString = cppStr.substr(index + 1);
-          element->config = this->readConfiguration(element->configAsString);
-        }
+      element->external = this->asp->getExternal(*value.name(), value.args());
+      element->external->assign(false);
 
-        std::string shortIris = this->ontology->toShortIriAll(elementStr);
-        auto value = supplementary::ClingWrapper::stringToValue(shortIris.c_str());
+      this->asp->add(element->name, {}, element->aspString);
+      this->asp->ground(element->name, {});
 
-        switch (type)
-        {
-          case ASPElementType::ASP_COMPUTATION_NODE:
-          case ASPElementType::ASP_SOURCE_NODE:
-          case ASPElementType::ASP_MAP_NODE:
-          case ASPElementType::ASP_IRO_NODE:
-            if (false == this->nodeStore->existNodeCreator(element->className))
-            {
-              _log->warn("Missing creator for node '%v' of type '%v', cpp grounding '%v', asp external set to false",
-                         element->name, ASPElementTypeNames[type],
-                         element->className == "" ? "NULL" : element->className);
-              continue;
-            }
-            break;
-          default:
-            break;
-        }
+      entity->addASPElement(element);
+      this->groundingDirty = true;
+    }
+  }
+}
 
-        element->external = this->asp->getExternal(*value.name(), value.args());
-        element->external->assign(false);
+void ASPModelGenerator::readTransformations()
+{
+  std::string system;
+  this->self->getId(EntityDirectory::ID_ONTOLOGY, system);
+  system = this->ontology->toShortIri(system);
 
-        this->asp->add(element->name, {}, element->aspString);
-        this->asp->ground(element->name, {});
-
-        entity->addASPElement(element);
-        this->groundingDirty = true;
+  for(auto &transNode : this->gcontainerFactory->getTransformations())
+  {
+    bool found = true;
+    for (auto &t : this->transformations)
+    {
+      if (t.node->shortName == transNode.second->shortName)
+      {
+        found = true;
+        break;
       }
     }
+
+    if (found)
+      continue;
+
+    std::stringstream ss;
+    auto &trans = transNode.second->transformation;
+    auto &name = transNode.second->shortName;
+    auto scope = this->ontology->toShortIri(trans->getScope());
+    std::string iro = "iro(" + system + "," + name + ",any,none).";
+    ss << iro << std::endl;
+
+    ss << "output(" << system << "," << name << "," << scope << ","
+        << this->ontology->toShortIri(trans->getTargetRepresentation()->name) + ",none)." << std::endl;
+
+    for (auto &input : trans->getInputs())
+    {
+      ss << "input(" << system << "," << name << "," << scope << ","
+          << this->ontology->toShortIri(input->name) << ",none,1,1) :- " << iro << std::endl;
+    }
+
+    auto element = std::make_shared<ASPElement>();
+    element->aspString = this->ontology->toShortIriAll(ss.str());
+    element->name = transNode.second->shortName;
+    element->className = transNode.second->shortName;
+    element->state = ASPElementState::ADDED_TO_ASP;
+    element->type = ASPElementType::ASP_IRO_NODE;
+
+    auto value = supplementary::ClingWrapper::stringToValue(iro.c_str());
+
+    element->external = this->asp->getExternal(*value.name(), value.args());
+    element->external->assign(false);
+
+    this->asp->add(element->name, {}, element->aspString);
+    this->asp->ground(element->name, {});
+
+    this->groundingDirty = true;
   }
 }
 
