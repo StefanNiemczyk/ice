@@ -31,7 +31,7 @@ ServalCommunication::ServalCommunication(std::weak_ptr<ICEngine> engine, std::st
     authPass(authPass), serval(nullptr), local(local), running (false)
 {
   _log = el::Loggers::getLogger("ServalCommunication");
-  this->maxMessageSend = 10;
+  this->maxMessageSend = 5;
 }
 
 ServalCommunication::~ServalCommunication()
