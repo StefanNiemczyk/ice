@@ -27,6 +27,7 @@ InformationRequest::InformationRequest(std::weak_ptr<ICEngine> engine, std::shar
   this->timeout = 2000;
   auto e = this->engine.lock();
   this->informationStore = e->getInformationStore();
+  this->sendPerTickCount = e->getCommunicationInterface()->getMaxMessageSend();
 }
 
 InformationRequest::~InformationRequest()
@@ -121,13 +122,12 @@ void InformationRequest::tick()
       return;
     }
 
-    int send = 10;
-    int max = std::min((int)(this->currentIndex + send), (int) this->information.size());
+    int max = std::min((int)(this->currentIndex + this->sendPerTickCount), (int) this->information.size());
     for (int i=this->currentIndex; i < max; ++i)
     {
       this->sendInformation(i);
     }
-    this->currentIndex += send;
+    this->currentIndex += this->sendPerTickCount;
   }
 }
 

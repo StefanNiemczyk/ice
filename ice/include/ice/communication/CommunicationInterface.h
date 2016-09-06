@@ -66,6 +66,7 @@ public:
   void setOntologyInterface(std::shared_ptr<OntologyInterface> ontology);
   Traffic& getTraffic();
   void resetTraffic();
+  int getMaxMessageSend();
 
 protected:
   // methodes which need to be implemented by child class

@@ -56,9 +56,7 @@ main(int argc, char *argv[])
             }
 
             len++;
-            std::string text(std::to_string(len));
-            uint8_t msg[text.length()];
-            std::copy(text.begin(), text.end(), msg);
+            uint8_t msg[700];
 
 //            client.send(argv[1], msg, text.length());
 
@@ -72,7 +70,7 @@ main(int argc, char *argv[])
             header.ttl = PAYLOAD_TTL_DEFAULT;
             header.flags |= MDP_FLAG_BIND | MDP_FLAG_NO_CRYPT;
 
-            mdp_send(sock, &header, msg, text.length());
+            mdp_send(sock, &header, msg, 700);
         }
 
         std::cout << "client: cleanup..." << std::endl;

@@ -45,6 +45,7 @@ private:
 
 private:
   std::shared_ptr<InformationStore>                             informationStore;
+  int                                                           sendPerTickCount;
   int                                                           resendCount;
   int                                                           tryCount;
   int                                                           currentIndex;
