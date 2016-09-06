@@ -24,7 +24,7 @@ InformationRequest::InformationRequest(std::weak_ptr<ICEngine> engine, std::shar
     ComJob(InformationRequest::ID, engine, entity, el::Loggers::getLogger("InformationRequest")), currentIndex(-1), tryCount(
         0), receivedAck(false), resendCount(0)
 {
-  this->timeout = 500;
+  this->timeout = 2000;
   auto e = this->engine.lock();
   this->informationStore = e->getInformationStore();
   this->sendPerTickCount = e->getCommunicationInterface()->getMaxMessageSend();

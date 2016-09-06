@@ -31,7 +31,7 @@ ServalCommunication::ServalCommunication(std::weak_ptr<ICEngine> engine, std::st
     authPass(authPass), serval(nullptr), local(local), running (false)
 {
   _log = el::Loggers::getLogger("ServalCommunication");
-  this->maxMessageSend = 5;
+  this->maxMessageSend = 3;
 }
 
 ServalCommunication::~ServalCommunication()
@@ -222,6 +222,12 @@ int ServalCommunication::readMessage(std::vector<std::shared_ptr<Message>> &outM
 void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
 {
   std::string sid;
+
+  if (false == msg->getEntity()->isAvailable())
+  {
+    this->_log->error("Dropped Msg: Trying to send message to not available serval instance %v", msg->getEntity()->toString());
+    return;
+  }
 
   if (false == msg->getEntity()->getId(EntityDirectory::ID_SERVAL, sid))
   {
