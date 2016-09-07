@@ -157,6 +157,7 @@ void ServalCommunication::read()
       continue;
     }
 
+    entity->setActiveTimestamp();
 
     this->traffic.receivedBytes += recCount;
     ++this->traffic.messageReceivedCount;

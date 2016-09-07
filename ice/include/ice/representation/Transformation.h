@@ -91,8 +91,7 @@ struct TransformationOperation
 
   std::string formula;
   std::string varname;
-  std::map<std::string,
-    std::pair<std::vector<int>*, int>> varmap;
+  std::map<std::string, std::pair<std::vector<int>*, int>> varmap;
 
   BasicRepresentationType valueType;
   void* value;
@@ -116,20 +115,21 @@ public:
   std::unique_ptr<std::vector<std::string>> getASPRepreentation(std::string system);
 
 private:
+  // Converts the void pointers data from the type given by the parameter
+  // type to a double value.
+  double convertDouble(void *data, ice::BasicRepresentationType type);
+
+  // Allocates memory for type and returns a void pointer pointing
+  // to converted value of parameter val.
+  void *convertVoid(double val, ice::BasicRepresentationType type);
+
+private:
   const std::string                             name;
   const std::string                             scope;
   std::shared_ptr<Representation>               targetRepresentation;
   std::vector<std::shared_ptr<Representation>>  inputs;
   std::vector<TransformationOperation*>         operations;
   std::weak_ptr<ice::GContainerFactory>         factory;
-
-  // Converts the void pointers data from the type given by the parameter
-  // type to a double value.
-  double convertDouble(void *data, ice::BasicRepresentationType type);
-
-  // Allocates memory for type and returns a void pointer poitning 
-  // to converted value of parameter val.
-  void *convertVoid(double val, ice::BasicRepresentationType type);
 };
 
 } /* namespace ice */

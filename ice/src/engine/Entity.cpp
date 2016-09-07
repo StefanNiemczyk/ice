@@ -361,6 +361,11 @@ void Entity::setActiveTimestamp(time value)
 void Entity::setActiveTimestamp()
 {
   this->timestamp = this->timeFactory->createTime();
+
+  if (false == this->available && this->isTimeout() == false)
+  {
+    this->setAvailable(true);
+  }
 }
 
 bool Entity::isAvailable()
