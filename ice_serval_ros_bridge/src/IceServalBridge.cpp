@@ -196,6 +196,7 @@ void IceServalBridge::init()
 
   _log->info("Bridge for identity '%v' initialized, requests: '%v', offers '%v'",
              this->self->toString(), this->requiredInfos.size(), this->offeredInfos.size());
+  this->initialized = true;
 }
 
 void IceServalBridge::discoveredIceIdentity(std::shared_ptr<Entity> entity)

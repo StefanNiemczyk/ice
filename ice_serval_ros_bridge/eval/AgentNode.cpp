@@ -65,6 +65,8 @@ void callback(std::shared_ptr<ice::InformationRequest> request)
     std::cerr << "#########################################################################" << std::endl;
     file.flush();
     file.close();
+    node->cleanUp();
+    ros::shutdown();
   }
 }
 
