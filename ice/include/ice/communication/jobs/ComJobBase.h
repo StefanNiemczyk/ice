@@ -203,6 +203,9 @@ public:
 
   virtual void abort()
   {
+    if (this->state == CJState::CJ_ABORTED)
+      return;
+
     this->state = CJState::CJ_ABORTED;
     this->sendCommand(IceMessageIds::IMI_CANCLE_JOB);
     this->callCallbackAborted();
@@ -210,6 +213,9 @@ public:
 
   virtual void finish()
   {
+    if (this->state == CJState::CJ_FINISHED)
+      return;
+
     this->state = CJState::CJ_FINISHED;
     this->sendCommand(IceMessageIds::IMI_FINISH);
     this->callCallbackFinished();
