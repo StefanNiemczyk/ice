@@ -7,10 +7,11 @@
 
 #include "ice/representation/Transformation.h"
 
+#include <sstream>
+#include <muParser.h>
+
 #include "ice/representation/GContainer.h"
 #include "ice/representation/GContainerFactory.h"
-
-#include <muParser.h>
 
 namespace ice
 {
@@ -109,36 +110,47 @@ std::vector<std::shared_ptr<Representation>>& Transformation::getInputs()
   return this->inputs;
 }
 
-void Transformation::print()
+std::string Transformation::toString()
 {
-  std::cout << "Transformation: " << this->name << " for scope " << this->scope << std::endl;
-  std::cout << "Inputs: " << this->inputs.size() << std::endl;
+  std::stringstream ss;
+
+  ss << "Transformation: " << this->name << std::endl;
+  ss << "Scope " << this->scope << std::endl;
+  ss << "Target " << this->targetRepresentation->name << std::endl;
+  ss << "Inputs: " << this->inputs.size() << std::endl;
 
   for (auto input : this->inputs)
   {
-    std::cout << "   " << input->name << std::endl;
+    ss << "   " << input->name << std::endl;
   }
 
-  std::cout << "Operations: " << this->operations.size() << std::endl;
+  ss << "Operations: " << this->operations.size() << std::endl;
 
   for (auto op : this->operations)
   {
     switch (op->type)
     {
       case DEFAULT:
-        std::cout << "   " << this->targetRepresentation->pathToString(op->targetDimension) << " Default Value "
+        ss << "   " << this->targetRepresentation->pathToString(op->targetDimension) << " Default Value "
             << op->value << std::endl;
         break;
       case USE:
-        std::cout << "   " << this->targetRepresentation->pathToString(op->targetDimension) << " Use from index "
+        ss << "   " << this->targetRepresentation->pathToString(op->targetDimension) << " Use from index "
             << op->sourceIndex << ": " << this->inputs.at(op->sourceIndex)->pathToString(op->sourceDimension)
             << std::endl;
         break;
       case FORMULA:
-        std::cout << "   " << this->targetRepresentation->pathToString(op->targetDimension) << " Formula " << std::endl;
+        ss << "   " << this->targetRepresentation->pathToString(op->targetDimension) << " Formula " << std::endl;
         break;
     }
   }
+
+  return ss.str();
+}
+
+void Transformation::print()
+{
+  std::cout << this->toString() << std::endl;
 }
 
 double Transformation::convertDouble(void *data, BasicRepresentationType type)

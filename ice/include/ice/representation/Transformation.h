@@ -111,6 +111,7 @@ public:
   std::shared_ptr<Representation> getTargetRepresentation();
   std::vector<TransformationOperation*>& getOperations();
   std::vector<std::shared_ptr<Representation>>& getInputs();
+  std::string toString();
   void print();
   std::unique_ptr<std::vector<std::string>> getASPRepreentation(std::string system);
 

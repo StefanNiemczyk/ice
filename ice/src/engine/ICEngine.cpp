@@ -19,6 +19,7 @@ namespace ice
 ICEngine::ICEngine(std::shared_ptr<Configuration> config) :
     initialized(false), config(config), running(false)
 {
+  _log = el::Loggers::getLogger("ICEngine");
 }
 
 ICEngine::~ICEngine()
@@ -82,10 +83,14 @@ void ICEngine::init()
   this->streamStore->readEntitiesFromOntology();
 
   this->initialized = true;
+  _log->info("Engine initialized '%v'", this->self->toString());
 }
 
 void ICEngine::start()
 {
+  // generating transformation based on ontology
+  this->aspTransformationGenerator->extractTransformations();
+
   // creating processing model
   auto model = this->modelGenerator->createProcessingModel();
   this->updateStrategie->update(model);

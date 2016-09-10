@@ -171,6 +171,7 @@ public:
   void addOfferedInformation(std::vector<InformationSpecification> const &offeres);
 
   std::vector<std::pair<std::string, std::string>>& getOntologyIds();
+  void setSuperEngine(bool value);
 
   // Sharing Stuff
   SharedSubModel& getSendSubModel();
@@ -202,6 +203,7 @@ private:
   void clearContainer(SharedSubModel &container);
 
 private:
+  bool                                                  superEngine;
   std::weak_ptr<ICEngine>                               engine;
   std::shared_ptr<EntityDirectory>                      directory;
   std::shared_ptr<TimeFactory>				timeFactory;

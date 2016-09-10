@@ -38,7 +38,7 @@ void EntityDirectory::init()
 
   std::initializer_list<Id> ids = {{ID_SERVAL, ""}, {ID_ONTOLOGY, ""}, {ID_ICE, ""}};
   this->self = std::make_shared<Entity>(this->shared_from_this(), this->engine, this->timeFactory, ids);
-  this->self->setIceIdentity(true);
+  this->self->setSuperEngine(true);
 
   this->entities.push_back(this->self);
 }

@@ -73,7 +73,6 @@ public:
 
   int readXMLTransformation(std::string fileName);
   std::shared_ptr<Transformation> fromXMLDesc(TransDesc* desc);
-  std::unique_ptr<std::vector<std::vector<std::string>>> getASPRepresentation(std::string system, bool autoTransformation);
   void* convertStringToBasic(BasicRepresentationType type, std::string value);
 
   void printReps();

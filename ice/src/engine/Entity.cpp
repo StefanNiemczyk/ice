@@ -406,6 +406,9 @@ bool Entity::isActiveCooperation()
 
 bool Entity::isTimeout()
 {
+  if (this->superEngine)
+    return false;
+
   return this->timeFactory->checkTimeout(this->timestamp, this->timeoutDuration);
 }
 
@@ -492,6 +495,17 @@ void Entity::addOfferedInformation(std::vector<InformationSpecification> const &
 std::vector<std::pair<std::string, std::string>>& Entity::getOntologyIds()
 {
   return this->ontologyIds;
+}
+
+void Entity::setSuperEngine(bool value)
+{
+  this->superEngine = value;
+
+  if (value)
+  {
+    this->iceIdentity = true;
+    this->available = true;
+  }
 }
 
 // -----------------------------------------------------------------------------------

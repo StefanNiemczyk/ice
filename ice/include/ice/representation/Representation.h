@@ -101,7 +101,7 @@ private:
 
     auto rep = this->dimensions.at(path->at(index));
 
-    if (false == rep->isBasic())
+    if (false == rep->isBasic() && index + 1 < path->size())
       rep->pathToString(path, index + 1, ss);
   }
 };

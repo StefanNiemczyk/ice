@@ -36,6 +36,9 @@ void FastUpdateStrategie::cleanUpInternal()
 
 void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> const &model)
 {
+  if (model == nullptr)
+    return;
+
   _log->info("Processing new model");
   UpdateStrategie::update(model);
 

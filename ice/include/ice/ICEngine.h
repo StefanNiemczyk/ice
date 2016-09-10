@@ -35,6 +35,8 @@
 #include "ice/representation/ASPTransformationGeneration.h"
 #include "ice/ros/RosCommunication.h"
 
+#include "easylogging++.h"
+
 // Forward declarations
 namespace ice
 {
@@ -204,6 +206,7 @@ protected:
   std::shared_ptr<EntityDirectory>              entityDirectory;                /**< The directory for known entities */
   std::shared_ptr<Entity>                       self;                           /**< This engine */
   std::mutex                                    mtx_;                           /**< Mutex */
+  el::Logger                                    *_log;
 };
 
 } /* namespace ice */

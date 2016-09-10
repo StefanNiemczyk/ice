@@ -125,6 +125,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
   }
 
   // Transformations
+  std::cout << "###########################################################################" << std::endl;
   this->readTransformations();
 
   for (auto &trans : this->transformations)
@@ -142,6 +143,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
       trans.asp->external->assign(false);
     }
   }
+  std::cout << "###########################################################################" << std::endl;
 
   // activate and deactivate systems
   std::vector<std::shared_ptr<Entity>> used;
@@ -302,6 +304,19 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
     _log->debug("Look up node '%v' to process entity '%v'", nodeName, nodeEntity);
 
     auto aspNode = entity->getASPElementByName(nodeName);
+
+    if (aspNode == nullptr && entity == this->self)
+    {
+      std::cout << "here " << this->transformations.size();
+      for (auto &transNode : this->transformations)
+      {
+        if (transNode.asp->name == nodeName)
+        {
+          aspNode = transNode.asp;
+          break;
+        }
+      }
+    }
 
     if (aspNode == nullptr)
     {
@@ -655,10 +670,11 @@ void ASPModelGenerator::readTransformations()
   std::string system;
   this->self->getId(EntityDirectory::ID_ONTOLOGY, system);
   system = this->ontology->toShortIri(system);
+  std::cout << this->gcontainerFactory->getTransformations().size() << std::endl;
 
   for(auto &transNode : this->gcontainerFactory->getTransformations())
   {
-    bool found = true;
+    bool found = false;
     for (auto &t : this->transformations)
     {
       if (t.node->shortName == transNode.second->shortName)
@@ -687,6 +703,8 @@ void ASPModelGenerator::readTransformations()
           << this->ontology->toShortIri(input->name) << ",none,1,1) :- " << iro << std::endl;
     }
 
+    ss << "metadataProcessing(cost," << system << "," << name << ",10)." << std::endl;
+
     auto element = std::make_shared<ASPElement>();
     element->aspString = this->ontology->toShortIriAll(ss.str());
     element->name = transNode.second->shortName;
@@ -703,6 +721,15 @@ void ASPModelGenerator::readTransformations()
     this->asp->ground(element->name, {});
 
     this->groundingDirty = true;
+
+    _log->info("Created external for transformation node %v: %v -> %v", element->name,
+               transNode.second->transformation->getInputs().at(0)->name,
+               transNode.second->transformation->getTargetRepresentation()->name);
+
+    ASPTransformation node;
+    node.asp = element;
+    node.node = transNode.second;
+    this->transformations.push_back(node);
   }
 }
 
