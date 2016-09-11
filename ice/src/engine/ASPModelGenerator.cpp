@@ -410,6 +410,9 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
     nodeDesc.relatedEntity = (nodeEntity2 == "none" ? "" : this->ontology->toLongIri(nodeEntity2));
     nodeDesc.config = aspNode->configAsString;
 
+    if (nodeDesc.aspName == "")
+      nodeDesc.aspName = aspNode->name;
+
     nodes.push_back(nodeDesc);
 
     if (false == valid)
@@ -708,7 +711,7 @@ void ASPModelGenerator::readTransformations()
     auto element = std::make_shared<ASPElement>();
     element->aspString = this->ontology->toShortIriAll(ss.str());
     element->name = transNode.second->shortName;
-    element->className = transNode.second->shortName;
+    element->className = transNode.second->name;
     element->state = ASPElementState::ADDED_TO_ASP;
     element->type = ASPElementType::ASP_IRO_NODE;
 

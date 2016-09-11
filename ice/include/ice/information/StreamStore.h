@@ -216,20 +216,17 @@ template<typename T>
   inline std::shared_ptr<ice::InformationStream<T>> ice::StreamStore::getStream(
       InformationSpecification *specification, std::string provider, std::string sourceSystem)
   {
-    std::shared_ptr<BaseInformationStream> stream;
-    std::shared_ptr<ice::InformationStream<T>> ptr;
-
-    stream = this->getBaseStream(specification, provider, sourceSystem);
+    auto stream = this->getBaseStream(specification, provider, sourceSystem);
 
     if (false == stream)
-      return ptr;
+      return nullptr;
 
     if (typeid(T) == *stream->getTypeInfo())
       return std::static_pointer_cast<InformationStream<T>>(stream);
     else
       throw std::bad_cast();
 
-    return ptr;
+    return nullptr;
   }
 
 #endif /* STREAMSTORE_H_ */

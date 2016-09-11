@@ -144,7 +144,7 @@ std::shared_ptr<BaseInformationStream> StreamStore::selectBestStream(
 {
   if (streams->size() == 0)
   {
-    return std::shared_ptr<BaseInformationStream>();
+    return nullptr;
   }
 
   auto best = streams->at(0);
