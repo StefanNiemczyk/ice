@@ -100,6 +100,11 @@ std::shared_ptr<Representation> Transformation::getTargetRepresentation()
   return this->targetRepresentation;
 }
 
+void Transformation::setTargetRepresentation(std::shared_ptr<Representation> representation)
+{
+  this->targetRepresentation = representation;
+}
+
 std::vector<TransformationOperation*>& Transformation::getOperations()
 {
   return this->operations;

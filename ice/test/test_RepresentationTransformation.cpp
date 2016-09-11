@@ -16,6 +16,7 @@
 
 #include "ice/ICEngine.h"
 
+#include "etc/EngineStuff.cpp"
 #include "gtest/gtest.h"
 
 namespace
@@ -470,6 +471,73 @@ TEST(RepresentationTransformationTest, xmlReader)
   ASSERT_TRUE(foundP2toP3);
   ASSERT_TRUE(foundP3toP2);
   ASSERT_TRUE(foundP3Rot);
+}
+
+TEST(RepresentationTransformationTest, handMadeTransformation)
+{
+  std::string path = ros::package::getPath("ice");
+  bool result;
+
+  auto oi = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
+  oi->addIRIMapper(path + "/ontology/");
+
+  ASSERT_FALSE(oi->errorOccurred());
+
+  result = oi->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
+
+  ASSERT_FALSE(oi->errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi->loadOntologies();
+
+  ASSERT_FALSE(oi->errorOccurred());
+  ASSERT_TRUE(result);
+
+  result = oi->isConsistent();
+
+  ASSERT_FALSE(oi->errorOccurred());
+  ASSERT_TRUE(result);
+
+  std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
+  factory->setOntologyInterface(oi);
+  factory->init();
+
+  auto p2dRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos2D");
+  auto p3dRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");
+
+  ASSERT_TRUE(p2dRep != false);
+  ASSERT_TRUE(p3dRep != false);
+
+  auto p2dX = p2dRep->accessPath({"http://vs.uni-kassel.de/Ice#XCoordinate"});
+  auto p2dY = p2dRep->accessPath({"http://vs.uni-kassel.de/Ice#YCoordinate"});
+
+  auto p3dX = p3dRep->accessPath({"http://vs.uni-kassel.de/Ice#XCoordinate"});
+  auto p3dY = p3dRep->accessPath({"http://vs.uni-kassel.de/Ice#YCoordinate"});
+  auto p3dZ = p3dRep->accessPath({"http://vs.uni-kassel.de/Ice#ZCoordinate"});
+
+  std::shared_ptr<ice::Transformation> trans = std::make_shared<TestTransformation>(factory);
+  std::string name = "TestTransformation";
+  factory->addTransformation(name, trans, false);
+
+  trans = factory->getTransformationByName(name);
+
+  ASSERT_NE(nullptr, trans);
+
+  auto input = factory->makeInstance("http://vs.uni-kassel.de/IceTest#Pos2D");
+
+  double x = 1500;
+  double y = 2500;
+  double z = 500;
+
+  input->set(p3dX, &x);
+  input->set(p3dY, &y);
+
+  auto output = trans->transform(&input);
+
+  ASSERT_NE(nullptr, output);
+  ASSERT_EQ(x, output->getValue<double>(p3dX));
+  ASSERT_EQ(y, output->getValue<double>(p3dY));
+  ASSERT_EQ(z, output->getValue<double>(p3dZ));
 }
 
 }

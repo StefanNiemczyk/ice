@@ -101,21 +101,22 @@ class Transformation
 {
 public:
   Transformation(std::weak_ptr<ice::GContainerFactory> factory, std::string name, std::string scope,
-                 std::shared_ptr<Representation> targetRepresentation);
+                 std::shared_ptr<Representation> targetRepresentation = nullptr);
   virtual ~Transformation();
 
-  std::shared_ptr<GContainer> transform(std::shared_ptr<GContainer>* inputs);
+  virtual std::shared_ptr<GContainer> transform(std::shared_ptr<GContainer>* inputs);
 
   const std::string getName() const;
   const std::string getScope() const;
   std::shared_ptr<Representation> getTargetRepresentation();
+  void setTargetRepresentation(std::shared_ptr<Representation> representation);
   std::vector<TransformationOperation*>& getOperations();
   std::vector<std::shared_ptr<Representation>>& getInputs();
   std::string toString();
   void print();
   std::unique_ptr<std::vector<std::string>> getASPRepreentation(std::string system);
 
-private:
+protected:
   // Converts the void pointers data from the type given by the parameter
   // type to a double value.
   double convertDouble(void *data, ice::BasicRepresentationType type);
@@ -124,7 +125,7 @@ private:
   // to converted value of parameter val.
   void *convertVoid(double val, ice::BasicRepresentationType type);
 
-private:
+protected:
   const std::string                             name;
   const std::string                             scope;
   std::shared_ptr<Representation>               targetRepresentation;

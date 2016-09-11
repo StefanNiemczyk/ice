@@ -125,7 +125,6 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
   }
 
   // Transformations
-  std::cout << "###########################################################################" << std::endl;
   this->readTransformations();
 
   for (auto &trans : this->transformations)
@@ -143,7 +142,6 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
       trans.asp->external->assign(false);
     }
   }
-  std::cout << "###########################################################################" << std::endl;
 
   // activate and deactivate systems
   std::vector<std::shared_ptr<Entity>> used;
@@ -673,7 +671,6 @@ void ASPModelGenerator::readTransformations()
   std::string system;
   this->self->getId(EntityDirectory::ID_ONTOLOGY, system);
   system = this->ontology->toShortIri(system);
-  std::cout << this->gcontainerFactory->getTransformations().size() << std::endl;
 
   for(auto &transNode : this->gcontainerFactory->getTransformations())
   {

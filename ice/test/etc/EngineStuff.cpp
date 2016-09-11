@@ -8,6 +8,8 @@
 #include "ice/information/InformationStream.h"
 #include "ice/information/StreamFactory.h"
 #include "ice/processing/Node.h"
+#include "ice/representation/GContainer.h"
+#include "ice/representation/Transformation.h"
 #include "ice/ICEngine.h"
 
 class TestFactory : public ice::StreamFactory
@@ -155,5 +157,39 @@ public:
   virtual int performNode()
   {
     return 0;
+  }
+};
+
+class TestTransformation : public ice::Transformation
+{
+public:
+  TestTransformation(std::weak_ptr<ice::GContainerFactory> factory) : Transformation(factory, "TestTransformation", "http://vs.uni-kassel.de/Ice#Position")
+  {
+    auto f = factory.lock();
+    this->factory = f;
+    targetRepresentation = f->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");
+    inputs.push_back(f->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos2D"));
+  }
+
+  ~TestTransformation() {}
+
+  virtual std::shared_ptr<ice::GContainer> transform(std::shared_ptr<ice::GContainer>* inputs)
+  {
+    auto output = this->factory.lock()->makeInstance(this->targetRepresentation);
+
+    auto p2dX = this->inputs[0]->accessPath({"http://vs.uni-kassel.de/Ice#XCoordinate"});
+    auto p2dY = this->inputs[0]->accessPath({"http://vs.uni-kassel.de/Ice#YCoordinate"});
+
+    auto p3dX = targetRepresentation->accessPath({"http://vs.uni-kassel.de/Ice#XCoordinate"});
+    auto p3dY = targetRepresentation->accessPath({"http://vs.uni-kassel.de/Ice#YCoordinate"});
+    auto p3dZ = targetRepresentation->accessPath({"http://vs.uni-kassel.de/Ice#ZCoordinate"});
+
+    double defaultZ = 500;
+
+    output->set(p3dX, inputs[0]->get(p2dX));
+    output->set(p3dY, inputs[0]->get(p2dY));
+    output->set(p3dZ, &defaultZ);
+
+    return output;
   }
 };
