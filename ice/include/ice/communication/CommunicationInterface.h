@@ -94,6 +94,7 @@ protected:
 
   Traffic                                     traffic;
   int                                         maxMessageSend;
+  int                                         discoveryInterval;
   std::queue<std::shared_ptr<Message>>        messages;
   std::vector<std::shared_ptr<ComJobBase>>    comJobsOwn;
   std::vector<std::shared_ptr<ComJobBase>>    comJobsOwnNew;

@@ -31,7 +31,7 @@ namespace ice
 {
 
 CommunicationInterface::CommunicationInterface(std::weak_ptr<ICEngine> engine) :
-    running(false), engine(engine), maxMessageSend(10)
+    running(false), engine(engine), maxMessageSend(10), discoveryInterval(20)
 {
   _log = el::Loggers::getLogger("CommunicationInterface");
 }
@@ -224,7 +224,7 @@ void CommunicationInterface::workerTask()
   while (this->running)
   {
     // check all n iterations for new peers
-    if (counter >= 10)
+    if (counter >= discoveryInterval)
     {
       this->discover();
       this->directory->checkTimeout();

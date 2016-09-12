@@ -28,6 +28,7 @@ RosCommunication::RosCommunication(std::weak_ptr<ICEngine> engine) :
 {
   this->_log = el::Loggers::getLogger("RosCommunication");
   this->running = false;
+  this->discoveryInterval = 200;
 }
 
 RosCommunication::~RosCommunication()
