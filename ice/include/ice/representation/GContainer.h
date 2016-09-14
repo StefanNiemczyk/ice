@@ -35,6 +35,9 @@ public:
 	}
 
 public:
+        GContainer() {
+                _log = getLogger();
+        }
 	GContainer(std::shared_ptr<Representation> rep) {
 		_log = getLogger();
 		this->representation = rep;
