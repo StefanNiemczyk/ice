@@ -122,8 +122,24 @@ std::shared_ptr<Representation> GContainerFactory::fromCSV(
   auto rep2 = addOrGet(dimRepStr, tmpMap);
   rep2->type = this->getBasicRep(dimRepStr);
 
-  rep->dimensionNames.push_back(dimStr);
-  rep->dimensions.push_back(rep2);
+  bool inserted = false;
+  for (int i=0; i < rep->dimensionNames.size(); ++i)
+  {
+    if (rep->dimensionNames.at(i) > dimStr)
+    {
+      rep->dimensionNames.insert(rep->dimensionNames.begin()+i, dimStr);
+      rep->dimensions.insert(rep->dimensions.begin()+i, rep2);
+
+      inserted = true;
+      break;
+    }
+  }
+
+  if (false == inserted)
+  {
+    rep->dimensionNames.push_back(dimStr);
+    rep->dimensions.push_back(rep2);
+  }
 
   return rep;
 }

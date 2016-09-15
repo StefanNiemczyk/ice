@@ -42,6 +42,7 @@ include_directories(
 )  
 
 add_library(${PROJECT_NAME}
+  src/GPSPosition.cpp
   src/InformationMap.cpp
 )
 
