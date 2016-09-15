@@ -57,10 +57,10 @@ TEST(EvalModelGeneration, simpleEvalTests)
 //  }
 
 //  TConf conf;
-  conf.parallelGroupsMin = 10;
-  conf.parallelGroupsMax = 150;
-  conf.parallelGrounsStep = 20;
-  conf.levels = {10,20};
+  conf.parallelGroupsMin = 50;
+  conf.parallelGroupsMax = 300;
+  conf.parallelGrounsStep = 50;
+  conf.levels = {10,10};
   conf.inputsMin = 1;
   conf.inputsMax = 4;
   conf.skipLevel = false;

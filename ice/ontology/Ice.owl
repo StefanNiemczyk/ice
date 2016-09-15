@@ -180,6 +180,18 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/Ice#isConnectionFrom -->
+
+    <owl:ObjectProperty rdf:about="&Ice;isConnectionFrom"/>
+    
+
+
+    <!-- http://vs.uni-kassel.de/Ice#isConnectionTo -->
+
+    <owl:ObjectProperty rdf:about="&Ice;isConnectionTo"/>
+    
+
+
     <!-- http://vs.uni-kassel.de/Ice#isGroundingOf -->
 
     <owl:ObjectProperty rdf:about="&Ice;isGroundingOf"/>
@@ -335,22 +347,6 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:intersectionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;DoubleRep"/>
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="&Ice;hasUnit"/>
-                                <owl:hasValue rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/units#radian"/>
-                            </owl:Restriction>
-                        </owl:intersectionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
                 <owl:onClass>
                     <owl:Class>
                         <owl:intersectionOf rdf:parseType="Collection">
@@ -363,6 +359,22 @@
                     </owl:Class>
                 </owl:onClass>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;DoubleRep"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="&Ice;hasUnit"/>
+                                <owl:hasValue rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/units#radian"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -410,6 +422,14 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/Ice#Bandwidth -->
+
+    <owl:Class rdf:about="&Ice;Bandwidth">
+        <rdfs:subClassOf rdf:resource="&Ice;TransferMetadata"/>
+    </owl:Class>
+    
+
+
     <!-- http://vs.uni-kassel.de/Ice#BasicRepresentation -->
 
     <owl:Class rdf:about="&Ice;BasicRepresentation">
@@ -425,6 +445,22 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;DoubleRep"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="&Ice;hasUnit"/>
+                                <owl:hasValue rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/units#radian"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
                 <owl:onClass>
                     <owl:Class>
                         <owl:intersectionOf rdf:parseType="Collection">
@@ -437,22 +473,6 @@
                     </owl:Class>
                 </owl:onClass>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:intersectionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;DoubleRep"/>
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="&Ice;hasUnit"/>
-                                <owl:hasValue rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/units#radian"/>
-                            </owl:Restriction>
-                        </owl:intersectionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -495,6 +515,12 @@
     <owl:Class rdf:about="&Ice;ComputationNode">
         <rdfs:subClassOf rdf:resource="&Ice;Node"/>
     </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/Ice#Connection -->
+
+    <owl:Class rdf:about="&Ice;Connection"/>
     
 
 
@@ -577,6 +603,28 @@
     <owl:Class rdf:about="&Ice;DefaultMovementRep">
         <rdfs:subClassOf rdf:resource="&Ice;MovementRepresentation"/>
         <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;Translation"/>
+                            <rdf:Description rdf:about="&Ice;ValueScope"/>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="&Ice;Orientation"/>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                        <owl:someValuesFrom rdf:resource="&Ice;EulerAnglesRep"/>
+                                    </owl:Restriction>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
                     <owl:Restriction>
@@ -602,28 +650,6 @@
                 </owl:intersectionOf>
             </owl:Class>
         </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:unionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;Translation"/>
-                            <rdf:Description rdf:about="&Ice;ValueScope"/>
-                            <owl:Class>
-                                <owl:intersectionOf rdf:parseType="Collection">
-                                    <rdf:Description rdf:about="&Ice;Orientation"/>
-                                    <owl:Restriction>
-                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                                        <owl:someValuesFrom rdf:resource="&Ice;EulerAnglesRep"/>
-                                    </owl:Restriction>
-                                </owl:intersectionOf>
-                            </owl:Class>
-                        </owl:unionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
-            </owl:Restriction>
-        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -632,6 +658,7 @@
 
     <owl:Class rdf:about="&Ice;Delay">
         <rdfs:subClassOf rdf:resource="&Ice;InformationMetadata"/>
+        <rdfs:subClassOf rdf:resource="&Ice;TransferMetadata"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasGrounding"/>
@@ -670,6 +697,14 @@
 
     <owl:Class rdf:about="&Ice;DoubleRep">
         <rdfs:subClassOf rdf:resource="&Ice;FloatNumericalRepresentation"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/Ice#EnergyCost -->
+
+    <owl:Class rdf:about="&Ice;EnergyCost">
+        <rdfs:subClassOf rdf:resource="&Ice;TransferMetadata"/>
     </owl:Class>
     
 
@@ -842,14 +877,14 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                <owl:onClass rdf:resource="&Ice;DoubleRep"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:allValuesFrom rdf:resource="&Ice;DoubleRep"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                <owl:allValuesFrom rdf:resource="&Ice;DoubleRep"/>
+                <owl:onClass rdf:resource="&Ice;DoubleRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -1175,38 +1210,6 @@
     <owl:Class rdf:about="&Ice;RelativeCoordinatePositionRep">
         <rdfs:subClassOf rdf:resource="&Ice;PositionRepresentation"/>
         <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:unionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;ValueScope"/>
-                            <rdf:Description rdf:about="&Ice;XCoordinate"/>
-                            <rdf:Description rdf:about="&Ice;YCoordinate"/>
-                            <rdf:Description rdf:about="&Ice;ZCoordinate"/>
-                        </owl:unionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasRelatedDimension"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:intersectionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;Position"/>
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                                <owl:onClass rdf:resource="&Ice;CoordinatePositionRep"/>
-                                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-                            </owl:Restriction>
-                        </owl:intersectionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
                     <owl:Restriction>
@@ -1242,6 +1245,38 @@
                 </owl:intersectionOf>
             </owl:Class>
         </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;ValueScope"/>
+                            <rdf:Description rdf:about="&Ice;XCoordinate"/>
+                            <rdf:Description rdf:about="&Ice;YCoordinate"/>
+                            <rdf:Description rdf:about="&Ice;ZCoordinate"/>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRelatedDimension"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;Position"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                <owl:onClass rdf:resource="&Ice;CoordinatePositionRep"/>
+                                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -1275,13 +1310,13 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasScope"/>
-                <owl:someValuesFrom rdf:resource="&Ice;Position"/>
+                <owl:someValuesFrom rdf:resource="&Ice;Orientation"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasScope"/>
-                <owl:someValuesFrom rdf:resource="&Ice;Orientation"/>
+                <owl:someValuesFrom rdf:resource="&Ice;Position"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -1334,6 +1369,20 @@
     <owl:Class rdf:about="&Ice;RollPitchYawRep">
         <rdfs:subClassOf rdf:resource="&Ice;OrientationRepresentation"/>
         <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;Pitch"/>
+                            <rdf:Description rdf:about="&Ice;Roll"/>
+                            <rdf:Description rdf:about="&Ice;Yaw"/>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
                     <owl:Restriction>
@@ -1354,20 +1403,6 @@
                 </owl:intersectionOf>
             </owl:Class>
         </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:unionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;Pitch"/>
-                            <rdf:Description rdf:about="&Ice;Roll"/>
-                            <rdf:Description rdf:about="&Ice;Yaw"/>
-                        </owl:unionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
-            </owl:Restriction>
-        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -1382,36 +1417,6 @@
 
     <owl:Class rdf:about="&Ice;ShortRep">
         <rdfs:subClassOf rdf:resource="&Ice;IntegerNumericalRepresentation"/>
-    </owl:Class>
-    
-
-
-    <!-- http://vs.uni-kassel.de/Ice#SinkNode -->
-
-    <owl:Class rdf:about="&Ice;SinkNode">
-        <rdfs:subClassOf rdf:resource="&Ice;Node"/>
-    </owl:Class>
-    
-
-
-    <!-- http://vs.uni-kassel.de/Ice#SmoothingNode -->
-
-    <owl:Class rdf:about="&Ice;SmoothingNode">
-        <owl:equivalentClass>
-            <owl:Class>
-                <owl:intersectionOf rdf:parseType="Collection">
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="&Ice;impairInformationMetadata"/>
-                        <owl:someValuesFrom rdf:resource="&Ice;Delay"/>
-                    </owl:Restriction>
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="&Ice;improveInformationMetadata"/>
-                        <owl:someValuesFrom rdf:resource="&Ice;Accuracy"/>
-                    </owl:Restriction>
-                </owl:intersectionOf>
-            </owl:Class>
-        </owl:equivalentClass>
-        <rdfs:subClassOf rdf:resource="&Ice;Node"/>
     </owl:Class>
     
 
@@ -1486,6 +1491,14 @@
 
     <owl:Class rdf:about="&Ice;TimestampScope">
         <rdfs:subClassOf rdf:resource="&Ice;ValueScope"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/Ice#TransferMetadata -->
+
+    <owl:Class rdf:about="&Ice;TransferMetadata">
+        <rdfs:subClassOf rdf:resource="&Ice;Metadata"/>
     </owl:Class>
     
 
@@ -1604,6 +1617,20 @@
     <owl:Class rdf:about="&Ice;WGS84Rep">
         <rdfs:subClassOf rdf:resource="&Ice;PositionRepresentation"/>
         <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;Altitude"/>
+                            <rdf:Description rdf:about="&Ice;Latitude"/>
+                            <rdf:Description rdf:about="&Ice;Longitude"/>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
                     <owl:Restriction>
@@ -1623,20 +1650,6 @@
                     </owl:Restriction>
                 </owl:intersectionOf>
             </owl:Class>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:unionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;Altitude"/>
-                            <rdf:Description rdf:about="&Ice;Latitude"/>
-                            <rdf:Description rdf:about="&Ice;Longitude"/>
-                        </owl:unionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
-            </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     
@@ -1690,6 +1703,22 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;DoubleRep"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="&Ice;hasUnit"/>
+                                <owl:hasValue rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/units#milliMeter"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
                 <owl:onClass>
                     <owl:Class>
                         <owl:intersectionOf rdf:parseType="Collection">
@@ -1702,22 +1731,6 @@
                     </owl:Class>
                 </owl:onClass>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:intersectionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;DoubleRep"/>
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="&Ice;hasUnit"/>
-                                <owl:hasValue rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/units#milliMeter"/>
-                            </owl:Restriction>
-                        </owl:intersectionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -1772,6 +1785,22 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;DoubleRep"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="&Ice;hasUnit"/>
+                                <owl:hasValue rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/units#milliMeter"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
                 <owl:onClass>
                     <owl:Class>
                         <owl:intersectionOf rdf:parseType="Collection">
@@ -1784,22 +1813,6 @@
                     </owl:Class>
                 </owl:onClass>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:intersectionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;DoubleRep"/>
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="&Ice;hasUnit"/>
-                                <owl:hasValue rdf:resource="http://www.semanticweb.org/sni/ontologies/2013/7/units#milliMeter"/>
-                            </owl:Restriction>
-                        </owl:intersectionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -2079,14 +2092,6 @@
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="&Ice;ComputationNode"/>
-            <rdf:Description rdf:about="&Ice;SinkNode"/>
-            <rdf:Description rdf:about="&Ice;SourceNode"/>
-        </owl:members>
-    </rdf:Description>
-    <rdf:Description>
-        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
-        <owl:members rdf:parseType="Collection">
             <rdf:Description rdf:about="&Ice;EntityType"/>
             <rdf:Description rdf:about="&Ice;Grounding"/>
             <rdf:Description rdf:about="&Ice;Map"/>
@@ -2101,15 +2106,6 @@
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="&Ice;Movement"/>
-            <rdf:Description rdf:about="&Ice;Orientation"/>
-            <rdf:Description rdf:about="&Ice;Position"/>
-            <rdf:Description rdf:about="&Ice;Timestamp"/>
-        </owl:members>
-    </rdf:Description>
-    <rdf:Description>
-        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
-        <owl:members rdf:parseType="Collection">
             <rdf:Description rdf:about="&Ice;Alpha"/>
             <rdf:Description rdf:about="&Ice;Altitude"/>
             <rdf:Description rdf:about="&Ice;Beta"/>
@@ -2119,6 +2115,15 @@
             <rdf:Description rdf:about="&Ice;Pitch"/>
             <rdf:Description rdf:about="&Ice;Roll"/>
             <rdf:Description rdf:about="&Ice;Yaw"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="&Ice;Movement"/>
+            <rdf:Description rdf:about="&Ice;Orientation"/>
+            <rdf:Description rdf:about="&Ice;Position"/>
+            <rdf:Description rdf:about="&Ice;Timestamp"/>
         </owl:members>
     </rdf:Description>
 </rdf:RDF>

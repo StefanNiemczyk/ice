@@ -70,32 +70,10 @@
     
 
 
-    <!-- http://vs.uni-kassel.de/IceTest#KalmanFilter -->
-
-    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#KalmanFilter">
-        <rdfs:subClassOf rdf:resource="&Ice;ComputationNode"/>
-    </owl:Class>
-    
-
-
     <!-- http://vs.uni-kassel.de/IceTest#Pos2D -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#Pos2D">
         <rdfs:subClassOf rdf:resource="&Ice;PositionRepresentation"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:unionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;ValueScope"/>
-                            <rdf:Description rdf:about="&Ice;XCoordinate"/>
-                            <rdf:Description rdf:about="&Ice;YCoordinate"/>
-                        </owl:unionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
-            </owl:Restriction>
-        </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
@@ -111,6 +89,20 @@
                     </owl:Restriction>
                 </owl:intersectionOf>
             </owl:Class>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;ValueScope"/>
+                            <rdf:Description rdf:about="&Ice;XCoordinate"/>
+                            <rdf:Description rdf:about="&Ice;YCoordinate"/>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     
@@ -296,15 +288,15 @@
         <rdfs:subClassOf rdf:resource="&Ice;ComputationNode"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasInput"/>
-                <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream1"/>
+                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
+                <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
-                <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2"/>
+                <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream1"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -338,12 +330,6 @@
         <rdfs:subClassOf rdf:resource="&Ice;NamedMap"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;aboutEntity"/>
-                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestEntity"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;isMapOf"/>
                 <owl:someValuesFrom>
                     <owl:Class>
@@ -356,6 +342,12 @@
                         </owl:intersectionOf>
                     </owl:Class>
                 </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;aboutEntity"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestEntity"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -453,21 +445,6 @@
     
 
 
-    <!-- http://vs.uni-kassel.de/IceTest#TestSinkNode -->
-
-    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestSinkNode">
-        <rdfs:subClassOf rdf:resource="&Ice;SinkNode"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasInput"/>
-                <owl:onClass rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream2"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-    </owl:Class>
-    
-
-
     <!-- http://vs.uni-kassel.de/IceTest#TestSourceNode -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNode">
@@ -536,36 +513,6 @@
     <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestTransformation1">
         <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestRepresentation"/>
         <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:unionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;ValueScope"/>
-                            <owl:Class>
-                                <owl:intersectionOf rdf:parseType="Collection">
-                                    <rdf:Description rdf:about="&Ice;Orientation"/>
-                                    <owl:Restriction>
-                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                                        <owl:someValuesFrom rdf:resource="&Ice;EulerAnglesRep"/>
-                                    </owl:Restriction>
-                                </owl:intersectionOf>
-                            </owl:Class>
-                            <owl:Class>
-                                <owl:intersectionOf rdf:parseType="Collection">
-                                    <rdf:Description rdf:about="&Ice;Position"/>
-                                    <owl:Restriction>
-                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                                        <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#Pos3D"/>
-                                    </owl:Restriction>
-                                </owl:intersectionOf>
-                            </owl:Class>
-                        </owl:unionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
                     <owl:Restriction>
@@ -598,6 +545,36 @@
                     </owl:Restriction>
                 </owl:intersectionOf>
             </owl:Class>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;ValueScope"/>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="&Ice;Orientation"/>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                        <owl:someValuesFrom rdf:resource="&Ice;EulerAnglesRep"/>
+                                    </owl:Restriction>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="&Ice;Position"/>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                        <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#Pos3D"/>
+                                    </owl:Restriction>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     
@@ -608,36 +585,6 @@
     <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestTransformation2">
         <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestRepresentation"/>
         <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
-                <owl:allValuesFrom>
-                    <owl:Class>
-                        <owl:unionOf rdf:parseType="Collection">
-                            <rdf:Description rdf:about="&Ice;ValueScope"/>
-                            <owl:Class>
-                                <owl:intersectionOf rdf:parseType="Collection">
-                                    <rdf:Description rdf:about="&Ice;Orientation"/>
-                                    <owl:Restriction>
-                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                                        <owl:someValuesFrom rdf:resource="&Ice;EulerAnglesRep"/>
-                                    </owl:Restriction>
-                                </owl:intersectionOf>
-                            </owl:Class>
-                            <owl:Class>
-                                <owl:intersectionOf rdf:parseType="Collection">
-                                    <rdf:Description rdf:about="&Ice;Position"/>
-                                    <owl:Restriction>
-                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                                        <owl:someValuesFrom rdf:resource="&Ice;CoordinatePositionRep"/>
-                                    </owl:Restriction>
-                                </owl:intersectionOf>
-                            </owl:Class>
-                        </owl:unionOf>
-                    </owl:Class>
-                </owl:allValuesFrom>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
                     <owl:Restriction>
@@ -670,6 +617,36 @@
                     </owl:Restriction>
                 </owl:intersectionOf>
             </owl:Class>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="&Ice;ValueScope"/>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="&Ice;Orientation"/>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                        <owl:someValuesFrom rdf:resource="&Ice;EulerAnglesRep"/>
+                                    </owl:Restriction>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="&Ice;Position"/>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
+                                        <owl:someValuesFrom rdf:resource="&Ice;CoordinatePositionRep"/>
+                                    </owl:Restriction>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     
