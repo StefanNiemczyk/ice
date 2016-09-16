@@ -695,6 +695,25 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/IceTest#ConTest2Sys1ToSys2Ind -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#ConTest2Sys1ToSys2Ind">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#ConnectionTest2Sys1ToSys2 -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#ConnectionTest2Sys1ToSys2">
+        <rdf:type rdf:resource="&Ice;Connection"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#ConTest2Sys1ToSys2Ind"/>
+        <Ice:isConnectionFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd1"/>
+        <Ice:isConnectionTo rdf:resource="http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd2"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://vs.uni-kassel.de/IceTest#Pos2DReqInd -->
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#Pos2DReqInd">
