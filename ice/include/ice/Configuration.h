@@ -53,6 +53,7 @@ public:
   long coordinationMessageTimeout;
   int maxRetryCount;
 
+  std::string ontologyIriMapper;
   std::string ontologyIri;
   std::string ontologyIriOwnEntity;
 

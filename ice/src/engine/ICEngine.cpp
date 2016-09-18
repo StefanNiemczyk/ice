@@ -62,6 +62,8 @@ void ICEngine::init()
   // Initialize ontology
   this->ontologyInterface = std::make_shared<OntologyInterface>(path + "/java/lib/");
   this->ontologyInterface->addIRIMapper(path + "/ontology/");
+  if (config->ontologyIriMapper != "")
+    this->ontologyInterface->addIRIMapper(config->ontologyIriMapper);
   this->ontologyInterface->addOntologyIRI(this->config->ontologyIri);
   this->ontologyInterface->loadOntologies();
 

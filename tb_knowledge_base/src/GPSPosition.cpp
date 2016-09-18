@@ -12,10 +12,10 @@ namespace ice
 
 int GPSPosition::ALTITUDE_PATH = 0;
 int GPSPosition::LATITUDE_PATH = 1;
-int GPSPosition::LONGTITUDE_PATH = 2;
+int GPSPosition::LONGITUDE_PATH = 2;
 
 GPSPosition::GPSPosition(std::shared_ptr<Representation> const &representation) :
-    GContainer(representation), latitude(0), longtitude(0), altitude(0)
+    GContainer(representation), latitude(0), longitude(0), altitude(0)
 {
   //
 }
@@ -23,6 +23,17 @@ GPSPosition::GPSPosition(std::shared_ptr<Representation> const &representation) 
 GPSPosition::~GPSPosition()
 {
   //
+}
+
+GContainer* GPSPosition::clone()
+{
+  auto pos = new GPSPosition(this->representation);
+
+  pos->latitude = this->latitude;
+  pos->longitude = this->longitude;
+  pos->altitude = this->altitude;
+
+  return pos;
 }
 
 void GPSPosition::print(int level, std::string dimension)
@@ -40,9 +51,9 @@ std::pair<BasicRepresentationType, void*> GPSPosition::getPair(std::vector<int> 
   {
     return std::make_pair(BasicRepresentationType::DOUBLE, &this->latitude);
   }
-  else if (indices->at(index) == LONGTITUDE_PATH)
+  else if (indices->at(index) == LONGITUDE_PATH)
   {
-    return std::make_pair(BasicRepresentationType::DOUBLE, &this->longtitude);
+    return std::make_pair(BasicRepresentationType::DOUBLE, &this->longitude);
   }
 
   return std::make_pair(BasicRepresentationType::UNSET, nullptr);
@@ -58,9 +69,9 @@ void* GPSPosition::get(std::vector<int> *indices, int index)
   {
     return &this->latitude;
   }
-  else if (indices->at(index) == LONGTITUDE_PATH)
+  else if (indices->at(index) == LONGITUDE_PATH)
   {
-    return &this->longtitude;
+    return &this->longitude;
   }
 
   return nullptr;
@@ -78,9 +89,9 @@ bool GPSPosition::set(std::vector<int> *indices, int index, const void* value)
     this->latitude = *((double*) value);
     return true;
   }
-  else if (indices->at(index) == LONGTITUDE_PATH)
+  else if (indices->at(index) == LONGITUDE_PATH)
   {
-    this->longtitude = *((double*) value);
+    this->longitude = *((double*) value);
     return true;
   }
 

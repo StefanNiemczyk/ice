@@ -16,12 +16,18 @@
 #include "ice/representation/GContainer.h"
 #include "ice/representation/GContainerFactory.h"
 
+#include "GPSPosition.h"
 
-TEST(TransformationNode, simpleTest)
+
+TEST(GPSTransformation, gpspostion)
 {
+
+  std::string path = ros::package::getPath("tb_knowledge_base");
+
   std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
-  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
-  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSystem";
+  config->ontologyIriMapper = path + "/ontology";
+  config->ontologyIri = "http://vs.uni-kassel.de/TurtleBot";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/TurtleBot#Leonardo";
 
   std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
 
@@ -34,6 +40,44 @@ TEST(TransformationNode, simpleTest)
 
   auto factory = engine->getGContainerFactory();
 
+  auto creator = [](std::shared_ptr<ice::GContainerFactory> factory){
+    auto rep = factory->getRepresentation("http://vs.uni-kassel.de/Ice#WGS84Rep");
+    return std::make_shared<ice::GPSPosition>(rep);
+  };
+  bool result = factory->registerCustomCreator("http://vs.uni-kassel.de/Ice#WGS84Rep", creator);
+
+  ASSERT_TRUE(result);
+
+  auto rep = factory->getRepresentation("http://vs.uni-kassel.de/Ice#WGS84Rep");
+  auto lat = rep->accessPath({"http://vs.uni-kassel.de/Ice#Latitude"});
+  auto lon = rep->accessPath({"http://vs.uni-kassel.de/Ice#Longitude"});
+  auto alt = rep->accessPath({"http://vs.uni-kassel.de/Ice#Altitude"});
+
+  ASSERT_NE(nullptr, lat);
+  ASSERT_NE(nullptr, lon);
+  ASSERT_NE(nullptr, alt);
+
+  auto pos1 = std::static_pointer_cast<ice::GPSPosition>(factory->makeInstance(rep));
+
+  pos1->latitude = 11.111;
+  pos1->longitude = 22.222;
+  pos1->altitude = 33.333;
+
+  ASSERT_EQ(11.111, pos1->getValue<double>(lat));
+  ASSERT_EQ(22.222, pos1->getValue<double>(lon));
+  ASSERT_EQ(33.333, pos1->getValue<double>(alt));
+
+  double dLat = 99;
+  double dLon = 9990;
+  double dAlt = 999999;
+
+  pos1->set(lat, &dLat);
+  pos1->set(lon, &dLon);
+  pos1->set(alt, &dAlt);
+
+  ASSERT_EQ(dLat, pos1->latitude);
+  ASSERT_EQ(dLon, pos1->longitude);
+  ASSERT_EQ(dAlt, pos1->altitude);
 }
 
 
