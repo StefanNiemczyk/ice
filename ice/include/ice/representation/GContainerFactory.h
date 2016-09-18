@@ -51,6 +51,8 @@ struct TransNode
 
 class GContainerFactory : public std::enable_shared_from_this<GContainerFactory>
 {
+  using creatorFunction = std::function<std::shared_ptr<GContainer>(std::shared_ptr<GContainerFactory>)>;
+
 public:
   GContainerFactory();
   GContainerFactory(std::weak_ptr<ICEngine> engine);
@@ -65,6 +67,7 @@ public:
   int fromCSVStrings(std::unique_ptr<std::vector<std::string>> lines);
   std::shared_ptr<Representation> getRepresentation(std::string representation);
 
+  bool registerCustomCreator(std::string representation, const creatorFunction& creator);
   std::shared_ptr<GContainer> makeInstance(std::string name);
   std::shared_ptr<GContainer> makeInstance(std::shared_ptr<Representation> representation);
   std::shared_ptr<GContainer> fromJSON(std::string jsonStr);
@@ -107,6 +110,7 @@ private:
   std::shared_ptr<OntologyInterface>                            ontologyInterface;
   std::map<std::string, std::shared_ptr<Representation>>        repMap;
   std::map<std::string, BasicRepresentationType>                typeMap;
+  std::map<std::string, creatorFunction>                        customGContainer;
   int                                                           transIter;
   std::map<std::string, std::shared_ptr<TransNode>>             transformations;
 };

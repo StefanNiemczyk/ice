@@ -15,8 +15,11 @@ namespace ice
 
 class GPSPosition : public GContainer
 {
+private:
+  static int LATITUDE_PATH, LONGTITUDE_PATH, ALTITUDE_PATH;
+
 public:
-  GPSPosition();
+  GPSPosition(std::shared_ptr<Representation> const &representation);
   virtual ~GPSPosition();
 
   virtual void print(int level, std::string dimension = "");
@@ -26,7 +29,7 @@ public:
   virtual std::string toJSON();
   virtual Value toJSONValue(Document &d);
 
-private:
+public:
   double latitude;
   double longtitude;
   double altitude;
