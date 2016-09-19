@@ -618,8 +618,7 @@ std::shared_ptr<Transformation> GContainerFactory::fromXMLDesc(TransDesc* desc)
     return std::shared_ptr<Transformation>();
   }
 
-  std::shared_ptr<Transformation> trans = std::make_shared<Transformation>(this->shared_from_this(), desc->name, scope,
-                                                                           rep);
+  std::shared_ptr<Transformation> trans = std::make_shared<Transformation>(this->engine, desc->name, scope, rep);
 
 // reading inputs
   std::map<int, std::shared_ptr<Representation>> inputs;

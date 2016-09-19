@@ -12,14 +12,17 @@
 
 #include "ice/representation/GContainer.h"
 #include "ice/representation/GContainerFactory.h"
+#include "ice/ICEngine.h"
 
 namespace ice
 {
 
-Transformation::Transformation(std::weak_ptr<ice::GContainerFactory> factory, std::string name, std::string scope,
+Transformation::Transformation(std::weak_ptr<ICEngine> engine, std::string name, std::string scope,
                                std::shared_ptr<Representation> targetRepresentation) :
-    factory(factory), name(name), scope(scope), targetRepresentation(targetRepresentation)
+    name(name), scope(scope), targetRepresentation(targetRepresentation)
 {
+  this->engine = engine;
+  this->factory = engine.lock()->getGContainerFactory();
 }
 
 Transformation::~Transformation()
