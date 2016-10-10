@@ -156,8 +156,7 @@ void ASPTransformationGeneration::extractTransformations()
       continue;
     }
 
-    std::shared_ptr<Transformation> transformation = std::make_shared<Transformation>(this->engine, name, scope,
-                                                                                      rep2);
+    auto transformation = std::make_shared<Transformation>(this->engine, name, scope, rep2);
 
     // set input representation
     transformation->getInputs().push_back(rep1);

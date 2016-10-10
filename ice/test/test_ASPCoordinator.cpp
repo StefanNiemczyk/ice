@@ -65,6 +65,7 @@ TEST(ASPModelGenerator, simpleTest)
 
 TEST(ASPModelGenerator, transformationTest)
 {
+  ice::Node::clearNodeStore();
   ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
   ice::Node::registerNodeCreator("TestComputationalNodeGrounding", &SmothingNode::createNode);
   ice::Node::registerNodeCreator("Pos3DSourceNode", &SimpleSourceNode::createNode);
@@ -135,6 +136,7 @@ TEST(ASPModelGenerator, transformationTest)
 
 TEST(ASPModelGenerator, twoSystemsSimple)
 {
+  ice::Node::clearNodeStore();
   ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
   ice::Node::registerNodeCreator("TestComputationalNodeGrounding", &SmothingNode::createNode);
 
@@ -214,6 +216,7 @@ TEST(ASPModelGenerator, twoSystemsSimple)
 
 TEST(ASPModelGenerator, twoSystemsComplex)
 {
+  ice::Node::clearNodeStore();
   ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
   ice::Node::registerNodeCreator("TestComputationalNodeGrounding", &SmothingNode::createNode);
 

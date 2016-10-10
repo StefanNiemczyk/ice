@@ -22,38 +22,23 @@
 namespace
 {
 
-TEST(RepresentationTransformationTest, rollPitchYawToEulerAngles)
+TEST(EulerRepTransformation, rollPitchYawToEulerAngles)
 {
-  std::string path = ros::package::getPath("ice");
-  bool result;
 
-  auto oi = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
-  oi->addIRIMapper(path + "/ontology/");
+  ice::Node::clearNodeStore();
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSystem";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  engine->setTimeFactory(std::make_shared<ice::SimpleTimeFactory>());
 
-  ASSERT_FALSE(oi->errorOccurred());
-
-  result = oi->addOntologyIRI("http://vs.uni-kassel.de/Ice");
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->loadOntologies();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->isConsistent();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
-  factory->setOntologyInterface(oi);
-  factory->init();
+  engine->init();
+  auto factory = engine->getGContainerFactory();
 
   ice::XMLTransformationReader reader;
 
-  result = reader.readFile("data/euler_transformation.xml");
+  auto result = reader.readFile("data/euler_transformation.xml");
 
   ASSERT_TRUE(result);
 

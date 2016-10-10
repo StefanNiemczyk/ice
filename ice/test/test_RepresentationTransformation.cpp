@@ -265,43 +265,27 @@ TEST(RepresentationTransformationTest, formulaMultiVariableOperation)
 
 TEST(RepresentationTransformationTest, xmlReader)
 {
-  std::string path = ros::package::getPath("ice");
-  bool result;
+  ice::Node::clearNodeStore();
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSystem";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  engine->setTimeFactory(std::make_shared<ice::SimpleTimeFactory>());
 
-  auto oi = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
-  oi->addIRIMapper(path + "/ontology/");
-
-  ASSERT_FALSE(oi->errorOccurred());
-
-  result = oi->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->loadOntologies();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->isConsistent();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
-  factory->setOntologyInterface(oi);
-  factory->init();
+  engine->init();
+  auto factory = engine->getGContainerFactory();
 
   ice::XMLTransformationReader reader;
 
-  result = reader.readFile("data/transformation_example_1.xml");
+  auto result = reader.readFile("data/transformation_example_1.xml");
 
   ASSERT_TRUE(result);
 
-  auto p2dRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos2D");
-  auto p3dRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");
-  auto p3dRotRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3DRot");
-  auto rollPitchYawRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#RollPitchYawRep");
+  auto p2dRep = engine->getGContainerFactory()->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos2D");
+  auto p3dRep = engine->getGContainerFactory()->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");
+  auto p3dRotRep = engine->getGContainerFactory()->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3DRot");
+  auto rollPitchYawRep = engine->getGContainerFactory()->getRepresentation("http://vs.uni-kassel.de/IceTest#RollPitchYawRep");
 
   ASSERT_TRUE(p2dRep != false);
   ASSERT_TRUE(p3dRep != false);
@@ -475,32 +459,16 @@ TEST(RepresentationTransformationTest, xmlReader)
 
 TEST(RepresentationTransformationTest, handMadeTransformation)
 {
-  std::string path = ros::package::getPath("ice");
-  bool result;
+  ice::Node::clearNodeStore();
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSystem";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  engine->setTimeFactory(std::make_shared<ice::SimpleTimeFactory>());
 
-  auto oi = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
-  oi->addIRIMapper(path + "/ontology/");
-
-  ASSERT_FALSE(oi->errorOccurred());
-
-  result = oi->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->loadOntologies();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->isConsistent();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
-  factory->setOntologyInterface(oi);
-  factory->init();
+  engine->init();
+  auto factory = engine->getGContainerFactory();
 
   auto p2dRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos2D");
   auto p3dRep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");
@@ -515,8 +483,8 @@ TEST(RepresentationTransformationTest, handMadeTransformation)
   auto p3dY = p3dRep->accessPath({"http://vs.uni-kassel.de/Ice#YCoordinate"});
   auto p3dZ = p3dRep->accessPath({"http://vs.uni-kassel.de/Ice#ZCoordinate"});
 
-  std::shared_ptr<ice::Transformation> trans = std::make_shared<TestTransformation>(factory);
   std::string name = "TestTransformation";
+  std::shared_ptr<ice::Transformation> trans = std::make_shared<TestTransformation>(factory);
   factory->addTransformation(name, trans, false);
 
   trans = factory->getTransformationByName(name);

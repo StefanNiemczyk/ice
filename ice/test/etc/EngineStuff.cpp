@@ -163,7 +163,7 @@ public:
 class TestTransformation : public ice::Transformation
 {
 public:
-  TestTransformation(std::weak_ptr<ice::ICEngine> factory) : Transformation(factory, "TestTransformation", "http://vs.uni-kassel.de/Ice#Position")
+  TestTransformation(std::weak_ptr<ice::GContainerFactory> factory) : Transformation(factory, "TestTransformation", "http://vs.uni-kassel.de/Ice#Position")
   {
     auto f = this->factory.lock();
     targetRepresentation = f->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");

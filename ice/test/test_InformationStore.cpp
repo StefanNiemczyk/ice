@@ -21,6 +21,7 @@
 #include "ice/information/InformationStore.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/processing/Node.h"
+#include "ice/ICEngine.h"
 
 TEST(InformationStore, simpleTest)
 {
@@ -84,40 +85,17 @@ TEST(InformationStore, simpleTest)
 TEST(InformationStore, ontology1)
 {
   ice::Node::clearNodeStore();
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSystem";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  engine->setTimeFactory(std::make_shared<ice::SimpleTimeFactory>());
 
-  std::string path = ros::package::getPath("ice");
-  bool result;
+  engine->init();
+  auto factory = engine->getGContainerFactory();
 
-  auto oi = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
-  oi->addIRIMapper(path + "/ontology/");
-
-  ASSERT_FALSE(oi->errorOccurred());
-
-  result = oi->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->loadOntologies();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->isConsistent();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  auto factory = std::make_shared<ice::GContainerFactory>();
-  factory->setOntologyInterface(oi);
-  factory->init();
-
-  ice::ASPTransformationGeneration asp;
-
-  asp.setOntology(oi);
-  asp.setGContainerFactory(factory);
-
-  asp.extractTransformations();
+  engine->getASPTransformationGeneration()->extractTransformations();
 
   // Test transformation
   std::string name = "autoTrans_http://vs.uni-kassel.de/Ice#Position_http://vs.uni-kassel.de/Ice#CoordinatePositionRep_http://vs.uni-kassel.de/IceTest#Pos3D";

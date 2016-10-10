@@ -25,6 +25,13 @@ Transformation::Transformation(std::weak_ptr<ICEngine> engine, std::string name,
   this->factory = engine.lock()->getGContainerFactory();
 }
 
+Transformation::Transformation(std::weak_ptr<GContainerFactory> factory, std::string name, std::string scope,
+               std::shared_ptr<Representation> targetRepresentation):
+        name(name), scope(scope), targetRepresentation(targetRepresentation)
+{
+  this->factory = factory;
+}
+
 Transformation::~Transformation()
 {
   for (auto op : this->operations)

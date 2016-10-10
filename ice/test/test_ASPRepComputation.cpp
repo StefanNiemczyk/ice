@@ -17,6 +17,7 @@
 #include "ice/representation/GContainerFactory.h"
 #include "ice/representation/Transformation.h"
 #include "ice/representation/XMLTransformationReader.h"
+#include "ice/ICEngine.h"
 
 TEST(ASPRepComp, simple)
 {
@@ -61,48 +62,26 @@ TEST(ASPRepComp, simple)
 
 TEST(ASPRepComp, ontology1)
 {
-  std::string path = ros::package::getPath("ice");
-  bool result;
+  ice::Node::clearNodeStore();
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSystem";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  engine->setTimeFactory(std::make_shared<ice::SimpleTimeFactory>());
 
-  auto oi = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
-  oi->addIRIMapper(path + "/ontology/");
+  engine->init();
 
-  ASSERT_FALSE(oi->errorOccurred());
-
-  result = oi->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->loadOntologies();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->isConsistent();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
-  factory->setOntologyInterface(oi);
-  factory->init();
-
-  ice::ASPTransformationGeneration asp;
-
-  asp.setOntology(oi);
-  asp.setGContainerFactory(factory);
-
-  asp.extractTransformations();
+  engine->getASPTransformationGeneration()->extractTransformations();
 
   // Test transformation
   std::string name = "autoTrans_http://vs.uni-kassel.de/Ice#Position_http://vs.uni-kassel.de/Ice#CoordinatePositionRep_http://vs.uni-kassel.de/IceTest#Pos3D";
-  auto trans = factory->getTransformationByName(name);
+  auto trans = engine->getGContainerFactory()->getTransformationByName(name);
 
   ASSERT_TRUE(trans != false);
 
-  auto repIn = factory->getRepresentation("http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
-  auto repOut = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");
+  auto repIn = engine->getGContainerFactory()->getRepresentation("http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
+  auto repOut = engine->getGContainerFactory()->getRepresentation("http://vs.uni-kassel.de/IceTest#Pos3D");
 
   ASSERT_TRUE(repIn != false);
   ASSERT_TRUE(repOut != false);
@@ -123,7 +102,7 @@ TEST(ASPRepComp, ontology1)
   ASSERT_TRUE(outY != nullptr);
   ASSERT_TRUE(outZ != nullptr);
 
-  auto in = factory->makeInstance(repIn);
+  auto in = engine->getGContainerFactory()->makeInstance(repIn);
 
   double x = 4.44;
   double y = 5.55;
@@ -143,49 +122,25 @@ TEST(ASPRepComp, ontology1)
 TEST(ASPRepComp, ontology2)
 {
   ice::Node::clearNodeStore();
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSystem";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  engine->setTimeFactory(std::make_shared<ice::SimpleTimeFactory>());
 
-  std::string path = ros::package::getPath("ice");
-  bool result;
+  engine->init();
 
-  auto oi = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
-  oi->addIRIMapper(path + "/ontology/");
-
-  ASSERT_FALSE(oi->errorOccurred());
-
-  result = oi->addOntologyIRI("http://vs.uni-kassel.de/IceTest");
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->loadOntologies();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  result = oi->isConsistent();
-
-  ASSERT_FALSE(oi->errorOccurred());
-  ASSERT_TRUE(result);
-
-  std::shared_ptr<ice::GContainerFactory> factory = std::make_shared<ice::GContainerFactory>();
-  factory->setOntologyInterface(oi);
-  factory->init();
-
-  ice::ASPTransformationGeneration asp;
-
-  asp.setOntology(oi);
-  asp.setGContainerFactory(factory);
-
-  asp.extractTransformations();
+  engine->getASPTransformationGeneration()->extractTransformations();
 
   // Test transformation
   std::string name = "autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2";
-  auto trans = factory->getTransformationByName(name);
+  auto trans = engine->getGContainerFactory()->getTransformationByName(name);
 
   ASSERT_TRUE(trans != false);
 
-  auto repIn = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#TestTransformation1");
-  auto repOut = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#TestTransformation2");
+  auto repIn = engine->getGContainerFactory()->getRepresentation("http://vs.uni-kassel.de/IceTest#TestTransformation1");
+  auto repOut = engine->getGContainerFactory()->getRepresentation("http://vs.uni-kassel.de/IceTest#TestTransformation2");
 
   ASSERT_TRUE(repIn != false);
   ASSERT_TRUE(repOut != false);
@@ -230,7 +185,7 @@ TEST(ASPRepComp, ontology2)
   ASSERT_TRUE(outOb != nullptr);
   ASSERT_TRUE(outOc != nullptr);
 
-  auto in = factory->makeInstance(repIn);
+  auto in = engine->getGContainerFactory()->makeInstance(repIn);
 
   double x = 4.44;
   double y = 5.55;

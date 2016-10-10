@@ -103,6 +103,8 @@ class Transformation
 public:
   Transformation(std::weak_ptr<ICEngine> engine, std::string name, std::string scope,
                  std::shared_ptr<Representation> targetRepresentation = nullptr);
+  Transformation(std::weak_ptr<GContainerFactory> factory, std::string name, std::string scope,
+                 std::shared_ptr<Representation> targetRepresentation = nullptr);
   virtual ~Transformation();
 
   virtual std::shared_ptr<GContainer> transform(std::shared_ptr<GContainer>* inputs);
