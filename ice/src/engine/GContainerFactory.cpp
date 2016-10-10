@@ -215,6 +215,15 @@ std::shared_ptr<Representation> GContainerFactory::getRepresentation(std::string
   return it->second;
 }
 
+bool GContainerFactory::registerCustomCreator(std::string representation, const creatorFunction& creator)
+{
+  if (this->customGContainer.find(representation) != this->customGContainer.end())
+     return false;
+
+   this->customGContainer.insert(std::pair<std::string, const creatorFunction&>(representation, creator));
+   return true;
+}
+
 std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::string repName)
 {
   auto rep = this->getRepresentation(repName);
@@ -226,6 +235,23 @@ std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::string repName)
   }
 
   return this->makeInstance(rep);
+}
+
+std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::shared_ptr<Representation> representation)
+{
+  // check costum creators
+  auto custom = this->customGContainer.find(representation->name);
+  if (custom != this->customGContainer.end())
+  {
+    return (custom->second)(this->shared_from_this());
+  }
+
+  auto container = this->makeGContainerInstance(representation);
+
+  if (container == nullptr)
+    return std::shared_ptr<GContainer>();
+
+  return std::shared_ptr<GContainer>(container);
 }
 
 std::shared_ptr<GContainer> GContainerFactory::fromJSON(std::string jsonStr)
@@ -457,16 +483,6 @@ bool GContainerFactory::fromJSONValue(const Value &value, std::shared_ptr<GConta
   return true;
 }
 
-std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::shared_ptr<Representation> representation)
-{
-  auto container = this->makeGContainerInstance(representation);
-
-  if (container == nullptr)
-    return std::shared_ptr<GContainer>();
-
-  return std::shared_ptr<GContainer>(container);
-}
-
 GContainer* GContainerFactory::makeGContainerInstance(std::shared_ptr<Representation> representation)
 {
   if (representation->isBasic())
@@ -602,8 +618,7 @@ std::shared_ptr<Transformation> GContainerFactory::fromXMLDesc(TransDesc* desc)
     return std::shared_ptr<Transformation>();
   }
 
-  std::shared_ptr<Transformation> trans = std::make_shared<Transformation>(this->shared_from_this(), desc->name, scope,
-                                                                           rep);
+  std::shared_ptr<Transformation> trans = std::make_shared<Transformation>(this->engine, desc->name, scope, rep);
 
 // reading inputs
   std::map<int, std::shared_ptr<Representation>> inputs;

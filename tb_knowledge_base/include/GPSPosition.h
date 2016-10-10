@@ -15,20 +15,28 @@ namespace ice
 
 class GPSPosition : public GContainer
 {
+private:
+  static int LATITUDE_PATH, LONGITUDE_PATH, ALTITUDE_PATH;
+
 public:
-  GPSPosition();
+  GPSPosition(std::shared_ptr<Representation> const &representation);
   virtual ~GPSPosition();
 
+  virtual GContainer* clone();
   virtual void print(int level, std::string dimension = "");
   virtual std::pair<BasicRepresentationType, void*> getPair(std::vector<int> *indices, int index);
   virtual void* get(std::vector<int> *indices, int index);
+
+  virtual bool set(std::vector<int> *indices, const void* value) {
+          return this->set(indices, 0, value);
+  }
   virtual bool set(std::vector<int> *indices, int index, const void* value);
   virtual std::string toJSON();
   virtual Value toJSONValue(Document &d);
 
-private:
+public:
   double latitude;
-  double longtitude;
+  double longitude;
   double altitude;
 };
 

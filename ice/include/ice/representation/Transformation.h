@@ -18,6 +18,7 @@ namespace ice
 {
 class GContainer;
 class GContainerFactory;
+class ICEngine;
 } /* namespace ice */
 
 namespace ice
@@ -100,7 +101,7 @@ struct TransformationOperation
 class Transformation
 {
 public:
-  Transformation(std::weak_ptr<ice::GContainerFactory> factory, std::string name, std::string scope,
+  Transformation(std::weak_ptr<ICEngine> engine, std::string name, std::string scope,
                  std::shared_ptr<Representation> targetRepresentation = nullptr);
   virtual ~Transformation();
 
@@ -131,7 +132,8 @@ protected:
   std::shared_ptr<Representation>               targetRepresentation;
   std::vector<std::shared_ptr<Representation>>  inputs;
   std::vector<TransformationOperation*>         operations;
-  std::weak_ptr<ice::GContainerFactory>         factory;
+  std::weak_ptr<ICEngine>                       engine;
+  std::weak_ptr<GContainerFactory>              factory;
 };
 
 } /* namespace ice */

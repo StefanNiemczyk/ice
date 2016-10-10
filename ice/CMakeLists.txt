@@ -54,7 +54,7 @@ set(CMAKE_JAVA_INCLUDE_PATH
 catkin_package(
    INCLUDE_DIRS include ${JNI_INCLUDE_DIRS}
    LIBRARIES ice ${JNI_LIBRARIES}
-   CATKIN_DEPENDS roscpp std_msgs ice_msgs cling_wrap muparser 
+   CATKIN_DEPENDS roscpp roslib std_msgs ice_msgs cling_wrap muparser 
    DEPENDS TinyXML Boost
 )
 
