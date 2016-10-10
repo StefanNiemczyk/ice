@@ -34,7 +34,7 @@ tnode(k,SYSTEM,NODE,ENTITY,none) :-
 	nodeTemplate(SYSTEM,NODE,ENTITY_TYPE), 
 	entity(ENTITY,ENTITY_TYPE),
 	hasScope(ENTITY_TYPE,SCOPE), 
-	input(SYSTEM,NODE,SCOPE,REP2,_,_), 
+	input(SYSTEM,NODE,SCOPE,_,_,_), 
 	query(k).
 tnode(k,SYSTEM,NODE,ENTITY,none) :- 
 	nodeTemplate(SYSTEM,NODE,any), 
