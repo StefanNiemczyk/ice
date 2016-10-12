@@ -788,6 +788,7 @@ public:
                                   [this] (supplementary::ClingWrapper *asp)
                                   {
                                     this->lambda(asp);
+//                                    asp->add("base", {}, "system(o0_EvalSystem,default).");
 //          asp->setModelCount(0);
                                   //        asp->setSaveProgress(200);
                                   //      asp->add("base",{},"stream(1,o0_EvalSystem,o0_EvalNodeSourceInd,o0_EvalSystem,information(o0_EvalEntity,o0_EvalScope,o0_EvalRepresentation0,none)).");

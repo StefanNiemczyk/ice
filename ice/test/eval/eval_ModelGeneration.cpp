@@ -7,7 +7,7 @@ using namespace std;
 TEST(EvalModelGeneration, simpleEvalTests)
 {
   std::string path = "/home/sni/Desktop/eval";
-  int runs = 50;
+  int runs = 5;
 
   EvalScenarios scenarios2(path + "", [&] (supplementary::ClingWrapper *asp){
     asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
@@ -15,7 +15,7 @@ TEST(EvalModelGeneration, simpleEvalTests)
   });
   //                                 global      verbose gnuplot         runs
 //  scenarios2.fuseVictimsScenario(    true,       false,  true,            runs,      false, 6, 20, 2);
-//  scenarios2.representationScenario( true,       true,  true,          runs,      2, 12, 1);
+  scenarios2.representationScenario( true,       false,  true,          runs,      12, 12, 1);
   scenarios2.chainScenario(          true,       false,  true,          runs,      10, 10, 1, 10, 10, 1);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 10, 10, 10);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 20, 20, 10);

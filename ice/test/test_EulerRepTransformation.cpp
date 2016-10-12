@@ -24,7 +24,6 @@ namespace
 
 TEST(EulerRepTransformation, rollPitchYawToEulerAngles)
 {
-
   ice::Node::clearNodeStore();
   auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
   std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();

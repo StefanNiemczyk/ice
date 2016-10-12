@@ -447,6 +447,8 @@ public:
 
        for (auto ontSystem : *ontSystems)
        {
+         asp.add("base", {}, "system(" + ontology.toShortIri(ontSystem) + ",default)." );
+
 //         entity = directory->lookup(EntityDirectory::ID_ONTOLOGY, ontSystem, true);
 //
 //         if (entity->getExternal() == nullptr)

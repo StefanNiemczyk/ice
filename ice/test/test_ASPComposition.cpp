@@ -692,15 +692,6 @@ TEST(ClingWrap, simpleChainTest)
   cw->add("base", {}, "hasScope(robot,scope1).");
   cw->add("base", {}, "hasRepresentation(scope1,rep1).");
 
-//  for (int i=0; i < 100; ++i)
-//  {
-//    std::stringstream ss;
-//
-//    ss << "value(" << i << ").";
-//    cw->add("base", {}, ss.str());
-//  }
-
-
   cw->ground("base", {});
 
   // entities
@@ -769,7 +760,7 @@ TEST(ClingWrap, simpleChainTest)
 //  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,11)"));
 }
 
-TEST(ClingWrap, nodeUsedTwiced)
+TEST(ClingWrap, nodeUsedTwice)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");

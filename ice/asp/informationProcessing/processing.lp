@@ -60,12 +60,17 @@ tnode(k,SYSTEM,IRO,ENTITY,none) :-
 	query(k).
 
 % identify special nodes
-snode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
-	tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO),
-	tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,_,_).
-nnode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
-	tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO),
-	tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO2,_,_),
+snode(TNODE) :-
+	tstream(k,SYSTEM,TNODE,INFO),
+	tinput(TNODE,INFO,_,_).
+%{ snode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)); nnode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) } :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2).
+%nnode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
+%	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),
+%	not snode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)).
+nnode(TNODE) :-
+	not snode(TNODE),
+	tstream(k,SYSTEM,TNODE,INFO),
+	tinput(TNODE,INFO2,_,_),
 	INFO != INFO2.
 nnode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
 	sourceNode(SYSTEM,NODE,_),
