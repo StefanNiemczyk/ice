@@ -68,7 +68,6 @@ snode(TNODE) :-
 %	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),
 %	not snode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)).
 nnode(TNODE) :-
-	not snode(TNODE),
 	tstream(k,SYSTEM,TNODE,INFO),
 	tinput(TNODE,INFO2,_,_),
 	INFO != INFO2.
@@ -443,12 +442,19 @@ metadataOutput(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE1+VALUE2+VALUE3) :-
 selectedStream(k,SYSTEM,node(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO,STEP) :-
 	before(tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),tnode(k,SYSTEM,none,none,none),INFO,0),
 	stream(k,SYSTEM,node(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO,STEP).
+
+%0 { selectedStream(k,SYSTEM,NODE,INFO,STEP) : stream(k,SYSTEM,NODE,INFO,STEP) } 1:-
+%	requiredStream(SYSTEM,INFO).
+%#maximize { 1@5,SYSTEM,NODE,INFO : selectedStream(k,SYSTEM,NODE,INFO,_) }.
 :~ requiredStream(SYSTEM,INFO), not selectedStream(k,SYSTEM,_,INFO,_), query(k). [1@5,requiredStream]
 
 % maps
 selectedMap(k,SYSTEM,mapNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO_TYPE,STEP) :-
 	before(tmapNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),tnode(k,SYSTEM,none,none,none),INFO,0),
 	map(k,SYSTEM,mapNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO_TYPE,STEP).
+
+%0 { selectedMap(k,SYSTEM,mapNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO_TYPE,STEP) : map(k,SYSTEM,mapNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO_TYPE,STEP) } 1 :-
+%	requiredMap(SYSTEM,INFO_TYPE).
 :~ requiredMap(SYSTEM,INFO_TYPE), not selectedMap(k,SYSTEM,_,INFO_TYPE,_), query(k). [1@5,requiredMap]
 
 % checking point budget of systems

@@ -63,11 +63,11 @@ mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2) :-
 	query(k).
 
 % detect loops
-cycle(k,TNODE,TNODE2) :- before(TNODE,TNODE2,_,_).
-cycle(k,TNODE,TNODE2) :- 
- 	cycle(TNODE,TNODE_BEFORE),
- 	cycle(TNODE_BEFORE,TNODE2).
-:- cycle(k,TNODE,TNODE).
+%cycle(k,TNODE,TNODE2) :- before(TNODE,TNODE2,_,_).
+%cycle(k,TNODE,TNODE2) :- 
+% 	cycle(TNODE,TNODE_BEFORE),
+% 	cycle(TNODE_BEFORE,TNODE2).
+%:- cycle(k,TNODE,TNODE).
 
 % transfer streams if nodes are from different systems
 streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,node(k,SYSTEM_SOURCE,NODE2,ENTITY3,ENTITY4),INFO,STEP),0) :-

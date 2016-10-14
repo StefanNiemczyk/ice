@@ -67,7 +67,7 @@ metadataStream(k,METADATA,stream(k,SYSTEM_TARGET,PROVIDER,INFO,STEP+1),VALUE) :-
 
 metadataStream(k,METADATA,stream(k,SYSTEM_TARGET,PROVIDER,INFO,STEP+1),VALUE+VALUE_PROCESSING) :-
 	streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,PROVIDER,INFO,STEP),_), 
-	metadataStream(k,delay,stream(k,SYSTEM_SOURCE,PROVIDER,INFO,STEP),VALUE),
+	metadataStream(k,METADATA,stream(k,SYSTEM_SOURCE,PROVIDER,INFO,STEP),VALUE),
 	metadataOutput(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE_PROCESSING).
 
 
@@ -163,60 +163,60 @@ metadataMap(k,METADATA,map(k,SYSTEM_TARGET,PROVIDER,INFO_TYPE,STEP+1),VALUE+VALU
 % checking stream QoS metadata
 :~ requiredStream(SYSTEM,INFO), 
    selectedStream(k,SYSTEM,PROVIDER,INFO,STEP),
-   requiredMetadata(METADATA,SYSTEM,INFO,REQUIRED_VALUE), 
+   requiredMetadata(METADATA,SYSTEM,INFO,TRESHOLD), 
    metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO,STEP),VALUE), 
    metadata(information,METADATA,maximize),
-   REQUIRED_VALUE < VALUE,
+   TRESHOLD > VALUE,
    query(k). [1@4,requiredStream]
 :~ requiredStream(SYSTEM,INFO), 
    selectedStream(k,SYSTEM,PROVIDER,INFO,STEP),
-   requiredMetadata(METADATA,SYSTEM,INFO,REQUIRED_VALUE), 
+   requiredMetadata(METADATA,SYSTEM,INFO,TRESHOLD), 
    metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO,STEP),VALUE),
    metadata(information,METADATA,minimize), 
-   REQUIRED_VALUE > VALUE,
+   TRESHOLD < VALUE,
    query(k). [1@4,requiredStream]
 
 :~ requiredStream(SYSTEM,INFO), 
    selectedStream(k,SYSTEM,PROVIDER,INFO,STEP),
-   requiredMetadata(METADATA,SYSTEM,INFO,REQUIRED_VALUE), 
+   requiredMetadata(METADATA,SYSTEM,INFO,TRESHOLD), 
    metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO,STEP),VALUE), 
    metadata(stream,METADATA,maximize),
-   REQUIRED_VALUE < VALUE,
+   TRESHOLD > VALUE,
    query(k). [1@4,requiredStream]
 :~ requiredStream(SYSTEM,INFO), 
    selectedStream(k,SYSTEM,PROVIDER,INFO,STEP),
-   requiredMetadata(METADATA,SYSTEM,INFO,REQUIRED_VALUE), 
+   requiredMetadata(METADATA,SYSTEM,INFO,TRESHOLD), 
    metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO,STEP),VALUE),
    metadata(stream,METADATA,minimize), 
-   REQUIRED_VALUE > VALUE,
+   TRESHOLD < VALUE,
    query(k). [1@4,requiredStream]
 
 
 % checking map QoS parameters
 :~ selectedMap(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),
-   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,REQUIRED_VALUE), 
+   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,TRESHOLD), 
    metadataMap(k,METADATA,map(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
    metadata(information,METADATA,maximize),
-   REQUIRED_VALUE < VALUE,
+   TRESHOLD > VALUE,
    query(k). [1@4,requiredStream]
 :~ selectedMap(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),
-   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,REQUIRED_VALUE), 
+   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,TRESHOLD), 
    metadataMap(k,METADATA,map(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
    metadata(information,METADATA,minimize),
-   REQUIRED_VALUE > VALUE,
+   TRESHOLD < VALUE,
    query(k). [1@4,requiredStream]
 
 :~ selectedMap(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),
-   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,REQUIRED_VALUE), 
+   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,TRESHOLD), 
    metadataMap(k,METADATA,map(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
    metadata(map,METADATA,maximize),
-   REQUIRED_VALUE < VALUE,
+   TRESHOLD > VALUE,
    query(k). [1@4,requiredStream]
 :~ selectedMap(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),
-   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,REQUIRED_VALUE), 
+   requiredMetadata(METADATA,SYSTEM,INFO_TYPE,TRESHOLD), 
    metadataMap(k,METADATA,map(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
    metadata(map,METADATA,minimize),
-   REQUIRED_VALUE > VALUE,
+   TRESHOLD < VALUE,
    query(k). [1@4,requiredStream]
 
 
