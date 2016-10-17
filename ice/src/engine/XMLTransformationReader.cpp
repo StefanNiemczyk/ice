@@ -136,7 +136,7 @@ bool XMLTransformationReader::readOperations(TiXmlElement* element, std::vector<
     if (!child)
     {
       _log->error("Invalid child '%v' of operations", child);
-      return nullptr;
+      return false;
     }
     else if (strcmp("dimension", child) == 0)
     {
