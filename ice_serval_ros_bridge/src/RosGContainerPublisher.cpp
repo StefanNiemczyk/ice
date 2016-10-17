@@ -207,7 +207,7 @@ bool RosGContainerPublisher::readXMLFile(const std::string& fileName)
     if (!child)
     {
       _log->error("Invalid child '%v' of operations", child);
-      return nullptr;
+      return false;
     }
     else if (strcmp("template", child) == 0)
     {

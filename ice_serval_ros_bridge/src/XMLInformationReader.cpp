@@ -57,7 +57,7 @@ bool XMLInformationReader::readFile(const std::string& fileName)
     if (!child)
     {
       _log->error("Invalid child '%v' of operations", child);
-      return nullptr;
+      return false;
     }
     else if (strcmp("offered", child) == 0)
     {
@@ -113,7 +113,7 @@ bool XMLInformationReader::readOffered(TiXmlElement* element)
     if (!child)
     {
       _log->error("Invalid child '%v' of operations", child);
-      return nullptr;
+      return false;
     }
     else if (strcmp("entity", child) == 0)
     {
@@ -174,7 +174,7 @@ bool XMLInformationReader::readRequired(TiXmlElement* element)
     if (!child)
     {
       _log->error("Invalid child '%v' of operations", child);
-      return nullptr;
+      return false;
     }
     else if (strcmp("entity", child) == 0)
     {
