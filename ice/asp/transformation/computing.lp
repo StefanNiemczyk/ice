@@ -82,10 +82,10 @@ tryFix(simRep(SCOPE,REP1,REP2)) :-
 	dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,REP_TARGET,empty),
 	simpleIro(NODE,DIM,REP_SOURCE,REP_TARGET).
 
-fix(SIM_REP,DIM,REP_SOURCE,iro) :-
+fixed(SIM_REP,DIM,REP_SOURCE,iro) :-
 	useIro(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE).
 
-fix(SIM_REP,DIM,REP_TARGET,iro) :-
+fixed(SIM_REP,DIM,REP_TARGET,iro) :-
 	useIro(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE).
 
 fixCost(SIM_REP,useIro(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE),10) :-
@@ -99,9 +99,9 @@ useAutoIRO(SIM_REP,DIM,REP_SOURCE,REP_TARGET) :-
 	dimensionDeviation(SIM_REP,DIM,REP_TARGET,empty),
 	autoIRO(DIM,REP_SOURCE,REP_TARGET).
 
-fix(SIM_REP,DIM,REP_SOURCE,autoIro) :-
+fixed(SIM_REP,DIM,REP_SOURCE,autoIro) :-
 	useAutoIRO(SIM_REP,DIM,REP_SOURCE,REP_TARGET).
-fix(SIM_REP,DIM,REP_TARGET,autoIro) :-
+fixed(SIM_REP,DIM,REP_TARGET,autoIro) :-
 	useAutoIRO(SIM_REP,DIM,REP_SOURCE,REP_TARGET).
 
 fixCost(SIM_REP,useAutoIRO(SIM_REP,DIM,REP_SOURCE,REP_TARGET),1) :-
@@ -109,26 +109,26 @@ fixCost(SIM_REP,useAutoIRO(SIM_REP,DIM,REP_SOURCE,REP_TARGET),1) :-
 
 
 % remove missing element in target represenation
-{ fix(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,remove) } :-
+{ fixed(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,remove) } :-
 	tryFix(simRep(SCOPE,REP1,REP2)),
 	dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,miss).
 
-fixCost(SIM_REP,fix(SIM_REP,DIM,DIM_REP,remove),10) :-
-	fix(SIM_REP,DIM,DIM_REP,remove).
+fixCost(SIM_REP,fixed(SIM_REP,DIM,DIM_REP,remove),10) :-
+	fixed(SIM_REP,DIM,DIM_REP,remove).
 
 
 % use default value for empty source representation 
-{ fix(SIM_REP,DIM,DIM_REP,default) } :-
+{ fixed(SIM_REP,DIM,DIM_REP,default) } :-
 	tryFix(SIM_REP),
 	dimensionDeviation(SIM_REP,DIM,DIM_REP,empty),
 	valueScopeDefault(DIM,_).
 
-fixCost(SIM_REP,fix(SIM_REP,DIM,DIM_REP,default),10) :-
-	fix(SIM_REP,DIM,DIM_REP,default).
+fixCost(SIM_REP,fixed(SIM_REP,DIM,DIM_REP,default),5) :-
+	fixed(SIM_REP,DIM,DIM_REP,default).
 
 
 -fixed(SIM_REP) :-
-	not fix(SIM_REP,DIM,DIM_REP,_), 
+	not fixed(SIM_REP,DIM,DIM_REP,_), 
 	dimensionDeviation(SIM_REP,DIM,DIM_REP,_).
 
 autoIRO(SCOPE,REP1,REP2) :- 

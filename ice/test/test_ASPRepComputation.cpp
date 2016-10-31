@@ -43,12 +43,12 @@ TEST(ASPRepComp, simple)
 
   EXPECT_EQ(true, cw->query("simRep(position,coords,coords2D)"));
   EXPECT_EQ(true, cw->query("dimensionDeviation(simRep(position,coords,coords2D),z,floatRep,miss)"));
-  EXPECT_EQ(true, cw->query("fix(simRep(position,coords,coords2D),z,floatRep,remove)"));
+  EXPECT_EQ(true, cw->query("fixed(simRep(position,coords,coords2D),z,floatRep,remove)"));
   EXPECT_EQ(true, cw->query("autoIRO(position,coords,coords2D)"));
 
   EXPECT_EQ(true, cw->query("simRep(position,coords2D,coords)"));
   EXPECT_EQ(true, cw->query("dimensionDeviation(simRep(position,coords2D,coords),z,floatRep,empty)"));
-  EXPECT_EQ(true, cw->query("fix(simRep(position,coords2D,coords),z,floatRep,default)"));
+  EXPECT_EQ(true, cw->query("fixed(simRep(position,coords2D,coords),z,floatRep,default)"));
   EXPECT_EQ(true, cw->query("autoIRO(position,coords2D,coords)"));
 
   EXPECT_EQ(true, cw->query("match(simRep(position,coords2D,coords),x,floatRep)"));
