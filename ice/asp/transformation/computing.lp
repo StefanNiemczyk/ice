@@ -1,3 +1,5 @@
+
+% Identify usable transform operations
 simpleIro(NODE,SCOPE,REP1,REP2) :-
 	iro(SYSTEM,NODE,any,none),
 	input(SYSTEM,NODE,SCOPE,REP1,none,1,1),
@@ -15,7 +17,9 @@ simpleRep(REP) :-
 	representation(REP),
 	not -simpleRep(REP).
 
-
+% stuff 
+hasDimension(REP1,DIM,DIM_REP) :-
+	hasDimension(REP1,DIM,DIM_REP,MIN,MAX).
 
 % determine similar representations
 simRep(SCOPE,REP1,REP2) :-
@@ -24,21 +28,16 @@ simRep(SCOPE,REP1,REP2) :-
 	hasRepresentation(SCOPE,REP1), 
 	hasRepresentation(SCOPE,REP2), 
 	scope(SCOPE), 
-	REP1 != REP2,
-	not simpleIro(_,SCOPE,REP1,REP2).
+	REP1 != REP2.
 
 % dimension matching
-
 match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP) :-
 	autoIRO(SCOPE,REP1,REP2),
 	hasDimension(REP1,DIM,DIM_REP),
 	hasDimension(REP2,DIM,DIM_REP).
 
 
-% diviations
-
-hasDimension(REP1,DIM,DIM_REP) :-
-	hasDimension(REP1,DIM,DIM_REP,MIN,MAX).
+%% diviations
 
 % missing dimension in target representation
 dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,miss) :-
@@ -68,7 +67,8 @@ dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,empty) :-
 tryFix(simRep(SCOPE,REP1,REP2)) :-
 	simRep(SCOPE,REP1,REP2),
 	hasDimension(REP1,DIM,DIM_REP,MIN,MAX),
-	hasDimension(REP2,DIM,DIM_REP,MIN,MAX).%,
+	hasDimension(REP2,DIM,DIM_REP,MIN,MAX),
+	not simpleIro(_,SCOPE,REP1,REP2).%,
 %	match(simRep(SCOPE,REP1,REP2),_,_).
 	%MATCHING = #count{DIM,DIM_REP : match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP)},
 	%MATCHING > 0.
