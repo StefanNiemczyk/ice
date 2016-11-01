@@ -111,13 +111,13 @@ void ASPTransformationGeneration::extractTransformations()
   std::shared_ptr<ProcessingModel> model = std::make_shared<ProcessingModel>();
 
   // query computed auto transformations
-  // autoIRO(SCOPE,REP1,REP2)
+  // autoTrans(SCOPE,REP1,REP2)
   std::vector<Gringo::Value> values;
   values.push_back("?");
   values.push_back("?");
   values.push_back("?");
 
-  Gringo::Value nodeQuery("autoIRO", values);
+  Gringo::Value nodeQuery("autoTrans", values);
   auto queryResult = asp.queryAllTrue(&nodeQuery);
 
   for (auto trans : *queryResult)
@@ -311,26 +311,26 @@ bool ASPTransformationGeneration::extractOperations(supplementary::ClingWrapper 
     transformation->getOperations().push_back(o);
   }
 
-  // TODO extract using IROs
+  // TODO extract using Transformations
 
 
-  // useAutoIRO(simRep(SCOPE,REP1,REP2),SCOPE,REP_SOURCE,REP_TARGET)
+  // useAutoTrans(simRep(SCOPE,REP1,REP2),SCOPE,REP_SOURCE,REP_TARGET)
   values.clear();
   values.push_back(simRep);
   values.push_back("?");
   values.push_back("?");
   values.push_back("?");
 
-  Gringo::Value autoIroQuery("useAutoIRO", values);
-  auto autoIROResult = asp.queryAllTrue(&autoIroQuery);
+  Gringo::Value autoTransQuery("useAutoTrans", values);
+  auto autoTransResult = asp.queryAllTrue(&autoTransQuery);
 
-  for (auto autoIro : *autoIROResult)
+  for (auto autoTrans : *autoTransResult)
   {
-    std::string scope = *autoIro.args()[1].name();
-    std::string r1Str = *autoIro.args()[2].name();
-    std::string r2Str = *autoIro.args()[3].name();
+    std::string scope = *autoTrans.args()[1].name();
+    std::string r1Str = *autoTrans.args()[2].name();
+    std::string r2Str = *autoTrans.args()[3].name();
 
-    _log->debug("Process used auto IRO for '%v' (scope), '%v' (represetnation1), '%v' (representation2)", scope, r1Str,
+    _log->debug("Process used autoTrans for '%v' (scope), '%v' (represetnation1), '%v' (representation2)", scope, r1Str,
                 r2Str);
 
     values.clear();

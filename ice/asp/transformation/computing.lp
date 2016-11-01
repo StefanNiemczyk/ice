@@ -1,7 +1,7 @@
 
 % Identify usable transform operations
-simpleIro(NODE,SCOPE,REP1,REP2) :-
-	iro(SYSTEM,NODE,any,none),
+simpleTrans(NODE,SCOPE,REP1,REP2) :-
+	transformation(SYSTEM,NODE,any,none),
 	input(SYSTEM,NODE,SCOPE,REP1,none,1,1),
 	output(SYSTEM,NODE,SCOPE,REP2,none).
 	%INPUTS = #count{SCOPE2,REP,ENTITY2,MIN,MAX : input(SYSTEM,NODE,SCOPE2,REP,ENTITY2,MIN,MAX)},
@@ -32,7 +32,7 @@ simRep(SCOPE,REP1,REP2) :-
 
 % dimension matching
 match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP) :-
-	autoIRO(SCOPE,REP1,REP2),
+	autoTrans(SCOPE,REP1,REP2),
 	hasDimension(REP1,DIM,DIM_REP),
 	hasDimension(REP2,DIM,DIM_REP).
 
@@ -68,44 +68,44 @@ tryFix(simRep(SCOPE,REP1,REP2)) :-
 	simRep(SCOPE,REP1,REP2),
 	hasDimension(REP1,DIM,DIM_REP,MIN,MAX),
 	hasDimension(REP2,DIM,DIM_REP,MIN,MAX),
-	not simpleIro(_,SCOPE,REP1,REP2).%,
+	not simpleTrans(_,SCOPE,REP1,REP2).%,
 %	match(simRep(SCOPE,REP1,REP2),_,_).
 	%MATCHING = #count{DIM,DIM_REP : match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP)},
 	%MATCHING > 0.
 
 
 % fixes
-% using exisitng iro to transform dimensions
-{ useIro(simRep(SCOPE,REP1,REP2),SCOPE,REP_SOURCE,REP_TARGET,NODE) } :-
+% using exisitng transformation to transform dimensions
+{ useTrans(simRep(SCOPE,REP1,REP2),SCOPE,REP_SOURCE,REP_TARGET,NODE) } :-
 	tryFix(simRep(SCOPE,REP1,REP2)),
 	dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,REP_SOURCE,miss),
 	dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,REP_TARGET,empty),
-	simpleIro(NODE,DIM,REP_SOURCE,REP_TARGET).
+	simpleTrans(NODE,DIM,REP_SOURCE,REP_TARGET).
 
-fixed(SIM_REP,DIM,REP_SOURCE,iro) :-
-	useIro(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE).
+fixed(SIM_REP,DIM,REP_SOURCE,transformation) :-
+	useTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE).
 
-fixed(SIM_REP,DIM,REP_TARGET,iro) :-
-	useIro(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE).
+fixed(SIM_REP,DIM,REP_TARGET,transformation) :-
+	useTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE).
 
-fixCost(SIM_REP,useIro(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE),10) :-
-	useIro(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE).
+fixCost(SIM_REP,useTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE),10) :-
+	useTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE).
 
 
 % using already computed transformations to transform dimensions
-useAutoIRO(SIM_REP,DIM,REP_SOURCE,REP_TARGET) :-
+{ useAutoTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET) } :-
 	tryFix(SIM_REP),
 	dimensionDeviation(SIM_REP,DIM,REP_SOURCE,miss),
 	dimensionDeviation(SIM_REP,DIM,REP_TARGET,empty),
-	autoIRO(DIM,REP_SOURCE,REP_TARGET).
+	autoTrans(DIM,REP_SOURCE,REP_TARGET).
 
-fixed(SIM_REP,DIM,REP_SOURCE,autoIro) :-
-	useAutoIRO(SIM_REP,DIM,REP_SOURCE,REP_TARGET).
-fixed(SIM_REP,DIM,REP_TARGET,autoIro) :-
-	useAutoIRO(SIM_REP,DIM,REP_SOURCE,REP_TARGET).
+fixed(SIM_REP,DIM,REP_SOURCE,autoTrans) :-
+	useAutoTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET).
+fixed(SIM_REP,DIM,REP_TARGET,autoTrans) :-
+	useAutoTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET).
 
-fixCost(SIM_REP,useAutoIRO(SIM_REP,DIM,REP_SOURCE,REP_TARGET),1) :-
-	useAutoIRO(SIM_REP,DIM,REP_SOURCE,REP_TARGET).
+fixCost(SIM_REP,useAutoTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET),1) :-
+	useAutoTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET).
 
 
 % remove missing element in target represenation
@@ -131,12 +131,12 @@ fixCost(SIM_REP,fixed(SIM_REP,DIM,DIM_REP,default),5) :-
 	not fixed(SIM_REP,DIM,DIM_REP,_), 
 	dimensionDeviation(SIM_REP,DIM,DIM_REP,_).
 
-autoIRO(SCOPE,REP1,REP2) :- 
+autoTrans(SCOPE,REP1,REP2) :- 
 	tryFix(simRep(SCOPE,REP1,REP2)),
 	not -fixed(simRep(SCOPE,REP1,REP2)).
 
-% maximize the number of created auto iros
-#maximize{ 1@2,SCOPE,REP1,REP2 : autoIRO(SCOPE,REP1,REP2) }.
+% maximize the number of created auto transformations
+#maximize{ 1@2,SCOPE,REP1,REP2 : autoTrans(SCOPE,REP1,REP2) }.
 
 % minimize the number of fixing steps
 #minimize{ COST@1,SIM_REP,FIX : fixCost(SIM_REP,FIX,COST) }.

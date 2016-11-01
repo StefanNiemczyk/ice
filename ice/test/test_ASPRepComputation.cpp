@@ -26,9 +26,9 @@ TEST(ASPRepComp, simple)
   cw->addKnowledgeFile("../asp/transformation/computing.lp");
   cw->init();
 
-  cw->add("query", {}, "#external iro(system1,coords2Wgs84,any,none).");
-  auto coords2Wgs84 = cw->getExternal("iro", {"system1", "coords2Wgs84", "any", "none"}, "coords2Wgs84", {}, true);
-  cw->add("query", {}, "input(system1,coords2Wgs84,velocity,vel1,none,1,1) :- iro(system1,coords2Wgs84,any,none).");
+  cw->add("query", {}, "#external transformation(system1,coords2Wgs84,any,none).");
+  auto coords2Wgs84 = cw->getExternal("transformation", {"system1", "coords2Wgs84", "any", "none"}, "coords2Wgs84", {}, true);
+  cw->add("query", {}, "input(system1,coords2Wgs84,velocity,vel1,none,1,1).");
   cw->add("query", {}, "output(system1,coords2Wgs84,velocity,vel2,none).");
   cw->ground("query", {});
 
@@ -44,20 +44,20 @@ TEST(ASPRepComp, simple)
   EXPECT_EQ(true, cw->query("simRep(position,coords,coords2D)"));
   EXPECT_EQ(true, cw->query("dimensionDeviation(simRep(position,coords,coords2D),z,floatRep,miss)"));
   EXPECT_EQ(true, cw->query("fixed(simRep(position,coords,coords2D),z,floatRep,remove)"));
-  EXPECT_EQ(true, cw->query("autoIRO(position,coords,coords2D)"));
+  EXPECT_EQ(true, cw->query("autoTrans(position,coords,coords2D)"));
 
   EXPECT_EQ(true, cw->query("simRep(position,coords2D,coords)"));
   EXPECT_EQ(true, cw->query("dimensionDeviation(simRep(position,coords2D,coords),z,floatRep,empty)"));
   EXPECT_EQ(true, cw->query("fixed(simRep(position,coords2D,coords),z,floatRep,default)"));
-  EXPECT_EQ(true, cw->query("autoIRO(position,coords2D,coords)"));
+  EXPECT_EQ(true, cw->query("autoTrans(position,coords2D,coords)"));
 
   EXPECT_EQ(true, cw->query("match(simRep(position,coords2D,coords),x,floatRep)"));
   EXPECT_EQ(true, cw->query("match(simRep(position,coords2D,coords),y,floatRep)"));
   EXPECT_EQ(false, cw->query("match(simRep(position,coords2D,coords),z,floatRep)"));
 
-  EXPECT_EQ(false, cw->query("autoIRO(position,relCoords,coords)"));
+  EXPECT_EQ(false, cw->query("autoTrans(position,relCoords,coords)"));
 
-  EXPECT_EQ(true, cw->query("simpleIro(coords2Wgs84,velocity,vel1,vel2)"));
+  EXPECT_EQ(true, cw->query("simpleTrans(coords2Wgs84,velocity,vel1,vel2)"));
 }
 
 TEST(ASPRepComp, ontology1)
