@@ -691,7 +691,7 @@ void ASPModelGenerator::readTransformations()
     auto &trans = transNode.second->transformation;
     auto &name = transNode.second->shortName;
     auto scope = this->ontology->toShortIri(trans->getScope());
-    std::string iro = "iro(" + system + "," + name + ",any,none).";
+    std::string iro = "autoTrans(" + system + "," + name + ",any,none).";
     ss << iro << std::endl;
 
     ss << "output(" << system << "," << name << "," << scope << ","
@@ -704,6 +704,7 @@ void ASPModelGenerator::readTransformations()
     }
 
     ss << "metadataProcessing(cost," << system << "," << name << ",10)." << std::endl;
+    ss << "metadataOutput(accuracy," << system << "," << name << ",max,-5,0)." << std::endl;
 
     auto element = std::make_shared<ASPElement>();
     element->aspString = this->ontology->toShortIriAll(ss.str());

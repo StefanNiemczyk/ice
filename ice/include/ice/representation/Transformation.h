@@ -117,7 +117,6 @@ public:
   std::vector<std::shared_ptr<Representation>>& getInputs();
   std::string toString();
   void print();
-  std::unique_ptr<std::vector<std::string>> getASPRepreentation(std::string system);
 
 protected:
   // Converts the void pointers data from the type given by the parameter

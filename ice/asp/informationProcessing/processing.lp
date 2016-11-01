@@ -59,21 +59,58 @@ tnode(k,SYSTEM,IRO,ENTITY,none) :-
 	input(SYSTEM,IRO,SCOPE,_,_,_,_),
 	query(k).
 
+tnode(k,SYSTEM,NODE,ENTITY,ENTITY2) :- 
+	autoTrans(SYSTEM,NODE,any,any), 
+	entity(ENTITY,ENTITY_TYPE), 
+	hasScope(ENTITY_TYPE,SCOPE), 
+	input(SYSTEM,NODE,SCOPE,_,_,_,_),
+	entity(ENTITY2,ENTITY_TYPE2), 
+	hasScope(ENTITY_TYPE2,SCOPE2), 
+	input2(SYSTEM,NODE,SCOPE2,_,_,_,_),
+	query(k).
+tnode(k,SYSTEM,NODE,ENTITY,none) :- 
+	autoTrans(SYSTEM,NODE,any,none), 
+	entity(ENTITY,ENTITY_TYPE), 
+	hasScope(ENTITY_TYPE,SCOPE), 
+	input(SYSTEM,NODE,SCOPE,_,_,_,_),
+	query(k).
+
 % identify special nodes
-snode(TNODE) :-
-	tstream(k,SYSTEM,TNODE,INFO),
-	tinput(TNODE,INFO,_,_).
-%{ snode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)); nnode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) } :- tnode(k,SYSTEM,NODE,ENTITY,ENTITY2).
+%snode(TNODE) :-
+%	tstream(k,SYSTEM,TNODE,INFO),
+%	tinput(TNODE,INFO,_,_).
+%snode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
+%	tnode(k,SYSTEM,IRO,ENTITY,ENTITY2),
+%	transformation(SYSTEM,NODE,_,_).
+%nnode(TNODE) :-
+%	tstream(k,SYSTEM,TNODE,INFO),
+%	tinput(TNODE,INFO2,_,_),
+%	INFO != INFO2.
 %nnode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
-%	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),
-%	not snode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)).
-nnode(TNODE) :-
-	tstream(k,SYSTEM,TNODE,INFO),
-	tinput(TNODE,INFO2,_,_),
+%	sourceNode(SYSTEM,NODE,_),
+%	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2).
+
+snode(tnode(k, SYSTEM, NODE, ENTITY, ENTITY2)) :-
+	tstream(k, SYSTEM,tnode(k, SYSTEM, NODE, ENTITY, ENTITY2), INFO),
+	tinput(tnode(k, SYSTEM, NODE, ENTITY, ENTITY2), INFO, _, _).
+snode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
+	tnode(k,SYSTEM,IRO,ENTITY,ENTITY2),
+	autoTrans(SYSTEM,NODE,_,_).
+nnode(tnode(k, SYSTEM, NODE, ENTITY, ENTITY2)) :-
+	nodeTemplate(SYSTEM,NODE,_),
+	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),
+	tstream(k, SYSTEM, tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), INFO),
+	tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), INFO2, _, _),
 	INFO != INFO2.
-nnode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
-	sourceNode(SYSTEM,NODE,_),
-	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2).
+nnode(tnode(k, SYSTEM, NODE, ENTITY, ENTITY2)) :-
+	iro(SYSTEM,NODE,_,_),
+	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),
+	tstream(k, SYSTEM, tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), INFO),
+	tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2), INFO2, _, _),
+	INFO != INFO2.
+nnode(tnode(k, SYSTEM, NODE, ENTITY, ENTITY2)) :-
+	sourceNode(SYSTEM, NODE, _),
+	tnode(k, SYSTEM, NODE, ENTITY, ENTITY2).
 	
 
 % computing theoretical streams created by nodes
@@ -130,6 +167,13 @@ tnodeCount(k,SYSTEM,NODE,MINV+MINV2,MAXV+MAXV2) :-
 
 tnodeCount(k,SYSTEM,IRO,MINV+MINV2,MAXV+MAXV2) :- 
 	iro(SYSTEM,IRO,_,_), 
+	MINV = #sum{MIN,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,MIN,_)}, 
+	MAXV = #sum{MAX,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,_,MAX)}, 
+	MINV2 = #sum{MIN,SCOPE,REP,ENT2 : input2(SYSTEM,IRO,SCOPE,REP,ENT2,MIN,_)}, 
+	MAXV2 = #sum{MAX,SCOPE,REP,ENT2 : input2(SYSTEM,IRO,SCOPE,REP,ENT2,_,MAX)}.
+
+tnodeCount(k,SYSTEM,IRO,MINV+MINV2,MAXV+MAXV2) :- 
+	autoTrans(SYSTEM,IRO,_,_), 
 	MINV = #sum{MIN,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,MIN,_)}, 
 	MAXV = #sum{MAX,SCOPE,REP,ENT2 : input(SYSTEM,IRO,SCOPE,REP,ENT2,_,MAX)}, 
 	MINV2 = #sum{MIN,SCOPE,REP,ENT2 : input2(SYSTEM,IRO,SCOPE,REP,ENT2,MIN,_)}, 
