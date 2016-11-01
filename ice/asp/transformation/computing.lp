@@ -40,12 +40,12 @@ match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP) :-
 %% diviations
 
 % missing dimension in target representation
-dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,miss) :-
+dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,missing) :-
 	tryFix(simRep(SCOPE,REP1,REP2)),
 	hasDimension(REP1,DIM,DIM_REP),
 	not hasDimension(REP2,DIM,DIM_REP).
 
-dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,miss) :-
+dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,missing) :-
 	tryFix(simRep(SCOPE,REP1,REP2)),
 	hasDimension(REP1,DIM,DIM_REP,COUNT1,COUNT1),
 	hasDimension(REP2,DIM,DIM_REP,COUNT2,COUNT2),
@@ -78,7 +78,7 @@ tryFix(simRep(SCOPE,REP1,REP2)) :-
 % using exisitng transformation to transform dimensions
 { useTrans(simRep(SCOPE,REP1,REP2),SCOPE,REP_SOURCE,REP_TARGET,NODE) } :-
 	tryFix(simRep(SCOPE,REP1,REP2)),
-	dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,REP_SOURCE,miss),
+	dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,REP_SOURCE,missing),
 	dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,REP_TARGET,empty),
 	simpleTrans(NODE,DIM,REP_SOURCE,REP_TARGET).
 
@@ -95,7 +95,7 @@ fixCost(SIM_REP,useTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET,NODE),10) :-
 % using already computed transformations to transform dimensions
 { useAutoTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET) } :-
 	tryFix(SIM_REP),
-	dimensionDeviation(SIM_REP,DIM,REP_SOURCE,miss),
+	dimensionDeviation(SIM_REP,DIM,REP_SOURCE,missing),
 	dimensionDeviation(SIM_REP,DIM,REP_TARGET,empty),
 	autoTrans(DIM,REP_SOURCE,REP_TARGET).
 
@@ -111,7 +111,7 @@ fixCost(SIM_REP,useAutoTrans(SIM_REP,DIM,REP_SOURCE,REP_TARGET),1) :-
 % remove missing element in target represenation
 { fixed(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,remove) } :-
 	tryFix(simRep(SCOPE,REP1,REP2)),
-	dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,miss).
+	dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,missing).
 
 fixCost(SIM_REP,fixed(SIM_REP,DIM,DIM_REP,remove),10) :-
 	fixed(SIM_REP,DIM,DIM_REP,remove).
