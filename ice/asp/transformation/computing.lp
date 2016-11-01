@@ -66,8 +66,10 @@ dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,empty) :-
 % try to fix if at least 50% dimensions are matching
 tryFix(simRep(SCOPE,REP1,REP2)) :-
 	simRep(SCOPE,REP1,REP2),
-	hasDimension(REP1,DIM,DIM_REP,MIN,MAX),
-	hasDimension(REP2,DIM,DIM_REP,MIN,MAX),
+%	hasDimension(REP1,DIM,DIM_REP,MIN,MAX),
+%	hasDimension(REP2,DIM,DIM_REP,MIN,MAX),
+	hasDimension(REP1,DIM,_,_,_),
+	hasDimension(REP2,DIM,_,_,_),
 	not simpleTrans(_,SCOPE,REP1,REP2).%,
 %	match(simRep(SCOPE,REP1,REP2),_,_).
 	%MATCHING = #count{DIM,DIM_REP : match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP)},
