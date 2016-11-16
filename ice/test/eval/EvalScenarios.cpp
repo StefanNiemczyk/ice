@@ -1107,7 +1107,7 @@ public:
         //          toCheck.push_back(ss.str());
 
         auto result = mg.testSeries(
-            fileName, &toCheck, runs, true, global, verbose, 3, 10, [&] (supplementary::ClingWrapper *asp)
+            fileName, &toCheck, runs, false, global, verbose, 3, 10, [&] (supplementary::ClingWrapper *asp)
             {
               this->lambda(asp);
 
