@@ -42,8 +42,9 @@ struct TConf {
 class EvalScenarios
 {
 public:
-  EvalScenarios(std::string logPath, std::function<void(supplementary::ClingWrapper *asp)> lambda = nullptr)
+  EvalScenarios(std::string logPath, bool warmUp, std::function<void(supplementary::ClingWrapper *asp)> lambda = nullptr)
   {
+    this->warmUp = warmUp;
     this->logPath = logPath;
     this->lambda = lambda;
   }
@@ -211,7 +212,7 @@ public:
       std::vector<std::string> toCheck;
       ModelGeneration mg(path, true);
 
-      auto result = mg.testSeries(owlPath, &toCheck, runs, true, true, verbose, 3, 10,
+      auto result = mg.testSeries(owlPath, &toCheck, runs, this->warmUp, true, verbose, 3, 10,
                                   [this] (supplementary::ClingWrapper *asp)
                                   {
                                     this->lambda(asp);
@@ -486,7 +487,7 @@ public:
         //      ss << "sumCost(1," << chainSize << ")";
         //      toCheck.push_back(ss.str());
 
-        auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, chainSize,
+        auto result = mg.testSeries(fileName, &toCheck, runs, this->warmUp, global, verbose, 3, chainSize,
                                     [this] (supplementary::ClingWrapper *asp)
                                     {
                                       this->lambda(asp);
@@ -784,7 +785,7 @@ public:
 //        ss << "sumMetadata(1,cost,2)";
 //        toCheck.push_back(ss.str());
 
-      auto result = mg.testSeries(fileName, &toCheck, runs, true, global, verbose, 3, reps,
+      auto result = mg.testSeries(fileName, &toCheck, runs, this->warmUp, global, verbose, 3, reps,
                                   [this] (supplementary::ClingWrapper *asp)
                                   {
                                     this->lambda(asp);
@@ -1107,7 +1108,7 @@ public:
         //          toCheck.push_back(ss.str());
 
         auto result = mg.testSeries(
-            fileName, &toCheck, runs, false, global, verbose, 3, 10, [&] (supplementary::ClingWrapper *asp)
+            fileName, &toCheck, runs, this->warmUp, global, verbose, 3, 10, [&] (supplementary::ClingWrapper *asp)
             {
               this->lambda(asp);
 
@@ -1453,7 +1454,7 @@ public:
 //          toCheck.push_back(ss.str());
 
         auto result = mg.testSeries(
-            fileName, &toCheck, runs, true, global, verbose, 3, 10, [&] (supplementary::ClingWrapper *asp)
+            fileName, &toCheck, runs, this->warmUp, global, verbose, 3, 10, [&] (supplementary::ClingWrapper *asp)
             {
               this->lambda(asp);
 
@@ -1811,7 +1812,7 @@ public:
         //      toCheck.push_back(ss.str());
 
         auto result = mg.testSeries(
-            fileName, &toCheck, runs, true, global, verbose, 3, 10, [&] (supplementary::ClingWrapper *asp)
+            fileName, &toCheck, runs, this->warmUp, global, verbose, 3, 10, [&] (supplementary::ClingWrapper *asp)
             {
               this->lambda(asp);
 
@@ -2317,6 +2318,7 @@ public:
   }
 
 private:
+  bool warmUp;
   std::string logPath;
   std::function<void(supplementary::ClingWrapper *asp)> lambda;
 };

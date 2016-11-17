@@ -28,9 +28,9 @@ struct MemoryUsage
   double vmUsageMax;
   double residentSetMax;
 
-  double javaTotalMemoryMax;
-  double javaMaxMemoryMax;
-  double javaFreeMemoryMax;
+  double javaRamUsageMax;
+//  double javaMaxMemoryMax;
+//  double javaFreeMemoryMax;
 };
 
 class MemoryManager
@@ -59,15 +59,20 @@ public:
       jm /= btmb;
       jf /= btmb;
 
-      if (jt > this->mu.javaTotalMemoryMax)
-        this->mu.javaTotalMemoryMax = jt;
-      if (jt > this->mu.javaMaxMemoryMax)
-        this->mu.javaMaxMemoryMax = jm;
-      if (jt > this->mu.javaFreeMemoryMax)
-        this->mu.javaFreeMemoryMax = jf;
+      if (jt > this->mu.javaRamUsageMax)
+        this->mu.javaRamUsageMax = jt;
+//      if (jt > this->mu.javaMaxMemoryMax)
+//        this->mu.javaMaxMemoryMax = jm;
+//      if (jt > this->mu.javaFreeMemoryMax)
+//        this->mu.javaFreeMemoryMax = jf;
     }
 
     return this->mu;
+  }
+
+  bool isActive()
+  {
+    return this->active;
   }
 
   void start()
@@ -93,9 +98,9 @@ public:
     this->mu.residentSetMax = 0;
     this->mu.vmUsageMax = 0;
 
-    this->mu.javaTotalMemoryMax = 0;
-    this->mu.javaMaxMemoryMax = 0;
-    this->mu.javaFreeMemoryMax = 0;
+    this->mu.javaRamUsageMax = 0;
+//    this->mu.javaMaxMemoryMax = 0;
+//    this->mu.javaFreeMemoryMax = 0;
 
     if (this->ontology)
       this->ontology->resetMemoryMonitor();

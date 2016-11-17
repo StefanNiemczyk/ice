@@ -28,12 +28,12 @@ struct ModelGenerationResult
   long aspAuxAtomCount;
   bool successful;
 
-  double vmUsageMax;
+  double ramUsageBeforeMax;
   double residentSetMax;
 
-  double javaTotalMemoryMax;
+  double javaRamUsageMax;
   double javaMaxMemoryMax;
-  double javaFreeMemoryMax;
+  double javaRamUsageBeforeMax;
 
   void print()
   {
@@ -51,11 +51,11 @@ struct ModelGenerationResult
     std::cout << "ASP bodies count\t" << aspBodiesCount << std::endl;
     std::cout << "ASP aux atom count\t" << aspAuxAtomCount << std::endl;
 
-    std::cout << "Memory vm usage\t\t" << vmUsageMax << " mb" << std::endl;
+    std::cout << "Memory vm usage\t\t" << ramUsageBeforeMax << " mb" << std::endl;
     std::cout << "Memory ram usage\t\t" << residentSetMax << " mb" << std::endl;
-    std::cout << "Memory java total\t\t" << javaTotalMemoryMax << " mb" << std::endl;
+    std::cout << "Memory java total\t\t" << javaRamUsageMax << " mb" << std::endl;
     std::cout << "Memory java max\t\t" << javaMaxMemoryMax << " mb" << std::endl;
-    std::cout << "Memory java free\t\t" << javaFreeMemoryMax << " mb" << std::endl;
+    std::cout << "Memory java free\t\t" << javaRamUsageBeforeMax << " mb" << std::endl;
   }
 };
 
@@ -80,11 +80,11 @@ struct ModelGenerationSeriesResult
   double aspBodiesCountVar;
   double aspAuxAtomCountVar;
 
-  double vmUsageMaxVar;
+  double ramUsageBeforeMaxVar;
   double residentSetMaxVar;
-  double javaTotalMemoryMaxVar;
+  double javaRamUsageMaxVar;
   double javaMaxMemoryMaxVar;
-  double javaFreeMemoryMaxVar;
+  double javaRamUsageBeforeMaxVar;
 
   void print()
   {
@@ -114,16 +114,17 @@ struct ModelGenerationSeriesResult
     printf("ASP Aux Atom Count     %10lu    (%10.3f var), %10lu    (best), %10lu    (worst)\n", avg.aspAuxAtomCount,
            aspAuxAtomCountVar, best.aspAuxAtomCount, worst.aspAuxAtomCount);
 
-    printf("Memory vm usage        %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.vmUsageMax,
-           vmUsageMaxVar, best.vmUsageMax, worst.vmUsageMax);
-    printf("Memory ram usage       %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.residentSetMax,
+    printf("Memory ram before      %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.ramUsageBeforeMax,
+           ramUsageBeforeMaxVar, best.ramUsageBeforeMax, worst.ramUsageBeforeMax);
+    printf("Memory java before     %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaRamUsageBeforeMax,
+           javaRamUsageBeforeMaxVar, best.javaRamUsageBeforeMax, worst.javaRamUsageBeforeMax);
+
+    printf("Memory ram             %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.residentSetMax,
            residentSetMaxVar, best.residentSetMax, worst.residentSetMax);
-    printf("Memory java total      %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaTotalMemoryMax,
-           javaTotalMemoryMaxVar, best.javaTotalMemoryMax, worst.javaTotalMemoryMax);
-    printf("Memory java max        %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaMaxMemoryMax,
-           javaMaxMemoryMaxVar, best.javaMaxMemoryMax, worst.javaMaxMemoryMax);
-    printf("Memory java free       %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaFreeMemoryMax,
-           javaFreeMemoryMaxVar, best.javaFreeMemoryMax, worst.javaFreeMemoryMax);
+    printf("Memory java            %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaRamUsageMax,
+           javaRamUsageMaxVar, best.javaRamUsageMax, worst.javaRamUsageMax);
+//    printf("Memory java max        %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaMaxMemoryMax,
+//           javaMaxMemoryMaxVar, best.javaMaxMemoryMax, worst.javaMaxMemoryMax);
   }
 };
 
@@ -205,11 +206,11 @@ public:
     result.aspGroundingTimeVar = 0;
     result.aspSolvingTimeVar = 0;
 
-    result.vmUsageMaxVar = 0;
+    result.ramUsageBeforeMaxVar = 0;
     result.residentSetMaxVar = 0;
-    result.javaTotalMemoryMaxVar = 0;
+    result.javaRamUsageMaxVar = 0;
     result.javaMaxMemoryMaxVar = 0;
-    result.javaFreeMemoryMaxVar = 0;
+    result.javaRamUsageBeforeMaxVar = 0;
 
     VarianceOnline totalTimeVar, ontologyReadTimeVar, ontologyReasonerTimeVar, ontologyToASPTimeVar,
                    aspGroundingTimeVar, aspSolvingTimeVar, aspSatTimeVar, aspUnsatTimeVar, aspModelCountVar,
@@ -283,11 +284,11 @@ public:
         aspBodiesCountVar.add(r.aspBodiesCount);
         aspAuxAtomCountVar.add(r.aspAuxAtomCount);
 
-        vmUsageMaxVar.add(r.vmUsageMax);
+        vmUsageMaxVar.add(r.ramUsageBeforeMax);
         residentSetMaxVar.add(r.residentSetMax);
-        javaTotalMemoryMaxVar.add(r.javaTotalMemoryMax);
+        javaTotalMemoryMaxVar.add(r.javaRamUsageMax);
         javaMaxMemoryMaxVar.add(r.javaMaxMemoryMax);
-        javaFreeMemoryMaxVar.add(r.javaFreeMemoryMax);
+        javaFreeMemoryMaxVar.add(r.javaRamUsageBeforeMax);
 
         if (i == 0 && m == 0)
         {
@@ -310,11 +311,11 @@ public:
           result.avg.aspBodiesCount += r.aspBodiesCount;
           result.avg.aspAuxAtomCount += r.aspAuxAtomCount;
 
-          result.avg.vmUsageMax += r.vmUsageMax;
+          result.avg.ramUsageBeforeMax += r.ramUsageBeforeMax;
           result.avg.residentSetMax += r.residentSetMax;
-          result.avg.javaTotalMemoryMax += r.javaTotalMemoryMax;
+          result.avg.javaRamUsageMax += r.javaRamUsageMax;
           result.avg.javaMaxMemoryMax += r.javaMaxMemoryMax;
-          result.avg.javaFreeMemoryMax += r.javaFreeMemoryMax;
+          result.avg.javaRamUsageBeforeMax += r.javaRamUsageBeforeMax;
 
           if (r.totalTime < result.best.totalTime)
             result.best.totalTime = r.totalTime;
@@ -376,30 +377,30 @@ public:
           else if (r.aspAuxAtomCount > result.worst.aspAuxAtomCount)
             result.worst.aspAuxAtomCount = r.aspAuxAtomCount;
 
-          if (r.vmUsageMax < result.best.vmUsageMax)
-            result.best.vmUsageMax = r.vmUsageMax;
-          else if (r.vmUsageMax > result.worst.vmUsageMax)
-            result.worst.vmUsageMax = r.vmUsageMax;
+          if (r.ramUsageBeforeMax < result.best.ramUsageBeforeMax)
+            result.best.ramUsageBeforeMax = r.ramUsageBeforeMax;
+          else if (r.ramUsageBeforeMax > result.worst.ramUsageBeforeMax)
+            result.worst.ramUsageBeforeMax = r.ramUsageBeforeMax;
 
           if (r.residentSetMax < result.best.residentSetMax)
             result.best.residentSetMax = r.residentSetMax;
           else if (r.residentSetMax > result.worst.residentSetMax)
             result.worst.residentSetMax = r.residentSetMax;
 
-          if (r.javaTotalMemoryMax < result.best.javaTotalMemoryMax)
-            result.best.javaTotalMemoryMax = r.javaTotalMemoryMax;
-          else if (r.javaTotalMemoryMax > result.worst.javaTotalMemoryMax)
-            result.worst.javaTotalMemoryMax = r.javaTotalMemoryMax;
+          if (r.javaRamUsageMax < result.best.javaRamUsageMax)
+            result.best.javaRamUsageMax = r.javaRamUsageMax;
+          else if (r.javaRamUsageMax > result.worst.javaRamUsageMax)
+            result.worst.javaRamUsageMax = r.javaRamUsageMax;
 
           if (r.javaMaxMemoryMax < result.best.javaMaxMemoryMax)
             result.best.javaMaxMemoryMax = r.javaMaxMemoryMax;
           else if (r.javaMaxMemoryMax > result.worst.javaMaxMemoryMax)
             result.worst.javaMaxMemoryMax = r.javaMaxMemoryMax;
 
-          if (r.javaFreeMemoryMax < result.best.javaFreeMemoryMax)
-            result.best.javaFreeMemoryMax = r.javaFreeMemoryMax;
-          else if (r.javaFreeMemoryMax > result.worst.javaFreeMemoryMax)
-            result.worst.javaFreeMemoryMax = r.javaFreeMemoryMax;
+          if (r.javaRamUsageBeforeMax < result.best.javaRamUsageBeforeMax)
+            result.best.javaRamUsageBeforeMax = r.javaRamUsageBeforeMax;
+          else if (r.javaRamUsageBeforeMax > result.worst.javaRamUsageBeforeMax)
+            result.worst.javaRamUsageBeforeMax = r.javaRamUsageBeforeMax;
         }
 
         end = std::chrono::system_clock::now();
@@ -422,11 +423,11 @@ public:
     result.aspBodiesCountVar = aspBodiesCountVar.getVariance();
     result.aspAuxAtomCountVar = aspAuxAtomCountVar.getVariance();
 
-    result.vmUsageMaxVar = vmUsageMaxVar.getVariance();
+    result.ramUsageBeforeMaxVar = vmUsageMaxVar.getVariance();
     result.residentSetMaxVar = residentSetMaxVar.getVariance();
-    result.javaTotalMemoryMaxVar = javaTotalMemoryMaxVar.getVariance();
+    result.javaRamUsageMaxVar = javaTotalMemoryMaxVar.getVariance();
     result.javaMaxMemoryMaxVar = javaMaxMemoryMaxVar.getVariance();
-    result.javaFreeMemoryMaxVar = javaFreeMemoryMaxVar.getVariance();
+    result.javaRamUsageBeforeMaxVar = javaFreeMemoryMaxVar.getVariance();
 
     int runCount = models * p_count;
 
@@ -443,11 +444,11 @@ public:
     result.avg.aspBodiesCount /= runCount;
     result.avg.aspAuxAtomCount /= runCount;
 
-    result.avg.vmUsageMax /= runCount;
+    result.avg.ramUsageBeforeMax /= runCount;
     result.avg.residentSetMax /= runCount;
-    result.avg.javaTotalMemoryMax /= runCount;
+    result.avg.javaRamUsageMax /= runCount;
     result.avg.javaMaxMemoryMax /= runCount;
-    result.avg.javaFreeMemoryMax /= runCount;
+    result.avg.javaRamUsageBeforeMax /= runCount;
 
     return result;
   }
@@ -462,6 +463,15 @@ public:
     std::chrono::time_point<std::chrono::system_clock> start, end, startOntologyRead, endOntologyRead,
                                                        startOntologyReasoner, endOntologyReasoner, startOntologyToASP,
                                                        endOntologyToASP, startAsp, endAsp;
+
+    auto mm = MemoryManager::getInstance();
+    ofstream aspFile;
+    if (mm->isActive())
+    {
+      int index = p_ontPath.find_last_of("/") + 1;
+      std::string name = p_ontPath.substr(index, p_ontPath.length() - index - 4);
+      aspFile.open ("/tmp/" + name + ".lp");
+    }
 
     // Initializing ASP
     supplementary::ClingWrapper asp;
@@ -490,7 +500,6 @@ public:
     ontology->loadOntology(p_ontPath);
 
     // MemoryManagement
-    auto mm = MemoryManager::getInstance();
     mm->setOntologyInterface(ontology);
     mm->reset();
 
@@ -523,6 +532,11 @@ public:
       {
         entities.push_back(noIri);
         asp.add(programPart, {}, noIri);
+
+        if (mm->isActive())
+        {
+          aspFile << noIri << std::endl;
+        }
       }
     }
 
@@ -540,6 +554,11 @@ public:
        for (auto ontSystem : *ontSystems)
        {
          asp.add("base", {}, "system(" + ontology->toShortIri(ontSystem) + ",default)." );
+
+         if (mm->isActive())
+         {
+           aspFile << "system(" + ontology->toShortIri(ontSystem) + ",default).";
+         }
 
 //         entity = directory->lookup(EntityDirectory::ID_ONTOLOGY, ontSystem, true);
 //
@@ -650,11 +669,24 @@ public:
              element->external->assign(true);
 
              asp.add(element->name, {}, element->aspString);
+             if (mm->isActive())
+             {
+               std::string str = element->aspString;
+               std::string::size_type i = str.find("#external ");
+                  while (i != std::string::npos) {
+                    str.erase(i, 10);
+                    i = str.find("#external ", i);
+                  }
+               aspFile << str;
+             }
              asp.ground(element->name, {});
          }
        }
       //
     }
+
+    if (mm->isActive())
+      aspFile.close();
 
     endOntologyToASP = std::chrono::system_clock::now();
 
@@ -667,6 +699,17 @@ public:
     if (lambda != nullptr)
       lambda(&asp);
 
+    // memory stuff
+    if (mm->isActive())
+    {
+      auto &mu = mm->getMemoryUsage();
+      result.ramUsageBeforeMax = mu.residentSetMax;
+      result.javaRamUsageBeforeMax = mu.javaRamUsageMax;
+
+//      std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+      mm->reset();
+    }
+
     // Grounding
 //    std::cout << "ASP ground call" << std::endl;
     startAsp = std::chrono::system_clock::now();
@@ -677,7 +720,10 @@ public:
 
     // Solving
 //    std::cout << "ASP solving" << std::endl;
-    auto solveResult = asp.solve();
+    Gringo::SolveResult solveResult;
+    bool solve = true;
+    if (solve)
+      solveResult = asp.solve();
 //    std::cout << "ASP done" << std::endl;
     endAsp = std::chrono::system_clock::now();
 
@@ -702,49 +748,52 @@ public:
     result.aspAuxAtomCount = asp.getAuxAtomsCount();
 
     auto &mu = mm->getMemoryUsage();
-    result.vmUsageMax = mu.vmUsageMax;
+//    result.vmUsageMax = mu.vmUsageMax;
     result.residentSetMax = mu.residentSetMax;
-    result.javaTotalMemoryMax = mu.javaTotalMemoryMax;
-    result.javaMaxMemoryMax = mu.javaMaxMemoryMax;
-    result.javaFreeMemoryMax = mu.javaFreeMemoryMax;
+    result.javaRamUsageMax = mu.javaRamUsageMax;
+//    result.javaMaxMemoryMax = mu.javaMaxMemoryMax;
+//    result.javaFreeMemoryMax = mu.javaFreeMemoryMax;
     mm->resetOntologyInterface();
 
-    if (solveResult == Gringo::SolveResult::SAT)
+    if (solve)
     {
-      if (verbose)
+      if (solveResult == Gringo::SolveResult::SAT)
       {
-        asp.printLastModel(false);
-        ofstream file;
-        file.open("/tmp/tut.txt");
-        file << asp.toStringLastModel(true);
-        file.close();
-      }
-
-      bool first = true;
-
-      for (auto toCheck : *p_requiredModelElements)
-      {
-        auto value = supplementary::ClingWrapper::stringToValue(toCheck.c_str());
-        std::string name = *value.name();
-        if (false == asp.query(name, value.args()))
+        if (verbose)
         {
-          if (first)
-          {
-            if (false == verbose)
-              std::cout << std::endl << asp.toStringLastModel(false) << std::endl;
-            first = false;
-          }
+          asp.printLastModel(false);
+          ofstream file;
+          file.open("/tmp/tut.txt");
+          file << asp.toStringLastModel(true);
+          file.close();
+        }
 
-          value.print(std::cout);
-          std::cout << std::endl;
-          result.successful = false;
+        bool first = true;
+
+        for (auto toCheck : *p_requiredModelElements)
+        {
+          auto value = supplementary::ClingWrapper::stringToValue(toCheck.c_str());
+          std::string name = *value.name();
+          if (false == asp.query(name, value.args()))
+          {
+            if (first)
+            {
+              if (false == verbose)
+                std::cout << std::endl << asp.toStringLastModel(false) << std::endl;
+              first = false;
+            }
+
+            value.print(std::cout);
+            std::cout << std::endl;
+            result.successful = false;
+          }
         }
       }
-    }
-    else
-    {
-      std::cout << "UNSAT" << std::endl;
-      result.successful = false;
+      else
+      {
+        std::cout << "UNSAT" << std::endl;
+        result.successful = false;
+      }
     }
 
     externals.clear();

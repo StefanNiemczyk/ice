@@ -8,11 +8,11 @@ using namespace std;
 TEST(EvalModelGeneration, simpleEvalTests)
 {
   std::string path = "/home/sni/Desktop/eval";
-  int runs = 1;
+  int runs = 10;
 
   MemoryManager::getInstance()->start();
 
-  EvalScenarios scenarios2(path + "", [&] (supplementary::ClingWrapper *asp){
+  EvalScenarios scenarios2(path + "", false, [&] (supplementary::ClingWrapper *asp){
     asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
     asp->setRandomize("20,15");
   });
@@ -21,7 +21,7 @@ TEST(EvalModelGeneration, simpleEvalTests)
 //  scenarios2.fuseVictimsScenario(    true,       false,  false,          runs,      false, 6, 20, 2);
 //  scenarios2.representationScenario( true,       false,  false,          runs,      2, 12, 1);
   scenarios2.chainScenario(          true,       false,  false,          runs,      10, 10, 1, 1, 10, 1);
-//  scenarios2.chainScenario(          false,      false,  false,          runs,      10, 10, 1, 10, 10, 1);
+//  scenarios2.chainScenario(          false,      false,  false,          runs,      10, 10, 1, 1, 10, 1);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 10, 10, 10);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 20, 20, 10);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 30, 30, 10);

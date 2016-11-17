@@ -1557,12 +1557,12 @@ public class IceOntologyInterface {
 				long m = Runtime.getRuntime().maxMemory();
 				long f = Runtime.getRuntime().freeMemory();
 
-				if (t > ioi.memoryUsage[0])
-					ioi.memoryUsage[0] = t;
-				if (m > ioi.memoryUsage[1])
-					ioi.memoryUsage[1] = m;
-				if (f > ioi.memoryUsage[2])
-					ioi.memoryUsage[2] = f;
+				// if (t > ioi.memoryUsage[0])
+				// ioi.memoryUsage[0] = t;
+				if (t - f > ioi.memoryUsage[0])
+					ioi.memoryUsage[0] = t - f;
+				// if (f > ioi.memoryUsage[2])
+				// ioi.memoryUsage[2] = f;
 
 				try {
 					Thread.sleep(5);
