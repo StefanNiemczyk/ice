@@ -105,6 +105,11 @@ public:
   bool setSomeMaxCardinality(int p_value);
   LogLevel getLogLevel();
   void setLogLevel(LogLevel level);
+  void getMemoryUsage(double &total, double &max, double &free);
+  void startMemoryMonitor();
+  void stopMemoryMonitor();
+  void resetMemoryMonitor();
+
   bool isInformationDirty();
   bool isSystemDirty();
   bool isLoadDirty();
@@ -178,6 +183,11 @@ private:
 
   jmethodID                                             getLogLevelMethod; /**< Method id */
   jmethodID                                             setLogLevelMethod; /**< Method id */
+
+  jmethodID                                             getMemoryUsageMethod; /**< Method id */
+  jmethodID                                             startMemoryMonitorMethod; /**< Method id */
+  jmethodID                                             stopMemoryMonitorMethod; /**< Method id */
+  jmethodID                                             resetMemoryMonitorMethod; /**< Method id */
 
 };
 

@@ -58,6 +58,10 @@ public class IceOntologyInterface {
 	private String mainIRI;
 	private String mainIRIPrefix;
 
+	Thread memoryMonitor;
+	public long[] memoryUsage = new long[3];
+	public boolean memoryMonitorState = false;
+
 	public IceOntologyInterface() {
 		// System.gc();
 		this.manager = OWLManager.createOWLOntologyManager();
@@ -75,6 +79,29 @@ public class IceOntologyInterface {
 
 	public void cleanUp() {
 		System.gc();
+	}
+
+	public void startMemoryMonitor() {
+		if (memoryMonitorState == true)
+			return;
+
+		this.memoryMonitorState = true;
+
+		Thread t = new Thread(new MemoryMonitor(this));
+
+		t.start();
+	}
+
+	public void stopMemoryMonitor() {
+		this.memoryMonitorState = false;
+	}
+
+	public void resetMemoryMonitor() {
+		memoryUsage = new long[3];
+	}
+
+	public long[] getMemoryUsage() {
+		return this.memoryUsage;
 	}
 
 	public void addIRIMapper(final String p_path) {
@@ -1515,4 +1542,35 @@ public class IceOntologyInterface {
 		return stockArr;
 	}
 
+	private class MemoryMonitor implements Runnable {
+		IceOntologyInterface ioi;
+
+		public MemoryMonitor(IceOntologyInterface ioi) {
+			super();
+			this.ioi = ioi;
+		}
+
+		@Override
+		public void run() {
+			while (ioi.memoryMonitorState) {
+				long t = Runtime.getRuntime().totalMemory();
+				long m = Runtime.getRuntime().maxMemory();
+				long f = Runtime.getRuntime().freeMemory();
+
+				if (t > ioi.memoryUsage[0])
+					ioi.memoryUsage[0] = t;
+				if (m > ioi.memoryUsage[1])
+					ioi.memoryUsage[1] = m;
+				if (f > ioi.memoryUsage[2])
+					ioi.memoryUsage[2] = f;
+
+				try {
+					Thread.sleep(5);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 }

@@ -179,6 +179,11 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   this->getLogLevelMethod = this->env->GetMethodID(this->javaOntologyInterface, "getLogLevel", "()I");
   this->setLogLevelMethod = this->env->GetMethodID(this->javaOntologyInterface, "setLogLevel", "(I)V");
 
+  this->getMemoryUsageMethod = this->env->GetMethodID(this->javaOntologyInterface, "getMemoryUsage", "()[J");
+  this->startMemoryMonitorMethod = this->env->GetMethodID(this->javaOntologyInterface, "startMemoryMonitor", "()V");
+  this->stopMemoryMonitorMethod = this->env->GetMethodID(this->javaOntologyInterface, "stopMemoryMonitor", "()V");
+  this->resetMemoryMonitorMethod = this->env->GetMethodID(this->javaOntologyInterface, "resetMemoryMonitor", "()V");
+
   this->empty = env->NewStringUTF("");
 
   if (this->checkError("Constructor", "Failed to lookup method ids for class de/unikassel/vs/ice/IceOntologyInterface"))
@@ -1565,6 +1570,53 @@ void OntologyInterface::setLogLevel(LogLevel ll)
 
   if (this->checkError("setLogging", "Error occurred at updating LogLevel to " + ll))
     return;
+}
+
+void OntologyInterface::getMemoryUsage(double &total, double &max, double &free)
+{
+  this->checkError("readRepresentation", "Error exists, readOntologyIriMappingFromOntology will not be executed");
+
+  jlongArray result = (jlongArray)env->CallObjectMethod(this->javaInterface, this->getMemoryUsageMethod);
+
+  if (this->checkError("readRepresentation", "Error exists, readOntologyIriMappingFromOntology will not be executed"))
+  {
+    total = -1;
+    max = -1;
+    free = -1;
+    return;
+  }
+
+  int size = env->GetArrayLength(result);
+  jlong* arr = env->GetLongArrayElements(result, 0);
+
+  total = arr[0];
+  max = arr[1];
+  free = arr[2];
+
+  env->ReleaseLongArrayElements(result, arr, 0);
+
+  env->DeleteLocalRef(result);
+}
+
+void OntologyInterface::startMemoryMonitor()
+{
+  this->checkError("readRepresentation", "Error exists, readOntologyIriMappingFromOntology will not be executed");
+  env->CallVoidMethod(this->javaInterface, this->startMemoryMonitorMethod);
+  this->checkError("readRepresentation", "Error exists, readOntologyIriMappingFromOntology will not be executed");
+}
+
+void OntologyInterface::stopMemoryMonitor()
+{
+  this->checkError("readRepresentation", "Error exists, readOntologyIriMappingFromOntology will not be executed");
+  env->CallVoidMethod(this->javaInterface, this->stopMemoryMonitorMethod);
+  this->checkError("readRepresentation", "Error exists, readOntologyIriMappingFromOntology will not be executed");
+}
+
+void OntologyInterface::resetMemoryMonitor()
+{
+  this->checkError("readRepresentation", "Error exists, readOntologyIriMappingFromOntology will not be executed");
+  env->CallVoidMethod(this->javaInterface, this->resetMemoryMonitorMethod);
+  this->checkError("readRepresentation", "Error exists, readOntologyIriMappingFromOntology will not be executed");
 }
 
 bool OntologyInterface::isInformationDirty()

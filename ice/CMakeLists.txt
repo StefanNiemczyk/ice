@@ -175,7 +175,6 @@ target_link_libraries(ice_node
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test 
-  test/eval/MemoryMonitor.cpp
   test/eval/eval_ModelGeneration.cpp
   test/eval/ModelGeneration.cpp
   test/eval/EvalScenarios.cpp

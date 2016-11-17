@@ -5,18 +5,33 @@
  *      Author: sni
  */
 
-#include <unistd.h>
+#ifndef MEMORYMANAGER_H_
+#define MEMORYMANAGER_H_
+
+#include <chrono>
 #include <ios>
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <string>
 #include <thread>
-#include <chrono>
+#include <unistd.h>
 
 #include "stdlib.h"
 #include "stdio.h"
 #include "string.h"
 
+#include "ice/ontology/OntologyInterface.h"
+
+struct MemoryUsage
+{
+  double vmUsageMax;
+  double residentSetMax;
+
+  double javaTotalMemoryMax;
+  double javaMaxMemoryMax;
+  double javaFreeMemoryMax;
+};
 
 class MemoryManager
 {
@@ -30,14 +45,29 @@ public:
 public:
   ~MemoryManager() {}
 
-  double getResidentSetMax()
+  MemoryUsage& getMemoryUsage()
   {
-    return this->residentSetMax;
-  }
+    if (this->ontology)
+    {
+      double btmb = 1024.0 * 1024.0;
+      double jt, jm, jf;
 
-  double getVmUsageMax()
-  {
-    return this->vmUsageMax;
+      this->ontology->getMemoryUsage(jt, jm, jf);
+
+
+      jt /= btmb;
+      jm /= btmb;
+      jf /= btmb;
+
+      if (jt > this->mu.javaTotalMemoryMax)
+        this->mu.javaTotalMemoryMax = jt;
+      if (jt > this->mu.javaMaxMemoryMax)
+        this->mu.javaMaxMemoryMax = jm;
+      if (jt > this->mu.javaFreeMemoryMax)
+        this->mu.javaFreeMemoryMax = jf;
+    }
+
+    return this->mu;
   }
 
   void start()
@@ -60,17 +90,38 @@ public:
 
   void reset()
   {
-    this->residentSetMax = 0;
-    this->vmUsageMax = 0;
+    this->mu.residentSetMax = 0;
+    this->mu.vmUsageMax = 0;
+
+    this->mu.javaTotalMemoryMax = 0;
+    this->mu.javaMaxMemoryMax = 0;
+    this->mu.javaFreeMemoryMax = 0;
+
+    if (this->ontology)
+      this->ontology->resetMemoryMonitor();
+  }
+
+  void resetOntologyInterface()
+  {
+    if (this->ontology)
+    {
+      this->ontology->stopMemoryMonitor();
+    }
+    this->ontology.reset();
+  }
+
+  void setOntologyInterface(std::shared_ptr<ice::OntologyInterface> &ontology)
+  {
+    this->ontology = ontology;
+    this->ontology->startMemoryMonitor();
   }
 
 private:
   MemoryManager()
   {
     this->active = false;
-    this->sleepTime = 100;
-    this->residentSetMax = 0;
-    this->vmUsageMax = 0;
+    this->sleepTime = 5;
+    this->reset();
   }
 
   void checkMemory()
@@ -86,14 +137,15 @@ private:
 
 //      int ret = getrusage(RUSAGE_SELF, &usage);
 
-      if (v > this->vmUsageMax)
-        this->vmUsageMax = v;
+      v /= 1024;
+      r /= 1024;
 
-      if (r > this->residentSetMax)
-        this->residentSetMax = r;
+      if (v > this->mu.vmUsageMax)
+        this->mu.vmUsageMax = v;
+      if (r > this->mu.residentSetMax)
+        this->mu.residentSetMax = r;
 
-
-      std::cout << r << std::endl;
+//      std::cout << r << "java: " << jt << ", " << jm << ", " << jf << std::endl;
 
       std::this_thread::sleep_for(std::chrono::milliseconds(this->sleepTime));
     }
@@ -188,7 +240,10 @@ private:
   std::thread worker;
   int sleepTime;
   bool active;
-
-  double vmUsageMax;
-  double residentSetMax;
+  std::shared_ptr<ice::OntologyInterface> ontology;
+  MemoryUsage mu;
 };
+
+
+#endif
+

@@ -7,6 +7,7 @@
 #include "ice/EntityDirectory.h"
 #include "ice/TypeDefs.h"
 #include "ice/ontology/OntologyInterface.h"
+#include "MemoryMonitor.h"
 
 #include "ClingWrapper.h"
 #include "External.h"
@@ -27,6 +28,13 @@ struct ModelGenerationResult
   long aspAuxAtomCount;
   bool successful;
 
+  double vmUsageMax;
+  double residentSetMax;
+
+  double javaTotalMemoryMax;
+  double javaMaxMemoryMax;
+  double javaFreeMemoryMax;
+
   void print()
   {
     std::cout << "Result\t\t\t\t" << (successful ? "true" : "false") << std::endl;
@@ -42,6 +50,12 @@ struct ModelGenerationResult
     std::cout << "ASP atom count\t\t" << aspAtomCount << std::endl;
     std::cout << "ASP bodies count\t" << aspBodiesCount << std::endl;
     std::cout << "ASP aux atom count\t" << aspAuxAtomCount << std::endl;
+
+    std::cout << "Memory vm usage\t\t" << vmUsageMax << " mb" << std::endl;
+    std::cout << "Memory ram usage\t\t" << residentSetMax << " mb" << std::endl;
+    std::cout << "Memory java total\t\t" << javaTotalMemoryMax << " mb" << std::endl;
+    std::cout << "Memory java max\t\t" << javaMaxMemoryMax << " mb" << std::endl;
+    std::cout << "Memory java free\t\t" << javaFreeMemoryMax << " mb" << std::endl;
   }
 };
 
@@ -65,6 +79,12 @@ struct ModelGenerationSeriesResult
   double aspAtomCountVar;
   double aspBodiesCountVar;
   double aspAuxAtomCountVar;
+
+  double vmUsageMaxVar;
+  double residentSetMaxVar;
+  double javaTotalMemoryMaxVar;
+  double javaMaxMemoryMaxVar;
+  double javaFreeMemoryMaxVar;
 
   void print()
   {
@@ -93,6 +113,17 @@ struct ModelGenerationSeriesResult
            aspBodiesCountVar, best.aspBodiesCount, worst.aspBodiesCount);
     printf("ASP Aux Atom Count     %10lu    (%10.3f var), %10lu    (best), %10lu    (worst)\n", avg.aspAuxAtomCount,
            aspAuxAtomCountVar, best.aspAuxAtomCount, worst.aspAuxAtomCount);
+
+    printf("Memory vm usage        %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.vmUsageMax,
+           vmUsageMaxVar, best.vmUsageMax, worst.vmUsageMax);
+    printf("Memory ram usage       %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.residentSetMax,
+           residentSetMaxVar, best.residentSetMax, worst.residentSetMax);
+    printf("Memory java total      %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaTotalMemoryMax,
+           javaTotalMemoryMaxVar, best.javaTotalMemoryMax, worst.javaTotalMemoryMax);
+    printf("Memory java max        %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaMaxMemoryMax,
+           javaMaxMemoryMaxVar, best.javaMaxMemoryMax, worst.javaMaxMemoryMax);
+    printf("Memory java free       %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaFreeMemoryMax,
+           javaFreeMemoryMaxVar, best.javaFreeMemoryMax, worst.javaFreeMemoryMax);
   }
 };
 
@@ -174,9 +205,16 @@ public:
     result.aspGroundingTimeVar = 0;
     result.aspSolvingTimeVar = 0;
 
+    result.vmUsageMaxVar = 0;
+    result.residentSetMaxVar = 0;
+    result.javaTotalMemoryMaxVar = 0;
+    result.javaMaxMemoryMaxVar = 0;
+    result.javaFreeMemoryMaxVar = 0;
+
     VarianceOnline totalTimeVar, ontologyReadTimeVar, ontologyReasonerTimeVar, ontologyToASPTimeVar,
                    aspGroundingTimeVar, aspSolvingTimeVar, aspSatTimeVar, aspUnsatTimeVar, aspModelCountVar,
-                   aspAtomCountVar, aspBodiesCountVar, aspAuxAtomCountVar;
+                   aspAtomCountVar, aspBodiesCountVar, aspAuxAtomCountVar, vmUsageMaxVar, residentSetMaxVar,
+                   javaTotalMemoryMaxVar, javaMaxMemoryMaxVar, javaFreeMemoryMaxVar;
 
     if (warmUp)
     {
@@ -245,6 +283,12 @@ public:
         aspBodiesCountVar.add(r.aspBodiesCount);
         aspAuxAtomCountVar.add(r.aspAuxAtomCount);
 
+        vmUsageMaxVar.add(r.vmUsageMax);
+        residentSetMaxVar.add(r.residentSetMax);
+        javaTotalMemoryMaxVar.add(r.javaTotalMemoryMax);
+        javaMaxMemoryMaxVar.add(r.javaMaxMemoryMax);
+        javaFreeMemoryMaxVar.add(r.javaFreeMemoryMax);
+
         if (i == 0 && m == 0)
         {
           result.best = r;
@@ -265,6 +309,12 @@ public:
           result.avg.aspAtomCount += r.aspAtomCount;
           result.avg.aspBodiesCount += r.aspBodiesCount;
           result.avg.aspAuxAtomCount += r.aspAuxAtomCount;
+
+          result.avg.vmUsageMax += r.vmUsageMax;
+          result.avg.residentSetMax += r.residentSetMax;
+          result.avg.javaTotalMemoryMax += r.javaTotalMemoryMax;
+          result.avg.javaMaxMemoryMax += r.javaMaxMemoryMax;
+          result.avg.javaFreeMemoryMax += r.javaFreeMemoryMax;
 
           if (r.totalTime < result.best.totalTime)
             result.best.totalTime = r.totalTime;
@@ -325,6 +375,31 @@ public:
             result.best.aspAuxAtomCount = r.aspAuxAtomCount;
           else if (r.aspAuxAtomCount > result.worst.aspAuxAtomCount)
             result.worst.aspAuxAtomCount = r.aspAuxAtomCount;
+
+          if (r.vmUsageMax < result.best.vmUsageMax)
+            result.best.vmUsageMax = r.vmUsageMax;
+          else if (r.vmUsageMax > result.worst.vmUsageMax)
+            result.worst.vmUsageMax = r.vmUsageMax;
+
+          if (r.residentSetMax < result.best.residentSetMax)
+            result.best.residentSetMax = r.residentSetMax;
+          else if (r.residentSetMax > result.worst.residentSetMax)
+            result.worst.residentSetMax = r.residentSetMax;
+
+          if (r.javaTotalMemoryMax < result.best.javaTotalMemoryMax)
+            result.best.javaTotalMemoryMax = r.javaTotalMemoryMax;
+          else if (r.javaTotalMemoryMax > result.worst.javaTotalMemoryMax)
+            result.worst.javaTotalMemoryMax = r.javaTotalMemoryMax;
+
+          if (r.javaMaxMemoryMax < result.best.javaMaxMemoryMax)
+            result.best.javaMaxMemoryMax = r.javaMaxMemoryMax;
+          else if (r.javaMaxMemoryMax > result.worst.javaMaxMemoryMax)
+            result.worst.javaMaxMemoryMax = r.javaMaxMemoryMax;
+
+          if (r.javaFreeMemoryMax < result.best.javaFreeMemoryMax)
+            result.best.javaFreeMemoryMax = r.javaFreeMemoryMax;
+          else if (r.javaFreeMemoryMax > result.worst.javaFreeMemoryMax)
+            result.worst.javaFreeMemoryMax = r.javaFreeMemoryMax;
         }
 
         end = std::chrono::system_clock::now();
@@ -347,6 +422,12 @@ public:
     result.aspBodiesCountVar = aspBodiesCountVar.getVariance();
     result.aspAuxAtomCountVar = aspAuxAtomCountVar.getVariance();
 
+    result.vmUsageMaxVar = vmUsageMaxVar.getVariance();
+    result.residentSetMaxVar = residentSetMaxVar.getVariance();
+    result.javaTotalMemoryMaxVar = javaTotalMemoryMaxVar.getVariance();
+    result.javaMaxMemoryMaxVar = javaMaxMemoryMaxVar.getVariance();
+    result.javaFreeMemoryMaxVar = javaFreeMemoryMaxVar.getVariance();
+
     int runCount = models * p_count;
 
     result.avg.totalTime /= runCount;
@@ -361,6 +442,12 @@ public:
     result.avg.aspAtomCount /= runCount;
     result.avg.aspBodiesCount /= runCount;
     result.avg.aspAuxAtomCount /= runCount;
+
+    result.avg.vmUsageMax /= runCount;
+    result.avg.residentSetMax /= runCount;
+    result.avg.javaTotalMemoryMax /= runCount;
+    result.avg.javaMaxMemoryMax /= runCount;
+    result.avg.javaFreeMemoryMax /= runCount;
 
     return result;
   }
@@ -397,21 +484,26 @@ public:
     asp.init();
 
     // Initializing OwlAPI
-    ice::OntologyInterface ontology(path + "/java/lib/");
-    ontology.setLogLevel(ice::LogLevel::Error);
-    ontology.addIRIMapper(path + "/ontology/");
-    ontology.loadOntology(p_ontPath);
+    auto ontology = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
+    ontology->setLogLevel(ice::LogLevel::Error);
+    ontology->addIRIMapper(path + "/ontology/");
+    ontology->loadOntology(p_ontPath);
+
+    // MemoryManagement
+    auto mm = MemoryManager::getInstance();
+    mm->setOntologyInterface(ontology);
+    mm->reset();
 
     start = std::chrono::system_clock::now();
 
     // Load ontology
     startOntologyRead = std::chrono::system_clock::now();
-    ontology.loadOntologies();
+    ontology->loadOntologies();
     endOntologyRead = std::chrono::system_clock::now();
 
     // Reasoning ontology
     startOntologyReasoner = std::chrono::system_clock::now();
-    ontology.initReasoner(true);
+    ontology->initReasoner(true);
     endOntologyReasoner = std::chrono::system_clock::now();
 
     // Ontology 2 ASP
@@ -422,11 +514,11 @@ public:
     std::string programPart = "ontology" + 1;
     std::string item, noIri;
     std::stringstream ss;
-    ss.str(ontology.readInformationStructureAsASP());
+    ss.str(ontology->readInformationStructureAsASP());
 
     while (std::getline(ss, item, '\n'))
     {
-      noIri = ontology.toShortIriAll(item);
+      noIri = ontology->toShortIriAll(item);
       if (std::find(entities.begin(), entities.end(), noIri) == entities.end())
       {
         entities.push_back(noIri);
@@ -437,7 +529,7 @@ public:
     if (false == this->testRepresentations)
     {
     //
-      auto ontSystems = ontology.getSystems();
+      auto ontSystems = ontology->getSystems();
 
 //       std::string iriSelf;
 //       self->getId(EntityDirectory::ID_ONTOLOGY, iriSelf);
@@ -447,7 +539,7 @@ public:
 
        for (auto ontSystem : *ontSystems)
        {
-         asp.add("base", {}, "system(" + ontology.toShortIri(ontSystem) + ",default)." );
+         asp.add("base", {}, "system(" + ontology->toShortIri(ontSystem) + ",default)." );
 
 //         entity = directory->lookup(EntityDirectory::ID_ONTOLOGY, ontSystem, true);
 //
@@ -460,7 +552,7 @@ public:
 //           asp.add("base", {}, "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ",default).");
 //         }
 
-         auto nodes = ontology.readNodesAndIROsAsASP(ontSystem);
+         auto nodes = ontology->readNodesAndIROsAsASP(ontSystem);
 
          auto &types = nodes->at(0);
          auto &names = nodes->at(1);
@@ -516,8 +608,8 @@ public:
 
 //             _log->info("ASP element '%v' not found, creating new element", std::string(name));
              auto element = std::make_shared<ice::ASPElement>();
-             element->aspString = ontology.toShortIriAll(aspStr);
-             element->name = ontology.toShortIri(name);
+             element->aspString = ontology->toShortIriAll(aspStr);
+             element->name = ontology->toShortIri(name);
              element->state = ice::ASPElementState::ADDED_TO_ASP;
              element->type = type;
 
@@ -533,7 +625,7 @@ public:
                //element->config = "";//this->readConfiguration(element->configAsString);
              }
 
-             std::string shortIris = ontology.toShortIriAll(elementStr);
+             std::string shortIris = ontology->toShortIriAll(elementStr);
              auto value = supplementary::ClingWrapper::stringToValue(shortIris.c_str());
 
 //             switch (type)
@@ -608,6 +700,14 @@ public:
     result.aspAtomCount = asp.getAtomCount();
     result.aspBodiesCount = asp.getBodiesCount();
     result.aspAuxAtomCount = asp.getAuxAtomsCount();
+
+    auto &mu = mm->getMemoryUsage();
+    result.vmUsageMax = mu.vmUsageMax;
+    result.residentSetMax = mu.residentSetMax;
+    result.javaTotalMemoryMax = mu.javaTotalMemoryMax;
+    result.javaMaxMemoryMax = mu.javaMaxMemoryMax;
+    result.javaFreeMemoryMax = mu.javaFreeMemoryMax;
+    mm->resetOntologyInterface();
 
     if (solveResult == Gringo::SolveResult::SAT)
     {
