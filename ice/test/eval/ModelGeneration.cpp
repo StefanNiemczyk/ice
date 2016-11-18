@@ -500,8 +500,11 @@ public:
     ontology->loadOntology(p_ontPath);
 
     // MemoryManagement
-    mm->setOntologyInterface(ontology);
-    mm->reset();
+    if (mm->isActive())
+    {
+      mm->setOntologyInterface(ontology);
+      mm->reset();
+    }
 
     start = std::chrono::system_clock::now();
 
@@ -747,13 +750,13 @@ public:
     result.aspBodiesCount = asp.getBodiesCount();
     result.aspAuxAtomCount = asp.getAuxAtomsCount();
 
-    auto &mu = mm->getMemoryUsage();
-//    result.vmUsageMax = mu.vmUsageMax;
-    result.residentSetMax = mu.residentSetMax;
-    result.javaRamUsageMax = mu.javaRamUsageMax;
-//    result.javaMaxMemoryMax = mu.javaMaxMemoryMax;
-//    result.javaFreeMemoryMax = mu.javaFreeMemoryMax;
-    mm->resetOntologyInterface();
+    if (mm->isActive())
+    {
+      auto &mu = mm->getMemoryUsage();
+      result.residentSetMax = mu.residentSetMax;
+      result.javaRamUsageMax = mu.javaRamUsageMax;
+      mm->resetOntologyInterface();
+    }
 
     if (solve)
     {
