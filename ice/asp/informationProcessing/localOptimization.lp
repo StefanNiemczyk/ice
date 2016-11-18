@@ -6,14 +6,19 @@
 %%%%
 %%%%--------------------------------------------------------------------------------------
 #program query(k,maxHopCount,maxStepCount).
-
 % heuristic of node output QoS
-heuristic(k,tstream(k,SYSTEM,tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO),METADATA,1000-SUM) :-
+heuristic(k,tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO),METADATA,1000-SUM) :-
 	metadata(information,METADATA,minimize),
-	SYSTEM = SYSTEM2,
-	tstream(k,SYSTEM,tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO),
-	metadataOutput(METADATA,SYSTEM2,NODE,TYPE,FIX_VALUE,MOD_VALUE),
-	nodeCount(node(k,SYSTEM2,NODE,ENTITY,ENTITY2),MIN,MAX),
+	tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO),
+	metadataOutput(METADATA,SYSTEM,NODE,TYPE,FIX_VALUE,MOD_VALUE),
+	nodeCount(node(k,SYSTEM,NODE,ENTITY,ENTITY2),MIN,MAX),
+	SUM = FIX_VALUE+(MAX-MIN+1)*MOD_VALUE.
+
+heuristic(k,tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO),METADATA,SUM) :-
+	metadata(information,METADATA,maximize),
+	tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO),
+	metadataOutput(METADATA,SYSTEM,NODE,TYPE,FIX_VALUE,MOD_VALUE),
+	nodeCount(node(k,SYSTEM,NODE,ENTITY,ENTITY2),MIN,MAX),
 	SUM = FIX_VALUE+(MAX-MIN+1)*MOD_VALUE.
 
 heuristic(k,tstream(k,SYSTEM,tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO),METADATA,1000-SUM) :-
@@ -33,13 +38,6 @@ heuristic(k,tstream(k,SYSTEM,tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO),delay,10
 	nodeCount(node(k,SYSTEM2,NODE,ENTITY,ENTITY2),MIN,MAX),
 	transfer(SYSTEM2,SYSTEM),
 	metadataOutput(delay,SYSTEM2,SYSTEM,TRANSFER_DELAY).
-
-heuristic(k,tstream(k,SYSTEM,tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO),METADATA,SUM) :-
-	metadata(information,METADATA,maximize),
-	tstream(k,SYSTEM,tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO),
-	metadataOutput(METADATA,SYSTEM2,NODE,TYPE,FIX_VALUE,MOD_VALUE),
-	nodeCount(node(k,SYSTEM2,NODE,ENTITY,ENTITY2),MIN,MAX),
-	SUM = FIX_VALUE+(MAX-MIN+1)*MOD_VALUE.
 
 
 % see traveling salespersons problem for details
