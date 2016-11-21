@@ -29,10 +29,9 @@ struct ModelGenerationResult
   bool successful;
 
   double ramUsageBeforeMax;
-  double residentSetMax;
+  double ramUsageMax;
 
   double javaRamUsageMax;
-  double javaMaxMemoryMax;
   double javaRamUsageBeforeMax;
 
   void print()
@@ -52,9 +51,8 @@ struct ModelGenerationResult
     std::cout << "ASP aux atom count\t" << aspAuxAtomCount << std::endl;
 
     std::cout << "Memory vm usage\t\t" << ramUsageBeforeMax << " mb" << std::endl;
-    std::cout << "Memory ram usage\t\t" << residentSetMax << " mb" << std::endl;
+    std::cout << "Memory ram usage\t\t" << ramUsageMax << " mb" << std::endl;
     std::cout << "Memory java total\t\t" << javaRamUsageMax << " mb" << std::endl;
-    std::cout << "Memory java max\t\t" << javaMaxMemoryMax << " mb" << std::endl;
     std::cout << "Memory java free\t\t" << javaRamUsageBeforeMax << " mb" << std::endl;
   }
 };
@@ -81,9 +79,8 @@ struct ModelGenerationSeriesResult
   double aspAuxAtomCountVar;
 
   double ramUsageBeforeMaxVar;
-  double residentSetMaxVar;
+  double ramUsageMaxVar;
   double javaRamUsageMaxVar;
-  double javaMaxMemoryMaxVar;
   double javaRamUsageBeforeMaxVar;
 
   void print()
@@ -119,8 +116,8 @@ struct ModelGenerationSeriesResult
     printf("Memory java before     %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaRamUsageBeforeMax,
            javaRamUsageBeforeMaxVar, best.javaRamUsageBeforeMax, worst.javaRamUsageBeforeMax);
 
-    printf("Memory ram             %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.residentSetMax,
-           residentSetMaxVar, best.residentSetMax, worst.residentSetMax);
+    printf("Memory ram             %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.ramUsageMax,
+           ramUsageMaxVar, best.ramUsageMax, worst.ramUsageMax);
     printf("Memory java            %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaRamUsageMax,
            javaRamUsageMaxVar, best.javaRamUsageMax, worst.javaRamUsageMax);
 //    printf("Memory java max        %10f    (%10.3f var), %10f    (best), %10f    (worst)\n", avg.javaMaxMemoryMax,
@@ -207,9 +204,8 @@ public:
     result.aspSolvingTimeVar = 0;
 
     result.ramUsageBeforeMaxVar = 0;
-    result.residentSetMaxVar = 0;
+    result.ramUsageMaxVar = 0;
     result.javaRamUsageMaxVar = 0;
-    result.javaMaxMemoryMaxVar = 0;
     result.javaRamUsageBeforeMaxVar = 0;
 
     VarianceOnline totalTimeVar, ontologyReadTimeVar, ontologyReasonerTimeVar, ontologyToASPTimeVar,
@@ -285,9 +281,8 @@ public:
         aspAuxAtomCountVar.add(r.aspAuxAtomCount);
 
         vmUsageMaxVar.add(r.ramUsageBeforeMax);
-        residentSetMaxVar.add(r.residentSetMax);
+        residentSetMaxVar.add(r.ramUsageMax);
         javaTotalMemoryMaxVar.add(r.javaRamUsageMax);
-        javaMaxMemoryMaxVar.add(r.javaMaxMemoryMax);
         javaFreeMemoryMaxVar.add(r.javaRamUsageBeforeMax);
 
         if (i == 0 && m == 0)
@@ -312,9 +307,8 @@ public:
           result.avg.aspAuxAtomCount += r.aspAuxAtomCount;
 
           result.avg.ramUsageBeforeMax += r.ramUsageBeforeMax;
-          result.avg.residentSetMax += r.residentSetMax;
+          result.avg.ramUsageMax += r.ramUsageMax;
           result.avg.javaRamUsageMax += r.javaRamUsageMax;
-          result.avg.javaMaxMemoryMax += r.javaMaxMemoryMax;
           result.avg.javaRamUsageBeforeMax += r.javaRamUsageBeforeMax;
 
           if (r.totalTime < result.best.totalTime)
@@ -382,20 +376,15 @@ public:
           else if (r.ramUsageBeforeMax > result.worst.ramUsageBeforeMax)
             result.worst.ramUsageBeforeMax = r.ramUsageBeforeMax;
 
-          if (r.residentSetMax < result.best.residentSetMax)
-            result.best.residentSetMax = r.residentSetMax;
-          else if (r.residentSetMax > result.worst.residentSetMax)
-            result.worst.residentSetMax = r.residentSetMax;
+          if (r.ramUsageMax < result.best.ramUsageMax)
+            result.best.ramUsageMax = r.ramUsageMax;
+          else if (r.ramUsageMax > result.worst.ramUsageMax)
+            result.worst.ramUsageMax = r.ramUsageMax;
 
           if (r.javaRamUsageMax < result.best.javaRamUsageMax)
             result.best.javaRamUsageMax = r.javaRamUsageMax;
           else if (r.javaRamUsageMax > result.worst.javaRamUsageMax)
             result.worst.javaRamUsageMax = r.javaRamUsageMax;
-
-          if (r.javaMaxMemoryMax < result.best.javaMaxMemoryMax)
-            result.best.javaMaxMemoryMax = r.javaMaxMemoryMax;
-          else if (r.javaMaxMemoryMax > result.worst.javaMaxMemoryMax)
-            result.worst.javaMaxMemoryMax = r.javaMaxMemoryMax;
 
           if (r.javaRamUsageBeforeMax < result.best.javaRamUsageBeforeMax)
             result.best.javaRamUsageBeforeMax = r.javaRamUsageBeforeMax;
@@ -424,9 +413,8 @@ public:
     result.aspAuxAtomCountVar = aspAuxAtomCountVar.getVariance();
 
     result.ramUsageBeforeMaxVar = vmUsageMaxVar.getVariance();
-    result.residentSetMaxVar = residentSetMaxVar.getVariance();
+    result.ramUsageMaxVar = residentSetMaxVar.getVariance();
     result.javaRamUsageMaxVar = javaTotalMemoryMaxVar.getVariance();
-    result.javaMaxMemoryMaxVar = javaMaxMemoryMaxVar.getVariance();
     result.javaRamUsageBeforeMaxVar = javaFreeMemoryMaxVar.getVariance();
 
     int runCount = models * p_count;
@@ -445,9 +433,8 @@ public:
     result.avg.aspAuxAtomCount /= runCount;
 
     result.avg.ramUsageBeforeMax /= runCount;
-    result.avg.residentSetMax /= runCount;
+    result.avg.ramUsageMax /= runCount;
     result.avg.javaRamUsageMax /= runCount;
-    result.avg.javaMaxMemoryMax /= runCount;
     result.avg.javaRamUsageBeforeMax /= runCount;
 
     return result;
@@ -724,7 +711,7 @@ public:
     // Solving
 //    std::cout << "ASP solving" << std::endl;
     Gringo::SolveResult solveResult;
-    bool solve = true;
+    bool solve = false;
     if (solve)
       solveResult = asp.solve();
 //    std::cout << "ASP done" << std::endl;
@@ -753,7 +740,7 @@ public:
     if (mm->isActive())
     {
       auto &mu = mm->getMemoryUsage();
-      result.residentSetMax = mu.residentSetMax;
+      result.ramUsageMax = mu.residentSetMax;
       result.javaRamUsageMax = mu.javaRamUsageMax;
       mm->resetOntologyInterface();
     }

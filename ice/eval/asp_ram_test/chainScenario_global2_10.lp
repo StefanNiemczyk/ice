@@ -134,8 +134,8 @@ output(o0_EvalSystem,o0_EvalNode2_0Ind,o0_EvalScope2_0,o0_EvalRepresentation2_0,
 metadataOutput(delay,o0_EvalSystem,o0_EvalNode2_0Ind,fix,1,0).
 metadataOutput(accuracy,o0_EvalSystem,o0_EvalNode2_0Ind,fix,8,0).
 nodeTemplate(o0_EvalSystem,o0_EvalNode8_1Ind,any).
-input(o0_EvalSystem,o0_EvalNode8_1Ind,o0_EvalScope2_0,o0_EvalRepresentation2_0,none,1,1).
 output(o0_EvalSystem,o0_EvalNode8_1Ind,o0_EvalScope2_1,o0_EvalRepresentation2_1,none).
+input(o0_EvalSystem,o0_EvalNode8_1Ind,o0_EvalScope2_0,o0_EvalRepresentation2_0,none,1,1).
 metadataOutput(accuracy,o0_EvalSystem,o0_EvalNode8_1Ind,max,2,0).
 metadataOutput(delay,o0_EvalSystem,o0_EvalNode8_1Ind,max,1,0).
 sourceNode(o0_EvalSystem,o0_EvalNode8_0Ind,o0_EvalEntity).

@@ -58,10 +58,14 @@ void evalRam(int argc, char **argv)
 
 void evalGeneration(int argc, char **argv)
 {
+  assert(argc == 2 && "Error: wrong size of arguments " + argc);
+
+  int index = std::stoi(argv[1]);
+
   std::string path = "/home/sni/Desktop/eval";
   int runs = 1;
 
-//  MemoryManager::getInstance()->start();
+  MemoryManager::getInstance()->start();
 
   EvalScenarios scenarios2(path + "", false, [&] (supplementary::ClingWrapper *asp){
     asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
@@ -122,7 +126,6 @@ void evalGeneration(int argc, char **argv)
 //  conf.skipLevel = false;
 //  scenariosT.transformation(false, true, runs, 50, conf);
 
-//  int dead = 5 / 0;
   MemoryManager::getInstance()->stop();
 }
 

@@ -312,14 +312,17 @@ public:
         metadataValues2.clear();
         metadataGroundings.clear();
 
-        std::cout << std::endl;
-        std::cout
-            << "---------------------------------------------------------------------------------------------------"
-            << std::endl;
-        std::cout
-            << "---------------------------------------------------------------------------------------------------"
-            << std::endl;
-        std::cout << "Starting eval " << chainSize << " chain size, " << nodes << " nodes" << std::endl << std::endl;
+        if (verbose)
+        {
+          std::cout << std::endl;
+          std::cout
+              << "---------------------------------------------------------------------------------------------------"
+              << std::endl;
+          std::cout
+              << "---------------------------------------------------------------------------------------------------"
+              << std::endl;
+          std::cout << "Starting eval " << chainSize << " chain size, " << nodes << " nodes" << std::endl << std::endl;
+        }
 
         std::string system = "EvalSystem";
 
@@ -1859,7 +1862,12 @@ public:
           //        asp->setModelCount(0);
           });
 
-        result.print();
+        // Ram Eval Stuff
+        std::cout << result.ramUsageBeforeMaxVar << "\t" << result.ramUsageMaxVar << "\t"
+            << result.javaRamUsageBeforeMaxVar << "\t" << result.javaRamUsageMaxVar;
+
+        if (verbose)
+          result.print();
 
         // print to file
         file << systems << "\t";
