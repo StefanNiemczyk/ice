@@ -246,7 +246,8 @@ public:
     {
       for (int i = 0; i < p_count; ++i)
       {
-        std::cout << "Starting run " << (i + 1) << " ... ";
+        if (verbose)
+          std::cout << "Starting run " << (i + 1) << " ... ";
         start = std::chrono::system_clock::now();
 
         std::string ontology;
@@ -393,6 +394,7 @@ public:
         }
 
         end = std::chrono::system_clock::now();
+        if (verbose)
         std::cout << "finished " << (r.successful ? "successful" : "unsuccessful") << " after: "
             << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms, processing time: "
             << r.totalTime << " ms" << std::endl;
@@ -711,7 +713,7 @@ public:
     // Solving
 //    std::cout << "ASP solving" << std::endl;
     Gringo::SolveResult solveResult;
-    bool solve = false;
+    bool solve = true;
     if (solve)
       solveResult = asp.solve();
 //    std::cout << "ASP done" << std::endl;

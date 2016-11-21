@@ -301,159 +301,159 @@ public:
     {
       for (int nodes = nodesMin; nodes <= nodesMax; nodes += nodesStep)
       {
-        inputs.clear();
-        inputsMin.clear();
-        inputsMax.clear();
-        outputs.clear();
-        outputsMin.clear();
-        outputsMax.clear();
-        metadatas.clear();
-        metadataValues.clear();
-        metadataValues2.clear();
-        metadataGroundings.clear();
-
-        if (verbose)
-        {
-          std::cout << std::endl;
-          std::cout
-              << "---------------------------------------------------------------------------------------------------"
-              << std::endl;
-          std::cout
-              << "---------------------------------------------------------------------------------------------------"
-              << std::endl;
-          std::cout << "Starting eval " << chainSize << " chain size, " << nodes << " nodes" << std::endl << std::endl;
-        }
-
-        std::string system = "EvalSystem";
-
-        ice::OntologyInterface oi(path + "/java/lib/");
-
-        oi.addIRIMapper(path + "/ontology/");
-        oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
-        oi.loadOntologies();
-
-        std::vector<std::string> scopes;
-        oi.addEntityType(entityType, scopes);
-
-        oi.addIndividual(entity, entityType);
-        oi.addSystem(system);
-
-        for (int i = 0; i < chainSize; ++i)
-        {
-          inputs.clear();
-          inputsMin.clear();
-          inputsMax.clear();
-          outputs.clear();
-          outputsMin.clear();
-          outputsMax.clear();
-
-          ss.str("");
-          ss << "EvalScope" << chainSize << "_" << i;
-          std::string scope = ss.str();
-          ss.str("");
-          ss << "EvalValueScope" << chainSize << "_" << i;
-          std::string valueScope = ss.str();
-          ss.str("");
-          ss << "EvalRepresentation" << chainSize << "_" << i;
-          std::string representation = ss.str();
-          ss.str("");
-          ss << "EvalStream" << chainSize << "_" << i;
-          std::string stream = ss.str();
-          ss.str("");
-          ss << "EvalStream" << chainSize << "_" << (i - 1);
-          std::string lastStream = ss.str();
-
-          // add information structure
-          oi.addValueScope(superValueScope, valueScope, "DoubleRep");
-
-          std::vector<std::string> vec;
-          vec.push_back(valueScope);
-          oi.addRepresentation(superRepresentation, representation, vec);
-
-          std::vector<std::string> reps;
-          reps.push_back(representation);
-          oi.addEntityScope(scope, reps);
-
-          std::vector<std::string> scopes;
-          scopes.push_back(scope);
-          oi.addScopesToEntityType(entityType, scopes);
-
-          oi.addNamedStream(stream, scope, representation);
-
-          inputs.push_back(lastStream);
-          inputsMin.push_back(1);
-          inputsMax.push_back(1);
-          outputs.push_back(stream);
-          outputsMin.push_back(1);
-          outputsMax.push_back(1);
-
-          for (int j = 0; j < nodes; j++)
-          {
-            metadatas.clear();
-            metadataValues.clear();
-            metadataValues2.clear();
-            metadataGroundings.clear();
-
-            ss.str("");
-            ss << "EvalNode" << j << "_" << i;
-            std::string node = ss.str();
-            if (i == 0)
-            {
-              //            if (j < 1)
-              //            {
-              oi.addSourceNodeClass(node, outputs, outputsMin, outputsMax);
-
-              metadatas.push_back("Delay");
-              metadataValues.push_back(1);
-              metadataValues2.push_back(0);
-              metadataGroundings.push_back("NodeDelayFixASPGrounding");
-              //            metadatas.push_back("Cost");
-              //            metadataValues.push_back(1);
-              //            metadataValues2.push_back(1);
-              //            metadataGroundings.push_back("NodeCostASPGrounding");
-              metadatas.push_back("Accuracy");
-              metadataValues.push_back(nodesMax - j);
-              metadataValues2.push_back(0);
-              metadataGroundings.push_back("NodeAccuracyFixASPGrounding");
-
-              oi.addNodeIndividual(node + "Ind", node, system, entity, "", metadatas, metadataValues, metadataValues2,
-                                   metadataGroundings);
-              //            }
-            }
-            else // if (j < 1)
-            {
-              oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
-
-              metadatas.push_back("Delay");
-              metadataValues.push_back(1);
-              metadataValues2.push_back(0);
-              metadataGroundings.push_back("NodeDelayASPGrounding");
-              //            metadatas.push_back("Cost");
-              //            metadataValues.push_back(1);
-              //            metadataValues2.push_back(1);
-              //            metadataGroundings.push_back("NodeCostASPGrounding");
-              metadatas.push_back("Accuracy");
-              metadataValues.push_back(nodesMax - j);
-              metadataValues2.push_back(0);
-              metadataGroundings.push_back("NodeAccuracyMaxASPGrounding");
-
-              // TODO fix
-              oi.addNodeIndividual(node + "Ind", node, system, "", "", metadatas, metadataValues, metadataValues2,
-                                   metadataGroundings);
-            }
-          }
-        }
-
-        ss.str("");
-        ss << "EvalStream" << chainSize << "_" << chainSize - 1;
-        std::string stream = ss.str();
-        std::string reqStream = "Req" + stream;
-        oi.addRequiredStream(reqStream, stream, system, entity, "");
+//        inputs.clear();
+//        inputsMin.clear();
+//        inputsMax.clear();
+//        outputs.clear();
+//        outputsMin.clear();
+//        outputsMax.clear();
+//        metadatas.clear();
+//        metadataValues.clear();
+//        metadataValues2.clear();
+//        metadataGroundings.clear();
+//
+//        if (verbose)
+//        {
+//          std::cout << std::endl;
+//          std::cout
+//              << "---------------------------------------------------------------------------------------------------"
+//              << std::endl;
+//          std::cout
+//              << "---------------------------------------------------------------------------------------------------"
+//              << std::endl;
+//          std::cout << "Starting eval " << chainSize << " chain size, " << nodes << " nodes" << std::endl << std::endl;
+//        }
+//
+//        std::string system = "EvalSystem";
+//
+//        ice::OntologyInterface oi(path + "/java/lib/");
+//
+//        oi.addIRIMapper(path + "/ontology/");
+//        oi.addOntologyIRI("http://vs.uni-kassel.de/Ice");
+//        oi.loadOntologies();
+//
+//        std::vector<std::string> scopes;
+//        oi.addEntityType(entityType, scopes);
+//
+//        oi.addIndividual(entity, entityType);
+//        oi.addSystem(system);
+//
+//        for (int i = 0; i < chainSize; ++i)
+//        {
+//          inputs.clear();
+//          inputsMin.clear();
+//          inputsMax.clear();
+//          outputs.clear();
+//          outputsMin.clear();
+//          outputsMax.clear();
+//
+//          ss.str("");
+//          ss << "EvalScope" << chainSize << "_" << i;
+//          std::string scope = ss.str();
+//          ss.str("");
+//          ss << "EvalValueScope" << chainSize << "_" << i;
+//          std::string valueScope = ss.str();
+//          ss.str("");
+//          ss << "EvalRepresentation" << chainSize << "_" << i;
+//          std::string representation = ss.str();
+//          ss.str("");
+//          ss << "EvalStream" << chainSize << "_" << i;
+//          std::string stream = ss.str();
+//          ss.str("");
+//          ss << "EvalStream" << chainSize << "_" << (i - 1);
+//          std::string lastStream = ss.str();
+//
+//          // add information structure
+//          oi.addValueScope(superValueScope, valueScope, "DoubleRep");
+//
+//          std::vector<std::string> vec;
+//          vec.push_back(valueScope);
+//          oi.addRepresentation(superRepresentation, representation, vec);
+//
+//          std::vector<std::string> reps;
+//          reps.push_back(representation);
+//          oi.addEntityScope(scope, reps);
+//
+//          std::vector<std::string> scopes;
+//          scopes.push_back(scope);
+//          oi.addScopesToEntityType(entityType, scopes);
+//
+//          oi.addNamedStream(stream, scope, representation);
+//
+//          inputs.push_back(lastStream);
+//          inputsMin.push_back(1);
+//          inputsMax.push_back(1);
+//          outputs.push_back(stream);
+//          outputsMin.push_back(1);
+//          outputsMax.push_back(1);
+//
+//          for (int j = 0; j < nodes; j++)
+//          {
+//            metadatas.clear();
+//            metadataValues.clear();
+//            metadataValues2.clear();
+//            metadataGroundings.clear();
+//
+//            ss.str("");
+//            ss << "EvalNode" << j << "_" << i;
+//            std::string node = ss.str();
+//            if (i == 0)
+//            {
+//              //            if (j < 1)
+//              //            {
+//              oi.addSourceNodeClass(node, outputs, outputsMin, outputsMax);
+//
+//              metadatas.push_back("Delay");
+//              metadataValues.push_back(1);
+//              metadataValues2.push_back(0);
+//              metadataGroundings.push_back("NodeDelayFixASPGrounding");
+//              //            metadatas.push_back("Cost");
+//              //            metadataValues.push_back(1);
+//              //            metadataValues2.push_back(1);
+//              //            metadataGroundings.push_back("NodeCostASPGrounding");
+//              metadatas.push_back("Accuracy");
+//              metadataValues.push_back(nodesMax - j);
+//              metadataValues2.push_back(0);
+//              metadataGroundings.push_back("NodeAccuracyFixASPGrounding");
+//
+//              oi.addNodeIndividual(node + "Ind", node, system, entity, "", metadatas, metadataValues, metadataValues2,
+//                                   metadataGroundings);
+//              //            }
+//            }
+//            else // if (j < 1)
+//            {
+//              oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
+//
+//              metadatas.push_back("Delay");
+//              metadataValues.push_back(1);
+//              metadataValues2.push_back(0);
+//              metadataGroundings.push_back("NodeDelayASPGrounding");
+//              //            metadatas.push_back("Cost");
+//              //            metadataValues.push_back(1);
+//              //            metadataValues2.push_back(1);
+//              //            metadataGroundings.push_back("NodeCostASPGrounding");
+//              metadatas.push_back("Accuracy");
+//              metadataValues.push_back(nodesMax - j);
+//              metadataValues2.push_back(0);
+//              metadataGroundings.push_back("NodeAccuracyMaxASPGrounding");
+//
+//              // TODO fix
+//              oi.addNodeIndividual(node + "Ind", node, system, "", "", metadatas, metadataValues, metadataValues2,
+//                                   metadataGroundings);
+//            }
+//          }
+//        }
+//
+//        ss.str("");
+//        ss << "EvalStream" << chainSize << "_" << chainSize - 1;
+//        std::string stream = ss.str();
+//        std::string reqStream = "Req" + stream;
+//        oi.addRequiredStream(reqStream, stream, system, entity, "");
 
         ss.str("");
         ss << "/tmp/chainScenario_" << (global ? "global" : "local") << chainSize << "_" << nodes << ".owl";
         std::string fileName = ss.str();
-        oi.saveOntology(fileName);
+//        oi.saveOntology(fileName);
 
         ModelGeneration mg(path);
 
@@ -503,7 +503,13 @@ public:
                                     //              asp->setHeuristic("Domain");
                                   });
 
-        result.print();
+
+        // Ram Eval Stuff
+        std::cout << result.avg.ramUsageBeforeMax << "\t" << result.avg.ramUsageMax << "\t"
+            << result.avg.javaRamUsageBeforeMax << "\t" << result.avg.javaRamUsageMax << std::endl;
+
+        if (verbose)
+          result.print();
 
         // print to file
         file << chainSize << "\t";
@@ -671,10 +677,10 @@ public:
 
       oi.addSourceNodeClass(node, outputs, outputsMin, outputsMax);
 
-//        metadatas.push_back("Delay");
-//        metadataValues.push_back(5);
-//        metadataValues2.push_back(5);
-//        metadataGroundings.push_back("NodeDelayFixASPGrounding");
+        metadatas.push_back("Delay");
+        metadataValues.push_back(5);
+        metadataValues2.push_back(5);
+        metadataGroundings.push_back("NodeDelayFixASPGrounding");
       metadatas.push_back("Cost");
       metadataValues.push_back(1);
       metadataValues2.push_back(0);
@@ -993,10 +999,14 @@ public:
 
             oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
 
-            metadatas.push_back("Cost");
+            metadatas.push_back("Delay");
             metadataValues.push_back(1);
-            metadataValues2.push_back(0);
-            metadataGroundings.push_back("NodeCostASPGrounding");
+            metadataValues2.push_back(1);
+            metadataGroundings.push_back("NodeDelayASPGrounding");
+//            metadatas.push_back("Cost");
+//            metadataValues.push_back(1);
+//            metadataValues2.push_back(0);
+//            metadataGroundings.push_back("NodeCostASPGrounding");
             metadatas.push_back("Accuracy");
             metadataValues.push_back(1);
             metadataValues2.push_back(2);
@@ -1027,10 +1037,14 @@ public:
 
             oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
 
-            metadatas.push_back("Cost");
+            metadatas.push_back("Delay");
             metadataValues.push_back(1);
-            metadataValues2.push_back(0);
-            metadataGroundings.push_back("NodeCostASPGrounding");
+            metadataValues2.push_back(1);
+            metadataGroundings.push_back("NodeDelayASPGrounding");
+//            metadatas.push_back("Cost");
+//            metadataValues.push_back(1);
+//            metadataValues2.push_back(0);
+//            metadataGroundings.push_back("NodeCostASPGrounding");
             metadatas.push_back("Accuracy");
             metadataValues.push_back(5);
             metadataValues2.push_back(0);
@@ -1862,12 +1876,7 @@ public:
           //        asp->setModelCount(0);
           });
 
-        // Ram Eval Stuff
-        std::cout << result.ramUsageBeforeMaxVar << "\t" << result.ramUsageMaxVar << "\t"
-            << result.javaRamUsageBeforeMaxVar << "\t" << result.javaRamUsageMaxVar;
-
-        if (verbose)
-          result.print();
+        result.print();
 
         // print to file
         file << systems << "\t";

@@ -72,10 +72,10 @@ void evalGeneration(int argc, char **argv)
     asp->setRandomize("20,15");
   });
   //                                 global      verbose gnuplot         runs
-//  scenarios2.fuseVictimsScenario(    true,       false,  false,          runs,      false, 10, 100, 10);
+//  scenarios2.fuseVictimsScenario(    true,       true,  false,          runs,      false, 10, 100, 10);
 //  scenarios2.fuseVictimsScenario(    true,       false,  false,          runs,      false, 6, 20, 2);
-//  scenarios2.representationScenario( true,       false,  false,          runs,      2, 12, 1);
-  scenarios2.chainScenario(          true,       false,  false,          runs,      1, 20, 1, 10, 10, 1);
+//  scenarios2.representationScenario( true,       true,  false,          runs,      2, 12, 1);
+  scenarios2.chainScenario(          true,       false,  false,          runs,      index, index, 1, 10, 10, 1);
 //  scenarios2.chainScenario(          false,      false,  false,          runs,      1, 20, 1, 10, 10, 1);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 10, 10, 10);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 20, 20, 10);
