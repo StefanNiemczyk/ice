@@ -1,0 +1,2 @@
+2016-11-21 08:06:22,947 FATAL [default] CRASH HANDLED; Application has crashed due to [SIGINT] signal
+2016-11-21 08:06:22,947 WARN  [default] Aborting application. Reason: Fatal log at [/home/sni/pjx/catkin_ws/src/ice/ice/include/easylogging++.h:5587]

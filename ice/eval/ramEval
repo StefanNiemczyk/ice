@@ -1,0 +1,28 @@
+#!/bin/bash
+# Functions and parameters
+
+result="/home/sni/Desktop/eval/"
+configRoot="/home/sni/pjx/catkin_ws/src/ice/ice/test/data/asp_ram_test/"
+exce="../../../../devel/lib/ice/eval_node"
+runs=50
+
+testConfig () {
+	echo "==================== $1 ===================="
+	index=$1
+	config="${configRoot}chainScenario_global10_$index.lp"
+	saveFile="${result}ram_eval_$index.txt"
+
+	echo "$config"
+	echo "$saveFile"
+
+ 	for i in `seq 1 $runs`; do
+		eval $exce $index >> $saveFile
+	done
+
+   return 0
+}
+
+
+for i in `seq 1 5`; do
+	testConfig $i
+done

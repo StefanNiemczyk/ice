@@ -1,27 +1,78 @@
-#include <gtest/gtest.h>
-#include <ClingWrapper.h>
-#include "EvalScenarios.cpp"
+/*
+ * eval_node.cpp
+ *
+ *  Created on: Nov 21, 2016
+ *      Author: sni
+ */
+
+#include "ros/ros.h"
+#include <ros/package.h>
+#include <iostream>
+
 #include "MemoryMonitor.h"
+#include "ClingWrapper.h"
+#include "EvalScenarios.cpp"
 
-using namespace std;
+void evalRam(int argc, char **argv)
+{
+  assert(argc == 2 && "Error: wrong size of arguments " + argc);
 
-TEST(EvalModelGeneration, simpleEvalTests)
+  int index = std::stoi(argv[1]);
+
+  auto mm = MemoryManager::getInstance();
+  mm->start();
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  double ram = mm->getMemoryUsage().residentSetMax;
+  double java = mm->getMemoryUsage().javaRamUsageMax;
+
+  std::string path = ros::package::getPath("ice");
+  bool global = true;
+  std::string fileName = "chainScenario_global" + std::to_string(index) + "_10.lp";
+
+  // Initializing ASP
+  supplementary::ClingWrapper asp;
+
+  asp.addKnowledgeFile(path + "/asp/informationProcessing/processing.lp");
+  asp.addKnowledgeFile(path + "/asp/informationProcessing/searchBottomUp.lp");
+  if (global)
+    asp.addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
+  else
+    asp.addKnowledgeFile(path + "/asp/informationProcessing/localOptimization.lp");
+
+  asp.addKnowledgeFile(path + "/eval/asp_ram_test/" + fileName);
+
+  asp.setNoWarnings(true);
+  asp.init();
+
+  auto lastQuery = asp.getExternal("query", {1}, "query", {1, 3, 10}, true);
+
+  asp.ground("query", {1});
+  asp.solve();
+
+  std::cout << mm->getMemoryUsage().residentSetMax << "\t" << ram << std::endl;
+
+  mm->stop();
+}
+
+void evalGeneration(int argc, char **argv)
 {
   std::string path = "/home/sni/Desktop/eval";
-  int runs = 50;
+  int runs = 1;
 
 //  MemoryManager::getInstance()->start();
 
-  EvalScenarios scenarios2(path + "", true, [&] (supplementary::ClingWrapper *asp){
+  EvalScenarios scenarios2(path + "", false, [&] (supplementary::ClingWrapper *asp){
     asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
     asp->setRandomize("20,15");
   });
   //                                 global      verbose gnuplot         runs
-  scenarios2.fuseVictimsScenario(    true,       false,  false,          runs,      false, 10, 100, 10);
+//  scenarios2.fuseVictimsScenario(    true,       false,  false,          runs,      false, 10, 100, 10);
 //  scenarios2.fuseVictimsScenario(    true,       false,  false,          runs,      false, 6, 20, 2);
 //  scenarios2.representationScenario( true,       false,  false,          runs,      2, 12, 1);
-//  scenarios2.chainScenario(          true,       false,  false,          runs,      10, 10, 1, 1, 10, 1);
-//  scenarios2.chainScenario(          false,      false,  false,          runs,      10, 10, 1, 1, 10, 1);
+  scenarios2.chainScenario(          true,       false,  false,          runs,      1, 20, 1, 10, 10, 1);
+//  scenarios2.chainScenario(          false,      false,  false,          runs,      1, 20, 1, 10, 10, 1);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 10, 10, 10);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 20, 20, 10);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 30, 30, 10);
@@ -71,5 +122,14 @@ TEST(EvalModelGeneration, simpleEvalTests)
 //  conf.skipLevel = false;
 //  scenariosT.transformation(false, true, runs, 50, conf);
 
-  int dead = 5 / 0;
+//  int dead = 5 / 0;
+  MemoryManager::getInstance()->stop();
+}
+
+int main(int argc, char **argv)
+{
+//  evalRam(argc, argv);
+  evalGeneration(argc, argv);
+
+  return 0;
 }

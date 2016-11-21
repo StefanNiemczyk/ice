@@ -169,18 +169,27 @@ target_link_libraries(ice_node
   ${JNI_LIBRARIES}
 )
 
+## Eval Stuff
+add_executable(eval_node
+  eval/eval_node.cpp
+  eval/ModelGeneration.cpp
+  eval/EvalScenarios.cpp
+ )
+ 
+target_link_libraries(eval_node
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${TinyXML_LIBRARIES}
+  ${JNI_LIBRARIES}
+)
+
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-catkin_add_gtest(${PROJECT_NAME}-test 
-  test/eval/eval_ModelGeneration.cpp
-  test/eval/ModelGeneration.cpp
-  test/eval/EvalScenarios.cpp
- # test/eval/eval_ASPMemory.cpp
- # test/eval/eval_AccessSpeed.cpp
- 
+catkin_add_gtest(${PROJECT_NAME}-test  
  # test/etc/EngineStuff.cpp
  # test/test_ASPCoordinator.cpp
  # test/test_JNI.cpp
