@@ -730,15 +730,15 @@ public:
     endAsp = std::chrono::system_clock::now();
 
     // unanticipated
-    start = std::chrono::system_clock::now();
-    startAsp = std::chrono::system_clock::now();
-    toDisable->external->assign(false);
-
-    // Solving
-    solveResult = asp.solve();
-    endAsp = std::chrono::system_clock::now();
-
-    end = std::chrono::system_clock::now();
+//    start = std::chrono::system_clock::now();
+//    startAsp = std::chrono::system_clock::now();
+////    toDisable->external->assign(false);
+//
+//    // Solving
+//    solveResult = asp.solve();
+//    endAsp = std::chrono::system_clock::now();
+//
+//    end = std::chrono::system_clock::now();
 
     result.successful = true;
     result.totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
