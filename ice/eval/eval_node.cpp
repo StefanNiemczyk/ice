@@ -58,9 +58,10 @@ void evalRam(int argc, char **argv)
 
 void evalGeneration(int argc, char **argv)
 {
-  assert(argc == 2 && "Error: wrong size of arguments " + argc);
+  assert(argc == 3 && "Error: wrong size of arguments " + argc);
 
   int index = std::stoi(argv[1]);
+  bool generateOwl = std::stoi(argv[2]);
 
   std::string path = "/home/sni/Desktop/eval";
 //  std::string path = "/home/pi/eval";
@@ -76,7 +77,7 @@ void evalGeneration(int argc, char **argv)
 //  scenarios2.fuseVictimsScenario(    true,       false,  false,          runs,      false, 100, 100, 10);
 //  scenarios2.fuseVictimsScenario(    true,       false,  false,          runs,      false, 6, 20, 2);
 //  scenarios2.representationScenario( true,       true,  false,          runs,      2, 12, 1);
-  scenarios2.chainScenario(          true,       false,  false,          runs,      index, index, 1, 10, 10, 1, true);
+  scenarios2.chainScenario(          true,       false,  false,          runs,      index, index, 1, 10, 10, 1, generateOwl);
 //  scenarios2.chainScenario(          false,      false,  false,          runs,      1, 20, 1, 10, 10, 1);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 10, 10, 10);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 20, 20, 10);
