@@ -174,6 +174,8 @@ private:
 
 class ModelGeneration
 {
+public:
+  int index;
 private:
   std::string path;
   bool testRepresentations;
@@ -532,6 +534,8 @@ public:
       }
     }
 
+    std::shared_ptr<ice::ASPElement> toDisable;
+
     if (false == this->testRepresentations)
     {
     //
@@ -660,6 +664,12 @@ public:
              element->external = asp.getExternal(*value.name(), value.args());
              element->external->assign(true);
 
+             // stuff szenario 2
+             if (element->name == "o0_EvalNode" + std::to_string(index) + "SourceInd")
+             {
+               toDisable = element;
+             }
+
              asp.add(element->name, {}, element->aspString);
              if (mm->isActive())
              {
@@ -717,6 +727,15 @@ public:
     if (solve)
       solveResult = asp.solve();
 //    std::cout << "ASP done" << std::endl;
+    endAsp = std::chrono::system_clock::now();
+
+    // unanticipated
+    start = std::chrono::system_clock::now();
+    startAsp = std::chrono::system_clock::now();
+    toDisable->external->assign(false);
+
+    // Solving
+    solveResult = asp.solve();
     endAsp = std::chrono::system_clock::now();
 
     end = std::chrono::system_clock::now();

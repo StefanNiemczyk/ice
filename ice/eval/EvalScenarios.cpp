@@ -999,14 +999,14 @@ public:
 
             oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
 
-            metadatas.push_back("Delay");
-            metadataValues.push_back(1);
-            metadataValues2.push_back(1);
-            metadataGroundings.push_back("NodeDelayASPGrounding");
-//            metadatas.push_back("Cost");
-//            metadataValues.push_back(1);
+//            metadatas.push_back("Delay");
+//            metadataValues.push_back(10);
 //            metadataValues2.push_back(0);
-//            metadataGroundings.push_back("NodeCostASPGrounding");
+//            metadataGroundings.push_back("NodeDelayASPGrounding");
+            metadatas.push_back("Cost");
+            metadataValues.push_back(1);
+            metadataValues2.push_back(0);
+            metadataGroundings.push_back("NodeCostASPGrounding");
             metadatas.push_back("Accuracy");
             metadataValues.push_back(1);
             metadataValues2.push_back(2);
@@ -1037,14 +1037,14 @@ public:
 
             oi.addComputationNodeClass(node, inputs, inputsMin, inputsMax, outputs, outputsMin, outputsMax);
 
-            metadatas.push_back("Delay");
-            metadataValues.push_back(1);
-            metadataValues2.push_back(1);
-            metadataGroundings.push_back("NodeDelayASPGrounding");
-//            metadatas.push_back("Cost");
+//            metadatas.push_back("Delay");
 //            metadataValues.push_back(1);
 //            metadataValues2.push_back(0);
-//            metadataGroundings.push_back("NodeCostASPGrounding");
+//            metadataGroundings.push_back("NodeDelayASPGrounding");
+            metadatas.push_back("Cost");
+            metadataValues.push_back(1);
+            metadataValues2.push_back(0);
+            metadataGroundings.push_back("NodeCostASPGrounding");
             metadatas.push_back("Accuracy");
             metadataValues.push_back(5);
             metadataValues2.push_back(0);
@@ -1071,6 +1071,10 @@ public:
             metadataValues.push_back(1);
             metadataValues2.push_back(0);
             metadataGroundings.push_back("NodeCostASPGrounding");
+//            metadatas.push_back("Delay");
+//            metadataValues.push_back(1);
+//            metadataValues2.push_back(0);
+//            metadataGroundings.push_back("NodeDelayASPGrounding");
 
             oi.addNodeIndividual(node + "SourceInd", "EvalNodeSource", system, entity, "", metadatas, metadataValues,
                                  metadataValues2, metadataGroundings);
@@ -1101,14 +1105,18 @@ public:
         if (global)
         {
           ss.str("");
+//          ss
+//              << "metadataStream(1,accuracy,stream(1,o0_EvalSystem0,node(1,o0_EvalSystem0,o0_SmoothingEvalNodeInd,o0_EvalEntity,none),"
+//               << "information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),4),"
+//               << (min(systems-1,5)*2 + 5 + 1 + systems - min(systems-1,5)) << ")";
           ss
               << "metadataStream(1,accuracy,stream(1,o0_EvalSystem0,node(1,o0_EvalSystem0,o0_SmoothingEvalNodeInd,o0_EvalEntity,none),"
                << "information(o0_EvalEntity,o0_EvalScope,o0_ReqRepresentation,none),4),"
-               << (min(systems-1,5)*2 + 5 + 1 + systems - min(systems-1,5)) << ")";
+               << (min(systems-1,5)*2 + 5 + 1 + systems - min(systems-1,5) -1) << ")";
           toCheck.push_back(ss.str());
         }
 
-        for (int i = systems - min(5, systems-1); i < systems; ++i)
+        for (int i = systems - 1 - min(5, systems-1); i < systems-1; ++i)
         {
           ss.str("");
           ss << "stream(1,o0_EvalSystem0,node(1,o0_EvalSystem" << i << ",o0_EvalNode" << i
@@ -1123,6 +1131,9 @@ public:
         //          ss.str("");
         //          ss << "sumMetadata(1,cost," << inputsCount + 1 << ")";
         //          toCheck.push_back(ss.str());
+
+        mg.index = systems-1;
+
 
         auto result = mg.testSeries(
             fileName, &toCheck, runs, this->warmUp, global, verbose, 3, 10, [&] (supplementary::ClingWrapper *asp)

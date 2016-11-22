@@ -58,24 +58,25 @@ void evalRam(int argc, char **argv)
 
 void evalGeneration(int argc, char **argv)
 {
-  assert(argc == 2 && "Error: wrong size of arguments " + argc);
-
-  int index = std::stoi(argv[1]);
+//  assert(argc == 2 && "Error: wrong size of arguments " + argc);
+//
+//  int index = std::stoi(argv[1]);
 
   std::string path = "/home/sni/Desktop/eval";
-  int runs = 1;
+//  std::string path = "/home/pi/eval";
+  int runs = 50;
 
-  MemoryManager::getInstance()->start();
+//  MemoryManager::getInstance()->start();
 
-  EvalScenarios scenarios2(path + "", false, [&] (supplementary::ClingWrapper *asp){
+  EvalScenarios scenarios2(path + "", true, [&] (supplementary::ClingWrapper *asp){
     asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
     asp->setRandomize("20,15");
   });
   //                                 global      verbose gnuplot         runs
-//  scenarios2.fuseVictimsScenario(    true,       true,  false,          runs,      false, 10, 100, 10);
+  scenarios2.fuseVictimsScenario(    true,       false,  false,          runs,      false, 10, 100, 10);
 //  scenarios2.fuseVictimsScenario(    true,       false,  false,          runs,      false, 6, 20, 2);
 //  scenarios2.representationScenario( true,       true,  false,          runs,      2, 12, 1);
-  scenarios2.chainScenario(          true,       false,  false,          runs,      index, index, 1, 10, 10, 1);
+//  scenarios2.chainScenario(          true,       false,  false,          runs,      index, index, 1, 10, 10, 1);
 //  scenarios2.chainScenario(          false,      false,  false,          runs,      1, 20, 1, 10, 10, 1);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 10, 10, 10);
 //  scenarios2.islandScenario(         true,       false,  false,          runs,      2, 10, 1, 20, 20, 10);
