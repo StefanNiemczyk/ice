@@ -228,14 +228,17 @@ public:
       file << result.numberSuccessful << "\t";
       file << result.avg.totalTime << "\t" << result.totalTimeVar << "\t" << result.best.totalTime << "\t"
           << result.worst.totalTime << "\t";
+      // 9
       file << result.avg.ontologyReadTime << "\t" << result.ontologyReadTimeVar << "\t" << result.best.ontologyReadTime
           << "\t" << result.worst.ontologyReadTime << "\t";
       file << result.avg.ontologyReasonerTime << "\t" << result.ontologyReasonerTimeVar << "\t"
           << result.best.ontologyReasonerTime << "\t" << result.worst.ontologyReasonerTime << "\t";
       file << result.avg.ontologyToASPTime << "\t" << result.ontologyToASPTimeVar << "\t" << result.best.ontologyToASPTime
           << "\t" << result.worst.ontologyToASPTime << "\t";
+      // 22
       file << result.avg.aspGroundingTime << "\t" << result.aspGroundingTimeVar << "\t" << result.best.aspGroundingTime
           << "\t" << result.worst.aspGroundingTime << "\t";
+      // 26
       file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
           << result.worst.aspSolvingTime << "\t";
       file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime << "\t"

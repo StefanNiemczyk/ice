@@ -738,8 +738,8 @@ public:
 //    // Solving
 //    solveResult = asp.solve();
 //    endAsp = std::chrono::system_clock::now();
-//
-//    end = std::chrono::system_clock::now();
+
+    end = std::chrono::system_clock::now();
 
     result.successful = true;
     result.totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
@@ -766,19 +766,26 @@ public:
       result.javaRamUsageMax = mu.javaRamUsageMax;
       mm->resetOntologyInterface();
     }
+    else
+    {
+      result.ramUsageBeforeMax = 0;
+      result.ramUsageMax = 0;
+      result.javaRamUsageBeforeMax = 0;
+      result.javaRamUsageMax = 0;
+    }
 
     if (solve)
     {
       if (solveResult == Gringo::SolveResult::SAT)
       {
-        if (verbose)
-        {
-          asp.printLastModel(false);
-          ofstream file;
-          file.open("/tmp/tut.txt");
-          file << asp.toStringLastModel(true);
-          file.close();
-        }
+//        if (verbose)
+//        {
+//          asp.printLastModel(false);
+//          ofstream file;
+//          file.open("/tmp/tut.txt");
+//          file << asp.toStringLastModel(true);
+//          file.close();
+//        }
 
         bool first = true;
 

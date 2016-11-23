@@ -125,7 +125,7 @@ void evalSynthesis(int argc, char **argv)
     conf.inputsMin = 1;
     conf.inputsMax = 4;
     conf.skipLevel = false;
-    scenariosT.transformation(false, false, runs, 50, conf);
+    scenariosT.transformation(true, false, runs, 50, conf);
   }
 
   conf.parallelGroupsMin = 50;
@@ -135,7 +135,7 @@ void evalSynthesis(int argc, char **argv)
   conf.inputsMin = 1;
   conf.inputsMax = 4;
   conf.skipLevel = false;
-  scenariosT.transformation(false, true, runs, 50, conf);
+  scenariosT.transformation(true, false, runs, 50, conf);
 }
 
 int main(int argc, char **argv)
