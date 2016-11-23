@@ -65,11 +65,12 @@ void evalGeneration(int argc, char **argv)
 
   std::string path = "/home/sni/Desktop/eval";
 //  std::string path = "/home/pi/eval";
-  int runs = 50;
+  int runs = 1;
 
-  MemoryManager::getInstance()->start();
+  if (false == generateOwl)
+    MemoryManager::getInstance()->start();
 
-  EvalScenarios scenarios2(path + "", true, [&] (supplementary::ClingWrapper *asp){
+  EvalScenarios scenarios2(path + "", false, [&] (supplementary::ClingWrapper *asp){
     asp->setPredefConfiguration(supplementary::PredefinedConfigurations::tweety);
     asp->setRandomize("20,15");
   });
@@ -100,41 +101,48 @@ void evalGeneration(int argc, char **argv)
 //  scenarios.systemsFullMashScenario( false,      false,  false,          runs,      10, 20, 1);
 //  scenarios.chainScenario(           false,      false,  false,          runs,      10, 10, 1, 1, 10, 1);
 
-
-//  runs = 1;
-//  EvalScenarios scenariosT(path + "", [&] (supplementary::ClingWrapper *asp){
-//    asp->setPredefConfiguration(supplementary::PredefinedConfigurations::trendy);
-//  });
-//  TConf conf;
-//  for (int i=50; i<=400; i+=50)
-//  {
-//    conf.parallelGroupsMin = 1;
-//    conf.parallelGroupsMax = 1;
-//    conf.parallelGrounsStep = 1;
-//    conf.levels = {10,i};
-//    conf.inputsMin = 1;
-//    conf.inputsMax = 4;
-//    conf.skipLevel = false;
-//    scenariosT.transformation(false, false, runs, 50, conf);
-//  }
-
-//  TConf conf;
-//  conf.parallelGroupsMin = 50;
-//  conf.parallelGroupsMax = 300;
-//  conf.parallelGrounsStep = 50;
-//  conf.levels = {10,10};
-//  conf.inputsMin = 1;
-//  conf.inputsMax = 4;
-//  conf.skipLevel = false;
-//  scenariosT.transformation(false, true, runs, 50, conf);
-
   MemoryManager::getInstance()->stop();
+}
+
+void evalSynthesis(int argc, char **argv)
+{
+//  std::string path = "/home/sni/Desktop/eval";
+  std::string path = "/home/pi/eval";
+  int runs = 1;
+
+  EvalScenarios scenariosT(path + "", true, [&] (supplementary::ClingWrapper *asp)
+  {
+    asp->setPredefConfiguration(supplementary::PredefinedConfigurations::trendy);
+    asp->setRandomize("20,15");
+  });
+  TConf conf;
+  for (int i = 50; i <= 400; i += 50)
+  {
+    conf.parallelGroupsMin = 1;
+    conf.parallelGroupsMax = 1;
+    conf.parallelGrounsStep = 1;
+    conf.levels = { 10,i};
+    conf.inputsMin = 1;
+    conf.inputsMax = 4;
+    conf.skipLevel = false;
+    scenariosT.transformation(false, false, runs, 50, conf);
+  }
+
+  conf.parallelGroupsMin = 50;
+  conf.parallelGroupsMax = 300;
+  conf.parallelGrounsStep = 50;
+  conf.levels = { 10,10};
+  conf.inputsMin = 1;
+  conf.inputsMax = 4;
+  conf.skipLevel = false;
+  scenariosT.transformation(false, true, runs, 50, conf);
 }
 
 int main(int argc, char **argv)
 {
 //  evalRam(argc, argv);
-  evalGeneration(argc, argv);
+//  evalGeneration(argc, argv);
+  evalSynthesis(argc, argv);
 
   return 0;
 }
