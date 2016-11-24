@@ -116,7 +116,7 @@ void evalSynthesis(int argc, char **argv)
     asp->setRandomize("20,15");
   });
   TConf conf;
-  for (int i = 400; i <= 400; i += 50)
+  for (int i = 300; i <= 400; i += 50)
   {
     conf.parallelGroupsMin = 1;
     conf.parallelGroupsMax = 1;
@@ -125,7 +125,7 @@ void evalSynthesis(int argc, char **argv)
     conf.inputsMin = 1;
     conf.inputsMax = 4;
     conf.skipLevel = false;
-    scenariosT.transformation(true, false, runs, 1, conf);
+    scenariosT.transformation(true, false, runs, 50, conf);
   }
 
   conf.parallelGroupsMin = 50;
@@ -135,7 +135,7 @@ void evalSynthesis(int argc, char **argv)
   conf.inputsMin = 1;
   conf.inputsMax = 4;
   conf.skipLevel = false;
-  scenariosT.transformation(true, false, runs, 1, conf);
+  scenariosT.transformation(true, false, runs, 50, conf);
 }
 
 int main(int argc, char **argv)
