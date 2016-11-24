@@ -51,10 +51,6 @@ TEST(ASPRepComp, simple)
   EXPECT_EQ(true, cw->query("fixed(simRep(position,coords2D,coords),z,floatRep,default)"));
   EXPECT_EQ(true, cw->query("autoTrans(position,coords2D,coords)"));
 
-  EXPECT_EQ(true, cw->query("match(simRep(position,coords2D,coords),x,floatRep)"));
-  EXPECT_EQ(true, cw->query("match(simRep(position,coords2D,coords),y,floatRep)"));
-  EXPECT_EQ(false, cw->query("match(simRep(position,coords2D,coords),z,floatRep)"));
-
   EXPECT_EQ(false, cw->query("autoTrans(position,relCoords,coords)"));
 
   EXPECT_EQ(true, cw->query("simpleTrans(coords2Wgs84,velocity,vel1,vel2)"));

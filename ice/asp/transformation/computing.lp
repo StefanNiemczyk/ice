@@ -17,10 +17,6 @@ simpleRep(REP) :-
 	representation(REP),
 	not -simpleRep(REP).
 
-% stuff 
-%hasDimension(REP1,DIM,DIM_REP) :-
-%	hasDimension(REP1,DIM,DIM_REP,MIN,MAX).
-
 % determine similar representations
 simRep(SCOPE,REP1,REP2) :-
 	simpleRep(REP1),
@@ -31,10 +27,18 @@ simRep(SCOPE,REP1,REP2) :-
 	REP1 != REP2.
 
 % dimension matching
-match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP) :-
-	autoTrans(SCOPE,REP1,REP2),
-	hasDimension(REP1,DIM,DIM_REP),
-	hasDimension(REP2,DIM,DIM_REP).
+%match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP) :-
+%	autoTrans(SCOPE,REP1,REP2),
+%	hasDimension(REP1,DIM,DIM_REP),
+%	hasDimension(REP2,DIM,DIM_REP).
+
+
+%% try to fix if at least one dimension is matching
+tryFix(simRep(SCOPE,REP1,REP2)) :-
+	simRep(SCOPE,REP1,REP2),
+	hasDimension(REP1,DIM,_),
+	hasDimension(REP2,DIM,_),
+	not simpleTrans(_,SCOPE,REP1,REP2).
 
 
 %% diviations
@@ -45,40 +49,15 @@ dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,missing) :-
 	hasDimension(REP1,DIM,DIM_REP),
 	not hasDimension(REP2,DIM,DIM_REP).
 
-%dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,missing) :-
-%	tryFix(simRep(SCOPE,REP1,REP2)),
-%	hasDimension(REP1,DIM,DIM_REP,COUNT1,COUNT1),
-%	hasDimension(REP2,DIM,DIM_REP,COUNT2,COUNT2),
-%	COUNT2 < COUNT1.
-
 % missing dimension in source representation
 dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,empty) :-
 	tryFix(simRep(SCOPE,REP1,REP2)),
 	not hasDimension(REP1,DIM,DIM_REP),
 	hasDimension(REP2,DIM,DIM_REP).
 
-dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,empty) :-
-	tryFix(simRep(SCOPE,REP1,REP2)),
-	hasDimension(REP1,DIM,DIM_REP,COUNT1,COUNT1),
-	hasDimension(REP2,DIM,DIM_REP,COUNT2,COUNT2),
-	COUNT1 < COUNT2.
 
-% try to fix if at least 50% dimensions are matching
-tryFix(simRep(SCOPE,REP1,REP2)) :-
-	simRep(SCOPE,REP1,REP2),
-%	hasDimension(REP1,DIM,DIM_REP,MIN,MAX),
-%	hasDimension(REP2,DIM,DIM_REP,MIN,MAX),
-%	hasDimension(REP1,DIM,_,_,_),
-%	hasDimension(REP2,DIM,_,_,_),
-	hasDimension(REP1,DIM,_),
-	hasDimension(REP2,DIM,_),
-	not simpleTrans(_,SCOPE,REP1,REP2).%,
-%	match(simRep(SCOPE,REP1,REP2),_,_).
-	%MATCHING = #count{DIM,DIM_REP : match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP)},
-	%MATCHING > 0.
+%% fixes
 
-
-% fixes
 % using exisitng transformation to transform dimensions
 { useTrans(simRep(SCOPE,REP1,REP2),SCOPE,REP_SOURCE,REP_TARGET,NODE) } :-
 	tryFix(simRep(SCOPE,REP1,REP2)),
@@ -131,6 +110,7 @@ fixCost(SIM_REP,fixed(SIM_REP,DIM,DIM_REP,default),5) :-
 	fixed(SIM_REP,DIM,DIM_REP,default).
 
 
+% identify generated transformations
 -fixed(SIM_REP) :-
 	not fixed(SIM_REP,DIM,DIM_REP,_), 
 	dimensionDeviation(SIM_REP,DIM,DIM_REP,_).
@@ -139,11 +119,12 @@ autoTrans(SCOPE,REP1,REP2) :-
 	tryFix(simRep(SCOPE,REP1,REP2)),
 	not -fixed(simRep(SCOPE,REP1,REP2)).
 
+
 % maximize the number of created auto transformations
 #maximize{ 1@2,SCOPE,REP1,REP2 : autoTrans(SCOPE,REP1,REP2) }.
 
 % minimize the number of fixing steps
-#minimize{ COST@1,SIM_REP,FIX : fixCost(SIM_REP,FIX,COST) }.
+#minimize{ COST@1,SCOPE,REP1,REP2,FIX : fixCost(simRep(SCOPE,REP1,REP2),FIX,COST), autoTrans(SCOPE,REP1,REP2) }.
 
 
 

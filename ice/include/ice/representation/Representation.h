@@ -79,6 +79,7 @@ private:
     {
       if (this->dimensionNames.at(i) == dimensions->at(index))
       {
+
         auto dim = this->dimensions.at(i);
         path->push_back(i);
 

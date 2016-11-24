@@ -207,48 +207,48 @@ bool ASPTransformationGeneration::extractOperations(supplementary::ClingWrapper 
 
   // extract matches
   // match(simRep(SCOPE,REP1,REP2),DIM,REP)
-  values.push_back(simRep);
-  values.push_back("?");
-  values.push_back("?");
-
-  Gringo::Value matchQuery("match", values);
-  auto matchQueryResult = asp.queryAllTrue(&matchQuery);
-
-  for (auto match : *matchQueryResult)
-  {
-    auto matchingScope = this->ontology->toLongIri(*match.args()[1].name());
-
-    path.push_back(matchingScope);
-    auto pathSource = rep1->accessPath(path);
-    path.pop_back();
-
-    if (nullptr == pathSource)
-    {
-      _log->error(
-          "Unknown path '%v' to matching source dimension for transformation '%v', transformation can not be created",
-          matchingScope, transformation->getName());
-      return false;
-    }
-
-    path.push_back(matchingScope);
-    auto pathTarget = rep2->accessPath(path);
-    path.pop_back();
-
-    if (nullptr == pathTarget)
-    {
-      _log->error(
-          "Unknown path '%v' to matching target dimension for transformation '%v', transformation can not be created",
-          matchingScope, transformation->getName());
-      return false;
-    }
-
-    ice::TransformationOperation* o = new ice::TransformationOperation();
-    o->sourceIndex = 0;
-    o->sourceDimension = pathSource;
-    o->type = ice::TransformationOperationType::USE;
-    o->targetDimension = pathTarget;
-    transformation->getOperations().push_back(o);
-  }
+//  values.push_back(simRep);
+//  values.push_back("?");
+//  values.push_back("?");
+//
+//  Gringo::Value matchQuery("match", values);
+//  auto matchQueryResult = asp.queryAllTrue(&matchQuery);
+//
+//  for (auto match : *matchQueryResult)
+//  {
+//    auto matchingScope = this->ontology->toLongIri(*match.args()[1].name());
+//
+//    path.push_back(matchingScope);
+//    auto pathSource = rep1->accessPath(path);
+//    path.pop_back();
+//
+//    if (nullptr == pathSource)
+//    {
+//      _log->error(
+//          "Unknown path '%v' to matching source dimension for transformation '%v', transformation can not be created",
+//          matchingScope, transformation->getName());
+//      return false;
+//    }
+//
+//    path.push_back(matchingScope);
+//    auto pathTarget = rep2->accessPath(path);
+//    path.pop_back();
+//
+//    if (nullptr == pathTarget)
+//    {
+//      _log->error(
+//          "Unknown path '%v' to matching target dimension for transformation '%v', transformation can not be created",
+//          matchingScope, transformation->getName());
+//      return false;
+//    }
+//
+//    ice::TransformationOperation* o = new ice::TransformationOperation();
+//    o->sourceIndex = 0;
+//    o->sourceDimension = pathSource;
+//    o->type = ice::TransformationOperationType::USE;
+//    o->targetDimension = pathTarget;
+//    transformation->getOperations().push_back(o);
+//  }
 
   std::vector<std::string> diviations;
 
@@ -340,13 +340,65 @@ bool ASPTransformationGeneration::extractOperations(supplementary::ClingWrapper 
     Gringo::Value simRep("simRep", values);
 
     path.push_back(this->ontology->toLongIri(scope));
-
     bool resultExtract = this->extractOperations(asp, transformation, simRep, rep1, rep2, path);
+    path.pop_back();
 
     if (false == resultExtract)
       return false;
+  }
 
+  // use can only be applied to first level dimensions
+  if (path.size() > 0)
+    return true;
+
+  // compute use operation
+  for (auto dimension : rep2->dimensionNames)
+  {
+    bool found = false;
+    auto &ops = transformation->getOperations();
+
+    path.push_back(dimension);
+    auto pathTarget = rep2->accessPath(path);
     path.pop_back();
+
+    if (nullptr == pathTarget)
+    {
+      _log->error(
+          "Unknown path '%v' to matching target dimension for transformation '%v', transformation can not be created",
+          dimension, transformation->getName());
+      return false;
+    }
+
+    for (auto op : ops)
+    {
+      if (op->targetDimension[0] == pathTarget[0])
+      {
+        found = true;
+        break;
+      }
+    }
+
+    if (found)
+      continue;
+
+    path.push_back(dimension);
+    auto pathSource = rep1->accessPath(path);
+    path.pop_back();
+
+    if (nullptr == pathSource)
+    {
+      _log->error(
+          "Unknown path '%v' to matching source dimension for transformation '%v', transformation can not be created",
+          dimension, transformation->getName());
+      return false;
+    }
+
+    ice::TransformationOperation* o = new ice::TransformationOperation();
+    o->sourceIndex = 0;
+    o->sourceDimension = pathSource;
+    o->type = ice::TransformationOperationType::USE;
+    o->targetDimension = pathTarget;
+    ops.push_back(o);
   }
 
   return true;
