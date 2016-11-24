@@ -30,22 +30,22 @@ hasRepresentation(position,coords).
 hasRepresentation(position,coords2D).
 hasRepresentation(position,wgs84).
 
-hasRelatedDimension(relCoords,position,coords,1,1).
+hasRelatedDimension(relCoords,position,coords).
 
-hasDimension(relCoords,x,1,1).
-hasDimension(relCoords,y,1,1).
-hasDimension(relCoords,z,1,1).
+hasDimension(relCoords,x,floatRep).
+hasDimension(relCoords,y,floatRep).
+hasDimension(relCoords,z,floatRep).
 
-hasDimension(coords,x,floatRep,1,1).
-hasDimension(coords,y,floatRep,1,1).
-hasDimension(coords,z,floatRep,1,1).
+hasDimension(coords,x,floatRep).
+hasDimension(coords,y,floatRep).
+hasDimension(coords,z,floatRep).
 
-hasDimension(coords2D,x,floatRep,1,1).
-hasDimension(coords2D,y,floatRep,1,1).
+hasDimension(coords2D,x,floatRep).
+hasDimension(coords2D,y,floatRep).
 
-hasDimension(wgs84,lat,floatRep,1,1).
-hasDimension(wgs84,lon,floatRep,1,1).
-hasDimension(wgs84,alt,floatRep,1,1).
+hasDimension(wgs84,lat,floatRep).
+hasDimension(wgs84,lon,floatRep).
+hasDimension(wgs84,alt,floatRep).
 
 hasRepresentation(x,floatRep).
 hasRepresentation(y,floatRep).

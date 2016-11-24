@@ -12,5 +12,10 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "ice_engine_test");
   ::testing::InitGoogleTest(&argc, argv);
 
-  return RUN_ALL_TESTS();
+
+  int result = RUN_ALL_TESTS();
+
+  int kill = 5 / 0;
+
+  return result;
 }

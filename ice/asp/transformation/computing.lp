@@ -11,15 +11,15 @@ simpleTrans(NODE,SCOPE,REP1,REP2) :-
 
 -simpleRep(REP) :-
 	representation(REP),
-	hasRelatedDimension(REP,_,_,_,_).
+	hasRelatedDimension(REP,_,_).
 
 simpleRep(REP) :-
 	representation(REP),
 	not -simpleRep(REP).
 
 % stuff 
-hasDimension(REP1,DIM,DIM_REP) :-
-	hasDimension(REP1,DIM,DIM_REP,MIN,MAX).
+%hasDimension(REP1,DIM,DIM_REP) :-
+%	hasDimension(REP1,DIM,DIM_REP,MIN,MAX).
 
 % determine similar representations
 simRep(SCOPE,REP1,REP2) :-
@@ -45,11 +45,11 @@ dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,missing) :-
 	hasDimension(REP1,DIM,DIM_REP),
 	not hasDimension(REP2,DIM,DIM_REP).
 
-dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,missing) :-
-	tryFix(simRep(SCOPE,REP1,REP2)),
-	hasDimension(REP1,DIM,DIM_REP,COUNT1,COUNT1),
-	hasDimension(REP2,DIM,DIM_REP,COUNT2,COUNT2),
-	COUNT2 < COUNT1.
+%dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,missing) :-
+%	tryFix(simRep(SCOPE,REP1,REP2)),
+%	hasDimension(REP1,DIM,DIM_REP,COUNT1,COUNT1),
+%	hasDimension(REP2,DIM,DIM_REP,COUNT2,COUNT2),
+%	COUNT2 < COUNT1.
 
 % missing dimension in source representation
 dimensionDeviation(simRep(SCOPE,REP1,REP2),DIM,DIM_REP,empty) :-
@@ -68,8 +68,10 @@ tryFix(simRep(SCOPE,REP1,REP2)) :-
 	simRep(SCOPE,REP1,REP2),
 %	hasDimension(REP1,DIM,DIM_REP,MIN,MAX),
 %	hasDimension(REP2,DIM,DIM_REP,MIN,MAX),
-	hasDimension(REP1,DIM,_,_,_),
-	hasDimension(REP2,DIM,_,_,_),
+%	hasDimension(REP1,DIM,_,_,_),
+%	hasDimension(REP2,DIM,_,_,_),
+	hasDimension(REP1,DIM,_),
+	hasDimension(REP2,DIM,_),
 	not simpleTrans(_,SCOPE,REP1,REP2).%,
 %	match(simRep(SCOPE,REP1,REP2),_,_).
 	%MATCHING = #count{DIM,DIM_REP : match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP)},

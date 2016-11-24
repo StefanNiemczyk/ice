@@ -202,8 +202,8 @@ public class InfoStructureVisitor extends IceVisitor {
 			}
 		} else if (ce.getProperty().equals(this.ii.hasDimension)) {
 			if (ce.getFiller().isAnonymous()) {
-				this.createAnonymiousDimension(ce.getFiller(), this.ii.hasRepresentation,
-						"hasDimension(%s,%s,%s,%d,%d).\n", 1, 1);
+				this.createAnonymiousDimension(ce.getFiller(), this.ii.hasRepresentation, "hasDimension(%s,%s,%s).\n",
+						1, 1);
 			} else {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
@@ -224,7 +224,7 @@ public class InfoStructureVisitor extends IceVisitor {
 					sb.append(this.iRIShortName(c.getIRI()));
 					sb.append(',');
 					sb.append(repStr);
-					sb.append(",1,1).\n");
+					sb.append(").\n");
 
 					c.accept(this);
 				}
@@ -232,7 +232,7 @@ public class InfoStructureVisitor extends IceVisitor {
 		} else if (ce.getProperty().equals(this.ii.hasRelatedDimension)) {
 			if (ce.getFiller().isAnonymous()) {
 				this.createAnonymiousDimension(ce.getFiller(), this.ii.hasRepresentation,
-						"hasRelatedDimension(%s,%s,%s,%d,%d).\n", 1, 1);
+						"hasRelatedDimension(%s,%s,%s).\n", 1, 1);
 			} else {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
@@ -253,7 +253,7 @@ public class InfoStructureVisitor extends IceVisitor {
 					sb.append(this.iRIShortName(c.getIRI()));
 					sb.append(',');
 					sb.append(repStr);
-					sb.append(",1,1).\n");
+					sb.append(").\n");
 
 					c.accept(this);
 				}
@@ -318,8 +318,8 @@ public class InfoStructureVisitor extends IceVisitor {
 
 		if (ce.getProperty().equals(this.ii.hasDimension)) {
 			if (ce.getFiller().isAnonymous()) {
-				this.createAnonymiousDimension(ce.getFiller(), this.ii.hasRepresentation,
-						"hasDimension(%s,%s,%s,%d,%d).\n", ce.getCardinality(), ce.getCardinality());
+				this.createAnonymiousDimension(ce.getFiller(), this.ii.hasRepresentation, "hasDimension(%s,%s,%s).\n",
+						ce.getCardinality(), ce.getCardinality());
 			} else {
 				Set<OWLClass> subs = this.getAllLeafs(ce.getFiller().asOWLClass());
 
@@ -340,10 +340,6 @@ public class InfoStructureVisitor extends IceVisitor {
 					sb.append(this.iRIShortName(c.getIRI()));
 					sb.append(",");
 					sb.append(repStr);
-					sb.append(",");
-					sb.append(ce.getCardinality());
-					sb.append(",");
-					sb.append(ce.getCardinality());
 					sb.append(").\n");
 
 					c.accept(this);
@@ -410,7 +406,7 @@ public class InfoStructureVisitor extends IceVisitor {
 				// sb.append(String.format(p_axiom,
 				// this.lastRepresentation.getIRI(), anonymiousName, min, max));
 				sb.append(String.format(p_axiom, this.iRIShortName(this.lastRepresentation.getIRI()),
-						this.iRIShortName(class1.getIRI()), unit, min, max));
+						this.iRIShortName(class1.getIRI()), unit));
 			}
 		}
 

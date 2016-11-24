@@ -778,15 +778,6 @@ public:
     {
       if (solveResult == Gringo::SolveResult::SAT)
       {
-//        if (verbose)
-//        {
-//          asp.printLastModel(false);
-//          ofstream file;
-//          file.open("/tmp/tut.txt");
-//          file << asp.toStringLastModel(true);
-//          file.close();
-//        }
-
         bool first = true;
 
         for (auto toCheck : *p_requiredModelElements)

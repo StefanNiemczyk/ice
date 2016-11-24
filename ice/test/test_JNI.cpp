@@ -160,8 +160,8 @@ TEST(JNITest, addInfoStructure)
 
   EXPECT_TRUE(str.find("hasScope(http://vs.uni-kassel.de/Ice#TestEntity,http://vs.uni-kassel.de/Ice#TestScope).") != std::string::npos);
   EXPECT_TRUE(str.find("hasRepresentation(http://vs.uni-kassel.de/Ice#TestScope,http://vs.uni-kassel.de/Ice#TestRep1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope1,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope2,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope1,http://vs.uni-kassel.de/Ice#DoubleRep).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope2,http://vs.uni-kassel.de/Ice#DoubleRep).") != std::string::npos);
 }
 
 TEST(JNITest, addDimension)
@@ -244,11 +244,11 @@ TEST(JNITest, addDimension)
 
   EXPECT_TRUE(str.find("hasScope(http://vs.uni-kassel.de/Ice#TestEntity,http://vs.uni-kassel.de/Ice#TestScope).") != std::string::npos);
   EXPECT_TRUE(str.find("hasRepresentation(http://vs.uni-kassel.de/Ice#TestScope,http://vs.uni-kassel.de/Ice#TestRep1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope1,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope2,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#Orientation,http://vs.uni-kassel.de/Ice#EulerAnglesRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope3,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
-  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#XCoordinate,http://vs.uni-kassel.de/Ice#DoubleRep,1,1).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope1,http://vs.uni-kassel.de/Ice#DoubleRep).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope2,http://vs.uni-kassel.de/Ice#DoubleRep).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#Orientation,http://vs.uni-kassel.de/Ice#EulerAnglesRep).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#TestValueScope3,http://vs.uni-kassel.de/Ice#DoubleRep).") != std::string::npos);
+  EXPECT_TRUE(str.find("hasDimension(http://vs.uni-kassel.de/Ice#TestRep1,http://vs.uni-kassel.de/Ice#XCoordinate,http://vs.uni-kassel.de/Ice#DoubleRep).") != std::string::npos);
 }
 
 TEST(JNITest, addStreamClass)
