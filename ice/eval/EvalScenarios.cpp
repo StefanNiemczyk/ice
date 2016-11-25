@@ -37,6 +37,28 @@ struct TConf {
 
     return ss.str();
   }
+
+  std::string toFileName() {
+    std::stringstream ss;
+
+    ss.str("");
+    ss << "[";
+    for (int i = 0; i < levels.size(); ++i)
+    {
+      if (i > 0)
+        ss << ",";
+      ss << levels[i];
+    }
+    ss << "]";
+
+    if (skipLevel)
+      ss << "_skip";
+
+//    ss << "_G(" << parallelGroupsMin << "," << parallelGroupsMax << "," << parallelGrounsStep << ")";
+    ss << "_IN(" << inputsMin << "," << inputsMax << ")";
+
+    return ss.str();
+  }
 };
 
 class EvalScenarios
@@ -49,7 +71,7 @@ public:
     this->lambda = lambda;
   }
 
-  void transformation(bool verbose, bool gnuplot, int runs, int models, TConf &conf)
+  void transformation(bool verbose, bool gnuplot, int runs, int models, TConf &conf, bool generate)
   {
     std::string path = ros::package::getPath("ice");
     std::stringstream ss;
@@ -88,10 +110,12 @@ public:
     for (int pg=conf.parallelGroupsMin; pg <= conf.parallelGroupsMax; pg += conf.parallelGrounsStep)
     {
       ss.str("");
-      ss << "/tmp/representations_" << conf.toString() << "_" << pg << "_";
+      ss << "/tmp/representations_" << conf.toFileName() << "_" << pg << "_";
       std::string owlPath = ss.str();
       ss.str("");
 
+      if (generate)
+      {
       for (int m=0; m < models; ++m)
       {
         ice::OntologyInterface oi(path + "/java/lib/");
@@ -207,6 +231,7 @@ public:
         std::string fileName = ss.str();
         oi.saveOntology(fileName);
         std::cout << fileName << std::endl;
+      }
       }
 
       std::vector<std::string> toCheck;
