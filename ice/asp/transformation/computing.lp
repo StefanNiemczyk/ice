@@ -18,13 +18,13 @@ simpleRep(REP) :-
 	not -simpleRep(REP).
 
 % determine similar representations
-simRep(SCOPE,REP1,REP2) :-
-	simpleRep(REP1),
-	simpleRep(REP2), 
-	hasRepresentation(SCOPE,REP1), 
-	hasRepresentation(SCOPE,REP2), 
-	scope(SCOPE), 
-	REP1 != REP2.
+%simRep(SCOPE,REP1,REP2) :-
+%	simpleRep(REP1),
+%	simpleRep(REP2), 
+%	hasRepresentation(SCOPE,REP1), 
+%	hasRepresentation(SCOPE,REP2), 
+%	scope(SCOPE), 
+%	REP1 != REP2.
 
 % dimension matching
 %match(simRep(SCOPE,REP1,REP2),DIM,DIM_REP) :-
@@ -35,7 +35,12 @@ simRep(SCOPE,REP1,REP2) :-
 
 %% try to fix if at least one dimension is matching
 tryFix(simRep(SCOPE,REP1,REP2)) :-
-	simRep(SCOPE,REP1,REP2),
+	simpleRep(REP1),
+	simpleRep(REP2), 
+	hasRepresentation(SCOPE,REP1), 
+	hasRepresentation(SCOPE,REP2), 
+	scope(SCOPE), 
+	REP1 != REP2,
 	hasDimension(REP1,DIM,_),
 	hasDimension(REP2,DIM,_),
 	not simpleTrans(_,SCOPE,REP1,REP2).
