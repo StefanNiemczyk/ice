@@ -129,7 +129,7 @@ autoTrans(SCOPE,REP1,REP2) :-
 #maximize{ 1@2,SCOPE,REP1,REP2 : autoTrans(SCOPE,REP1,REP2) }.
 
 % minimize the number of fixing steps
-#minimize{ COST@1,SCOPE,REP1,REP2,FIX : fixCost(simRep(SCOPE,REP1,REP2),FIX,COST), autoTrans(SCOPE,REP1,REP2) }.
+#minimize{ COST@1,SIM_REP,FIX : fixCost(SIM_REP,FIX,COST)}.
 
 
 
