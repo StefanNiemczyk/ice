@@ -179,6 +179,8 @@ public:
 private:
   std::string path;
   bool testRepresentations;
+  supplementary::ClingWrapper *asp;
+  std::shared_ptr<ice::OntologyInterface> ontology;
 
 public:
   ModelGeneration(std::string path, bool testRepresentations = false)
@@ -273,7 +275,9 @@ public:
         catch (const std::bad_alloc&) {
           ++aborted;
           std::cout << "Test run aborted, out of memory" << std::endl;
-          continue;
+          delete this->asp;
+          this->ontology.reset();
+          break;
         }
 
         if (r.successful)
@@ -480,27 +484,27 @@ public:
     }
 
     // Initializing ASP
-    supplementary::ClingWrapper asp;
+    asp = new supplementary::ClingWrapper();
 
     if (this->testRepresentations)
     {
-      asp.addKnowledgeFile(path + "/asp/transformation/computing.lp");
+      asp->addKnowledgeFile(path + "/asp/transformation/computing.lp");
     }
     else
     {
-      asp.addKnowledgeFile(path + "/asp/informationProcessing/processing.lp");
-      asp.addKnowledgeFile(path + "/asp/informationProcessing/searchBottomUp.lp");
+      asp->addKnowledgeFile(path + "/asp/informationProcessing/processing.lp");
+      asp->addKnowledgeFile(path + "/asp/informationProcessing/searchBottomUp.lp");
       if (global)
-        asp.addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
+        asp->addKnowledgeFile(path + "/asp/informationProcessing/globalOptimization.lp");
       else
-        asp.addKnowledgeFile(path + "/asp/informationProcessing/localOptimization.lp");
+        asp->addKnowledgeFile(path + "/asp/informationProcessing/localOptimization.lp");
     }
 
-    asp.setNoWarnings(true);
-    asp.init();
+    asp->setNoWarnings(true);
+    asp->init();
 
     // Initializing OwlAPI
-    auto ontology = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
+    ontology = std::make_shared<ice::OntologyInterface>(path + "/java/lib/");
     ontology->setLogLevel(ice::LogLevel::Error);
     ontology->addIRIMapper(path + "/ontology/");
     ontology->loadOntology(p_ontPath);
@@ -540,7 +544,7 @@ public:
       if (std::find(entities.begin(), entities.end(), noIri) == entities.end())
       {
         entities.push_back(noIri);
-        asp.add(programPart, {}, noIri);
+        asp->add(programPart, {}, noIri);
 
         if (mm->isActive())
         {
@@ -564,7 +568,7 @@ public:
 
        for (auto ontSystem : *ontSystems)
        {
-         asp.add("base", {}, "system(" + ontology->toShortIri(ontSystem) + ",default)." );
+         asp->add("base", {}, "system(" + ontology->toShortIri(ontSystem) + ",default)." );
 
          if (mm->isActive())
          {
@@ -676,7 +680,7 @@ public:
 //                 break;
 //             }
 
-             element->external = asp.getExternal(*value.name(), value.args());
+             element->external = asp->getExternal(*value.name(), value.args());
              element->external->assign(true);
 
              // stuff szenario 2
@@ -685,7 +689,7 @@ public:
                toDisable = element;
              }
 
-             asp.add(element->name, {}, element->aspString);
+             asp->add(element->name, {}, element->aspString);
              if (mm->isActive())
              {
                std::string str = element->aspString;
@@ -696,7 +700,7 @@ public:
                   }
                aspFile << str;
              }
-             asp.ground(element->name, {});
+             asp->ground(element->name, {});
          }
        }
       //
@@ -714,7 +718,7 @@ public:
     }
 
     if (lambda != nullptr)
-      lambda(&asp);
+      lambda(asp);
 
     // memory stuff
     if (mm->isActive())
@@ -731,17 +735,17 @@ public:
     // Grounding
     std::cout << "ASP ground call" << std::endl;
     startAsp = std::chrono::system_clock::now();
-    asp.ground(programPart, {});
+    asp->ground(programPart, {});
 
-    auto lastQuery = asp.getExternal("query", {1}, "query", {1, maxHopCount, maxStepCount}, true);
-    asp.ground("query", {1});
+    auto lastQuery = asp->getExternal("query", {1}, "query", {1, maxHopCount, maxStepCount}, true);
+    asp->ground("query", {1});
 
     // Solving
     std::cout << "ASP solving" << std::endl;
     Gringo::SolveResult solveResult;
     bool solve = true;
     if (solve)
-      solveResult = asp.solve();
+      solveResult = asp->solve();
     std::cout << "ASP done" << std::endl;
     endAsp = std::chrono::system_clock::now();
 
@@ -764,15 +768,15 @@ public:
         endOntologyReasoner - startOntologyReasoner).count();
     result.ontologyToASPTime = std::chrono::duration_cast<std::chrono::milliseconds>(
         endOntologyToASP - startOntologyToASP).count();
-    result.aspSolvingTime = asp.getSolvingTime();
+    result.aspSolvingTime = asp->getSolvingTime();
     result.aspGroundingTime = std::chrono::duration_cast<std::chrono::milliseconds>(endAsp - startAsp).count()
         - result.aspSolvingTime;
-    result.aspSatTime = asp.getSatTime();
-    result.aspUnsatTime = asp.getUnsatTime();
-    result.aspModelCount = asp.getModelCount();
-    result.aspAtomCount = asp.getAtomCount();
-    result.aspBodiesCount = asp.getBodiesCount();
-    result.aspAuxAtomCount = asp.getAuxAtomsCount();
+    result.aspSatTime = asp->getSatTime();
+    result.aspUnsatTime = asp->getUnsatTime();
+    result.aspModelCount = asp->getModelCount();
+    result.aspAtomCount = asp->getAtomCount();
+    result.aspBodiesCount = asp->getBodiesCount();
+    result.aspAuxAtomCount = asp->getAuxAtomsCount();
 
     if (mm->isActive())
     {
@@ -799,12 +803,12 @@ public:
         {
           auto value = supplementary::ClingWrapper::stringToValue(toCheck.c_str());
           std::string name = *value.name();
-          if (false == asp.query(name, value.args()))
+          if (false == asp->query(name, value.args()))
           {
             if (first)
             {
               if (false == verbose)
-                std::cout << std::endl << asp.toStringLastModel(false) << std::endl;
+                std::cout << std::endl << asp->toStringLastModel(false) << std::endl;
               first = false;
             }
 
@@ -825,6 +829,9 @@ public:
 
     if (verbose)
       result.print();
+
+    delete this->asp;
+    this->ontology.reset();
 
     return result;
   }
