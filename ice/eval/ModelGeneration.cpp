@@ -526,7 +526,7 @@ public:
 
     // Ontology 2 ASP
 //    if (false == warmUp)
-    std::cout << "Ontology 2 ASP" << std::endl;
+//    std::cout << "Ontology 2 ASP" << std::endl;
     startOntologyToASP = std::chrono::system_clock::now();
 
     std::string programPart = "ontology" + 1;
@@ -729,7 +729,7 @@ public:
     }
 
     // Grounding
-    std::cout << "ASP ground call" << std::endl;
+//    std::cout << "ASP ground call" << std::endl;
     startAsp = std::chrono::system_clock::now();
     asp.ground(programPart, {});
 
@@ -737,12 +737,12 @@ public:
     asp.ground("query", {1});
 
     // Solving
-    std::cout << "ASP solving" << std::endl;
+//    std::cout << "ASP solving" << std::endl;
     Gringo::SolveResult solveResult;
     bool solve = true;
     if (solve)
       solveResult = asp.solve();
-    std::cout << "ASP done" << std::endl;
+//    std::cout << "ASP done" << std::endl;
     endAsp = std::chrono::system_clock::now();
 
     // unanticipated
