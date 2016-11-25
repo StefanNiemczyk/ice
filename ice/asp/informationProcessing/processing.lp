@@ -448,34 +448,6 @@ map(k,SYSTEM_TARGET,PROVIDER,INFO_TYPE,STEP+1) :-
    SYSTEM_SOURCE1 != SYSTEM_SOURCE2.
 
 
-% transfer of information between islands
-transfer(SYSTEM_SOURCE,SYSTEM_TARGET) :- 
-	bridge(ISLAND1,ISLAND2),
-	connectToBridge(SYSTEM_SOURCE,ISLAND2),
-	connectToBridge(SYSTEM_TARGET,ISLAND1),
-	system(SYSTEM_SOURCE,ISLAND1), 
-	system(SYSTEM_TARGET,ISLAND2).
-
-metadataProcessing(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE1+VALUE2+VALUE3) :- 
-	bridge(ISLAND1,ISLAND2), 
-	system(SYSTEM_SOURCE,ISLAND1), 
-	system(SYSTEM_TARGET,ISLAND2),
-	connectToBridge(SYSTEM_SOURCE,ISLAND2),
-	connectToBridge(SYSTEM_TARGET,ISLAND1),
-	metadataProcessing(METADATA,SYSTEM_SOURCE,ISLAND2,VALUE1),
-	metadataProcessing(METADATA,SYSTEM_TARGET,ISLAND1,VALUE2),
-	metadataProcessing(METADATA,ISLAND1,ISLAND2,VALUE3).
-
-metadataOutput(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE1+VALUE2+VALUE3) :- 
-	bridge(ISLAND1,ISLAND2), 
-	system(SYSTEM_SOURCE,ISLAND1), 
-	system(SYSTEM_TARGET,ISLAND2),
-	connectToBridge(SYSTEM_SOURCE,ISLAND2),
-	connectToBridge(SYSTEM_TARGET,ISLAND1),
-	metadataOutput(METADATA,SYSTEM_SOURCE,ISLAND2,VALUE1),
-	metadataOutput(METADATA,SYSTEM_TARGET,ISLAND1,VALUE2),
-	metadataOutput(METADATA,ISLAND1,ISLAND2,VALUE3).
-
 
 %%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Checking
@@ -503,7 +475,7 @@ selectedMap(k,SYSTEM,mapNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO_TYPE,STEP) :-
 
 % checking point budget of systems
 reqPoints(k,SYSTEM,(SUM_NODES + SUM_STREAMS + SUM_MAP_NODES)) :- 
-	system(SYSTEM,ISLAND), 
+	system(SYSTEM), 
 	SUM_STREAMS = #sum{COST,SYSTEM_TARGET,PROVIDER,SOURCE,INFO,STEP : 
 				streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,SOURCE,INFO,STEP),_), 
 				metadataProcessing(cost,SYSTEM,SYSTEM_TARGET,COST)}, 
@@ -576,47 +548,15 @@ metadataOutput(delay,system2,system1,delayValue).
 %--------------------------------------------------------------------------------------
 #program system(name).
 
-#external system(name,default).
+#external system(name).
 
 %--------------------------------------------------------------------------------------
 #program system(name,points).
 
-#external system(name,default).
-systemPoints(name,points) :- system(name,default).
+#external system(name).
+systemPoints(name,points) :- system(name).
 
 
-%--------------------------------------------------------------------------------------
-#program island(name).
-
-#external island(name).
-
-
-%--------------------------------------------------------------------------------------
-#program system(name,points,island).
-
-#external system(name,island).
-systemPoints(name,points) :- system(name,island).
-
-
-%--------------------------------------------------------------------------------------
-#program connectToBridge(system,island,delayValue,costValue).
-
-connectToBridge(system,island).
-metadataProcessing(cost,system,island,costValue).
-metadataOutput(delay,system,island,delayValue).
-
-
-%--------------------------------------------------------------------------------------
-#program bridge(island1,island2,delayValue,costValue).
-
-#external bridge(island1,island2).
-bridge(island2,island1) :- bridge(island1,island2).
-
-metadataProcessing(cost,island1,island2,costValue).
-metadataOutput(delay,island1,island2,delayValue).
-
-metadataProcessing(cost,island2,island1,costValue).
-metadataOutput(delay,island2,island1,delayValue).
 
 
 

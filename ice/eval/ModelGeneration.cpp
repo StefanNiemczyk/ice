@@ -176,6 +176,7 @@ class ModelGeneration
 {
 public:
   int index;
+  int repOntIndex;
 private:
   std::string path;
   bool testRepresentations;
@@ -185,6 +186,8 @@ public:
   {
     this->path = path;
     this->testRepresentations = testRepresentations;
+    this->index = 0;
+    this->repOntIndex = -1;
   }
 
   ModelGenerationSeriesResult testSeries(std::string p_ontPath, std::vector<std::string>* p_requiredModelElements,
@@ -258,7 +261,10 @@ public:
 
         if (this->testRepresentations)
         {
-          ontology = p_ontPath + std::to_string(m) + ".owl";
+          if (this->repOntIndex > -1)
+            ontology = p_ontPath + std::to_string(this->repOntIndex) + ".owl";
+          else
+            ontology = p_ontPath + std::to_string(m) + ".owl";
         }
         else
         {

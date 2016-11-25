@@ -71,7 +71,7 @@ public:
     this->lambda = lambda;
   }
 
-  void transformation(bool verbose, bool gnuplot, int runs, int models, TConf &conf, bool generate)
+  void transformation(bool verbose, bool gnuplot, int runs, int models, TConf &conf, bool generate, int index)
   {
     std::string path = ros::package::getPath("ice");
     std::stringstream ss;
@@ -98,12 +98,16 @@ public:
     std::string logFile = ss.str();
     file.open(logFile);
 
+
+    if (verbose)
+    {
     std::cout << std::endl;
     std::cout << "---------------------------------------------------------------------------------------------------"
         << std::endl;
     std::cout << "---------------------------------------------------------------------------------------------------"
         << std::endl;
     std::cout << "Starting eval " << conf.toString() << std::endl;
+    }
 
     std::string systemStr = "EvalSystem";
 
@@ -230,12 +234,19 @@ public:
         ss << owlPath << m << ".owl";
         std::string fileName = ss.str();
         oi.saveOntology(fileName);
-        std::cout << fileName << std::endl;
+
+        if (verbose)
+          std::cout << fileName << std::endl;
       }
       }
 
       std::vector<std::string> toCheck;
       ModelGeneration mg(path, true);
+
+      if (index > -1)
+      {
+
+      }
 
       auto result = mg.testSeries(owlPath, &toCheck, runs, this->warmUp, true, verbose, 3, 10,
                                   [this] (supplementary::ClingWrapper *asp)
@@ -243,7 +254,16 @@ public:
                                     this->lambda(asp);
                                   }, models);
 
-      result.print();
+
+      // Ram Eval Stuff
+      if (MemoryManager::getInstance()->isActive())
+      {
+        std::cout << result.avg.ramUsageBeforeMax << "\t" << result.avg.ramUsageMax << "\t"
+            << result.avg.javaRamUsageBeforeMax << "\t" << result.avg.javaRamUsageMax << std::endl;
+      }
+
+      if (verbose)
+        result.print();
 
       // print to file
       file << pg << "\t";

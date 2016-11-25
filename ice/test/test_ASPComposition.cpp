@@ -10,7 +10,7 @@
 
 using namespace std;
 
-TEST(ClingWrap, simpleTest)
+TEST(ASPComposition, simpleTest)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
@@ -36,8 +36,8 @@ TEST(ClingWrap, simpleTest)
   cw->ground("entity", {"entity1", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -120,7 +120,7 @@ TEST(ClingWrap, simpleTest)
 //  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,8)"));
 }
 
-TEST(ClingWrap, simpleTestQuery)
+TEST(ASPComposition, simpleTestQuery)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
@@ -146,8 +146,8 @@ TEST(ClingWrap, simpleTestQuery)
   cw->ground("entity", {"entity1", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -238,7 +238,7 @@ TEST(ClingWrap, simpleTestQuery)
 //  EXPECT_EQ(true, cw->query("sumMetadata(3,cost,8)"));
 }
 
-TEST(ClingWrap, informationTranslation)
+TEST(ASPComposition, informationTranslation)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("data/asp/ontology.lp");
@@ -251,8 +251,8 @@ TEST(ClingWrap, informationTranslation)
   cw->ground("entity", {"nase", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "nase", "position", "coords", "none", 0, 90, 1});
@@ -290,7 +290,7 @@ TEST(ClingWrap, informationTranslation)
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system2,node(1,system1,coords2Wgs84,nase,none),information(nase,position,wgs84,none),3),91)"));
 }
 
-TEST(ClingWrap, ego2allo)
+TEST(ASPComposition, ego2allo)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("data/asp/ontology.lp");
@@ -304,8 +304,8 @@ TEST(ClingWrap, ego2allo)
   cw->ground("entity", {"bart", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "nase", "position", "coords", "none", 0, 90, 1});
@@ -349,7 +349,7 @@ TEST(ClingWrap, ego2allo)
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,allo2ego,bart,nase),information(bart,position,egoCoords,nase),3),92)"));
 }
 
-TEST(ClingWrap, requiredStreamsByEntityType)
+TEST(ASPComposition, requiredStreamsByEntityType)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
@@ -366,11 +366,11 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   cw->add("base", {}, "hasScope(type,scope1).");
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 10}, true);
-  auto system3 = cw->getExternal("system", {"system3", "default"}, "system", {"system1", 10}, true);
-  auto system4 = cw->getExternal("system", {"system4", "default"}, "system", {"system1", 10}, true);
-  auto system5 = cw->getExternal("system", {"system5", "default"}, "system", {"system1", 10}, true);
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2"}, "system", {"system1", 10}, true);
+  auto system3 = cw->getExternal("system", {"system3"}, "system", {"system1", 10}, true);
+  auto system4 = cw->getExternal("system", {"system4"}, "system", {"system1", 10}, true);
+  auto system5 = cw->getExternal("system", {"system5"}, "system", {"system1", 10}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -426,7 +426,7 @@ TEST(ClingWrap, requiredStreamsByEntityType)
   EXPECT_EQ(true, cw->query("metadataMap(1,delay,map(1,system1,mapNode(1,system1,mapNode,type,none),informationType(type,scope1,rep1,none),3),4001)"));
 }
 
-TEST(ClingWrap, mapFusion)
+TEST(ASPComposition, mapFusion)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
@@ -443,9 +443,9 @@ TEST(ClingWrap, mapFusion)
   cw->add("base", {}, "hasScope(type,scope1).");
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 10}, true);
-  auto system3 = cw->getExternal("system", {"system3", "default"}, "system", {"system1", 10}, true);
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2"}, "system", {"system1", 10}, true);
+  auto system3 = cw->getExternal("system", {"system3"}, "system", {"system1", 10}, true);
 //  auto system4 = cw->getExternal("system", {"system4", 10}, true);
 //  auto system5 = cw->getExternal("system", {"system5", 10}, true);
 
@@ -516,7 +516,7 @@ TEST(ClingWrap, mapFusion)
   EXPECT_EQ(true, cw->query("metadataMap(1,density,map(1,system1,mapNode(1,system1,mapFusionNode,type,none),informationType(type,scope1,rep1,none),3),7)"));
 }
 
-TEST(ClingWrap, fusion)
+TEST(ASPComposition, fusion)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
@@ -542,8 +542,8 @@ TEST(ClingWrap, fusion)
   cw->ground("entity", {"entity1", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
-  auto system2 = cw->getExternal("system", {"system2", "default"}, "system", {"system1", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -589,7 +589,7 @@ TEST(ClingWrap, fusion)
 
 }
 
-TEST(ClingWrap, noInputTest)
+TEST(ASPComposition, noInputTest)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
@@ -611,7 +611,7 @@ TEST(ClingWrap, noInputTest)
   cw->ground("entity", {"entity1", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -677,7 +677,7 @@ TEST(ClingWrap, noInputTest)
 //  EXPECT_EQ(true, cw->query("sumCost(1,11)"));
 }
 
-TEST(ClingWrap, simpleChainTest)
+TEST(ASPComposition, simpleChainTest)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
@@ -698,7 +698,7 @@ TEST(ClingWrap, simpleChainTest)
   cw->ground("entity", {"entity1", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 11}, true);
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 11}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -760,7 +760,7 @@ TEST(ClingWrap, simpleChainTest)
 //  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,11)"));
 }
 
-TEST(ClingWrap, nodeUsedTwice)
+TEST(ASPComposition, nodeUsedTwice)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
@@ -782,7 +782,7 @@ TEST(ClingWrap, nodeUsedTwice)
   cw->ground("entity", {"entity2", "robot"});
 
   // systems
-  auto system1 = cw->getExternal("system", {"system1", "default"}, "system", {"system1", 100}, true);
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
 
   // inputs
   cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
@@ -828,7 +828,7 @@ TEST(ClingWrap, nodeUsedTwice)
 //  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,18)"));
 }
 
-TEST(ClingWrap, localSimpleTest)
+TEST(ASPComposition, localSimpleTest)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
@@ -938,7 +938,7 @@ TEST(ClingWrap, localSimpleTest)
 //  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,8)"));
 }
 
-TEST(ClingWrap, localChainTest)
+TEST(ASPComposition, localChainTest)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
@@ -1029,12 +1029,13 @@ TEST(ClingWrap, localChainTest)
 //  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,1)"));
 }
 
-TEST(ClingWrap, simpleIslandTest)
+TEST(ASPComposition, simpleIslandTest)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/nicer.lp");
   cw->init();
 
   // ontology
@@ -1108,12 +1109,13 @@ TEST(ClingWrap, simpleIslandTest)
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),3),90)"));
 }
 
-TEST(ClingWrap, mapFusionIslandTest)
+TEST(ASPComposition, mapFusionIslandTest)
 {
   std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/nicer.lp");
   cw->init();
 
   // entities
@@ -1155,25 +1157,6 @@ TEST(ClingWrap, mapFusionIslandTest)
   cw->ground("sourceNode", {"in5", "system5", "system1", "entity5", "scope1", "rep1", "none", 0, 90, 1});
   auto input5 = cw->getExternal("sourceNode", {"system5", "in5", "entity5"}, true);
 
-  // input maps
-//  cw->add("mapInput1", {}, "#external mapNodeTemplate(system2,mapInput1,type).");
-//  auto mapInput1 = cw->getExternal("mapNodeTemplate", {"system2", "mapInput1", "type"}, "nodeTemplate", {}, true);
-//  cw->add("mapInput1", {}, "outputMap(system2,mapInput1,type,scope1,rep1,none).");
-//  cw->add("mapInput1", {}, "metadataProcessing(cost,system2,mapInput1,1).");
-//  cw->add("mapInput1", {}, "metadataOutput(delay,system2,mapInput1,fix,10,0).");
-//  cw->add("mapInput1", {}, "metadataOutput(accuracy,system2,mapInput1,fix,90,0).");
-//  cw->add("mapInput1", {}, "metadataOutput(density,system2,mapInput1,fix,3,0).");
-//  cw->ground("mapInput1", {});
-//
-//  cw->add("mapInput2", {}, "#external mapNodeTemplate(system3,mapInput2,type).");
-//  auto mapInput2 = cw->getExternal("mapNodeTemplate", {"system3", "mapInput2", "type"}, "nodeTemplate", {}, true);
-//  cw->add("mapInput2", {}, "outputMap(system3,mapInput2,type,scope1,rep1,none).");
-//  cw->add("mapInput2", {}, "metadataProcessing(cost,system3,mapInput2,1).");
-//  cw->add("mapInput2", {}, "metadataOutput(delay,system3,mapInput2,fix,10,0).");
-//  cw->add("mapInput2", {}, "metadataOutput(accuracy,system3,mapInput2,fix,90,0).");
-//  cw->add("mapInput2", {}, "metadataOutput(density,system3,mapInput2,fix,4,0).");
-//  cw->ground("mapInput2", {});
-
   // map fusion
   cw->add("mapFusionNode", {}, "#external mapNodeTemplate(system1,mapFusionNode,type).");
   auto nodeFusion = cw->getExternal("mapNodeTemplate", {"system1", "mapFusionNode", "type"}, "nodeTemplate", {}, true);
@@ -1206,4 +1189,92 @@ TEST(ClingWrap, mapFusionIslandTest)
   EXPECT_EQ(true, cw->query("metadataMap(1,accuracy,map(1,system1,mapNode(1,system1,mapFusionNode,type,none),informationType(type,scope1,rep1,none),3),110)"));
   EXPECT_EQ(true, cw->query("metadataMap(1,density,map(1,system1,mapNode(1,system1,mapFusionNode,type,none),informationType(type,scope1,rep1,none),3),5)"));
   EXPECT_EQ(true, cw->query("metadataMap(1,delay,map(1,system1,mapNode(1,system1,mapFusionNode,type,none),informationType(type,scope1,rep1,none),3),4005)"));
+}
+
+TEST(ASPComposition, islandCoverageTest)
+{
+  std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
+  cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/nicer.lp");
+  cw->init();
+
+  // entities
+  cw->ground("entity", {"entity1", "type"});
+  cw->ground("entity", {"entity2", "type"});
+  cw->ground("entity", {"entity3", "type"});
+  cw->ground("entity", {"entity4", "type"});
+  cw->ground("entity", {"entity5", "type"});
+  cw->add("base", {}, "hasScope(type,scope1).");
+
+  // islands
+  auto island1 = cw->getExternal("island", {"island1"}, true);
+  auto island2 = cw->getExternal("island", {"island2"}, true);
+  auto island3 = cw->getExternal("island", {"island3"}, true);
+  auto bridge12 = cw->getExternal("bridge", {"island1", "island2"}, "bridge", {"island1", "island2", 100, 22}, true);
+  auto bridge13 = cw->getExternal("bridge", {"island1", "island3"}, "bridge", {"island1", "island3", 4000, 22}, true);
+
+  // systems
+  cw->add("base", {}, "system(system1).");
+  cw->add("base", {}, "system(system2).");
+  cw->add("base", {}, "system(system3).");
+  cw->add("base", {}, "system(system4).");
+  cw->add("base", {}, "system(system5).");
+  auto system1 = cw->getExternal("system", {"system1", "island1"}, "system", {"system1", 100, "island1"}, true);
+  auto system2 = cw->getExternal("system", {"system2", "island1"}, "system", {"system2", 100, "island1"}, true);
+  auto system3 = cw->getExternal("system", {"system3", "island2"}, "system", {"system3", 100, "island2"}, true);
+  auto system4 = cw->getExternal("system", {"system4", "island2"}, "system", {"system4", 100, "island2"}, true);
+  auto system5 = cw->getExternal("system", {"system5", "island3"}, "system", {"system5", 100, "island3"}, true);
+
+  auto cb12 = cw->getExternal("connectToBridge", {"system1", "island2"}, "connectToBridge", {"system1", "island2", 2, 2}, true);
+  auto cb13 = cw->getExternal("connectToBridge", {"system1", "island3"}, "connectToBridge", {"system1", "island3", 2, 2}, true);
+  auto cb31 = cw->getExternal("connectToBridge", {"system3", "island1"}, "connectToBridge", {"system3", "island1", 2, 2}, true);
+  auto cb41 = cw->getExternal("connectToBridge", {"system4", "island1"}, "connectToBridge", {"system4", "island1", 2, 2}, true);
+  auto cb51 = cw->getExternal("connectToBridge", {"system5", "island1"}, "connectToBridge", {"system5", "island1", 2, 2}, true);
+
+  // inputs
+  cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
+  auto input1 = cw->getExternal("sourceNode", {"system1", "in1", "entity1"}, true);
+  cw->ground("sourceNode", {"in2", "system2", "system1", "entity2", "scope1", "rep1", "none", 0, 90, 1});
+  auto input2 = cw->getExternal("sourceNode", {"system2", "in2", "entity2"}, true);
+  cw->ground("sourceNode", {"in3", "system3", "system1", "entity3", "scope1", "rep1", "none", 0, 90, 1});
+  auto input3 = cw->getExternal("sourceNode", {"system3", "in3", "entity3"}, true);
+  cw->ground("sourceNode", {"in4", "system4", "system1", "entity4", "scope1", "rep1", "none", 0, 90, 1});
+  auto input4 = cw->getExternal("sourceNode", {"system4", "in4", "entity4"}, true);
+  cw->ground("sourceNode", {"in5", "system5", "system1", "entity5", "scope1", "rep1", "none", 0, 90, 1});
+  auto input5 = cw->getExternal("sourceNode", {"system5", "in5", "entity5"}, true);
+
+  // map fusion
+  cw->add("mapFusionNode", {}, "#external mapNodeTemplate(system1,mapFusionNode,type).");
+  auto nodeFusion = cw->getExternal("mapNodeTemplate", {"system1", "mapFusionNode", "type"}, "nodeTemplate", {}, true);
+  cw->add("mapFusionNode", {}, "input(system1,mapFusionNode,scope1,rep1,none,0,3) :- mapNodeTemplate(system1,mapFusionNode,type).");
+  cw->add("mapFusionNode", {}, "outputMap(system1,mapFusionNode,type,scope1,rep1,none).");
+  cw->add("mapFusionNode", {}, "metadataProcessing(cost,system1,mapFusionNode,1).");
+  cw->add("mapFusionNode", {}, "metadataOutput(delay,system1,mapFusionNode,max,1,0).");
+  cw->add("mapFusionNode", {}, "metadataOutput(accuracy,system1,mapFusionNode,avg,0,4).");
+  cw->add("mapFusionNode", {}, "metadataOutput(islandCoverage,system1,mapFusionNode,sum,0,1).");
+  cw->ground("mapFusionNode", {});
+
+  // requires
+  // requiredMap(system,entity_type,scope,representation,entity2).
+  auto required = cw->getExternal("requiredMap", {"system1", Gringo::Value("informationType", {"type", "scope1", "rep1", "none"})}, true);
+
+  // add transfer
+  auto transfer1_2 = cw->getExternal("transfer", {"system1", "system2"}, "transfer", {"system1", "system2", 10, 1}, true);
+
+  auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
+
+  cw->solve();
+  cw->printLastModel();
+//  std::cout << cw->getSolvingTime() << " ms" << std::endl;
+
+  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system1,in1,entity1,none),information(entity1,scope1,rep1,none),1)"));
+  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system2,in2,entity2,none),information(entity2,scope1,rep1,none),2)"));
+  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system3,in3,entity3,none),information(entity3,scope1,rep1,none),2)"));
+  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system4,in4,entity4,none),information(entity4,scope1,rep1,none),2)"));
+  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system5,in5,entity5,none),information(entity5,scope1,rep1,none),2)"));
+  EXPECT_EQ(true, cw->query("metadataMap(1,accuracy,map(1,system1,mapNode(1,system1,mapFusionNode,type,none),informationType(type,scope1,rep1,none),3),110)"));
+  EXPECT_EQ(true, cw->query("metadataMap(1,delay,map(1,system1,mapNode(1,system1,mapFusionNode,type,none),informationType(type,scope1,rep1,none),3),4005)"));
+  EXPECT_EQ(true, cw->query("metadataMap(1,islandCoverage,map(1,system1,mapNode(1,system1,mapFusionNode,type,none),informationType(type,scope1,rep1,none),3),3)"));
 }

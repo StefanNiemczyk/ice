@@ -71,7 +71,7 @@ void ASPModelGenerator::initInternal()
     std::string iri;
     this->self->getId(EntityDirectory::ID_ONTOLOGY, iri);
     iri = this->ontology->toShortIri(iri);
-    auto ext = this->asp->getExternal("system", {Gringo::Value(iri), "default"}, "system", {Gringo::Value(iri)}, true);
+    auto ext = this->asp->getExternal("system", {Gringo::Value(iri)}, "system", {Gringo::Value(iri)}, true);
     this->self->setExternal(ext);
   }
 }
@@ -542,10 +542,10 @@ void ASPModelGenerator::readSystemsFromOntology()
     if (entity->getExternal() == nullptr)
     {
       std::string iri = this->ontology->toShortIri(ontSystem);
-      auto ext = this->asp->getExternal("system", {Gringo::Value(iri), "default"}, "system", {Gringo::Value(iri)}, true);
+      auto ext = this->asp->getExternal("system", {Gringo::Value(iri)}, "system", {Gringo::Value(iri)}, true);
       entity->setExternal(ext);
 
-      this->asp->add("base", {}, "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ",default).");
+      this->asp->add("base", {}, "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ").");
     }
 
     auto nodes = this->ontology->readNodesAndIROsAsASP(ontSystem);
