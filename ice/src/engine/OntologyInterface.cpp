@@ -44,7 +44,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
   if (jvm == nullptr)
   {
     JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
-    JavaVMOption* options = new JavaVMOption[1];
+    JavaVMOption* options = new JavaVMOption[2];
 
     // creating classpath
     std::string classPath(
@@ -53,7 +53,7 @@ OntologyInterface::OntologyInterface(std::string const p_jarPath)
     std::string heapSize("-Xms256m -Xmx512m");
 
     options[0].optionString = (char *)classPath.c_str();
-//    options[1].optionString = (char *)heapSize.c_str();
+    options[1].optionString = (char *)heapSize.c_str();
     vm_args.version = JNI_VERSION_1_6;
     vm_args.nOptions = 1;
     vm_args.options = options;
