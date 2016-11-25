@@ -116,18 +116,19 @@ void evalSynthesis(int argc, char **argv)
     asp->setRandomize("20,15");
   });
   TConf conf;
-//  for (int i = 300; i <= 400; i += 50)
-//  {
-//    conf.parallelGroupsMin = 1;
-//    conf.parallelGroupsMax = 1;
-//    conf.parallelGrounsStep = 1;
-//    conf.levels = { 10,i};
-//    conf.inputsMin = 1;
-//    conf.inputsMax = 4;
-//    conf.skipLevel = false;
-//    scenariosT.transformation(true, false, runs, 50, conf, true);
-//  }
-
+/*  
+for (int i = 300; i <= 400; i += 50)
+  {
+    conf.parallelGroupsMin = 1;
+    conf.parallelGroupsMax = 1;
+    conf.parallelGrounsStep = 1;
+    conf.levels = { 10,i};
+    conf.inputsMin = 1;
+    conf.inputsMax = 4;
+    conf.skipLevel = false;
+    scenariosT.transformation(true, false, runs, 50, conf);
+  }
+*/
   conf.parallelGroupsMin = 300;
   conf.parallelGroupsMax = 300;
   conf.parallelGrounsStep = 50;
