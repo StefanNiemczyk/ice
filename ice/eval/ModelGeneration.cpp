@@ -244,6 +244,8 @@ public:
       std::cout << " done." << std::endl;
     }
 
+    int aborted = 0;
+
     for (int m = 0; m < models; ++m)
     {
       for (int i = 0; i < p_count; ++i)
@@ -263,8 +265,16 @@ public:
           ontology = p_ontPath;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-        auto r = this->test(ontology, p_requiredModelElements, false, global, verbose, maxHopCount, maxStepCount, lambda);
+        ModelGenerationResult r;
+        try
+        {
+          r = this->test(ontology, p_requiredModelElements, false, global, verbose, maxHopCount, maxStepCount, lambda);
+        }
+        catch (const std::bad_alloc&) {
+          ++aborted;
+          std::cout << "Test run aborted, out of memory" << std::endl;
+          continue;
+        }
 
         if (r.successful)
           ++result.numberSuccessful;
@@ -423,24 +433,28 @@ public:
     result.javaRamUsageBeforeMaxVar = javaFreeMemoryMaxVar.getVariance();
 
     int runCount = models * p_count;
+    double devide = runCount - aborted;
 
-    result.avg.totalTime /= runCount;
-    result.avg.ontologyReadTime /= runCount;
-    result.avg.ontologyReasonerTime /= runCount;
-    result.avg.ontologyToASPTime /= runCount;
-    result.avg.aspGroundingTime /= runCount;
-    result.avg.aspSolvingTime /= runCount;
-    result.avg.aspSatTime /= runCount;
-    result.avg.aspUnsatTime /= runCount;
-    result.avg.aspModelCount /= runCount;
-    result.avg.aspAtomCount /= runCount;
-    result.avg.aspBodiesCount /= runCount;
-    result.avg.aspAuxAtomCount /= runCount;
+    if (devide > 0)
+    {
+      result.avg.totalTime /= devide;
+      result.avg.ontologyReadTime /= devide;
+      result.avg.ontologyReasonerTime /= devide;
+      result.avg.ontologyToASPTime /= devide;
+      result.avg.aspGroundingTime /= devide;
+      result.avg.aspSolvingTime /= devide;
+      result.avg.aspSatTime /= devide;
+      result.avg.aspUnsatTime /= devide;
+      result.avg.aspModelCount /= devide;
+      result.avg.aspAtomCount /= devide;
+      result.avg.aspBodiesCount /= devide;
+      result.avg.aspAuxAtomCount /= devide;
 
-    result.avg.ramUsageBeforeMax /= runCount;
-    result.avg.ramUsageMax /= runCount;
-    result.avg.javaRamUsageMax /= runCount;
-    result.avg.javaRamUsageBeforeMax /= runCount;
+      result.avg.ramUsageBeforeMax /= devide;
+      result.avg.ramUsageMax /= devide;
+      result.avg.javaRamUsageMax /= devide;
+      result.avg.javaRamUsageBeforeMax /= devide;
+    }
 
     return result;
   }
