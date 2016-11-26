@@ -63,7 +63,7 @@ void evalGeneration(int argc, char **argv)
   int index = std::stoi(argv[1]);
   bool generateOwl = std::stoi(argv[2]);
 
-  std::string path = "/home/sni/Desktop/eval";
+  std::string path = "/home/sni/eval";
 //  std::string path = "/home/pi/eval";
   int runs = 1;
 
@@ -106,7 +106,7 @@ void evalGeneration(int argc, char **argv)
 
 void evalSynthesis(int argc, char **argv)
 {
-//  std::string path = "/home/sni/Desktop/eval";
+//  std::string path = "/home/sni/eval";
   std::string path = "/home/pi/eval";
   int runs = 1;
 
@@ -130,13 +130,13 @@ for (int i = 300; i <= 400; i += 50)
   }
 */
   conf.parallelGroupsMin = 50;
-  conf.parallelGroupsMax = 250;
+  conf.parallelGroupsMax = 300;
   conf.parallelGrounsStep = 50;
   conf.levels = { 10,10};
   conf.inputsMin = 1;
   conf.inputsMax = 4;
   conf.skipLevel = false;
-  scenariosT.transformation(true, false, runs, 50, conf, true, -1);
+  scenariosT.transformation(true, false, runs, 50, conf, false, -1);
 }
 
 int main(int argc, char **argv)
