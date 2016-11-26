@@ -77,7 +77,7 @@ public:
     std::stringstream ss;
     std::vector<int> usedDims;
 
-    ofstream file;
+//    ofstream file;
 
     ss.str("");
     ss << "[";
@@ -96,7 +96,7 @@ public:
     ss.str("");
     ss << this->logPath << "/representations_" << conf.toString() << ".txt";
     std::string logFile = ss.str();
-    file.open(logFile);
+//    file.open(logFile);
 
 
     if (verbose)
@@ -245,7 +245,7 @@ public:
 
       if (index > -1)
       {
-
+        mg.repOntIndex = index;
       }
 
       auto result = mg.testSeries(owlPath, &toCheck, runs, this->warmUp, true, verbose, 3, 10,
@@ -266,6 +266,7 @@ public:
         result.print();
 
       // print to file
+      auto &file = std::cout;
       file << pg << "\t";
       file << conf.inputsMin << "\t";
       file << conf.inputsMax << "\t";
@@ -303,7 +304,7 @@ public:
       file.flush();
     }
 
-    file.close();
+//    file.close();
 
     if (!gnuplot)
       return;
