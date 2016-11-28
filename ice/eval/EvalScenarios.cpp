@@ -77,7 +77,7 @@ public:
     std::stringstream ss;
     std::vector<int> usedDims;
 
-//    ofstream file;
+    ofstream file;
 
     ss.str("");
     ss << "[";
@@ -96,7 +96,7 @@ public:
     ss.str("");
     ss << this->logPath << "/representations_" << conf.toString() << ".txt";
     std::string logFile = ss.str();
-//    file.open(logFile);
+    file.open(logFile);
 
 
     if (verbose)
@@ -266,7 +266,6 @@ public:
         result.print();
 
       // print to file
-      auto &file = std::cout;
       file << pg << "\t";
       file << conf.inputsMin << "\t";
       file << conf.inputsMax << "\t";
@@ -279,6 +278,7 @@ public:
           << "\t" << result.worst.ontologyReadTime << "\t";
       file << result.avg.ontologyReasonerTime << "\t" << result.ontologyReasonerTimeVar << "\t"
           << result.best.ontologyReasonerTime << "\t" << result.worst.ontologyReasonerTime << "\t";
+      // 18
       file << result.avg.ontologyToASPTime << "\t" << result.ontologyToASPTimeVar << "\t" << result.best.ontologyToASPTime
           << "\t" << result.worst.ontologyToASPTime << "\t";
       // 22
@@ -304,7 +304,7 @@ public:
       file.flush();
     }
 
-//    file.close();
+    file.close();
 
     if (!gnuplot)
       return;

@@ -725,7 +725,6 @@ public:
     // memory stuff
     if (mm->isActive())
     {
-      ontology->callJniGc();
       auto &mu = mm->getMemoryUsage();
       result.ramUsageBeforeMax = mu.residentSetMax;
       result.javaRamUsageBeforeMax = mu.javaRamUsageMax;

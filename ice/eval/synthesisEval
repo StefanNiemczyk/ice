@@ -1,15 +1,13 @@
 #!/bin/bash
 # Functions and parameters
 
-result="/home/sni/Desktop/eval/"
-configRoot="/home/sni/pjx/catkin_ws/src/ice/ice/test/data/asp_ram_test/"
+result="$HOME/eval/"
 exce="../../../../devel/lib/ice/eval_node"
 runs=49
 
 testConfig () {
 	echo "==================== $1 ===================="
 	index=$1
-	config="${configRoot}chainScenario_global10_$index.lp"
 	saveFile="${result}ram_eval_$index.txt"
 
 	echo "$saveFile"
@@ -29,3 +27,5 @@ testConfig 150
 testConfig 200
 testConfig 250
 testConfig 300
+testConfig 350
+testConfig 400
