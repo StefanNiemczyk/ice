@@ -287,16 +287,22 @@ public:
       // 26
       file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime << "\t"
           << result.worst.aspSolvingTime << "\t";
+      // 30
       file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime << "\t"
           << result.worst.aspSatTime << "\t";
+      // 34
       file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime << "\t"
           << result.worst.aspUnsatTime << "\t";
+      // 38
       file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount << "\t"
           << result.worst.aspModelCount << "\t";
+      // 42
       file << result.avg.aspAtomCount << "\t" << result.aspAtomCountVar << "\t" << result.best.aspAtomCount << "\t"
           << result.worst.aspAtomCount << "\t";
+      // 46
       file << result.avg.aspBodiesCount << "\t" << result.aspBodiesCountVar << "\t" << result.best.aspBodiesCount << "\t"
           << result.worst.aspBodiesCount << "\t";
+      // 50
       file << result.avg.aspAuxAtomCount << "\t" << result.aspAuxAtomCountVar << "\t" << result.best.aspAuxAtomCount
           << "\t" << result.worst.aspAuxAtomCount << std::endl;
 
@@ -568,26 +574,37 @@ public:
         file << nodes << "\t";
         file << result.numberTotal << "\t";
         file << result.numberSuccessful << "\t";
+        // 5
         file << result.avg.totalTime << "\t" << result.totalTimeVar << "\t" << result.best.totalTime << "\t"
             << result.worst.totalTime << "\t";
+        // 9
         file << result.avg.ontologyReadTime << "\t" << result.ontologyReadTimeVar << "\t"
             << result.best.ontologyReadTime << "\t" << result.worst.ontologyReadTime << "\t";
+        // 13
         file << result.avg.ontologyReasonerTime << "\t" << result.ontologyReasonerTimeVar << "\t"
             << result.best.ontologyReasonerTime << "\t" << result.worst.ontologyReasonerTime << "\t";
+        // 17
         file << result.avg.ontologyToASPTime << "\t" << result.ontologyToASPTimeVar << "\t"
             << result.best.ontologyToASPTime << "\t" << result.worst.ontologyToASPTime << "\t";
+        // 21
         file << result.avg.aspGroundingTime << "\t" << result.aspGroundingTimeVar << "\t"
             << result.best.aspGroundingTime << "\t" << result.worst.aspGroundingTime << "\t";
+        // 25
         file << result.avg.aspSolvingTime << "\t" << result.aspSolvingTimeVar << "\t" << result.best.aspSolvingTime
             << "\t" << result.worst.aspSolvingTime << "\t";
+        // 29
         file << result.avg.aspSatTime << "\t" << result.aspSatTimeVar << "\t" << result.best.aspSatTime << "\t"
             << result.worst.aspSatTime << "\t";
+        // 33
         file << result.avg.aspUnsatTime << "\t" << result.aspUnsatTimeVar << "\t" << result.best.aspSatTime << "\t"
             << result.worst.aspUnsatTime << "\t";
+        // 37
         file << result.avg.aspModelCount << "\t" << result.aspModelCountVar << "\t" << result.best.aspModelCount << "\t"
             << result.worst.aspModelCount << "\t";
+        // 41
         file << result.avg.aspAtomCount << "\t" << result.aspAtomCountVar << "\t" << result.best.aspAtomCount << "\t"
             << result.worst.aspAtomCount << "\t";
+        // 45
         file << result.avg.aspBodiesCount << "\t" << result.aspBodiesCountVar << "\t" << result.best.aspBodiesCount
             << "\t" << result.worst.aspBodiesCount << "\t";
         file << result.avg.aspAuxAtomCount << "\t" << result.aspAuxAtomCountVar << "\t" << result.best.aspAuxAtomCount
