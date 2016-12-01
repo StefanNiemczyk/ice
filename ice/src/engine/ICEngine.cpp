@@ -49,7 +49,7 @@ void ICEngine::init()
   this->modelGenerator = std::make_shared<ASPModelGenerator>(this->shared_from_this());
   this->updateStrategie = std::make_shared<FastUpdateStrategie>(this->shared_from_this());
   this->gcontainerFactory = std::make_shared<GContainerFactory>(this->shared_from_this());
-  this->aspTransformationGenerator = std::make_shared<ASPTransformationGeneration>(this->shared_from_this());
+  this->aspTransformationGenerator = std::make_shared<TransformationSynthese>(this->shared_from_this());
   if (this->streamFactory == nullptr)
     this->streamFactory = std::make_shared<StreamFactory>(this->shared_from_this());
 
@@ -241,7 +241,7 @@ std::shared_ptr<GContainerFactory> ICEngine::getGContainerFactory()
   return this->gcontainerFactory;
 }
 
-std::shared_ptr<ASPTransformationGeneration> ICEngine::getASPTransformationGeneration()
+std::shared_ptr<TransformationSynthese> ICEngine::getASPTransformationGeneration()
 {
   return this->aspTransformationGenerator;
 }

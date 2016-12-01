@@ -5,8 +5,7 @@
  *      Author: sni
  */
 
-#include "ice/representation/ASPTransformationGeneration.h"
-
+#include <ice/representation/TransformationSynthese.h>
 #include <ros/package.h>
 
 #include "ice/ontology/OntologyInterface.h"
@@ -17,23 +16,23 @@
 namespace ice
 {
 
-ASPTransformationGeneration::ASPTransformationGeneration()
+TransformationSynthese::TransformationSynthese()
 {
   _log = el::Loggers::getLogger("ASPTransformationGeneration");
 }
 
-ASPTransformationGeneration::ASPTransformationGeneration(std::weak_ptr<ICEngine> engine) :
+TransformationSynthese::TransformationSynthese(std::weak_ptr<ICEngine> engine) :
     engine(engine)
 {
   _log = el::Loggers::getLogger("ASPTransformationGeneration");
 }
 
-ASPTransformationGeneration::~ASPTransformationGeneration()
+TransformationSynthese::~TransformationSynthese()
 {
   //
 }
 
-void ASPTransformationGeneration::init()
+void TransformationSynthese::init()
 {
   if (this->engine.expired())
     return;
@@ -43,13 +42,13 @@ void ASPTransformationGeneration::init()
   this->containerFactory = e->getGContainerFactory();
 }
 
-void ASPTransformationGeneration::cleanUp()
+void TransformationSynthese::cleanUp()
 {
   this->ontology.reset();
   this->containerFactory.reset();
 }
 
-void ASPTransformationGeneration::readInfoStructureFromOntology()
+void TransformationSynthese::readInfoStructureFromOntology()
 {
   _log->verbose(1, "Read information structure from ontology");
 
@@ -73,7 +72,7 @@ void ASPTransformationGeneration::readInfoStructureFromOntology()
   }
 }
 
-void ASPTransformationGeneration::extractTransformations()
+void TransformationSynthese::extractTransformations()
 {
   _log->verbose(1, "Extract transformations");
 
@@ -179,7 +178,7 @@ void ASPTransformationGeneration::extractTransformations()
   }
 }
 
-void ASPTransformationGeneration::extractDeviation(supplementary::ClingWrapper &asp,
+void TransformationSynthese::extractDeviation(supplementary::ClingWrapper &asp,
                                                    std::vector<std::string> &deviations, Gringo::Value &simRep,
                                                    std::string type)
 {
@@ -198,7 +197,7 @@ void ASPTransformationGeneration::extractDeviation(supplementary::ClingWrapper &
   }
 }
 
-bool ASPTransformationGeneration::extractOperations(supplementary::ClingWrapper &asp,
+bool TransformationSynthese::extractOperations(supplementary::ClingWrapper &asp,
                                                  std::shared_ptr<Transformation> transformation, Gringo::Value simRep,
                                                  std::shared_ptr<Representation> rep1,
                                                  std::shared_ptr<Representation> rep2, std::vector<std::string> &path)
@@ -404,12 +403,12 @@ bool ASPTransformationGeneration::extractOperations(supplementary::ClingWrapper 
   return true;
 }
 
-void ASPTransformationGeneration::setOntology(std::shared_ptr<OntologyInterface> ontology)
+void TransformationSynthese::setOntology(std::shared_ptr<OntologyInterface> ontology)
 {
   this->ontology = ontology;
 }
 
-void ASPTransformationGeneration::setGContainerFactory(std::shared_ptr<GContainerFactory> factory)
+void TransformationSynthese::setGContainerFactory(std::shared_ptr<GContainerFactory> factory)
 {
   this->containerFactory = factory;
 }

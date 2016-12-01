@@ -1,12 +1,12 @@
 /*
- * ASPTransformationGeneration.h
+ * TransformationSynthese.h
  *
  *  Created on: Dec 1, 2015
  *      Author: sni
  */
 
-#ifndef ASPTRANSFORMATIONGENERATION_H_
-#define ASPTRANSFORMATIONGENERATION_H_
+#ifndef TRANSFORMATIONSYNTHESE_H_
+#define TRANSFORMATIONSYNTHESE_H_
 
 #include <memory>
 #include <tuple>
@@ -36,12 +36,12 @@ class ClingWrapper;
 namespace ice
 {
 
-class ASPTransformationGeneration
+class TransformationSynthese
 {
 public:
-  ASPTransformationGeneration();
-  ASPTransformationGeneration(std::weak_ptr<ICEngine> engine);
-  virtual ~ASPTransformationGeneration();
+  TransformationSynthese();
+  TransformationSynthese(std::weak_ptr<ICEngine> engine);
+  virtual ~TransformationSynthese();
 
   void init();
   void cleanUp();

@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <ice/representation/TransformationSynthese.h>
 #include "ClingWrapper.h"
 #include "External.h"
 #include "BaseLiteral.h"
@@ -11,7 +12,6 @@
 
 #include "ice/ontology/OntologyInterface.h"
 #include "ice/processing/Node.h"
-#include "ice/representation/ASPTransformationGeneration.h"
 #include "ice/representation/Representation.h"
 #include "ice/representation/GContainer.h"
 #include "ice/representation/GContainerFactory.h"
