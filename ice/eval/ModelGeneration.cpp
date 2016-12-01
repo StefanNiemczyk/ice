@@ -588,7 +588,7 @@ public:
 //           asp.add("base", {}, "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ",default).");
 //         }
 
-         auto nodes = ontology->readNodesAndIROsAsASP(ontSystem);
+         auto nodes = ontology->readNodesAsASP(ontSystem);
 
          auto &types = nodes->at(0);
          auto &names = nodes->at(1);
@@ -624,15 +624,15 @@ public:
            }
            else if (typeStr == "MAP_NODE")
            {
-             type = ice::ASPElementType::ASP_MAP_NODE;
+             type = ice::ASPElementType::ASP_SET_NODE;
            }
            else if (typeStr == "IRO_NODE")
            {
-             type = ice::ASPElementType::ASP_IRO_NODE;
+             type = ice::ASPElementType::ASP_TRANSFORMATION_NODE;
            }
            else if (typeStr == "REQUIRED_MAP")
            {
-             type = ice::ASPElementType::ASP_REQUIRED_MAP;
+             type = ice::ASPElementType::ASP_REQUIRED_SET;
            }
            else
            {

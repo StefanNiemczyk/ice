@@ -309,7 +309,7 @@ TEST(JNITest, addRequiredStream)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  auto returnValues = oi.readNodesAndIROsAsASP("TestSystem");
+  auto returnValues = oi.readNodesAsASP("TestSystem");
 
     ASSERT_FALSE(oi.errorOccurred());
     ASSERT_TRUE(result);
@@ -387,7 +387,7 @@ TEST(JNITest, addSourceNode)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  auto returnValues = oi.readNodesAndIROsAsASP("TestSystem");
+  auto returnValues = oi.readNodesAsASP("TestSystem");
 
   ASSERT_EQ(returnValues->size(), 5);
 
@@ -467,7 +467,7 @@ TEST(JNITest, addComputationNode)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  auto returnValues = oi.readNodesAndIROsAsASP("TestSystem");
+  auto returnValues = oi.readNodesAsASP("TestSystem");
 
   ASSERT_EQ(returnValues->size(), 5);
 
@@ -533,7 +533,7 @@ TEST(JNITest, addIroNode)
   outputsMin.push_back(1);
   outputsMax.push_back(1);
 
-  result = oi.addIroNodeClass("TestNode", inputs, inputsMin, inputsMax, inputsRelated, inputsRelatedMin,
+  result = oi.addTransformationNodeClass("TestNode", inputs, inputsMin, inputsMax, inputsRelated, inputsRelatedMin,
                               inputsRelatedMax, outputs, outputsMin, outputsMax);
 
   ASSERT_FALSE(oi.errorOccurred());
@@ -558,7 +558,7 @@ TEST(JNITest, addIroNode)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  auto returnValues = oi.readNodesAndIROsAsASP("TestSystem");
+  auto returnValues = oi.readNodesAsASP("TestSystem");
 
   ASSERT_EQ(returnValues->size(), 5);
 
@@ -568,12 +568,12 @@ TEST(JNITest, addIroNode)
   ASSERT_EQ(returnValues->at(3).size(), 1);
   ASSERT_EQ(returnValues->at(4).size(), 1);
 
-  EXPECT_EQ("IRO_NODE", returnValues->at(0).at(0));
+  EXPECT_EQ("TRANSFORMATION_NODE", returnValues->at(0).at(0));
   EXPECT_EQ("http://vs.uni-kassel.de/Ice#TestNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("iro(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,any,none).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("transformation(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,any,none).\n", returnValues->at(2).at(0));
 
   std::string toTest = returnValues->at(3).at(0);
-  EXPECT_TRUE(toTest.find("#external iro(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,any,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external transformation(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,any,none).") != std::string::npos);
   EXPECT_TRUE(toTest.find("input(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
   EXPECT_TRUE(toTest.find("input2(http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataOutput(delay,http://vs.uni-kassel.de/Ice#TestSystem,http://vs.uni-kassel.de/Ice#TestNodeInd,max,5,5).") != std::string::npos);
@@ -645,7 +645,7 @@ TEST(JNITest, addNodeToSystem)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  auto returnValues = oi.readNodesAndIROsAsASP("TestSystem2");
+  auto returnValues = oi.readNodesAsASP("TestSystem2");
 
   ASSERT_EQ(returnValues->size(), 5);
 
@@ -699,7 +699,7 @@ TEST(JNITest, addMapNodeToSystem1)
 
   oi.addSystem("TestSystem");
 
-  result = oi.addNamedMap("TestMap", "Robot", "Position", "CoordinatePositionRep");
+  result = oi.addNamedSet("TestMap", "Robot", "Position", "CoordinatePositionRep");
 
   result = oi.addNamedStream("TestStream","Position","CoordinatePositionRep");
 
@@ -711,7 +711,7 @@ TEST(JNITest, addMapNodeToSystem1)
   outputsMin.push_back(1);
   outputsMax.push_back(1);
 
-  result = oi.addMapNodeClass("TestMapNode", inputs, inputsMin, inputsMax, inputsRelated, inputsRelatedMin,
+  result = oi.addSetNodeClass("TestMapNode", inputs, inputsMin, inputsMax, inputsRelated, inputsRelatedMin,
                               inputsRelatedMax, inputMaps, inputMapsMin, inputMapsMax, outputs, outputsMin, outputsMax);
 
   result = oi.addIndividual("TestEntity1", "Robot");
@@ -746,7 +746,7 @@ TEST(JNITest, addMapNodeToSystem1)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  auto returnValues = oi.readNodesAndIROsAsASP("TestSystem2");
+  auto returnValues = oi.readNodesAsASP("TestSystem2");
 
   ASSERT_EQ(returnValues->size(), 5);
 
@@ -756,15 +756,15 @@ TEST(JNITest, addMapNodeToSystem1)
   ASSERT_EQ(returnValues->at(3).size(), 1);
   ASSERT_EQ(returnValues->at(4).size(), 1);
 
-  EXPECT_EQ("MAP_NODE", returnValues->at(0).at(0));
+  EXPECT_EQ("SET_NODE", returnValues->at(0).at(0));
   EXPECT_EQ("http://vs.uni-kassel.de/Ice#TestMapNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("mapNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("setNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any).\n", returnValues->at(2).at(0));
 
   std::string toTest = returnValues->at(3).at(0);
 
-  EXPECT_TRUE(toTest.find("#external mapNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any)") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external setNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any)") != std::string::npos);
   EXPECT_TRUE(toTest.find("input(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("outputMap(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("outputSet(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,5).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataOutput(delay,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,fix,5,5).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,fix,-1,-1).") != std::string::npos);
@@ -802,7 +802,7 @@ TEST(JNITest, addMapNodeToSystem2)
 
   oi.addSystem("TestSystem");
 
-  result = oi.addNamedMap("TestMap", "Robot", "Position", "CoordinatePositionRep");
+  result = oi.addNamedSet("TestMap", "Robot", "Position", "CoordinatePositionRep");
 
   result = oi.addNamedStream("TestStream","Position","CoordinatePositionRep");
 
@@ -819,7 +819,7 @@ TEST(JNITest, addMapNodeToSystem2)
   inputMapsMin.push_back(1);
   inputMapsMax.push_back(2);
 
-  result = oi.addMapNodeClass("TestMapNode", inputs, inputsMin, inputsMax, inputsRelated, inputsRelatedMin,
+  result = oi.addSetNodeClass("TestMapNode", inputs, inputsMin, inputsMax, inputsRelated, inputsRelatedMin,
                               inputsRelatedMax, inputMaps, inputMapsMin, inputMapsMax, outputs, outputsMin, outputsMax);
 
   result = oi.addIndividual("TestEntity1", "Robot");
@@ -854,7 +854,7 @@ TEST(JNITest, addMapNodeToSystem2)
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  auto returnValues = oi.readNodesAndIROsAsASP("TestSystem2");
+  auto returnValues = oi.readNodesAsASP("TestSystem2");
 
   ASSERT_EQ(returnValues->size(), 5);
 
@@ -864,16 +864,16 @@ TEST(JNITest, addMapNodeToSystem2)
   ASSERT_EQ(returnValues->at(3).size(), 1);
   ASSERT_EQ(returnValues->at(4).size(), 1);
 
-  EXPECT_EQ("MAP_NODE", returnValues->at(0).at(0));
+  EXPECT_EQ("SET_NODE", returnValues->at(0).at(0));
   EXPECT_EQ("http://vs.uni-kassel.de/Ice#TestMapNodeInd", returnValues->at(1).at(0));
-  EXPECT_EQ("mapNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("setNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any).\n", returnValues->at(2).at(0));
 
   std::string toTest = returnValues->at(3).at(0);
 
-  EXPECT_TRUE(toTest.find("#external mapNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any)") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external setNodeTemplate(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,any)") != std::string::npos);
   EXPECT_TRUE(toTest.find("input(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,1).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("inputMap(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
-  EXPECT_TRUE(toTest.find("outputMap(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("inputSet(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none,1,2).") != std::string::npos);
+  EXPECT_TRUE(toTest.find("outputSet(http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataProcessing(cost,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,5).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataOutput(delay,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,fix,5,5).") != std::string::npos);
   EXPECT_TRUE(toTest.find("metadataOutput(accuracy,http://vs.uni-kassel.de/Ice#TestSystem2,http://vs.uni-kassel.de/Ice#TestMapNodeInd,fix,-1,-1).") != std::string::npos);
@@ -881,7 +881,7 @@ TEST(JNITest, addMapNodeToSystem2)
   EXPECT_EQ(0, returnValues->at(4).at(0).length());
 }
 
-TEST(JNITest, addRequiredMap)
+TEST(JNITest, addRequiredSet)
 {
   std::string path = ros::package::getPath("ice");
   bool result;
@@ -911,17 +911,17 @@ TEST(JNITest, addRequiredMap)
 
   oi.addSystem("TestSystem");
 
-  result = oi.addNamedMap("TestMap", "Robot", "Position", "CoordinatePositionRep");
+  result = oi.addNamedSet("TestMap", "Robot", "Position", "CoordinatePositionRep");
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  result = oi.addRequiredMap("ReqMap", "TestMap", "TestSystem", "");
+  result = oi.addRequiredSet("ReqMap", "TestMap", "TestSystem", "");
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);
 
-  auto returnValues = oi.readNodesAndIROsAsASP("TestSystem");
+  auto returnValues = oi.readNodesAsASP("TestSystem");
 
   ASSERT_EQ(returnValues->size(), 5);
 
@@ -931,17 +931,16 @@ TEST(JNITest, addRequiredMap)
   ASSERT_EQ(returnValues->at(3).size(), 1);
   ASSERT_EQ(returnValues->at(4).size(), 1);
 
-  EXPECT_EQ("REQUIRED_MAP", returnValues->at(0).at(0));
+  EXPECT_EQ("REQUIRED_SET", returnValues->at(0).at(0));
   EXPECT_EQ("http://vs.uni-kassel.de/Ice#ReqMap", returnValues->at(1).at(0));
-  EXPECT_EQ("requiredMap(http://vs.uni-kassel.de/Ice#TestSystem,informationType(http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none)).\n", returnValues->at(2).at(0));
+  EXPECT_EQ("requiredSet(http://vs.uni-kassel.de/Ice#TestSystem,informationType(http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none)).\n", returnValues->at(2).at(0));
 
   std::string toTest = returnValues->at(3).at(0);
 
-  EXPECT_TRUE(toTest.find("#external requiredMap(http://vs.uni-kassel.de/Ice#TestSystem,informationType(http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none))") != std::string::npos);
+  EXPECT_TRUE(toTest.find("#external requiredSet(http://vs.uni-kassel.de/Ice#TestSystem,informationType(http://vs.uni-kassel.de/Ice#Robot,http://vs.uni-kassel.de/Ice#Position,http://vs.uni-kassel.de/Ice#CoordinatePositionRep,none))") != std::string::npos);
 
   EXPECT_EQ(0, returnValues->at(4).at(0).length());
 }
-
 
 TEST(JNITest, save)
 {
@@ -1015,7 +1014,7 @@ TEST(JNITest, save)
   oi2.readInformationStructureAsASP();
   ASSERT_FALSE(oi.errorOccurred());
 
-  auto returnValues = oi2.readNodesAndIROsAsASP("TestSystem");
+  auto returnValues = oi2.readNodesAsASP("TestSystem");
 
   ASSERT_FALSE(oi.errorOccurred());
   ASSERT_TRUE(result);

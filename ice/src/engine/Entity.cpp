@@ -23,9 +23,9 @@
 namespace ice
 {
 
-Entity::Entity(const std::initializer_list<Id> ids)
-    : iceIdentity(false), directory(nullptr), timeFactory(nullptr), available(false), _log(
-                              el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000), timestamp(0)
+Entity::Entity(const std::initializer_list<Id> ids) :
+    iceIdentity(false), directory(nullptr), timeFactory(nullptr), available(false), _log(
+        el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000), timestamp(0), superEngine(false)
 {
   if (ids.size() == 0)
   {
@@ -38,9 +38,9 @@ Entity::Entity(const std::initializer_list<Id> ids)
 }
 
 Entity::Entity(std::shared_ptr<EntityDirectory> const &directory, std::weak_ptr<ICEngine> engine,
-		  std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id> ids)
-      : iceIdentity(false), directory(directory), engine(engine), timeFactory(factory), available(false), _log(
-				el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000)
+               std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id> ids) :
+    iceIdentity(false), directory(directory), engine(engine), timeFactory(factory), available(false), _log(
+        el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000), superEngine(false)
 {
   if (ids.size() == 0)
   {
@@ -279,7 +279,7 @@ void Entity::fuse(std::shared_ptr<Entity> &entity)
     this->addASPElement(element);
   }
 
-  for (auto &element : entity->aspIro)
+  for (auto &element : entity->aspTransformation)
   {
     this->addASPElement(element);
   }
@@ -289,7 +289,7 @@ void Entity::fuse(std::shared_ptr<Entity> &entity)
     this->addASPElement(element);
   }
 
-  for (auto &element : entity->aspRequiredMaps)
+  for (auto &element : entity->aspRequiredSets)
   {
     this->addASPElement(element);
   }
@@ -676,8 +676,8 @@ std::shared_ptr<ASPElement> Entity::getASPElementByName(ASPElementType type, std
           return node;
       }
       break;
-    case ASP_IRO_NODE:
-      for (auto node : this->aspIro)
+    case ASP_TRANSFORMATION_NODE:
+      for (auto node : this->aspTransformation)
       {
         if (node->name == name)
           return node;
@@ -690,8 +690,8 @@ std::shared_ptr<ASPElement> Entity::getASPElementByName(ASPElementType type, std
           return node;
       }
       break;
-    case ASP_REQUIRED_MAP:
-      for (auto node : this->aspRequiredMaps)
+    case ASP_REQUIRED_SET:
+      for (auto node : this->aspRequiredSets)
       {
         if (node->name == name)
           return node;
@@ -716,7 +716,7 @@ std::shared_ptr<ASPElement> Entity::getASPElementByName(std::string const name)
       return node;
   }
 
-  for (auto node : this->aspIro)
+  for (auto node : this->aspTransformation)
   {
     if (node->name == name)
       return node;
@@ -728,7 +728,7 @@ std::shared_ptr<ASPElement> Entity::getASPElementByName(std::string const name)
       return node;
   }
 
-  for (auto node : this->aspRequiredMaps)
+  for (auto node : this->aspRequiredSets)
   {
     if (node->name == name)
       return node;
@@ -747,14 +747,14 @@ void Entity::addASPElement(std::shared_ptr<ASPElement> node)
     case ASP_SOURCE_NODE:
       this->aspSourceNodes.push_back(node);
       break;
-    case ASP_IRO_NODE:
-      this->aspIro.push_back(node);
+    case ASP_TRANSFORMATION_NODE:
+      this->aspTransformation.push_back(node);
       break;
     case ASP_REQUIRED_STREAM:
       this->aspRequiredStreams.push_back(node);
       break;
-    case ASP_REQUIRED_MAP:
-      this->aspRequiredMaps.push_back(node);
+    case ASP_REQUIRED_SET:
+      this->aspRequiredSets.push_back(node);
       break;
   }
 }
@@ -778,7 +778,7 @@ bool Entity::updateExternals(bool activateRequired)
 
   this->external->assign(active);
 
-  for (auto element : this->aspIro)
+  for (auto element : this->aspTransformation)
   {
     element->external->assign(active);
   }

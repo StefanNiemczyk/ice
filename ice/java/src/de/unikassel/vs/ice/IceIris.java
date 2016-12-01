@@ -13,10 +13,10 @@ public class IceIris {
 	public final OWLClass node;
 	public final OWLClass computationNode;
 	public final OWLClass sourceNode;
-	public final OWLClass iroNode;
-	public final OWLClass mapNode;
+	public final OWLClass transformationNode;
+	public final OWLClass setNode;
 	public final OWLClass requiredStream;
-	public final OWLClass requiredMap;
+	public final OWLClass requiredSet;
 	public final OWLClass system;
 	public final OWLClass entityType;
 	public final OWLClass scope;
@@ -27,7 +27,7 @@ public class IceIris {
 	public final OWLClass valueScope;
 	public final OWLClass stream;
 	public final OWLClass namedStream;
-	public final OWLClass namedMap;
+	public final OWLClass namedSet;
 	public final OWLClass groundingOWLClass;
 	public final OWLClass metadataOWLClass;
 	public final OWLClass entityTypeOWLClass;
@@ -35,13 +35,13 @@ public class IceIris {
 
 	public final OWLObjectProperty hasSystem;
 	public final OWLObjectProperty hasInput;
-	public final OWLObjectProperty hasInputMap;
+	public final OWLObjectProperty hasInputSet;
 	public final OWLObjectProperty hasRelatedInput;
 	public final OWLObjectProperty hasOutput;
-	public final OWLObjectProperty hasOutputMap;
+	public final OWLObjectProperty hasOutputSet;
 	public final OWLObjectProperty isSystemOf;
 	public final OWLObjectProperty isStreamOf;
-	public final OWLObjectProperty isMapOf;
+	public final OWLObjectProperty isSetOf;
 	public final OWLObjectProperty isGroundingOf;
 	public final OWLObjectProperty onlyEntity;
 	public final OWLObjectProperty hasRepresentation;
@@ -74,14 +74,14 @@ public class IceIris {
 		this.node = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Node"));
 		this.computationNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "ComputationNode"));
 		this.sourceNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "SourceNode"));
-		this.iroNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "IRONode"));
-		this.mapNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "MapNode"));
+		this.transformationNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "TransformationNode"));
+		this.setNode = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "SetNode"));
 		this.requiredStream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "RequiredStream"));
-		this.requiredMap = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "RequiredMap"));
+		this.requiredSet = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "RequiredSet"));
 		this.system = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "System"));
 		this.stream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Stream"));
 		this.namedStream = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "NamedStream"));
-		this.namedMap = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "NamedMap"));
+		this.namedSet = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "NamedSet"));
 		this.groundingOWLClass = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Grounding"));
 		this.metadataOWLClass = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "Metadata"));
 		this.entityTypeOWLClass = p_dataFactory.getOWLClass(IRI.create(ICE_IRI_PREFIX + "EntityType"));
@@ -90,13 +90,13 @@ public class IceIris {
 
 		this.hasSystem = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasSystem"));
 		this.hasInput = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasInput"));
-		this.hasInputMap = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasInputMap"));
+		this.hasInputSet = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasInputSet"));
 		this.hasRelatedInput = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasRelatedInput"));
 		this.hasOutput = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasOutput"));
-		this.hasOutputMap = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasOutputMap"));
+		this.hasOutputSet = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasOutputSet"));
 		this.isSystemOf = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "isSystemOf"));
 		this.isStreamOf = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "isStreamOf"));
-		this.isMapOf = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "isMapOf"));
+		this.isSetOf = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "isSetOf"));
 		this.isGroundingOf = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "isGroundingOf"));
 		this.onlyEntity = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "onlyEntity"));
 		this.hasRepresentation = p_dataFactory.getOWLObjectProperty(IRI.create(ICE_IRI_PREFIX + "hasRepresentation"));

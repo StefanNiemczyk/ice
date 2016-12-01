@@ -74,7 +74,7 @@ TEST(TransformationNode, simpleTest)
 //  const ont::entity entityRelated,
 
   std::map<std::string, std::string> nodeConfig;
-  auto node = engine->getNodeStore()->registerNode(ice::NodeType::IRO,
+  auto node = engine->getNodeStore()->registerNode(ice::NodeType::TRANSFORMATION,
                                                    "P2Dto3D",
                                                    "testnode",
                                                    "test",

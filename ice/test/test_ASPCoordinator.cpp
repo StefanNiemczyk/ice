@@ -93,7 +93,7 @@ TEST(ASPModelGenerator, transformationTest)
 
   auto stream1 = engine->getStreamStore()->getStream<ice::GContainer>(&specPos3D, "http://vs.uni-kassel.de/IceTest#Pos3DSourceNodeInd",
                                                                          "http://vs.uni-kassel.de/IceTest#TestTransformSystem");
-  auto stream2 = engine->getStreamStore()->getStream<ice::GContainer>(&specPos2D, "iro7",
+  auto stream2 = engine->getStreamStore()->getStream<ice::GContainer>(&specPos2D, "transformation7",
                                                                          "http://vs.uni-kassel.de/IceTest#TestTransformSystem");
 
   ASSERT_TRUE((stream1 ? true : false));

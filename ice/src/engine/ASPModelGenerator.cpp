@@ -417,7 +417,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
       break;
   }
 
-  // TODO interpret map
+  // TODO interpret set
   // TODO selected stream
 
   return valid;
@@ -548,7 +548,7 @@ void ASPModelGenerator::readSystemsFromOntology()
       this->asp->add("base", {}, "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ").");
     }
 
-    auto nodes = this->ontology->readNodesAndIROsAsASP(ontSystem);
+    auto nodes = this->ontology->readNodesAsASP(ontSystem);
 
     this->toASP(nodes, entity);
   }
@@ -592,17 +592,17 @@ void ASPModelGenerator::toASP(std::unique_ptr<std::vector<std::vector<std::strin
     {
       type = ASPElementType::ASP_REQUIRED_STREAM;
     }
-    else if (typeStr == "MAP_NODE")
+    else if (typeStr == "SET_NODE")
     {
-      type = ASPElementType::ASP_MAP_NODE;
+      type = ASPElementType::ASP_SET_NODE;
     }
-    else if (typeStr == "IRO_NODE")
+    else if (typeStr == "TRANSFORMATION_NODE")
     {
-      type = ASPElementType::ASP_IRO_NODE;
+      type = ASPElementType::ASP_TRANSFORMATION_NODE;
     }
-    else if (typeStr == "REQUIRED_MAP")
+    else if (typeStr == "REQUIRED_SET")
     {
-      type = ASPElementType::ASP_REQUIRED_MAP;
+      type = ASPElementType::ASP_REQUIRED_SET;
     }
     else
     {
@@ -640,8 +640,8 @@ void ASPModelGenerator::toASP(std::unique_ptr<std::vector<std::vector<std::strin
       {
         case ASPElementType::ASP_COMPUTATION_NODE:
         case ASPElementType::ASP_SOURCE_NODE:
-        case ASPElementType::ASP_MAP_NODE:
-        case ASPElementType::ASP_IRO_NODE:
+        case ASPElementType::ASP_SET_NODE:
+        case ASPElementType::ASP_TRANSFORMATION_NODE:
           if (false == this->nodeStore->existNodeCreator(element->className))
           {
             _log->warn("Missing creator for node '%v' of type '%v', cpp grounding '%v', asp external set to false",
@@ -691,8 +691,8 @@ void ASPModelGenerator::readTransformations()
     auto &trans = transNode.second->transformation;
     auto &name = transNode.second->shortName;
     auto scope = this->ontology->toShortIri(trans->getScope());
-    std::string iro = "autoTrans(" + system + "," + name + ",any,none).";
-    ss << iro << std::endl;
+    std::string autoTrans = "autoTrans(" + system + "," + name + ",any,none).";
+    ss << autoTrans << std::endl;
 
     ss << "output(" << system << "," << name << "," << scope << ","
         << this->ontology->toShortIri(trans->getTargetRepresentation()->name) + ",none)." << std::endl;
@@ -700,7 +700,7 @@ void ASPModelGenerator::readTransformations()
     for (auto &input : trans->getInputs())
     {
       ss << "input(" << system << "," << name << "," << scope << ","
-          << this->ontology->toShortIri(input->name) << ",none,1,1) :- " << iro << std::endl;
+          << this->ontology->toShortIri(input->name) << ",none,1,1) :- " << autoTrans << std::endl;
     }
 
     ss << "metadataProcessing(cost," << system << "," << name << ",10)." << std::endl;
@@ -712,9 +712,9 @@ void ASPModelGenerator::readTransformations()
     element->name = transNode.second->shortName;
     element->className = transNode.second->name;
     element->state = ASPElementState::ADDED_TO_ASP;
-    element->type = ASPElementType::ASP_IRO_NODE;
+    element->type = ASPElementType::ASP_TRANSFORMATION_NODE;
 
-    auto value = supplementary::ClingWrapper::stringToValue(iro.c_str());
+    auto value = supplementary::ClingWrapper::stringToValue(autoTrans.c_str());
 
     element->external = this->asp->getExternal(*value.name(), value.args());
     element->external->assign(false);

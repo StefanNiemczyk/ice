@@ -63,26 +63,26 @@ public:
   bool addDimensionToRep(std::string const p_representation, std::string p_dimensions, std::string const p_entityScope);
   bool addDimensionToRep(std::string const p_representation, std::string p_dimensions);
   bool addNamedStream(std::string const p_stream, std::string const p_entityScope, std::string const p_representation);
-  bool addNamedMap(std::string const p_map, std::string const p_entityType, std::string const p_entityScope, std::string const p_representation);
+  bool addNamedSet(std::string const p_set, std::string const p_entityType, std::string const p_entityScope, std::string const p_representation);
   bool addRequiredStream(std::string const p_namedStream, std::string const p_namedStreamClass, std::string const p_system, std::string const p_entity, std::string const p_entityRelated);
-  bool addRequiredMap(std::string const p_namedMap, std::string const p_namedMapClass, std::string const p_system, std::string const p_entityRelated);
+  bool addRequiredSet(std::string const p_namedSet, std::string const p_namedSetClass, std::string const p_system, std::string const p_entityRelated);
   bool addSourceNodeClass(std::string const p_node, std::vector<std::string> p_outputs,
                           std::vector<int> p_outputsMinSize, std::vector<int> p_outputsMaxSize);
   bool addComputationNodeClass(std::string const p_node, std::vector<std::string> p_inputs,
                                std::vector<int> p_inputsMinSize, std::vector<int> p_inputsMaxSize,
                                std::vector<std::string> p_outputs, std::vector<int> p_outputsMinSize,
                                std::vector<int> p_outputsMaxSize);
-  bool addIroNodeClass(std::string const p_node, std::vector<std::string> p_inputs, std::vector<int> p_inputsMinSize,
+  bool addTransformationNodeClass(std::string const p_node, std::vector<std::string> p_inputs, std::vector<int> p_inputsMinSize,
                        std::vector<int> p_inputsMaxSize, std::vector<std::string> p_inputsRelated,
                        std::vector<int> p_inputsRelatedMinSize, std::vector<int> p_inputsRelatedMaxSize,
                        std::vector<std::string> p_outputs, std::vector<int> p_outputsMinSize,
                        std::vector<int> p_outputsMaxSize);
-  bool addMapNodeClass(std::string const p_node, std::vector<std::string> p_inputs, std::vector<int> p_inputsMinSize,
+  bool addSetNodeClass(std::string const p_node, std::vector<std::string> p_inputs, std::vector<int> p_inputsMinSize,
                        std::vector<int> p_inputsMaxSize, std::vector<std::string> p_inputsRelated,
                        std::vector<int> p_inputsRelatedMinSize, std::vector<int> p_inputsRelatedMaxSize,
-                       std::vector<std::string> p_inputMaps, std::vector<int> p_inputMapsMinSize,
-                       std::vector<int> p_inputMapsMaxSize, std::vector<std::string> p_outputMaps,
-                       std::vector<int> p_outputMapsMinSize, std::vector<int> p_outputMapsMaxSize);
+                       std::vector<std::string> p_inputSets, std::vector<int> p_inputSetsMinSize,
+                       std::vector<int> p_inputSetsMaxSize, std::vector<std::string> p_outputSets,
+                       std::vector<int> p_outputSetsMinSize, std::vector<int> p_outputSetsMaxSize);
   std::string toLongIri(std::string p_shortIri);
   std::string toShortIri(std::string p_longIri);
   std::string toShortIriAll(std::string p_string);
@@ -94,10 +94,10 @@ public:
   std::string readInformationStructureAsASP();
   std::string readRepresentationsAsCSV();
   std::unique_ptr<std::vector<std::string>> readRepresentations();
-  std::unique_ptr<std::vector<std::vector<std::string>>> readNodesAndIROsAsASP(std::string const p_system);
+  std::unique_ptr<std::vector<std::vector<std::string>>> readNodesAsASP(std::string const p_system);
   bool addNodeIndividual(std::string const p_node, std::string const p_nodeClass, std::string const p_system, std::string const p_aboutEntity, std::string const p_aboutRelatedEntity, std::vector<std::string> p_metadatas,
       std::vector<int> p_metadataValues, std::vector<int> p_metadataValues2, std::vector<std::string> p_metadataGroundings);
-  bool addIROIndividual(std::string const p_iro, std::string const p_iroClass, std::string const p_system, std::vector<std::string> p_metadatas,
+  bool addTransformationIndividual(std::string const p_transformation, std::string const p_transformationClass, std::string const p_system, std::vector<std::string> p_metadatas,
       std::vector<int> p_metadataValues, std::vector<std::string> p_metadataGroundings);
   int getSomeMinCardinality();
   bool setSomeMinCardinality(int p_value);
@@ -160,22 +160,22 @@ private:
   jmethodID                                             addDimensionToRep2Method; /**< Method id */
   jmethodID                                             addDimensionToRep3Method; /**< Method id */
   jmethodID                                             addNamedStreamMethod; /**< Method id */
-  jmethodID                                             addNamedMapMethod; /**< Method id */
+  jmethodID                                             addNamedSetMethod; /**< Method id */
   jmethodID                                             addRequiredStreamMethod; /**< Method id */
-  jmethodID                                             addRequiredMapMethod; /**< Method id */
+  jmethodID                                             addRequiredSetMethod; /**< Method id */
   jmethodID                                             addSourceNodeClassMethod; /**< Method id */
   jmethodID                                             addComputationNodeClassMethod; /**< Method id */
-  jmethodID                                             addIroNodeClassMethod; /**< Method id */
-  jmethodID                                             addMapNodeClassMethod; /**< Method id */
+  jmethodID                                             addTransformationNodeClassMethod; /**< Method id */
+  jmethodID                                             addSetNodeClassMethod; /**< Method id */
 
   jmethodID                                             addOntologyIRIMethod; /**< Method id */
   jmethodID                                             removeOntologyIRIMethod; /**< Method id */
   jmethodID                                             getOntologyIriMappingMethod; /**< Method id */
   jmethodID                                             readInformationStructureAsASPMethod; /**< Method id */
   jmethodID                                             readRepresentationsAsCSVMethod; /**< Method id */
-  jmethodID                                             readNodesAndIROsAsASPMethod; /**< Method id */
+  jmethodID                                             readNodesAsASPMethod; /**< Method id */
   jmethodID                                             addNodeIndividualMethod; /**< Method id */
-  jmethodID                                             addIROIndividualMethod; /**< Method id */
+  jmethodID                                             addTransformationIndividualMethod; /**< Method id */
   jmethodID                                             getSomeMinCardinalityMethod; /**< Method id */
   jmethodID                                             setSomeMinCardinalityMethod; /**< Method id */
   jmethodID                                             getSomeMaxCardinalityMethod; /**< Method id */

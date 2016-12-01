@@ -587,10 +587,10 @@ public class IceOntologyInterface {
 		return true;
 	}
 
-	public boolean addNamedMap(final String p_map, final String p_aboutEntity, final String p_entityScope,
+	public boolean addNamedSet(final String p_set, final String p_aboutEntity, final String p_entityScope,
 			final String p_representation) {
-		IRI mapIRI = IRI.create(this.mainIRIPrefix + p_map);
-		if (this.mainOntology.containsClassInSignature(mapIRI))
+		IRI setIRI = IRI.create(this.mainIRIPrefix + p_set);
+		if (this.mainOntology.containsClassInSignature(setIRI))
 			return false;
 
 		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
@@ -601,27 +601,27 @@ public class IceOntologyInterface {
 		OWLClass representation = this.findOWLClass(this.ii.representation, p_representation);
 
 		if (entity == null || entityScope == null || representation == null) {
-			logError(String.format("Unknown entity type class '%s' for map '%s', map not created.", p_aboutEntity,
-					p_map));
+			logError(String.format("Unknown entity type class '%s' for set '%s', set not created.", p_aboutEntity,
+					p_set));
 			return false;
 		}
 
 		// create value scope
-		OWLClass map = this.dataFactory.getOWLClass(mapIRI);
-		OWLSubClassOfAxiom axiom = dataFactory.getOWLSubClassOfAxiom(map, this.ii.namedMap);
+		OWLClass set = this.dataFactory.getOWLClass(setIRI);
+		OWLSubClassOfAxiom axiom = dataFactory.getOWLSubClassOfAxiom(set, this.ii.namedSet);
 		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, axiom);
 		changes.add(addAxiomChange);
 
 		OWLClassExpression hasRepresentation = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.hasRepresentation,
 				representation);
 		OWLClassExpression scope = this.dataFactory.getOWLObjectIntersectionOf(entityScope, hasRepresentation);
-		OWLClassExpression isStreamOf = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.isMapOf, scope);
-		OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(map, isStreamOf);
+		OWLClassExpression isStreamOf = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.isSetOf, scope);
+		OWLSubClassOfAxiom ax = this.dataFactory.getOWLSubClassOfAxiom(set, isStreamOf);
 		addAxiomChange = new AddAxiom(this.mainOntology, ax);
 		changes.add(addAxiomChange);
 
 		OWLClassExpression aboutEntity = this.dataFactory.getOWLObjectSomeValuesFrom(this.ii.aboutEntity, entity);
-		ax = this.dataFactory.getOWLSubClassOfAxiom(map, aboutEntity);
+		ax = this.dataFactory.getOWLSubClassOfAxiom(set, aboutEntity);
 		addAxiomChange = new AddAxiom(this.mainOntology, ax);
 		changes.add(addAxiomChange);
 
@@ -708,70 +708,50 @@ public class IceOntologyInterface {
 		return true;
 	}
 
-	public boolean addRequiredMap(final String p_requirdMap, final String p_namedMapClass, final String p_system,
+	public boolean addRequiredSet(final String p_requirdSet, final String p_namedSetClass, final String p_system,
 			final String p_relatedEntity) {
-		IRI requiredMapIRI = IRI.create(this.mainIRIPrefix + p_requirdMap);
-		if (this.mainOntology.containsIndividualInSignature(requiredMapIRI))
+		IRI requiredSetIRI = IRI.create(this.mainIRIPrefix + p_requirdSet);
+		if (this.mainOntology.containsIndividualInSignature(requiredSetIRI))
 			return false;
 
-		// IRI entityIRI = IRI.create(this.mainIRIPrefix + p_entity);
+		OWLClass namedSetClass = this.findOWLClass(this.ii.namedSet, p_namedSetClass);
 
-		// if (p_entity == null || p_entity.isEmpty()
-		// || false ==
-		// this.mainOntology.containsIndividualInSignature(entityIRI)) {
-		// log(String.format("Unknown entity '%s' for required stream '%s', stream not created.",
-		// p_entity,
-		// p_requirdStream));
-		// return false;
-		// }
-
-		OWLClass namedMapClass = this.findOWLClass(this.ii.namedMap, p_namedMapClass);
-
-		if (namedMapClass == null) {
-			logWarning(String.format("Unknown named map class '%s' for named map '%s', required map not created.",
-					p_namedMapClass, p_requirdMap));
+		if (namedSetClass == null) {
+			logWarning(String.format("Unknown named set class '%s' for named set '%s', required set not created.",
+					p_namedSetClass, p_requirdSet));
 			return false;
 		}
 
 		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 
-		OWLIndividual requiredMap = this.dataFactory.getOWLNamedIndividual(requiredMapIRI);
+		OWLIndividual requiredSet = this.dataFactory.getOWLNamedIndividual(requiredSetIRI);
 		OWLIndividual system = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_system));
 
-		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(namedMapClass, requiredMap);
+		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(namedSetClass, requiredSet);
 		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, ax);
 		changes.add(addAxiomChange);
 
 		OWLObjectPropertyAssertionAxiom assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(
-				this.ii.isSystemOf, system, requiredMap);
+				this.ii.isSystemOf, system, requiredSet);
 		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
 		changes.add(addAxiomChange);
 
-		ax = this.dataFactory.getOWLClassAssertionAxiom(this.ii.requiredMap, requiredMap);
+		ax = this.dataFactory.getOWLClassAssertionAxiom(this.ii.requiredSet, requiredSet);
 		addAxiomChange = new AddAxiom(this.mainOntology, ax);
 		changes.add(addAxiomChange);
-
-		// OWLIndividual entityInd =
-		// this.dataFactory.getOWLNamedIndividual(entityIRI);
-		//
-		// assertion =
-		// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.aboutEntity,
-		// requiredStream, entityInd);
-		// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-		// changes.add(addAxiomChange);
 
 		if (p_relatedEntity != null && false == p_relatedEntity.isEmpty()) {
 			IRI relatedEntityIRI = IRI.create(this.mainIRIPrefix + p_relatedEntity);
 			if (false == this.mainOntology.containsIndividualInSignature(relatedEntityIRI)) {
 				logWarning(String.format(
-						"Unknown related entity '%s' for required map '%s', required map not created.",
-						p_relatedEntity, p_requirdMap));
+						"Unknown related entity '%s' for required set '%s', required set not created.",
+						p_relatedEntity, p_requirdSet));
 				return false;
 			}
 
 			OWLIndividual relatedEntityInd = this.dataFactory.getOWLNamedIndividual(relatedEntityIRI);
 
-			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.aboutRelatedEntity, requiredMap,
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.aboutRelatedEntity, requiredSet,
 					relatedEntityInd);
 			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
 			changes.add(addAxiomChange);
@@ -800,31 +780,31 @@ public class IceOntologyInterface {
 				null, null, p_outputs, p_outputsMinSize, p_outputsMaxSize, null, null, null, null, null, null);
 	}
 
-	public boolean addIroNodeClass(final String p_node, final String p_inputs[], final int p_inputsMinSize[],
-			final int p_inputsMaxSize[], final String p_inputsRelated[], final int p_inputsRelatedMinSize[],
-			final int p_inputsRelatedMaxSize[], final String p_outputs[], final int p_outputsMinSize[],
-			final int p_outputsMaxSize[]) {
-		return this.addNodeClass(p_node, this.ii.iroNode, p_inputs, p_inputsMinSize, p_inputsMaxSize, p_inputsRelated,
-				p_inputsRelatedMinSize, p_inputsRelatedMaxSize, p_outputs, p_outputsMinSize, p_outputsMaxSize, null,
-				null, null, null, null, null);
+	public boolean addTransformationNodeClass(final String p_node, final String p_inputs[],
+			final int p_inputsMinSize[], final int p_inputsMaxSize[], final String p_inputsRelated[],
+			final int p_inputsRelatedMinSize[], final int p_inputsRelatedMaxSize[], final String p_outputs[],
+			final int p_outputsMinSize[], final int p_outputsMaxSize[]) {
+		return this.addNodeClass(p_node, this.ii.transformationNode, p_inputs, p_inputsMinSize, p_inputsMaxSize,
+				p_inputsRelated, p_inputsRelatedMinSize, p_inputsRelatedMaxSize, p_outputs, p_outputsMinSize,
+				p_outputsMaxSize, null, null, null, null, null, null);
 	}
 
-	public boolean addMapNodeClass(final String p_node, final String p_inputs[], final int p_inputsMinSize[],
+	public boolean addSetNodeClass(final String p_node, final String p_inputs[], final int p_inputsMinSize[],
 			final int p_inputsMaxSize[], final String p_inputsRelated[], final int p_inputsRelatedMinSize[],
-			final int p_inputsRelatedMaxSize[], final String p_inputMaps[], final int p_inputMapsMinSize[],
-			final int p_inputMapsMaxSize[], final String p_outputMaps[], final int p_outputMapsMinSize[],
-			final int p_outputMapsMaxSize[]) {
-		return this.addNodeClass(p_node, this.ii.mapNode, p_inputs, p_inputsMinSize, p_inputsMaxSize, p_inputsRelated,
-				p_inputsRelatedMinSize, p_inputsRelatedMaxSize, null, null, null, p_inputMaps, p_inputMapsMinSize,
-				p_inputMapsMaxSize, p_outputMaps, p_outputMapsMinSize, p_outputMapsMaxSize);
+			final int p_inputsRelatedMaxSize[], final String p_inputSets[], final int p_inputSetsMinSize[],
+			final int p_inputSetsMaxSize[], final String p_outputSets[], final int p_outputSetsMinSize[],
+			final int p_outputSetsMaxSize[]) {
+		return this.addNodeClass(p_node, this.ii.setNode, p_inputs, p_inputsMinSize, p_inputsMaxSize, p_inputsRelated,
+				p_inputsRelatedMinSize, p_inputsRelatedMaxSize, null, null, null, p_inputSets, p_inputSetsMinSize,
+				p_inputSetsMaxSize, p_outputSets, p_outputSetsMinSize, p_outputSetsMaxSize);
 	}
 
 	public boolean addNodeClass(final String p_node, final OWLClass p_nodeClass, final String p_inputs[],
 			final int p_inputsMinSize[], final int p_inputsMaxSize[], final String p_inputsRelated[],
 			final int p_inputsRelatedMinSize[], final int p_inputsRelatedMaxSize[], final String p_outputs[],
-			final int p_outputsMinSize[], final int p_outputsMaxSize[], final String p_inputMaps[],
-			final int p_inputMapsMinSize[], final int p_inputMapsMaxSize[], final String p_outputMaps[],
-			final int p_outputMapsMinSize[], final int p_outputMapsMaxSize[]) {
+			final int p_outputsMinSize[], final int p_outputsMaxSize[], final String p_inputSets[],
+			final int p_inputSetsMinSize[], final int p_inputSetsMaxSize[], final String p_outputSets[],
+			final int p_outputSetsMinSize[], final int p_outputSetsMaxSize[]) {
 		IRI nodeIRI = IRI.create(this.mainIRIPrefix + p_node);
 		if (this.mainOntology.containsClassInSignature(nodeIRI)) {
 			logWarning(String.format("Node with name '%s' already exists, will not be created.", p_node));
@@ -860,16 +840,16 @@ public class IceOntologyInterface {
 			return false;
 		}
 
-		// create input maps
-		if (false == this.addPropertiesToNode(node, this.ii.hasInputMap, this.ii.namedMap, p_inputMaps,
-				p_inputMapsMinSize, p_inputMapsMaxSize, changes)) {
+		// create input sets
+		if (false == this.addPropertiesToNode(node, this.ii.hasInputSet, this.ii.namedSet, p_inputSets,
+				p_inputSetsMinSize, p_inputSetsMaxSize, changes)) {
 			logWarning(String.format("Node '%s' not created.", p_node));
 			return false;
 		}
 
-		// create output maps
-		if (false == this.addPropertiesToNode(node, this.ii.hasOutputMap, this.ii.namedMap, p_outputMaps,
-				p_outputMapsMinSize, p_outputMapsMaxSize, changes)) {
+		// create output sets
+		if (false == this.addPropertiesToNode(node, this.ii.hasOutputSet, this.ii.namedSet, p_outputSets,
+				p_outputSetsMinSize, p_outputSetsMaxSize, changes)) {
 			logWarning(String.format("Node '%s' not created.", p_node));
 			return false;
 		}
@@ -1037,15 +1017,6 @@ public class IceOntologyInterface {
 			changes.add(addAxiomChange);
 		}
 
-		// ---
-		// Required for structure reasoner
-		// assertion =
-		// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isSystemOfOWLProperty,
-		// system.getIndividual(), nodeInd);
-		// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-		// changes.add(addAxiomChange);
-		// ---
-
 		// add metadata
 		for (int i = 0; i < p_metadatas.length; ++i) {
 			String metadata = p_metadatas[i];
@@ -1071,16 +1042,6 @@ public class IceOntologyInterface {
 			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.hasMetadata, nodeInd, metadataInd);
 			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
 			changes.add(addAxiomChange);
-
-			// ---
-			// Required for structure reasoner
-			// assertion =
-			// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isMetadataOfOWLProperty,
-			// metadataInd,
-			// nodeInd);
-			// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-			// changes.add(addAxiomChange);
-			// ---
 
 			// Set Values
 			OWLDataPropertyAssertionAxiom dataAssertion = this.dataFactory.getOWLDataPropertyAssertionAxiom(
@@ -1108,15 +1069,6 @@ public class IceOntologyInterface {
 					metadataGrounding);
 			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
 			changes.add(addAxiomChange);
-
-			// ---
-			// Required for structure reasoner
-			// assertion =
-			// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isGroundingOfOWLProperty,
-			// metadataGrounding, metadataInd);
-			// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-			// changes.add(addAxiomChange);
-			// ---
 		}
 
 		// apply changes
@@ -1127,11 +1079,11 @@ public class IceOntologyInterface {
 		return true;
 	}
 
-	public boolean addIROIndividual(final String p_iro, final String p_iroClass, final String p_system,
-			String[] p_metadatas, int[] p_metadataValues, String[] p_metadataGroundings) {
-		// check if iro exists
-		IRI iroIRI = IRI.create(this.mainIRIPrefix + p_iro);
-		if (this.mainOntology.containsIndividualInSignature(iroIRI))
+	public boolean addTransformationIndividual(final String p_transformation, final String p_transformationClass,
+			final String p_system, String[] p_metadatas, int[] p_metadataValues, String[] p_metadataGroundings) {
+		// check if transformation exists
+		IRI transformationIRI = IRI.create(this.mainIRIPrefix + p_transformation);
+		if (this.mainOntology.containsIndividualInSignature(transformationIRI))
 			return false;
 
 		OWLIndividual system = this.findOWLIndividual(this.ii.system, p_system, false);
@@ -1143,35 +1095,27 @@ public class IceOntologyInterface {
 			this.manager.addAxiom(this.mainOntology, ax);
 		}
 
-		// create iro
+		// create transformation
 		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-		OWLIndividual iroInd = this.dataFactory.getOWLNamedIndividual(iroIRI);
+		OWLIndividual transformationInd = this.dataFactory.getOWLNamedIndividual(transformationIRI);
 
-		OWLClass iroCls = this.findOWLClass(this.ii.iroNode, p_iroClass);
+		OWLClass transformationCls = this.findOWLClass(this.ii.transformationNode, p_transformationClass);
 
-		if (iroCls == null) {
-			logWarning(String.format("Unknown IRO class '%s' for IRO '%s' in system '%s', IRO not created.",
-					p_iroClass, p_iro, p_system));
+		if (transformationCls == null) {
+			logWarning(String
+					.format("Unknown transformation class '%s' for transformation '%s' in system '%s', transformation not created.",
+							p_transformationClass, p_transformation, p_system));
 			return false;
 		}
 
-		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(iroCls, iroInd);
+		OWLClassAssertionAxiom ax = this.dataFactory.getOWLClassAssertionAxiom(transformationCls, transformationInd);
 		AddAxiom addAxiomChange = new AddAxiom(this.mainOntology, ax);
 		changes.add(addAxiomChange);
 
 		OWLObjectPropertyAssertionAxiom assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(
-				this.ii.hasSystem, iroInd, system);
+				this.ii.hasSystem, transformationInd, system);
 		addAxiomChange = new AddAxiom(this.mainOntology, assertion);
 		changes.add(addAxiomChange);
-
-		// ---
-		// Required for structure reasoner
-		// assertion =
-		// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isSystemOfOWLProperty,
-		// system.getIndividual(), nodeInd);
-		// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-		// changes.add(addAxiomChange);
-		// ---
 
 		// add metadata
 		for (int i = 0; i < p_metadatas.length; ++i) {
@@ -1182,31 +1126,23 @@ public class IceOntologyInterface {
 			OWLClass metadataCls = this.findOWLClass(this.ii.metadataOWLClass, metadata);
 
 			if (metadataCls == null) {
-				logWarning(String.format("Unknown Metadata '%s' for IRO '%s' in system '%s', IRO not created.",
-						metadata, p_iro, p_system));
+				logWarning(String.format(
+						"Unknown Metadata '%s' for transformation '%s' in system '%s', transformation not created.",
+						metadata, p_transformation, p_system));
 				return false;
 			}
 
-			OWLIndividual metadataInd = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix + p_iro
-					+ metadata));
+			OWLIndividual metadataInd = this.dataFactory.getOWLNamedIndividual(IRI.create(this.mainIRIPrefix
+					+ p_transformation + metadata));
 
 			ax = this.dataFactory.getOWLClassAssertionAxiom(metadataCls, metadataInd);
 			addAxiomChange = new AddAxiom(this.mainOntology, ax);
 			changes.add(addAxiomChange);
 
-			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.hasMetadata, iroInd, metadataInd);
+			assertion = this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.ii.hasMetadata, transformationInd,
+					metadataInd);
 			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
 			changes.add(addAxiomChange);
-
-			// ---
-			// Required for structure reasoner
-			// assertion =
-			// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isMetadataOfOWLProperty,
-			// metadataInd,
-			// nodeInd);
-			// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-			// changes.add(addAxiomChange);
-			// ---
 
 			OWLDataPropertyAssertionAxiom dataAssertion = this.dataFactory.getOWLDataPropertyAssertionAxiom(
 					this.ii.hasMetadataValue, metadataInd, value);
@@ -1219,8 +1155,8 @@ public class IceOntologyInterface {
 
 			if (metadataGrounding == null) {
 				logWarning(String
-						.format("Unknown Metadata grounding '%s' of grounding '%s' for IRO '%s' in system '%s', IRO not created.",
-								grounding, metadata, p_iro, p_system));
+						.format("Unknown Metadata grounding '%s' of grounding '%s' for transformation '%s' in system '%s', transformation not created.",
+								grounding, metadata, p_transformation, p_system));
 				return false;
 			}
 
@@ -1228,15 +1164,6 @@ public class IceOntologyInterface {
 					metadataGrounding);
 			addAxiomChange = new AddAxiom(this.mainOntology, assertion);
 			changes.add(addAxiomChange);
-
-			// ---
-			// Required for structure reasoner
-			// assertion =
-			// this.dataFactory.getOWLObjectPropertyAssertionAxiom(this.isGroundingOfOWLProperty,
-			// metadataGrounding, metadataInd);
-			// addAxiomChange = new AddAxiom(this.mainOntology, assertion);
-			// changes.add(addAxiomChange);
-			// ---
 		}
 
 		// apply changes
@@ -1261,7 +1188,6 @@ public class IceOntologyInterface {
 	}
 
 	public String readInformationStructureAsASP() {
-		// long start = System.currentTimeMillis();
 		Set<OWLOntology> onts = new HashSet<OWLOntology>();
 		onts.add(this.mainOntology);
 
@@ -1274,15 +1200,6 @@ public class IceOntologyInterface {
 		for (OWLClassExpression cls : classes) {
 			cls.accept(isv);
 		}
-		// long stop = System.currentTimeMillis();
-		// if (stop - start > 100) {
-		// System.out.println("Time readInformationStructureAsASP " + (mid -
-		// start));
-		// System.out.println("Time readInformationStructureAsASP " + (mid2 -
-		// start));
-		// System.out.println("Time readInformationStructureAsASP " + (stop -
-		// start));
-		// }
 
 		return isv.toString();
 	}
@@ -1307,7 +1224,7 @@ public class IceOntologyInterface {
 		return sb.toString();
 	}
 
-	public String[][] readNodesAndIROsAsASP(String p_system) {
+	public String[][] readNodesAsASP(String p_system) {
 		Set<OWLOntology> onts = new HashSet<OWLOntology>();
 		onts.add(this.mainOntology);
 		onts.addAll(this.imports);
@@ -1321,7 +1238,7 @@ public class IceOntologyInterface {
 			this.manager.addAxiom(this.mainOntology, ax);
 		}
 
-		NodeIROVisitor niv = new NodeIROVisitor(this, onts, this.getReasoner(), this.ii);
+		NodeVisitor niv = new NodeVisitor(this, onts, this.getReasoner(), this.ii);
 
 		List<List<String>> result = niv.readInformation(system);
 
@@ -1523,16 +1440,9 @@ public class IceOntologyInterface {
 		int index = iriMapping.indexOf(values[0]);
 
 		if (index < 0) {
-			// index = IRI_MAPPING.size();
-			// IRI_MAPPING.add(values[0]);
-
 			this.logWarning(String.format("Unkonwn IRI '%s' from '%s', no mapping to short iri", values[0], p_iri));
 		}
 
-		// System.out.println(index + "   " + values[1] + "   " + values[0] +
-		// "   " + (IRI_MAPPING.size()));
-
-		// return "o" + index + "_" + values[1];
 		return p_iri.toString();
 	}
 

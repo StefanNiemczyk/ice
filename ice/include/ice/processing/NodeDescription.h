@@ -22,10 +22,10 @@ namespace ice
  */
 enum NodeType
 {
-  PROCESSING, //!< PROCESSING Processing node, has inputs and outputs
-  SOURCE,     //!< SOURCE Source node, only outputs
-  IRO,        //!< IRO IRO node, transforms information between representations
-  MAP         //!< MAP Map node creates or processes maps
+  PROCESSING,           //!< PROCESSING Processing node, has inputs and outputs
+  SOURCE,               //!< SOURCE Source node, only outputs
+  TRANSFORMATION,       //!< TRANSFORMATION transformation node, transforms information between representations
+  SET                   //!< SET set node creates or processes sets
 };
 
 //* NodeDescription

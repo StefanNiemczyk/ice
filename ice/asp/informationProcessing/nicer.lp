@@ -39,18 +39,18 @@ metadataOutput(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE1+VALUE2+VALUE3) :-
 % metadata computation: islandCoverage
 % definition
 metadata(stream,islandCoverage,maximize).
-metadata(map,islandCoverage,maximize).
+metadata(set,islandCoverage,maximize).
 
 % Propagation rule
-metadataMap(k,islandCoverage,map(k,SYSTEM,mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,STEP),VALUE+VALUE_SUM) :- 
-	map(k,SYSTEM,mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,STEP), 
+metadataSet(k,islandCoverage,set(k,SYSTEM,setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,STEP),VALUE+VALUE_SUM) :- 
+	set(k,SYSTEM,setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,STEP), 
 	metadataOutput(islandCoverage,SYSTEM,NODE,sum,_,_),
 	VALUE = #count{ ISLAND : 
-		connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),stream(k,_,node(_,SYSTEM2,_,_,_),_,_)), 
+		connectToSet(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),stream(k,_,node(_,SYSTEM2,_,_,_),_,_)), 
 		system(SYSTEM2,ISLAND)}, 
-	VALUE_SUM = #sum{D,MAP_INPUT : 
-		connectToMap(mapNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),MAP_INPUT),
-		metadataMap(k,islandCoverage,MAP_INPUT,D)}, 
+	VALUE_SUM = #sum{D,SET_INPUT : 
+		connectToSet(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),SET_INPUT),
+		metadataSet(k,islandCoverage,SET_INPUT,D)}, 
 	query(k).
 
 % optimization

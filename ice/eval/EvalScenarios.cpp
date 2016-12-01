@@ -798,7 +798,7 @@ public:
           ss << "EvalNode" << i << "_" << j;
           std::string node = ss.str();
 
-          oi.addIroNodeClass(node, inputs, inputsMin, inputsMax, inputsRelated, inputsRelatedMin, inputsRelatedMax,
+          oi.addTransformationNodeClass(node, inputs, inputsMin, inputsMax, inputsRelated, inputsRelatedMin, inputsRelatedMax,
                              outputs, outputsMin, outputsMax);
 
 //            metadatas.push_back("Delay");
@@ -2128,7 +2128,7 @@ public:
 
         // Add req map
         std::string map = "EvalMap";
-        oi.addNamedMap(map, entityType, scope, "ReqRepresentation");
+        oi.addNamedSet(map, entityType, scope, "ReqRepresentation");
 
         inputs.clear();
         inputsMin.clear();
@@ -2144,7 +2144,7 @@ public:
         outputsMin.push_back(1);
         outputsMax.push_back(1);
 
-        oi.addMapNodeClass("EvalMapNode", inputs, inputsMin, inputsMax, std::vector<std::string>(), std::vector<int>(),
+        oi.addSetNodeClass("EvalMapNode", inputs, inputsMin, inputsMax, std::vector<std::string>(), std::vector<int>(),
                            std::vector<int>(), std::vector<std::string>(), std::vector<int>(), std::vector<int>(),
                            outputs, outputsMin, outputsMax);
 
@@ -2219,7 +2219,7 @@ public:
 
               ss.str("");
               ss << "Req" << map << i;
-              oi.addRequiredMap(ss.str(), map, system, "");
+              oi.addRequiredSet(ss.str(), map, system, "");
             }
           }
         }

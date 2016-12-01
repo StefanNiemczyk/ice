@@ -86,6 +86,12 @@ std::string NodeDescription::toString()
     case (NodeType::SOURCE):
       ss << "Source";
       break;
+    case (NodeType::TRANSFORMATION):
+      ss << "Transformation";
+      break;
+    case (NodeType::SET):
+      ss << "Set";
+      break;
   }
   ss << ")";
 

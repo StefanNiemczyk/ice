@@ -70,7 +70,7 @@ add_jar(
   java/src/de/unikassel/vs/ice/IceIris.java
   java/src/de/unikassel/vs/ice/IceVisitor.java
   java/src/de/unikassel/vs/ice/InfoStructureVisitor.java
-  java/src/de/unikassel/vs/ice/NodeIROVisitor.java
+  java/src/de/unikassel/vs/ice/NodeVisitor.java
   java/src/de/unikassel/vs/ice/RepresentationVisitor.java
   java/src/de/unikassel/vs/ice/Representation.java
   java/src/de/unikassel/vs/ice/LogLevel.java
@@ -190,25 +190,25 @@ target_link_libraries(eval_node
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test  
-#  test/etc/EngineStuff.cpp
-#  test/test_ASPCoordinator.cpp
-#  test/test_JNI.cpp
+  test/etc/EngineStuff.cpp
+  test/test_ASPCoordinator.cpp
+  test/test_JNI.cpp
   test/test_ASPComposition.cpp
-#  test/test_ASPRepComputation.cpp
-#  test/test_GContainer.cpp
-#  test/test_RepresentationTransformation.cpp
-#  test/test_RepresentationJSON.cpp
-#  test/test_EulerRepTransformation.cpp
-#  test/test_RingBuffer.cpp
-#  test/test_Buffer.cpp
-#  test/test_EventHandler.cpp
-#  test/test_Time.cpp
-#  test/test_StreamStore.cpp
-#  test/test_Node.cpp
-#  test/test_NodeStore.cpp
-#  test/test_CallbackList.cpp
-#  test/test_InformationStore.cpp
-#  test/test_TransformationNode.cpp
+  test/test_ASPRepComputation.cpp
+  test/test_GContainer.cpp
+  test/test_RepresentationTransformation.cpp
+  test/test_RepresentationJSON.cpp
+  test/test_EulerRepTransformation.cpp
+  test/test_RingBuffer.cpp
+  test/test_Buffer.cpp
+  test/test_EventHandler.cpp
+  test/test_Time.cpp
+  test/test_StreamStore.cpp
+  test/test_Node.cpp
+  test/test_NodeStore.cpp
+  test/test_CallbackList.cpp
+  test/test_InformationStore.cpp
+  test/test_TransformationNode.cpp
 
   test/test_main.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test

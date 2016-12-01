@@ -52,10 +52,10 @@ enum ASPElementState
  */
 enum ASPElementType
 {
-  ASP_COMPUTATION_NODE, ASP_SOURCE_NODE, ASP_IRO_NODE, ASP_MAP_NODE, ASP_REQUIRED_STREAM, ASP_REQUIRED_MAP
+  ASP_COMPUTATION_NODE, ASP_SOURCE_NODE, ASP_TRANSFORMATION_NODE, ASP_SET_NODE, ASP_REQUIRED_STREAM, ASP_REQUIRED_SET
 };
-const std::string ASPElementTypeNames[] {"ASP_COMPUTATION_NODE", "ASP_SOURCE_NODE", "ASP_IRO_NODE", "ASP_MAP_NODE",
-                                         "ASP_REQUIRED_STREAM", "ASP_REQUIRED_MAP"};
+const std::string ASPElementTypeNames[] {"ASP_COMPUTATION_NODE", "ASP_SOURCE_NODE", "ASP_TRANSFORMATION_NODE", "ASP_SET_NODE",
+                                         "ASP_REQUIRED_STREAM", "ASP_REQUIRED_SET"};
 
 //* ASPNode
 /**
@@ -81,10 +81,10 @@ struct ASPElement
         return NodeType::SOURCE;
       case ASPElementType::ASP_COMPUTATION_NODE:
         return NodeType::PROCESSING;
-      case ASPElementType::ASP_IRO_NODE:
-        return NodeType::IRO;
-      case ASPElementType::ASP_MAP_NODE:
-        return NodeType::MAP;
+      case ASPElementType::ASP_TRANSFORMATION_NODE:
+        return NodeType::TRANSFORMATION;
+      case ASPElementType::ASP_SET_NODE:
+        return NodeType::SET;
     }
 
     return NodeType::PROCESSING;
@@ -229,9 +229,9 @@ private:
   std::shared_ptr<supplementary::External>              external;               /**< The external for the system */
   std::vector<std::shared_ptr<ASPElement>>              aspNodes;               /**< Vector of asp nodes */
   std::vector<std::shared_ptr<ASPElement>>              aspSourceNodes;         /**< Vector of asp source nodes */
-  std::vector<std::shared_ptr<ASPElement>>              aspIro;                 /**< Vector of iro nodes */
+  std::vector<std::shared_ptr<ASPElement>>              aspTransformation;      /**< Vector of transformation nodes */
   std::vector<std::shared_ptr<ASPElement>>              aspRequiredStreams;     /**< Vector of required streams */
-  std::vector<std::shared_ptr<ASPElement>>              aspRequiredMaps;        /**< Vector of required maps */
+  std::vector<std::shared_ptr<ASPElement>>              aspRequiredSets;        /**< Vector of required sets */
 };
 
 } /* namespace ice */

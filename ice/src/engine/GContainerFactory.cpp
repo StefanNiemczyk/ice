@@ -961,7 +961,7 @@ bool GContainerFactory::addTransformation(std::string name, std::shared_ptr<Tran
   auto tn = std::make_shared<TransNode>();
   tn->transformation = transformation;
   tn->name = transformation->getName();
-  tn->shortName = "iro" + std::to_string(++this->transIter);
+  tn->shortName = "transformation" + std::to_string(++this->transIter);
   tn->autoTransformation = autoTransformation;
   this->registerNodeForTransformation(tn);
   this->transformations[name] = tn;

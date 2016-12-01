@@ -94,18 +94,14 @@ import org.semanticweb.owlapi.model.SWRLSameIndividualAtom;
 import org.semanticweb.owlapi.model.SWRLVariable;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-public class NodeIROVisitor extends IceVisitor {
-
-	// private static final String IRO_PLACEHOLDER = "$IRO";
+public class NodeVisitor extends IceVisitor {
 
 	enum Type {
-		SOURCE_NODE, COMPUTATION_NODE, IRO_NODE, MAP_NODE, REQUIRED_STREAM, REQUIRED_MAP
+		SOURCE_NODE, COMPUTATION_NODE, TRANSFORMATION_NODE, SET_NODE, REQUIRED_STREAM, REQUIRED_SET
 	};
 
 	private Type currentType;
 	private OWLClass lastElement;
-	// private OWLClass iroScope;
-	// private OWLClass iroRelatedScope;
 	private OWLClass currentScope;
 	private OWLClass currentRepresentation;
 	private OWLClass currentEntityType;
@@ -118,7 +114,7 @@ public class NodeIROVisitor extends IceVisitor {
 
 	private OWLNamedIndividual grounding;
 
-	public NodeIROVisitor(final IceOntologyInterface p_ioi, final Set<OWLOntology> p_ontologies,
+	public NodeVisitor(final IceOntologyInterface p_ioi, final Set<OWLOntology> p_ontologies,
 			final OWLReasoner p_reasoner, final IceIris p_iceIris) {
 		super(p_ioi, p_ontologies, p_reasoner, p_iceIris);
 	}
@@ -150,7 +146,7 @@ public class NodeIROVisitor extends IceVisitor {
 			logDebug(String.format("Checking grounding %s in system %s", grounding, system));
 			this.grounding = grounding;
 
-			this.cardinalityContainers = new ArrayList<NodeIROVisitor.CardinalityContainer>();
+			this.cardinalityContainers = new ArrayList<NodeVisitor.CardinalityContainer>();
 			this.currentEntity = null;
 			this.currentRelatedEntity = null;
 			this.currentScope = null;
@@ -194,12 +190,12 @@ public class NodeIROVisitor extends IceVisitor {
 
 					this.found = true;
 					this.currentType = Type.REQUIRED_STREAM;
-				} else if (this.isSubClassOf(type, this.ii.requiredMap)) {
+				} else if (this.isSubClassOf(type, this.ii.requiredSet)) {
 					if (found)
 						continue;
 
 					this.found = true;
-					this.currentType = Type.REQUIRED_MAP;
+					this.currentType = Type.REQUIRED_SET;
 				}
 
 				type.accept(this);
@@ -210,11 +206,11 @@ public class NodeIROVisitor extends IceVisitor {
 				this.elementString = this.replace("requiredStream($system,$information).\n");
 				this.sb.append("#external ");
 				this.sb.append(this.elementString);
-			} else if (this.currentType == Type.REQUIRED_MAP) {
+			} else if (this.currentType == Type.REQUIRED_SET) {
 				// #external
-				// requiredMap(SYSTEM,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2)
+				// requiredSet(SYSTEM,ENTITY_TYPE,SCOPE,REPRESENTATION,ENTITY2)
 				this.elementString = this
-						.replace("requiredMap($system,informationType($type,$scope,$representation,$relatedEntity)).\n");
+						.replace("requiredSet($system,informationType($type,$scope,$representation,$relatedEntity)).\n");
 				this.sb.append("#external ");
 				this.sb.append(this.elementString);
 			}
@@ -263,7 +259,8 @@ public class NodeIROVisitor extends IceVisitor {
 				.getFlattened();
 
 		if (groundings.size() != 1) {
-			logWarning("Wrong size of hasGrounding properties " + groundings.size() + " " + individual + " will be skipped.");
+			logWarning("Wrong size of hasGrounding properties " + groundings.size() + " " + individual
+					+ " will be skipped.");
 		} else {
 			OWLNamedIndividual ind = groundings.iterator().next();
 
@@ -341,7 +338,8 @@ public class NodeIROVisitor extends IceVisitor {
 						continue;
 
 					if (this.currentEntity == null) {
-						logWarning(String.format("No entity specified for source node %s, skipping node", this.grounding));
+						logWarning(String.format("No entity specified for source node %s, skipping node",
+								this.grounding));
 						continue;
 					}
 
@@ -363,26 +361,26 @@ public class NodeIROVisitor extends IceVisitor {
 					this.elementString = this.replace("nodeTemplate($system,$element,$entity).\n");
 					this.sb.append("#external ");
 					this.sb.append(this.elementString);
-				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.iroNode)) {
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.transformationNode)) {
 					if (found)
 						continue;
 
 					this.found = true;
-					this.currentType = Type.IRO_NODE;
+					this.currentType = Type.TRANSFORMATION_NODE;
 					this.lastElement = ce;
 					doLater = true;
-				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.mapNode)) {
+				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.setNode)) {
 					if (found)
 						continue;
 
 					this.found = true;
-					this.currentType = Type.MAP_NODE;
+					this.currentType = Type.SET_NODE;
 					this.lastElement = ce;
 					doLater = true;
 				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.entityScope)) {
 					this.currentScope = ce;
 				} else {
-					// log(ax);
+					this.logDebug("Unknown class type for " + ax.toString());
 					others.add(ax);
 				}
 			}
@@ -393,16 +391,16 @@ public class NodeIROVisitor extends IceVisitor {
 			ax.getSuperClass().accept(this);
 		}
 
-		if (doLater && this.currentType == Type.IRO_NODE) {
-			// #external iro(system1,coords2Wgs84,any,position).
-			String string = this.replace("iro($system,$element,$entity,$relatedEntity).\n");
+		if (doLater && this.currentType == Type.TRANSFORMATION_NODE) {
+			// #external transformation(system1,coords2Wgs84,any,position).
+			String string = this.replace("transformation($system,$element,$entity,$relatedEntity).\n");
 
 			this.elementString = string;
 			this.sb.append("#external ");
 			this.sb.append(this.elementString);
-		} else if (doLater && this.currentType == Type.MAP_NODE) {
-			// mapNodeTemplate(SYSTEM,NODE,ENTITY_TYPE)
-			String node = this.replace("mapNodeTemplate($system,$element,$type).\n");
+		} else if (doLater && this.currentType == Type.SET_NODE) {
+			// setNodeTemplate(SYSTEM,NODE,ENTITY_TYPE)
+			String node = this.replace("setNodeTemplate($system,$element,$type).\n");
 
 			this.elementString = node;
 			this.sb.append("#external ");
@@ -426,7 +424,7 @@ public class NodeIROVisitor extends IceVisitor {
 			} else {
 				this.currentScope = ce.getFiller().asOWLClass();
 			}
-		} else if (ce.getProperty().equals(this.ii.isMapOf)) {
+		} else if (ce.getProperty().equals(this.ii.isSetOf)) {
 			if (ce.getFiller().isAnonymous()) {
 				ce.getFiller().accept(this);
 			} else {
@@ -517,11 +515,10 @@ public class NodeIROVisitor extends IceVisitor {
 			switch (this.currentType) {
 			case COMPUTATION_NODE:
 			case SOURCE_NODE:
-			case IRO_NODE:
-			case MAP_NODE:
+			case TRANSFORMATION_NODE:
+			case SET_NODE:
 				pattern = "input($system,$element,$scope,$representation,$checkRelatedEntity," + min + "," + max
 						+ ").\n";
-				// + this.elementString;
 				break;
 			default:
 				// TODO
@@ -530,8 +527,8 @@ public class NodeIROVisitor extends IceVisitor {
 			switch (this.currentType) {
 			case COMPUTATION_NODE:
 			case SOURCE_NODE:
-			case IRO_NODE:
-			case MAP_NODE:
+			case TRANSFORMATION_NODE:
+			case SET_NODE:
 				pattern = "output($system,$element,$scope,$representation,$checkRelatedEntity).\n";
 				break;
 			default:
@@ -541,37 +538,35 @@ public class NodeIROVisitor extends IceVisitor {
 			switch (this.currentType) {
 			case COMPUTATION_NODE:
 			case SOURCE_NODE:
-			case IRO_NODE:
-			case MAP_NODE:
+			case TRANSFORMATION_NODE:
+			case SET_NODE:
 				pattern = "input2($system,$element,$scope,$representation,$checkEntity," + min + "," + max + ").\n";
-				// + this.elementString;
 				break;
 			default:
 				// TODO
 			}
-		} else if (p_property.equals(this.ii.hasInputMap)) {
+		} else if (p_property.equals(this.ii.hasInputSet)) {
 			switch (this.currentType) {
 			case COMPUTATION_NODE:
 			case SOURCE_NODE:
-			case IRO_NODE:
-			case MAP_NODE:
-				pattern = "inputMap($system,$element,$type,$scope,$representation,$checkRelatedEntity," + min + ","
+			case TRANSFORMATION_NODE:
+			case SET_NODE:
+				pattern = "inputSet($system,$element,$type,$scope,$representation,$checkRelatedEntity," + min + ","
 						+ max + ").\n";
-				// + this.elementString;
 				break;
 			default:
 				// TODO
 			}
-		} else if (p_property.equals(this.ii.hasOutputMap)) {
+		} else if (p_property.equals(this.ii.hasOutputSet)) {
 			switch (this.currentType) {
 			case COMPUTATION_NODE:
 			case SOURCE_NODE:
-			case IRO_NODE:
+			case TRANSFORMATION_NODE:
 				// pattern =
-				// "outputMap($system,$element,$scope,$representation,$checkRelatedEntity).\n";
+				// "outputSet($system,$element,$scope,$representation,$checkRelatedEntity).\n";
 				break;
-			case MAP_NODE:
-				pattern = "outputMap($system,$element,$type,$scope,$representation,$checkRelatedEntity).\n";
+			case SET_NODE:
+				pattern = "outputSet($system,$element,$type,$scope,$representation,$checkRelatedEntity).\n";
 				break;
 			default:
 				// TODO
@@ -596,7 +591,7 @@ public class NodeIROVisitor extends IceVisitor {
 		} else {
 			OWLClass c = p_ce.asOWLClass();
 
-			if (this.isSubClassOf(c, this.ii.namedStream) || this.isSubClassOf(c, this.ii.namedMap)) {
+			if (this.isSubClassOf(c, this.ii.namedStream) || this.isSubClassOf(c, this.ii.namedSet)) {
 				for (OWLOntology ont : this.ontologies) {
 					for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(c)) {
 						ax.getSuperClass().accept(this);
