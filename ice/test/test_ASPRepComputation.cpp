@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <ice/representation/TransformationSynthese.h>
+#include <ice/representation/TransformationSynthesis.h>
 #include "ClingWrapper.h"
 #include "External.h"
 #include "BaseLiteral.h"
@@ -68,7 +68,7 @@ TEST(ASPRepComp, ontology1)
 
   engine->init();
 
-  engine->getASPTransformationGeneration()->extractTransformations();
+  engine->getASPTransformationGeneration()->synthesizeTransformations();
 
   // Test transformation
   std::string name = "autoTrans_http://vs.uni-kassel.de/Ice#Position_http://vs.uni-kassel.de/Ice#CoordinatePositionRep_http://vs.uni-kassel.de/IceTest#Pos3D";
@@ -127,7 +127,7 @@ TEST(ASPRepComp, ontology2)
 
   engine->init();
 
-  engine->getASPTransformationGeneration()->extractTransformations();
+  engine->getASPTransformationGeneration()->synthesizeTransformations();
 
   // Test transformation
   std::string name = "autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2";

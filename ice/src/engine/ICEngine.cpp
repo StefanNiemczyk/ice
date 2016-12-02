@@ -49,7 +49,7 @@ void ICEngine::init()
   this->modelGenerator = std::make_shared<ASPModelGenerator>(this->shared_from_this());
   this->updateStrategie = std::make_shared<FastUpdateStrategie>(this->shared_from_this());
   this->gcontainerFactory = std::make_shared<GContainerFactory>(this->shared_from_this());
-  this->aspTransformationGenerator = std::make_shared<TransformationSynthese>(this->shared_from_this());
+  this->aspTransformationGenerator = std::make_shared<TransformationSynthesis>(this->shared_from_this());
   if (this->streamFactory == nullptr)
     this->streamFactory = std::make_shared<StreamFactory>(this->shared_from_this());
 
@@ -79,7 +79,6 @@ void ICEngine::init()
 
   // Initialize update strategy
   this->updateStrategie->init();
-  this->entityDirectory->disvoeredIceIdentity.registerCallback(this->updateStrategie.get(), &UpdateStrategie::onEntityDiscovered);
 
   // reading information structure from ontology
   this->streamStore->readEntitiesFromOntology();
@@ -91,11 +90,10 @@ void ICEngine::init()
 void ICEngine::start()
 {
   // generating transformation based on ontology
-  this->aspTransformationGenerator->extractTransformations();
+  this->aspTransformationGenerator->synthesizeTransformations();
 
   // creating processing model
-  auto model = this->modelGenerator->createProcessingModel();
-  this->updateStrategie->update(model);
+  this->updateStrategie->update(ModelUpdateEvent::MUE_INITIAL);
 
   this->running = true;
 }
@@ -241,7 +239,7 @@ std::shared_ptr<GContainerFactory> ICEngine::getGContainerFactory()
   return this->gcontainerFactory;
 }
 
-std::shared_ptr<TransformationSynthese> ICEngine::getASPTransformationGeneration()
+std::shared_ptr<TransformationSynthesis> ICEngine::getASPTransformationGeneration()
 {
   return this->aspTransformationGenerator;
 }

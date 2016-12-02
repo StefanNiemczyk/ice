@@ -34,13 +34,13 @@ void FastUpdateStrategie::cleanUpInternal()
 {
 }
 
-void FastUpdateStrategie::update(std::shared_ptr<ProcessingModel> const &model)
+void FastUpdateStrategie::processModel(std::shared_ptr<ProcessingModel> const &model)
 {
   if (model == nullptr)
     return;
 
   _log->info("Processing new model");
-  UpdateStrategie::update(model);
+  UpdateStrategie::processModel(model);
 
   if (this->lastModel != nullptr)
   {
@@ -147,11 +147,6 @@ bool FastUpdateStrategie::handleSubModelResponse(std::shared_ptr<Entity> &entity
   this->established = true;
 
   return true;
-}
-
-void FastUpdateStrategie::onEntityDiscovered(std::shared_ptr<Entity> entity)
-{
-  this->triggerModelUpdate();
 }
 
 } /* namespace ice */

@@ -13,6 +13,7 @@
 #include "ice/processing/Node.h"
 #include "ice/ICEngine.h"
 #include "ice/Entity.h"
+#include "ice/EntityDirectory.h"
 
 namespace ice
 {
@@ -41,11 +42,17 @@ void UpdateStrategie::init()
   this->streamStore = en->getStreamStore();
   this->communication = en->getCommunicationInterface();
   this->modelGenerator = en->getProcessingModelGenerator();
+  this->directory = en->getEntityDirector();
   this->worker = std::thread(&UpdateStrategie::workerTask, this);
 
   this->self = en->getSelf();
 
   this->initInternal();
+
+  // register callback for new and vanisehd entities
+  this->directory->disvoeredIceIdentity.registerCallback(this, &UpdateStrategie::onEntityDiscovered);
+  this->directory->vanishedIceIdentity.registerCallback(this, &UpdateStrategie::onEntityVanished);
+
 }
 
 void UpdateStrategie::cleanUp()
@@ -71,7 +78,66 @@ void UpdateStrategie::cleanUp()
   this->cleanUpInternal();
 }
 
-void UpdateStrategie::update(std::shared_ptr<ProcessingModel> const &model)
+void UpdateStrategie::update(ModelUpdateEvent event, std::shared_ptr<void> object)
+{
+  if (false == this->running)
+  {
+    return;
+  }
+
+  bool trigger = false;
+  bool synchrone = false;
+
+  switch(event)
+  {
+    case MUE_INITIAL:
+      trigger = true;
+      synchrone = true;
+      break;
+    case MUE_NONE:
+      // TODO
+      break;
+    case MUE_INSTANCE_NEW:
+      trigger = true;
+      break;
+    case MUE_INSTANCE_VANISHED:
+      // TODO
+      trigger = true;
+      break;
+    case MUE_NODE_FAILURE:
+      // TODO
+      trigger = true;
+      break;
+    case MUE_INFORMATION_REQ:
+      trigger = true;
+      break;
+    case MUE_RESOURCE_REQ:
+      trigger = true;
+      break;
+    case MUE_OPTIMIZATION:
+      trigger = true;
+      break;
+  }
+
+  if (false == trigger)
+  {
+    return;
+  }
+
+  // trigger update
+  if (synchrone)
+  {
+    auto model = this->modelGenerator->createProcessingModel();
+    this->processModel(model);
+  }
+  else
+  {
+    std::lock_guard<std::mutex> guard(mtx_);
+    this->cv.notify_all();
+  }
+}
+
+void UpdateStrategie::processModel(std::shared_ptr<ProcessingModel> const &model)
 {
   this->lastModel = this->model;
   this->model = model;
@@ -367,10 +433,14 @@ std::shared_ptr<SubModel> UpdateStrategie::getSubModelDesc(std::shared_ptr<Entit
   return nullptr;
 }
 
-void UpdateStrategie::triggerModelUpdate()
+void UpdateStrategie::onEntityDiscovered(std::shared_ptr<Entity> entity)
 {
-  std::lock_guard<std::mutex> guard(mtx_);
-  this->cv.notify_all();
+  this->update(ModelUpdateEvent::MUE_INSTANCE_NEW, entity);
+}
+
+void UpdateStrategie::onEntityVanished(std::shared_ptr<Entity> entity)
+{
+  this->update(ModelUpdateEvent::MUE_INSTANCE_VANISHED, entity);
 }
 
 void UpdateStrategie::workerTask()
@@ -384,7 +454,7 @@ void UpdateStrategie::workerTask()
       break;
 
     auto model = this->modelGenerator->createProcessingModel();
-    this->update(model);
+    this->processModel(model);
   }
 }
 } /* namespace ice */

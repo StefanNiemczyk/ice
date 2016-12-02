@@ -8,7 +8,7 @@
 #ifndef ICENGINE_H_
 #define ICENGINE_H_
 
-#include <ice/representation/TransformationSynthese.h>
+#include <ice/representation/TransformationSynthesis.h>
 #include <exception>
 #include <iostream>
 #include <map>
@@ -185,7 +185,7 @@ public:
 
   std::shared_ptr<GContainerFactory> getGContainerFactory();
 
-  std::shared_ptr<TransformationSynthese> getASPTransformationGeneration();
+  std::shared_ptr<TransformationSynthesis> getASPTransformationGeneration();
 
 protected:
   bool                                          initialized;                    /**< True if the engine is initialized, else false */
@@ -202,7 +202,7 @@ protected:
   std::shared_ptr<ProcessingModelGenerator>     modelGenerator;                 /**< Processing model generator */
   std::shared_ptr<UpdateStrategie>              updateStrategie;                /**< Update strategie to modify the information processing */
   std::shared_ptr<GContainerFactory>            gcontainerFactory;              /**< Factory to create generic containers */
-  std::shared_ptr<TransformationSynthese>  aspTransformationGenerator;     /**< Component to create transformations based on an asp programm */
+  std::shared_ptr<TransformationSynthesis>  aspTransformationGenerator;     /**< Component to create transformations based on an asp programm */
   std::shared_ptr<EntityDirectory>              entityDirectory;                /**< The directory for known entities */
   std::shared_ptr<Entity>                       self;                           /**< This engine */
   std::mutex                                    mtx_;                           /**< Mutex */

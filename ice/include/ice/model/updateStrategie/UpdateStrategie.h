@@ -23,6 +23,7 @@ namespace ice
 class BaseInformationStream;
 class CommunicationInterface;
 class Entity;
+class EntityDirectory;
 class ICEngine;
 class StreamStore;
 class ProcessingModelGenerator;
@@ -34,6 +35,17 @@ class OntologyInterface;
 namespace ice
 {
 
+enum ModelUpdateEvent {
+  MUE_INITIAL,
+  MUE_NONE,
+  MUE_INSTANCE_NEW,
+  MUE_INSTANCE_VANISHED,
+  MUE_NODE_FAILURE,
+  MUE_INFORMATION_REQ,
+  MUE_RESOURCE_REQ,
+  MUE_OPTIMIZATION
+};
+
 class UpdateStrategie
 {
 public:
@@ -42,16 +54,19 @@ public:
 
   void init();
   void cleanUp();
+  void onEntityDiscovered(std::shared_ptr<Entity> entity);
+  void onEntityVanished(std::shared_ptr<Entity> entity);
 
-  virtual void update(std::shared_ptr<ProcessingModel> const &model);
-  virtual void initInternal() = 0;
-  virtual void cleanUpInternal() = 0;
+  // update processing model
+  virtual void update(ModelUpdateEvent event, std::shared_ptr<void> object = nullptr);
   virtual bool handleSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel) = 0;
   virtual bool handleSubModelResponse(std::shared_ptr<Entity> &entity, int modelIndex) = 0;
-  virtual void onEntityDiscovered(std::shared_ptr<Entity> entity) = 0;
-  void triggerModelUpdate();
 
 protected:
+  virtual void processModel(std::shared_ptr<ProcessingModel> const &model);
+  virtual void initInternal() = 0;
+  virtual void cleanUpInternal() = 0;
+
   bool processSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel);
   bool processSubModelResponse(std::shared_ptr<Entity> &entity, int modelIndex);
   std::shared_ptr<SubModel> getSubModelDesc(std::shared_ptr<Entity> &entity);
@@ -77,6 +92,7 @@ protected:
   std::shared_ptr<CommunicationInterface>       communication;          /**< Communication interface */
   std::shared_ptr<OntologyInterface>            ontology;               /**< Shared pointer to access the ontology */
   std::shared_ptr<ProcessingModelGenerator>     modelGenerator;         /**< The model generator */
+  std::shared_ptr<EntityDirectory>              directory;              /**< Directory to look up entities */
   bool                                          valid;                  /**< True if the current model is valid, else false */
   bool                                          established;            /**< True if the current model was established, else false */
   std::mutex                                    mtx_;                   /**< Mutex */

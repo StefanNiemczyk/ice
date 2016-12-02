@@ -5,8 +5,8 @@
  *      Author: sni
  */
 
-#ifndef TRANSFORMATIONSYNTHESE_H_
-#define TRANSFORMATIONSYNTHESE_H_
+#ifndef TRANSFORMATIONSYNTHESIS_H_
+#define TRANSFORMATIONSYNTHESIS_H_
 
 #include <memory>
 #include <tuple>
@@ -36,16 +36,16 @@ class ClingWrapper;
 namespace ice
 {
 
-class TransformationSynthese
+class TransformationSynthesis
 {
 public:
-  TransformationSynthese();
-  TransformationSynthese(std::weak_ptr<ICEngine> engine);
-  virtual ~TransformationSynthese();
+  TransformationSynthesis();
+  TransformationSynthesis(std::weak_ptr<ICEngine> engine);
+  virtual ~TransformationSynthesis();
 
   void init();
   void cleanUp();
-  void extractTransformations();
+  void synthesizeTransformations();
 
   void setOntology(std::shared_ptr<OntologyInterface> ontology);
   void setGContainerFactory(std::shared_ptr<GContainerFactory> factory);

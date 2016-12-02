@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <ice/representation/TransformationSynthese.h>
+#include <ice/representation/TransformationSynthesis.h>
 #include "ClingWrapper.h"
 #include "External.h"
 #include "BaseLiteral.h"
@@ -95,7 +95,7 @@ TEST(InformationStore, ontology1)
   engine->init();
   auto factory = engine->getGContainerFactory();
 
-  engine->getASPTransformationGeneration()->extractTransformations();
+  engine->getASPTransformationGeneration()->synthesizeTransformations();
 
   // Test transformation
   std::string name = "autoTrans_http://vs.uni-kassel.de/Ice#Position_http://vs.uni-kassel.de/Ice#CoordinatePositionRep_http://vs.uni-kassel.de/IceTest#Pos3D";
