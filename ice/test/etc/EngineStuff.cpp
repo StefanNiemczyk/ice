@@ -196,6 +196,60 @@ public:
   }
 };
 
+class SetTestNode : public ice::Node
+{
+public:
+
+  std::shared_ptr<ice::InformationSet<ice::Position>> inputSet;
+  std::shared_ptr<ice::InformationSet<ice::Position>> outputSet;
+
+  static std::shared_ptr<ice::Node> createNode()
+  {
+    auto node = std::make_shared<SetTestNode>();
+    auto desc = std::make_shared<ice::NodeDescription>(ice::NodeType::SET, "SetTestNode", "SetTestNode", "", "");
+    node->setNodeDescription(desc);
+
+    return node;
+  }
+
+  SetTestNode() : Node()
+  {
+
+  }
+
+  virtual std::string getClassName()
+  {
+    return "setTest";
+  }
+
+  int init()
+  {
+    if (this->inputSets.empty() || this->outputSets.empty()){
+      return 1;
+    }
+
+    this->inputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->inputSets[0]);
+    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->outputSets[0]);
+
+    return 0;
+  }
+
+  virtual int performNode()
+  {
+    auto infoEle = this->inputSet->get("muh");
+    std::unique_ptr<ice::Position> posNew(new ice::Position());
+    auto pos = infoEle->getInformation();
+
+    posNew->x = pos->x - 1;
+    posNew->y = pos->y - 1;
+    posNew->z = pos->z - 1;
+
+    this->outputSet->add(infoEle->getSpecification()->getEntity(), std::move(posNew));
+
+    return 0;
+  }
+};
+
 class SimpleSourceNode : public ice::Node
 {
 public:

@@ -109,7 +109,6 @@ template<typename T>
       for (auto listener : this->listenersAsynchronous)
       {
         auto event = std::make_shared<InformationEvent<T> >(listener, informationElement, this->shared_from_this());
-
         this->eventHandler->addTask(event);
       }
 

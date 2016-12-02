@@ -76,7 +76,7 @@ protected:
   std::string dataTypeForRepresentation(std::string representation);
   std::shared_ptr<BaseInformationStream> getStream(std::string &nodeName, std::string &source, std::string &entity,
                                                    std::string &scope, std::string &rep, std::string &relatedEntity, std::map<std::string, int> &metadata);
-  std::shared_ptr<BaseInformationStream> getStream(TransferDesc &desc);
+  std::shared_ptr<BaseInformationStream> getStream(TransferStreamDesc &desc);
 
 private:
   void workerTask();

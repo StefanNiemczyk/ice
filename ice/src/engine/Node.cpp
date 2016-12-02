@@ -7,11 +7,12 @@
 
 #include "ice/processing/Node.h"
 
-#include "ice/Entity.h"
-#include "ice/information/BaseInformationStream.h"
-
 #include <sstream>
 #include <set>
+
+#include "ice/Entity.h"
+#include "ice/information/BaseInformationSet.h"
+#include "ice/information/BaseInformationStream.h"
 
 namespace ice
 {
@@ -72,11 +73,17 @@ int Node::performTask()
 {
   // Node is not active
   if (false == this->active)
+  {
+    _log->info("Execution of %v interrupted, node not active", this->nodeDescription->getName());
     return 1;
+  }
 
   // Node is not valid
   if (false == this->isValid())
+  {
+    _log->info("Execution of %v interrupted, node not valid", this->nodeDescription->getName());
     return 1;
+  }
 
   // No cyclic execution
   if (this->cyclicTriggerTime < 0)
@@ -101,14 +108,14 @@ int Node::performTask()
   return 0;
 }
 
-int Node::addInput(std::shared_ptr<BaseInformationStream> stream, bool trigger)
+bool Node::addInput(std::shared_ptr<BaseInformationStream> stream, bool trigger)
 {
   std::lock_guard<std::mutex> guard(this->mtx_);
 
   for (auto streamItr : this->inputs)
   {
     if (streamItr == stream)
-      return 1;
+      return false;
   }
 
   this->inputs.push_back(stream);
@@ -119,13 +126,13 @@ int Node::addInput(std::shared_ptr<BaseInformationStream> stream, bool trigger)
     stream->registerTaskAsync(this->shared_from_this());
   }
 
-  return 0;
+  return true;
 }
 
-int Node::removeInput(std::shared_ptr<BaseInformationStream> stream)
+bool Node::removeInput(std::shared_ptr<BaseInformationStream> stream)
 {
   std::lock_guard<std::mutex> guard(this->mtx_);
-  int returnVel = 1;
+  bool result = false;
 
   for (int i = 0; i < this->inputs.size(); ++i)
   {
@@ -133,12 +140,13 @@ int Node::removeInput(std::shared_ptr<BaseInformationStream> stream)
     if (streamItr == stream)
     {
       this->inputs.erase(this->inputs.begin() + i);
-      returnVel = 0;
+      result = true;
+      break;
     }
   }
 
-  if (returnVel != 0)
-    return returnVel;
+  if (false == result)
+    return false;
 
   for (int i = 0; i < this->triggeredByInputs.size(); ++i)
   {
@@ -146,28 +154,29 @@ int Node::removeInput(std::shared_ptr<BaseInformationStream> stream)
     if (streamItr == stream)
     {
       this->triggeredByInputs.erase(this->triggeredByInputs.begin() + i);
+      break;
     }
   }
 
-  return returnVel;
+  return true;
 }
 
-int Node::addOutput(std::shared_ptr<BaseInformationStream> stream)
+bool Node::addOutput(std::shared_ptr<BaseInformationStream> stream)
 {
   std::lock_guard<std::mutex> guard(this->mtx_);
 
   for (auto streamItr : this->outputs)
   {
     if (streamItr == stream)
-      return 1;
+      return false;
   }
 
   this->outputs.push_back(stream);
 
-  return 0;
+  return true;
 }
 
-int Node::removeOutput(std::shared_ptr<BaseInformationStream> stream)
+bool Node::removeOutput(std::shared_ptr<BaseInformationStream> stream)
 {
   std::lock_guard<std::mutex> guard(this->mtx_);
 
@@ -177,11 +186,96 @@ int Node::removeOutput(std::shared_ptr<BaseInformationStream> stream)
     if (streamItr == stream)
     {
       this->outputs.erase(this->outputs.begin() + i);
-      return 0;
+      return true;
     }
   }
 
-  return 1;
+  return false;
+}
+
+
+bool Node::addInputSet(std::shared_ptr<BaseInformationSet> set, bool trigger)
+{
+  std::lock_guard<std::mutex> guard(this->mtx_);
+
+  for (auto &setItr : this->inputSets)
+  {
+    if (setItr == set)
+      return false;
+  }
+
+  this->inputSets.push_back(set);
+
+  if (trigger)
+  {
+    this->triggeredByInputSets.push_back(set);
+    set->registerTaskAsync(this->shared_from_this());
+  }
+
+  return true;
+}
+
+bool Node::removeInputSet(std::shared_ptr<BaseInformationSet> set)
+{
+  std::lock_guard<std::mutex> guard(this->mtx_);
+  bool result = false;
+
+  for (int i = 0; i < this->inputSets.size(); ++i)
+  {
+    auto &setItr = this->inputSets[i];
+    if (setItr == set)
+    {
+      this->inputSets.erase(this->inputSets.begin() + i);
+      result = true;
+    }
+  }
+
+  if (false == result)
+    return false;
+
+  for (int i = 0; i < this->triggeredByInputSets.size(); ++i)
+  {
+    auto &setItr = this->triggeredByInputSets[i];
+    if (setItr == set)
+    {
+      this->triggeredByInputSets.erase(this->triggeredByInputSets.begin() + i);
+      break;
+    }
+  }
+
+  return true;
+}
+
+bool Node::addOutputSet(std::shared_ptr<BaseInformationSet> set)
+{
+  std::lock_guard<std::mutex> guard(this->mtx_);
+
+  for (auto &setItr : this->outputSets)
+  {
+    if (setItr == set)
+      return false;
+  }
+
+  this->outputSets.push_back(set);
+
+  return true;
+}
+
+bool Node::removeOutputSet(std::shared_ptr<BaseInformationSet> set)
+{
+  std::lock_guard<std::mutex> guard(this->mtx_);
+
+  for (int i = 0; i < this->outputSets.size(); ++i)
+  {
+    auto &setItr = this->outputSets[i];
+    if (setItr == set)
+    {
+      this->outputSets.erase(this->outputSets.begin() + i);
+      return true;
+    }
+  }
+
+  return false;
 }
 
 int Node::init()
@@ -267,19 +361,34 @@ void Node::setConfiguration(std::map<std::string, std::string> configuration)
   this->configuration = configuration;
 }
 
-const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getInputs() const
+const std::vector<std::shared_ptr<BaseInformationStream>>& Node::getInputs() const
 {
-  return &this->inputs;
+  return this->inputs;
 }
 
-const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getTriggeredByInputs() const
+const std::vector<std::shared_ptr<BaseInformationStream>>& Node::getTriggeredByInputs() const
 {
-  return &this->triggeredByInputs;
+  return this->triggeredByInputs;
 }
 
-const std::vector<std::shared_ptr<BaseInformationStream>>* Node::getOutputs() const
+const std::vector<std::shared_ptr<BaseInformationStream>>& Node::getOutputs() const
 {
-  return &this->outputs;
+  return this->outputs;
+}
+
+const std::vector<std::shared_ptr<BaseInformationSet>>& Node::getInputSets() const
+{
+  return this->inputSets;
+}
+
+const std::vector<std::shared_ptr<BaseInformationSet>>& Node::getTriggeredByInputSets() const
+{
+  return this->triggeredByInputSets;
+}
+
+const std::vector<std::shared_ptr<BaseInformationSet>>& Node::getOutputSets() const
+{
+  return this->outputSets;
 }
 
 std::string Node::toString()

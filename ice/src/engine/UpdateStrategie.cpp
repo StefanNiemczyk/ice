@@ -386,7 +386,7 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string &n
   return stream;
 }
 
-std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(TransferDesc &desc)
+std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(TransferStreamDesc &desc)
 {
   std::map<std::string, int> metadata; //TODO
   return this->getStream(desc.nodeName, desc.sourceSystem, desc.entity, desc.scope, desc.representation, desc.relatedEntity, metadata);

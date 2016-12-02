@@ -424,7 +424,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
 }
 
 bool ASPModelGenerator::extractStreamTransfers(std::shared_ptr<Entity> &from, std::shared_ptr<Entity> &to,
-                                           std::vector<TransferDesc> &transfers)
+                                           std::vector<TransferStreamDesc> &transfers)
 {
   bool valid = true;
   std::string shortIriTo;

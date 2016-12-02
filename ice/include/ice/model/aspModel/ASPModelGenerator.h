@@ -75,7 +75,7 @@ private:
   void readTransformations();
   bool extractedSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModel> &subModel);
   bool extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<Entity> &entity, bool own);
-  bool extractStreamTransfers(std::shared_ptr<Entity> &from, std::shared_ptr<Entity> &to, std::vector<TransferDesc> &transfers);
+  bool extractStreamTransfers(std::shared_ptr<Entity> &from, std::shared_ptr<Entity> &to, std::vector<TransferStreamDesc> &transfers);
   std::map<std::string, std::string> readConfiguration(std::string const &config);
   void readMetadata(std::map<std::string, int> &metadata, const Gringo::Value &element);
   void readMetadata(std::string name, std::map<std::string, int> &metadata, const Gringo::Value &element);

@@ -97,7 +97,57 @@ struct InputStreamDesc
     }
 };
 
+struct InputSetDesc
+{
+  string                        sourceSystem;
+  string                        nodeName;
+  string                        nodeEntity;
+  string                        nodeEntityRelated;
+  string                        entity;
+  string                        scope;
+  string                        representation;
+  string                        relatedEntity;
+  std::map<std::string, int>    metadata;
+
+  friend class boost::serialization::access;
+  template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+      // serialize base class information
+      ar & sourceSystem;
+      ar & nodeName;
+      ar & nodeEntity;
+      ar & nodeEntityRelated;
+      ar & entity;
+      ar & scope;
+      ar & representation;
+      ar & relatedEntity;
+      ar & metadata;
+    }
+};
+
 struct OutputStreamDesc
+{
+  string                        entity;
+  string                        scope;
+  string                        representation;
+  string                        relatedEntity;
+  std::map<std::string, int>    metadata;
+
+  friend class boost::serialization::access;
+  template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+      // serialize base class information
+      ar & entity;
+      ar & scope;
+      ar & representation;
+      ar & relatedEntity;
+      ar & metadata;
+    }
+};
+
+struct OutputSetDesc
 {
   string                        entity;
   string                        scope;
@@ -145,7 +195,34 @@ struct NodeDesc
     }
 };
 
-struct TransferDesc
+struct TransferStreamDesc
+{
+  string                        sourceSystem;
+  string                        nodeName;
+  string                        nodeEntity;
+  string                        nodeEntityRelated;
+  string                        entity;
+  string                        scope;
+  string                        representation;
+  string                        relatedEntity;
+
+  friend class boost::serialization::access;
+  template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+      // serialize base class information
+      ar & sourceSystem;
+      ar & nodeName;
+      ar & nodeEntity;
+      ar & nodeEntityRelated;
+      ar & entity;
+      ar & scope;
+      ar & representation;
+      ar & relatedEntity;
+    }
+};
+
+struct TransferSetDesc
 {
   string                        sourceSystem;
   string                        nodeName;
@@ -176,8 +253,10 @@ struct SubModelDesc
 {
   int                           index;
   vector<NodeDesc>              nodes;
-  vector<TransferDesc>          send;
-  vector<TransferDesc>          receive;
+  vector<TransferStreamDesc>    send;
+  vector<TransferStreamDesc>    receive;
+  vector<TransferSetDesc>       sendSet;
+  vector<TransferSetDesc>       receiveSet;
 
   friend class boost::serialization::access;
   template<class Archive>
@@ -188,20 +267,28 @@ struct SubModelDesc
       ar & nodes;
       ar & send;
       ar & receive;
+      ar & sendSet;
+      ar & receiveSet;
     }
 };
 
 struct SubModel
 {
-  std::shared_ptr<Entity> entity;
-  bool accepted = false;
+  std::shared_ptr<Entity>       entity;
+  bool                          accepted = false;
   std::shared_ptr<SubModelDesc> model;
 };
 
 struct StreamTransfer
 {
-  std::shared_ptr<Entity> entity;
-  std::vector<TransferDesc> transfer;
+  std::shared_ptr<Entity>               entity;
+  std::vector<TransferStreamDesc>       transfer;
+};
+
+struct SetTransfer
+{
+  std::shared_ptr<Entity>       entity;
+  std::vector<TransferSetDesc>  transfer;
 };
 
 class ProcessingModel
@@ -214,14 +301,13 @@ public:
   virtual ~ProcessingModel();
 
   int getIndex() const;
-
+  std::vector<std::shared_ptr<SubModel>>& getSubModels();
   std::vector<NodeDesc>& getNodes();
 
   std::vector<std::shared_ptr<StreamTransfer>>& getReceive();
-
   std::vector<std::shared_ptr<StreamTransfer>>& getSend();
-
-  std::vector<std::shared_ptr<SubModel>>& getSubModels();
+  std::vector<std::shared_ptr<SetTransfer>>& getReceiveSet();
+  std::vector<std::shared_ptr<SetTransfer>>& getSendSet();
 
 private:
   const int index; /**< Index of the processing model */
@@ -229,6 +315,8 @@ private:
   std::vector<NodeDesc> nodes; /**< Nodes required by this model */
   std::vector<std::shared_ptr<StreamTransfer>> send; /**< Streams that needs to be send to other engines */
   std::vector<std::shared_ptr<StreamTransfer>> receive; /**< Streams that needs to be received from other engines */
+  std::vector<std::shared_ptr<SetTransfer>> sendSet; /**< Streams that needs to be send to other engines */
+  std::vector<std::shared_ptr<SetTransfer>> receiveSet; /**< Streams that needs to be received from other engines */
 };
 
 } /* namespace ice */

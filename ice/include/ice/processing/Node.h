@@ -21,14 +21,13 @@
 
 #include "easylogging++.h"
 
-namespace ice
-{
-  class BaseInformationStream;
-  class Entity;
-}
 
 namespace ice
 {
+// Forward declaration
+class BaseInformationSet;
+class BaseInformationStream;
+class Entity;
 
 class Node : public AsynchronousTask, public std::enable_shared_from_this<Node>
 {
@@ -49,67 +48,57 @@ public:
   Node();
   virtual ~Node();
 
+  virtual int init();
+  virtual int cleanUp();
+  virtual int destroy();
+
   std::shared_ptr<NodeDescription>& getNodeDescription();
   void setNodeDescription(std::shared_ptr<NodeDescription> &desc);
 
-  /*!
-   * \brief Executes the asynchronous task.
-   *
-   * Executes the asynchronous task.
-   */
-  virtual int performTask();
 
+  virtual int performTask();
   virtual int performNode() = 0;
 
   virtual std::string getClassName() = 0;
 
-  virtual int addInput(std::shared_ptr<BaseInformationStream> stream, bool trigger);
+  virtual bool addInput(std::shared_ptr<BaseInformationStream> stream, bool trigger);
+  virtual bool removeInput(std::shared_ptr<BaseInformationStream> stream);
+  virtual bool addOutput(std::shared_ptr<BaseInformationStream> stream);
+  virtual bool removeOutput(std::shared_ptr<BaseInformationStream> stream);
 
-  virtual int removeInput(std::shared_ptr<BaseInformationStream> stream);
-
-  virtual int addOutput(std::shared_ptr<BaseInformationStream> stream);
-
-  virtual int removeOutput(std::shared_ptr<BaseInformationStream> stream);
-
-  virtual int init();
-
-  virtual int cleanUp();
-
-  virtual int destroy();
+  virtual bool addInputSet(std::shared_ptr<BaseInformationSet> set, bool trigger);
+  virtual bool removeInputSet(std::shared_ptr<BaseInformationSet> set);
+  virtual bool addOutputSet(std::shared_ptr<BaseInformationSet> set);
+  virtual bool removeOutputSet(std::shared_ptr<BaseInformationSet> set);
 
   bool isActive() const;
-
   void activate();
-
   void deactivate();
 
   virtual bool isValid();
 
   long getCyclicTriggerTime() const;
-
   void setCyclicTriggerTime(long cyclicTriggerTime);
 
   std::shared_ptr<EventHandler> getEventHandler() const;
-
   void setEventHandler(std::shared_ptr<EventHandler> eventHandler);
 
   std::map<std::string, std::string> getConfiguration() const;
-
   void setConfiguration(std::map<std::string, std::string> configuration);
 
-  const std::vector<std::shared_ptr<BaseInformationStream>>* getInputs() const;
+  const std::vector<std::shared_ptr<BaseInformationStream>>& getInputs() const;
+  const std::vector<std::shared_ptr<BaseInformationStream>>& getTriggeredByInputs() const;
+  const std::vector<std::shared_ptr<BaseInformationStream>>& getOutputs() const;
 
-  const std::vector<std::shared_ptr<BaseInformationStream>>* getTriggeredByInputs() const;
-
-  const std::vector<std::shared_ptr<BaseInformationStream>>* getOutputs() const;
-
-  std::string toString();
+  const std::vector<std::shared_ptr<BaseInformationSet>>& getInputSets() const;
+  const std::vector<std::shared_ptr<BaseInformationSet>>& getTriggeredByInputSets() const;
+  const std::vector<std::shared_ptr<BaseInformationSet>>& getOutputSets() const;
 
   void registerEntity(std::shared_ptr<Entity> &entity);
-
   void unregisterEntity(std::shared_ptr<Entity> &entity);
-
   int getRegisteredEngineCount();
+
+  std::string toString();
 
 protected:
   long                                                  cyclicTriggerTime;      /**< period time of triggering this node */
@@ -119,6 +108,9 @@ protected:
   std::vector<std::shared_ptr<BaseInformationStream>>   inputs;                 /**< Input streams */
   std::vector<std::shared_ptr<BaseInformationStream>>   triggeredByInputs;      /**< Input streams triggering this node */
   std::vector<std::shared_ptr<BaseInformationStream>>   outputs;                /**< Output streams */
+  std::vector<std::shared_ptr<BaseInformationSet>>      inputSets;              /**< Input streams */
+  std::vector<std::shared_ptr<BaseInformationSet>>      triggeredByInputSets;   /**< Input streams triggering this node */
+  std::vector<std::shared_ptr<BaseInformationSet>>      outputSets;                /**< Output streams */
   std::shared_ptr<EventHandler>                         eventHandler;           /**< The event handler */
   std::map<std::string, std::string>                    configuration;          /**< Node Configuration */
   std::shared_ptr<NodeDescription>                      nodeDescription;        /**< Description of the node, used communication with others */
