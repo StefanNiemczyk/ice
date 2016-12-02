@@ -8,8 +8,6 @@
 #ifndef ICENGINE_H_
 #define ICENGINE_H_
 
-#include <ice/information/CollectionFactory.h>
-#include <ice/representation/TransformationSynthesis.h>
 #include <exception>
 #include <iostream>
 #include <map>
@@ -24,16 +22,15 @@
 #include "ice/Identifier.h"
 #include "ice/Time.h"
 #include "ice/communication/CommunicationInterface.h"
-//#include "ice/information/BaseInformationStream.h"
-//#include "ice/information/InformationStream.h"
+#include "ice/information/CollectionFactory.h"
 #include "ice/information/KnowledgeBase.h"
-#include "ice/information/StreamStore.h"
 #include "ice/model/ProcessingModelGenerator.h"
 #include "ice/ontology/OntologyInterface.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/processing/Node.h"
 #include "ice/processing/NodeStore.h"
 #include "ice/representation/GContainerFactory.h"
+#include "ice/representation/TransformationSynthesis.h"
 #include "ice/ros/RosCommunication.h"
 
 #include "easylogging++.h"
@@ -42,6 +39,7 @@
 namespace ice
 {
 class InformationStore;
+class StreamStore;
 class UpdateStrategie;
 } /* namespace ice */
 

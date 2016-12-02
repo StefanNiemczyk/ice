@@ -12,20 +12,10 @@
 #include <memory>
 #include <mutex>
 
-#include "ice/Configuration.h"
-#include "ice/processing/EventHandler.h"
-#include "ice/information/BaseInformationStream.h"
-#include "ice/information/CollectionDescription.h"
-#include "ice/information/InformationSpecification.h"
-#include "ice/information/InformationStream.h"
-#include "easylogging++.h"
 
-//Forward declarations
-namespace ice
-{
-class ICEngine;
-class CollectionFactory;
-}
+#include "ice/information/BaseInformationStream.h"
+#include "ice/information/CollectionStore.h"
+#include "ice/information/InformationStream.h"
 
 namespace ice
 {
@@ -33,7 +23,7 @@ namespace ice
 /**
  * This class stores the information types used by the icengine.
  */
-class StreamStore : public std::enable_shared_from_this<StreamStore>
+class StreamStore : public CollectionStore<BaseInformationStream>, public std::enable_shared_from_this<StreamStore>
 {
 public:
   /*!
@@ -58,9 +48,6 @@ public:
    * Default destructor
    */
   virtual ~StreamStore();
-
-  void init();
-  void cleanUp();
 
   /*!
    * \brief Registers an stream and returns a shared_ptr. Returns null if no matching information type exists.
@@ -111,29 +98,6 @@ public:
   template<typename T>
     std::shared_ptr<InformationStream<T>> getStream(InformationSpecification *specification, std::string provider,
                                                     std::string sourceSystem);
-
-  /*!
-   * \brief Returns a BaseInformationStream for the given stream name.
-   *
-   * Returns a BaseInformationStream with the given stream name. NULL is returned if no stream exists.
-   *
-   * \param streamName The name of the searched stream.
-   */
-  std::shared_ptr<BaseInformationStream> getBaseStream(InformationSpecification *specification, std::string provider = "",
-                                                       std::string sourceSystem = "");
-
-  void cleanUpUnused();
-
-private:
-  std::shared_ptr<BaseInformationStream> selectBestStream(std::vector<std::shared_ptr<BaseInformationStream>> *streams);
-
-private:
-  std::weak_ptr<ICEngine>                               engine;         /**< Weak pointer to the engine */
-  std::vector<std::shared_ptr<BaseInformationStream>>   streams;        /**< The information steams */
-  std::shared_ptr<EventHandler>                         eventHandler;   /**< Handler to execute events asynchronously */
-  std::shared_ptr<CollectionFactory>                    factory;        /**< Stream factory to create streams */
-  std::mutex                                            _mtx;           /**< Mutex */
-  el::Logger*                                           _log;           /**< Logger */
 };
 
 } /* namespace ice */
@@ -160,7 +124,7 @@ template<typename T>
 
     _log->debug("Created stream with '%v', '%v', '%v'", specification->toString(),
                 provider, sourceSystem);
-    this->streams.push_back(stream);
+    this->collections.push_back(stream);
 
     return stream;
   }
@@ -169,7 +133,7 @@ template<typename T>
   inline std::shared_ptr<ice::InformationStream<T>> ice::StreamStore::getStream(
       InformationSpecification *specification, std::string provider, std::string sourceSystem)
   {
-    auto stream = this->getBaseStream(specification, provider, sourceSystem);
+    auto stream = this->getBaseCollection(specification, provider, sourceSystem);
 
     if (false == stream)
       return nullptr;

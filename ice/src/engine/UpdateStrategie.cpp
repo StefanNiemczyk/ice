@@ -9,6 +9,7 @@
 
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationSpecification.h"
+#include "ice/information/StreamStore.h"
 #include "ice/model/ProcessingModelGenerator.h"
 #include "ice/processing/Node.h"
 #include "ice/ICEngine.h"
@@ -368,7 +369,7 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string &n
   auto infoSpec = std::make_shared<InformationSpecification>(entity, this->knowledgeBase->getEntityType(entity),
                                                              scope, rep, relatedEntity);
 
-  auto stream = this->knowledgeBase->streamStore->getBaseStream(infoSpec.get(), nodeName, source);
+  auto stream = this->knowledgeBase->streamStore->getBaseCollection(infoSpec.get(), nodeName, source);
 
   if (false == stream)
   {

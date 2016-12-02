@@ -10,6 +10,7 @@
 #include <ros/package.h>
 
 #include "ice/information/InformationStore.h"
+#include "ice/information/StreamStore.h"
 #include "ice/model/aspModel/ASPModelGenerator.h"
 #include "ice/model/updateStrategie/FastUpdateStrategie.h"
 

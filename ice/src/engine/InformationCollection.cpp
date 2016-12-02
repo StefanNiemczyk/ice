@@ -61,7 +61,7 @@ const std::string InformationCollection::getProvider() const
 }
 
 
-std::shared_ptr<CollectionDescription> InformationCollection::getStreamDescription()
+std::shared_ptr<CollectionDescription> InformationCollection::getDescription()
 {
   return this->streamDescription;
 }

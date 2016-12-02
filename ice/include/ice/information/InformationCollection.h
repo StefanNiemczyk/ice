@@ -92,11 +92,11 @@ public:
   const std::string getProvider() const;
 
   /*!
-   * \brief Returns the description of this stream.
+   * \brief Returns the description of this collection.
    *
-   * Returns the description of this stream.
+   * Returns the description of this collection.
    */
-  virtual std::shared_ptr<CollectionDescription> getStreamDescription();
+  virtual std::shared_ptr<CollectionDescription> getDescription();
 
   /*!
    * \brief Register a task which is executed asynchronous if a new information element is added.
