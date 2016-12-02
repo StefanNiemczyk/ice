@@ -111,7 +111,7 @@ add_library(${PROJECT_NAME}
   src/engine/CooperationRequest.cpp
   
   src/engine/NodeDescription.cpp
-  src/engine/StreamDescription.cpp
+  src/engine/CollectionDescription.cpp
   
   src/engine/EventHandler.cpp
   src/engine/LambdaTask.cpp
@@ -120,6 +120,7 @@ add_library(${PROJECT_NAME}
   src/engine/TransformationNode.cpp
   
   src/engine/BaseInformationStream.cpp
+  src/engine/InformationCollection.cpp
   src/engine/InformationSpecification.cpp
   src/engine/InformationStore.cpp
   src/engine/StreamFactory.cpp
@@ -209,6 +210,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/test_CallbackList.cpp
   test/test_InformationStore.cpp
   test/test_TransformationNode.cpp
+  test/test_InformationSet.cpp
 
   test/test_main.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test

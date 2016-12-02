@@ -76,7 +76,7 @@ std::shared_ptr<BaseInformationStream> StreamStore::registerBaseStream(
     return ptr;
   }
 
-  auto desc = std::make_shared<StreamDescription>(specification, name, provider, sourceSystem, metadata);
+  auto desc = std::make_shared<CollectionDescription>(specification, name, provider, sourceSystem, metadata);
   std::string type = dataType;
   auto stream = this->streamFactory->createStream(type, desc, this->eventHandler, streamSize);
 
@@ -158,7 +158,7 @@ std::shared_ptr<BaseInformationStream> StreamStore::selectBestStream(
 }
 
 std::shared_ptr<BaseInformationStream> StreamStore::getBaseStream(
-    const std::shared_ptr<StreamDescription> streamDescription)
+    const std::shared_ptr<CollectionDescription> streamDescription)
 {
   return this->getBaseStream(streamDescription->getInformationSpecification().get(), streamDescription->getProvider(),
                              streamDescription->getSourceSystem());

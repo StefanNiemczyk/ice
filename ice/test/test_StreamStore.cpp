@@ -1,3 +1,4 @@
+#include <ice/information/CollectionDescription.h>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -11,7 +12,6 @@
 #include "ice/information/InformationSpecification.h"
 #include "ice/information/InformationStream.h"
 #include "ice/information/StreamStore.h"
-#include "ice/information/StreamDescription.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/TypeDefs.h"
 
@@ -54,7 +54,7 @@ public:
   int value;
 
   const int newEvent(std::shared_ptr<ice::InformationElement<int>> element,
-                     std::shared_ptr<ice::InformationStream<int>> stream)
+                     std::shared_ptr<ice::InformationCollection> stream)
   {
     value = *element->getInformation();
 
@@ -78,7 +78,7 @@ public:
   int value;
 
   const int newEvent(std::shared_ptr<ice::InformationElement<int> > element,
-                     std::shared_ptr<ice::InformationStream<int> > stream)
+                     std::shared_ptr<ice::InformationCollection> stream)
   {
     value = *element->getInformation() + 3;
 

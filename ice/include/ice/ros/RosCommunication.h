@@ -46,15 +46,15 @@ protected:
   virtual void discover();
   virtual int readMessage(std::vector<std::shared_ptr<Message>> &outMessages);
   virtual void sendMessage(std::shared_ptr<Message> msg);
-  virtual std::shared_ptr<BaseInformationSender> createSender(std::shared_ptr<BaseInformationStream> stream);
-  virtual std::shared_ptr<InformationReceiver> createReceiver(std::shared_ptr<BaseInformationStream> stream);
+  virtual std::shared_ptr<BaseInformationSender> createSender(std::shared_ptr<InformationCollection> collection);
+  virtual std::shared_ptr<InformationReceiver> createReceiver(std::shared_ptr<InformationCollection> collection);
 
 private:
   template<typename ICEType, typename ROSType>
-    std::shared_ptr<BaseInformationSender> _createSender(std::shared_ptr<BaseInformationStream> stream,
+    std::shared_ptr<BaseInformationSender> _createSender(std::shared_ptr<InformationCollection> collection,
                                                          transformC2M<ICEType, ROSType> &messageTransform);
   template<typename ICEType, typename ROSType>
-    std::shared_ptr<InformationReceiver> _createReceiver(std::shared_ptr<BaseInformationStream> stream,
+    std::shared_ptr<InformationReceiver> _createReceiver(std::shared_ptr<InformationCollection> collection,
                                                          transformM2C<ICEType, ROSType> &messageTransform);
   void spin();
   bool checkReceiverIds(ice_msgs::ICEHeader header);
@@ -73,7 +73,7 @@ private:
 
 template<typename ICEType, typename ROSType>
   inline std::shared_ptr<BaseInformationSender> RosCommunication::_createSender(
-      std::shared_ptr<BaseInformationStream> stream, transformC2M<ICEType, ROSType> &messageTransform)
+      std::shared_ptr<InformationCollection> collection, transformC2M<ICEType, ROSType> &messageTransform)
   {
     // identifier engineId
     // ros::NodeHandle& nodeHandel
@@ -81,13 +81,13 @@ template<typename ICEType, typename ROSType>
     // int bufferSize
     // transform<ICEType, ROSType> &messageTransform
     return std::make_shared<RosInformationSender<ICEType, ROSType>>(this->iceId, &this->nodeHandel,
-                                                                    "/ice/" + std::to_string(stream->getHash()),
+                                                                    "/ice/" + std::to_string(collection->getHash()),
                                                                     100, messageTransform);
   }
 
 template<typename ICEType, typename ROSType>
   inline std::shared_ptr<InformationReceiver> RosCommunication::_createReceiver(
-      std::shared_ptr<BaseInformationStream> stream, transformM2C<ICEType, ROSType> &messageTransform)
+      std::shared_ptr<InformationCollection> collection, transformM2C<ICEType, ROSType> &messageTransform)
   {
     // identifier engineId
     // std::shared_ptr<BaseInformationStream> stream
@@ -95,8 +95,8 @@ template<typename ICEType, typename ROSType>
     // const std::string topic
     // int bufferSize,
     // transformM2C<ICEType, ROSType> &messageTransform
-    return std::make_shared<RosInformationReceiver<ICEType, ROSType>>(this->iceId, stream, &this->nodeHandel,
-                                                                      "/ice/" + std::to_string(stream->getHash()),
+    return std::make_shared<RosInformationReceiver<ICEType, ROSType>>(this->iceId, collection, &this->nodeHandel,
+                                                                      "/ice/" + std::to_string(collection->getHash()),
                                                                       100, messageTransform);
   }
 

@@ -13,12 +13,12 @@
 namespace ice
 {
 
-class BaseInformationStream;
+class InformationCollection;
 
 class InformationReceiver
 {
 public:
-  InformationReceiver(std::shared_ptr<BaseInformationStream> const &stream);
+  InformationReceiver(std::shared_ptr<InformationCollection> const &collection);
   virtual ~InformationReceiver();
 
   /*!
@@ -29,7 +29,7 @@ public:
   virtual const std::type_info* getTypeInfo();
 
 private:
-  std::shared_ptr<BaseInformationStream>        stream;
+  std::shared_ptr<InformationCollection>        collection;
 };
 
 } /* namespace ice */

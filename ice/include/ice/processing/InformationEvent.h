@@ -12,15 +12,11 @@
 
 #include "ice/information/InformationElement.h"
 #include "ice/processing/AsynchronousTask.h"
+#include "ice/information/InformationCollection.h"
+#include "ice/information/AbstractInformationListener.h"
 
 namespace ice
 {
-
-template<typename T>
-  class InformationStream;
-
-template<typename T>
-  class AbstractInformationListener;
 
 //* InformationEvent
 /**
@@ -43,11 +39,11 @@ template<typename T>
      * \param stream The stream.
      */
     InformationEvent(std::shared_ptr<AbstractInformationListener<T>> listener,
-                     std::shared_ptr<InformationElement<T>> element, std::shared_ptr<InformationStream<T>> stream)
+                     std::shared_ptr<InformationElement<T>> element, std::shared_ptr<InformationCollection> collection)
     {
       this->listener = listener;
       this->element = element;
-      this->stream = stream;
+      this->collection = collection;
     }
 
     /*!
@@ -67,18 +63,15 @@ template<typename T>
      */
     virtual int performTask()
     {
-      return this->listener->newEvent(element, stream);
+      return this->listener->newEvent(element, collection);
     }
 
   private:
     std::shared_ptr<AbstractInformationListener<T>> listener; /**< The listener to call for asynchronous operation */
     std::shared_ptr<InformationElement<T>> element; /**< The new information element */
-    std::shared_ptr<InformationStream<T>> stream; /**< The stream of the new information element */
+    std::shared_ptr<InformationCollection> collection; /**< The collection of the new information element */
   };
 
 } /* namespace ice */
-
-#include "ice/information/InformationStream.h"
-#include "ice/information/AbstractInformationListener.h"
 
 #endif /* ASYNCHRONOUS_EVENT_H_ */

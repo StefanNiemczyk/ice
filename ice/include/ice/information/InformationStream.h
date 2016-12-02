@@ -18,10 +18,10 @@
 
 #include "ice/Time.h"
 #include "ice/container/RingBuffer.h"
+#include "ice/information/CollectionDescription.h"
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationElement.h"
 #include "ice/information/InformationSpecification.h"
-#include "ice/information/StreamDescription.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/processing/InformationEvent.h"
 #include "easylogging++.h"
@@ -60,12 +60,9 @@ template<typename T>
      * \param streamDescription The description of this stream.
      * \param eventHandler Handler to execute events asynchronously.
      * \param streamSize The count of information elements within this stream.
-     * \param description The description of this stream.
-     * \param sharingMaxCount Max number of sharing this stream.
      */
-  InformationStream(std::shared_ptr<StreamDescription> streamDescription,
-                        std::shared_ptr<EventHandler> eventHandler, int streamSize,
-                        int sharingMaxCount = 0);
+  InformationStream(std::shared_ptr<CollectionDescription> streamDescription,
+                        std::shared_ptr<EventHandler> eventHandler, int streamSize);
 
     /*!
      * \brief Default destructor
@@ -205,10 +202,9 @@ template<typename T>
 //Implementing methods here
 
 template<typename T>
-  ice::InformationStream<T>::InformationStream(std::shared_ptr<StreamDescription> streamDescription,
-                                               std::shared_ptr<EventHandler> eventHandler, int streamSize,
-                                               int sharingMaxCount) :
-      BaseInformationStream(streamDescription, eventHandler, sharingMaxCount)
+  ice::InformationStream<T>::InformationStream(std::shared_ptr<CollectionDescription> streamDescription,
+                                               std::shared_ptr<EventHandler> eventHandler, int streamSize) :
+      BaseInformationStream(streamDescription, eventHandler)
   {
     this->ringBuffer = std::unique_ptr<RingBuffer<InformationElement<T>>>(
     new RingBuffer<InformationElement<T>>(streamSize));
@@ -306,13 +302,7 @@ template<typename T>
       return this->sender;
     }
 
-//    std::lock_guard<std::mutex> guard(_mtx);
-    if (this->sender)
-    {
-      return this->sender;
-    }
-
-    auto comResult = communication->registerStreamAsSender(this->shared_from_this());
+    auto comResult = communication->registerCollectionAsSender(this->shared_from_this());
 
     if (false == comResult)
     {
@@ -338,8 +328,7 @@ template<typename T>
   std::shared_ptr<ice::InformationReceiver> ice::InformationStream<T>::registerReceiver(
       std::shared_ptr<CommunicationInterface> &communication)
   {
-//    std::lock_guard<std::mutex> guard(_mtx);
-    auto comResult = communication->registerStreamAsReceiver(this->shared_from_this());
+    auto comResult = communication->registerCollectionAsReceiver(this->shared_from_this());
 
     if (false == comResult)
     {

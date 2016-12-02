@@ -12,20 +12,18 @@
 #include <memory>
 #include <mutex>
 
-#include "boost/uuid/uuid.hpp"
-
 #include "ice/Configuration.h"
-#include "ice/information/StreamDescription.h"
 #include "ice/processing/EventHandler.h"
+#include "ice/information/BaseInformationStream.h"
+#include "ice/information/CollectionDescription.h"
 #include "ice/information/InformationSpecification.h"
+#include "ice/information/InformationStream.h"
 #include "easylogging++.h"
 
 //Forward declarations
 namespace ice
 {
 class ICEngine;
-template<typename T>
-  class InformationStream;
 class StreamFactory;
 class OntologyInterface;
 }
@@ -157,7 +155,7 @@ public:
    *
    * \param streamDescription The description of the searched stream.
    */
-  std::shared_ptr<BaseInformationStream> getBaseStream(const std::shared_ptr<StreamDescription> streamDescription);
+  std::shared_ptr<BaseInformationStream> getBaseStream(const std::shared_ptr<CollectionDescription> streamDescription);
 
   void cleanUpStreams();
 
@@ -181,10 +179,6 @@ private:
 
 } /* namespace ice */
 
-//Include after forward declaration
-
-#include "ice/information/InformationStream.h"
-
 //Implementing methods here
 
 template<typename T>
@@ -202,7 +196,7 @@ template<typename T>
       return ptr;
     }
 
-    auto desc = std::make_shared<StreamDescription>(specification, name, provider, sourceSystem, metadata);
+    auto desc = std::make_shared<CollectionDescription>(specification, name, provider, sourceSystem, metadata);
     auto stream = std::make_shared<InformationStream<T>>(desc, this->eventHandler, streamSize);
 
     _log->debug("Created stream with '%v', '%v', '%v'", specification->toString(),

@@ -16,7 +16,7 @@
 #include "ros/ros.h"
 
 #include "ice/communication/InformationReceiver.h"
-#include "ice/information/BaseInformationStream.h"
+#include "ice/information/InformationCollection.h"
 #include "ice/information/InformationStream.h"
 
 #include "ice_msgs/ICEHeader.h"
@@ -32,7 +32,7 @@ template<typename ICEType, typename ROSType>
   class RosInformationReceiver : public InformationReceiver
   {
   public:
-    RosInformationReceiver(identifier engineId, std::shared_ptr<BaseInformationStream> stream,
+    RosInformationReceiver(identifier engineId, std::shared_ptr<InformationCollection> collection,
                            ros::NodeHandle* nodeHandel, const std::string topic, int bufferSize,
                            transformM2C<ICEType, ROSType> &messageTransform);
     virtual ~RosInformationReceiver();
@@ -52,15 +52,15 @@ template<typename ICEType, typename ROSType>
 
 template<typename ICEType, typename ROSType>
   inline RosInformationReceiver<ICEType, ROSType>::RosInformationReceiver(
-      identifier engineId, std::shared_ptr<BaseInformationStream> stream, ros::NodeHandle* nodeHandel,
+      identifier engineId, std::shared_ptr<InformationCollection> collection, ros::NodeHandle* nodeHandel,
       const std::string topic, int bufferSize, transformM2C<ICEType, ROSType> &messageTransform) :
-      InformationReceiver(stream), topic(topic)
+      InformationReceiver(collection), topic(topic)
   {
     this->engineId = engineId;
     this->bufferSize = bufferSize;
     this->subscriber = nodeHandel->subscribe(topic, bufferSize, &RosInformationReceiver::onMessage, this);
     this->messageTransform = messageTransform;
-    this->informationStream = std::static_pointer_cast<InformationStream<ICEType>>(stream);
+    this->informationStream = std::static_pointer_cast<InformationStream<ICEType>>(collection);
   }
 
 template<typename ICEType, typename ROSType>

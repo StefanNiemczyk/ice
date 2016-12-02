@@ -5,8 +5,8 @@
  *      Author: sni
  */
 
-#ifndef STREAMDESCRIPTION_H_
-#define STREAMDESCRIPTION_H_
+#ifndef COLLECTIONDESCRIPTION_H_
+#define COLLECTIONDESCRIPTION_H_
 
 #include <map>
 
@@ -22,52 +22,34 @@ namespace ice
 namespace ice
 {
 
-//* StreamDescription
+//* CollectionDescription
 /**
- * Data container to describe a stream.
+ * Data container to describe an information collection.
  */
-class StreamDescription
+class CollectionDescription
 {
 public:
 
   /*!
-   * \brief The constructor sets the information specification, the metadata of this stream, and if the stream is shared.
+   * \brief The constructor.
    *
-   * The constructor sets the information specification, the metadata of this stream, and if the stream is shared.
+   * The constructor.
    *
    * \param informationSpecification The specification of the information.
    * \param name The name of this stream
    * \param provider The provider of this stream.
    * \param sourceSystem The source system of this stream.
    * \param metadatas The metadata of this stream.
-   * \param shared True if the stream is shared, else false.
    */
-  StreamDescription(const std::shared_ptr<InformationSpecification> informationSpecification, std::string name,
-                    const std::string provider, const std::string sourceSystem, std::map<std::string, int> metadatas,
-                    bool shared = false);
+  CollectionDescription(const std::shared_ptr<InformationSpecification> informationSpecification, std::string name,
+                    const std::string provider, const std::string sourceSystem, std::map<std::string, int> metadatas);
 
   /*!
    * \brief Default destructor
    *
    * Default destructor
    */
-  virtual ~StreamDescription();
-
-  /*!
-   * \brief Returns true if the stream is shared, else false.
-   *
-   * Returns true if the stream is shared, else false.
-   */
-  bool isShared() const;
-
-  /*!
-   * \brief Sets if the streams is shared.
-   *
-   * Sets if the streams is shared.
-   *
-   * \param shared True if the stream is shared, else false.
-   */
-  void setShared(bool shared);
+  virtual ~CollectionDescription();
 
   /*!
    * \brief Returns the specification of the information stored in the stream.
@@ -139,18 +121,9 @@ public:
    *
    * \param rhs The other stream description
    */
-  const bool equals(StreamDescription const* rhs) const;
+  const bool equals(CollectionDescription const* rhs) const;
 
   identifier getId();
-
-  /*!
-   * \brief Returns true if the stream template is based an the same information type.
-   *
-   * Returns true if the stream template is based an the same information type.
-   *
-   * \param rhs The stream template description
-   */
-//  const bool equals(StreamTemplateDescription const* rhs) const;
 
   /*!
    * \brief Return the description as string.
@@ -160,12 +133,11 @@ public:
   std::string toString();
 
 private:
-  const std::shared_ptr<InformationSpecification> informationSpecification; /**< Specification of the information stored in the stream */
-  std::string name; /*< The name of the stream */
-  const std::string provider; /*< The provider of this stream */
-  const std::string sourceSystem; /**< The source system of this stream */
-  std::map<std::string, int> metadatas; /*< The metadata of this stream */
-  bool shared; /**< true if the information is shared, else false */
+  const std::shared_ptr<InformationSpecification> specification;        /**< Specification of the information */
+  std::string name;                                                     /**< The name */
+  const std::string provider;                                           /**< The provider */
+  const std::string sourceSystem;                                       /**< The source system */
+  std::map<std::string, int> metadatas;                                 /**< The metadata */
   identifier id;
 };
 

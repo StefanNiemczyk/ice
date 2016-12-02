@@ -7,12 +7,12 @@
 
 #include "ice/communication/InformationReceiver.h"
 
-#include "ice/information/BaseInformationStream.h"
+#include "ice/information/InformationCollection.h"
 
 namespace ice
 {
 
-InformationReceiver::InformationReceiver(std::shared_ptr<BaseInformationStream> const &stream) : stream(stream)
+InformationReceiver::InformationReceiver(std::shared_ptr<InformationCollection> const &collection) : collection(collection)
 {
   //
 }
@@ -29,7 +29,7 @@ InformationReceiver::~InformationReceiver()
  */
 const std::type_info* InformationReceiver::getTypeInfo()
 {
-  return this->stream->getTypeInfo();
+  return this->collection->getTypeInfo();
 }
 
 };

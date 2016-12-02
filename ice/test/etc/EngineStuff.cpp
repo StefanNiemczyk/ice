@@ -18,10 +18,9 @@ public:
   TestFactory(std::weak_ptr<ice::ICEngine> engine) : ice::StreamFactory(engine) {}
 
   std::shared_ptr<ice::BaseInformationStream> createStream(const std::string& className,
-                                                           std::shared_ptr<ice::StreamDescription> streamDescription,
+                                                           std::shared_ptr<ice::CollectionDescription> streamDescription,
                                                            std::shared_ptr<ice::EventHandler> eventHandler,
-                                                           int streamSize,
-                                                           int sharingMaxCount) const
+                                                           int streamSize) const
   {
     if (className == "")
       return nullptr;
@@ -30,27 +29,23 @@ public:
 
     if ("Position" == className)
     {
-      stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize,
-          sharingMaxCount);
+      stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize);
     }
     else if ("http://vs.uni-kassel.de/IceTest#TestRepresentation1" == className)
     {
-      stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize,
-          sharingMaxCount);
+      stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize);
     }
     else if ("http://vs.uni-kassel.de/IceTest#TestRepresentation2" == className)
     {
-      stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize,
-          sharingMaxCount);
+      stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize);
     }
     else if ("List[Position]" == className)
     {
-      stream = std::make_shared<ice::InformationStream<std::vector<ice::Position>>>(streamDescription, eventHandler, streamSize,
-          sharingMaxCount);
+      stream = std::make_shared<ice::InformationStream<std::vector<ice::Position>>>(streamDescription, eventHandler, streamSize);
     }
 
     if (stream == nullptr)
-      stream = ice::StreamFactory::createStream(className, streamDescription, eventHandler, streamSize, sharingMaxCount);
+      stream = ice::StreamFactory::createStream(className, streamDescription, eventHandler, streamSize);
 
     if (stream)
       return stream;

@@ -8,12 +8,12 @@
 #ifndef NODEDESCRIPTION_H_
 #define NODEDESCRIPTION_H_
 
+#include <ice/information/CollectionDescription.h>
 #include <memory>
 #include <vector>
 
 #include "ice/Identifier.h"
 #include "ice/TypeDefs.h"
-#include "ice/information/StreamDescription.h"
 
 namespace ice
 {

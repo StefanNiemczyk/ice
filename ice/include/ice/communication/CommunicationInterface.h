@@ -25,6 +25,7 @@ class BaseInformationSender;
 class ComJobBase;
 class Entity;
 class ICEngine;
+class InformationCollection;
 template<typename T>
 class InformationElement;
 class InformationReceiver;
@@ -54,8 +55,8 @@ public:
   void addComJob(std::shared_ptr<ComJobBase> const &job);
   void removeComJob(std::shared_ptr<ComJobBase> const &job);
   void discoveredEntity(std::shared_ptr<Entity> const &entity);
-  std::shared_ptr<BaseInformationSender> registerStreamAsSender(std::shared_ptr<BaseInformationStream> stream);
-  std::shared_ptr<InformationReceiver> registerStreamAsReceiver(std::shared_ptr<BaseInformationStream> stream);
+  std::shared_ptr<BaseInformationSender> registerCollectionAsSender(std::shared_ptr<InformationCollection> collection);
+  std::shared_ptr<InformationReceiver> registerCollectionAsReceiver(std::shared_ptr<InformationCollection> collection);
 
   // Get/Set
   std::shared_ptr<GContainerFactory> getGContainerFactory();
@@ -73,8 +74,8 @@ protected:
   virtual void discover() = 0;
   virtual int readMessage(std::vector<std::shared_ptr<Message>> &outMessages) = 0;
   virtual void sendMessage(std::shared_ptr<Message> msg) = 0;
-  virtual std::shared_ptr<BaseInformationSender> createSender(std::shared_ptr<BaseInformationStream> stream) = 0;
-  virtual std::shared_ptr<InformationReceiver> createReceiver(std::shared_ptr<BaseInformationStream> stream) = 0;
+  virtual std::shared_ptr<BaseInformationSender> createSender(std::shared_ptr<InformationCollection> collection) = 0;
+  virtual std::shared_ptr<InformationReceiver> createReceiver(std::shared_ptr<InformationCollection> collection) = 0;
   virtual void initInternal() = 0;
   virtual void cleanUpInternal() = 0;
 

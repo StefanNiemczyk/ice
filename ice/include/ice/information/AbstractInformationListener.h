@@ -11,7 +11,7 @@
 #include <memory>
 
 #include "ice/information/InformationElement.h"
-#include "ice/information/InformationStream.h"
+#include "ice/information/InformationCollection.h"
 
 namespace ice
 {
@@ -33,7 +33,7 @@ template<typename T>
      *
      * Default destructor
      */
-    virtual ~AbstractInformationListener();
+    virtual ~AbstractInformationListener() {};
 
     /*!
      * \brief This method will be triggered if a new element is added to the information stream.
@@ -44,24 +44,10 @@ template<typename T>
      * \param stream The stream which received the new information element.
      */
     virtual const int newEvent(std::shared_ptr<InformationElement<T>> element,
-                               std::shared_ptr<InformationStream<T>> stream);
+                               std::shared_ptr<InformationCollection> stream) = 0;
   };
 
 } /* namespace ice */
 
-//Include after forward declaration
-
-//Implementing methods here
-
-template<typename T>
-  inline ice::AbstractInformationListener<T>::~AbstractInformationListener()
-  {
-  }
-
-template<typename T>
-  inline const int ice::AbstractInformationListener<T>::newEvent(std::shared_ptr<InformationElement<T>> element,
-                                                            std::shared_ptr<InformationStream<T>> stream)
-  {
-  }
 
 #endif /* ABSTRACTINFORMATIONLISTENER_H_ */

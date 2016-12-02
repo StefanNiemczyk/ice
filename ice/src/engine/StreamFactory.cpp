@@ -36,9 +36,9 @@ void StreamFactory::cleanUp()
 }
 
 std::shared_ptr<BaseInformationStream> StreamFactory::createStream(const std::string& className,
-                                                                   std::shared_ptr<StreamDescription> streamDescription,
+                                                                   std::shared_ptr<CollectionDescription> streamDescription,
                                                                    std::shared_ptr<EventHandler> eventHandler,
-                                                                   int streamSize, int sharingMaxCount) const
+                                                                   int streamSize) const
 {
   std::shared_ptr<BaseInformationStream> stream;
 
@@ -52,48 +52,43 @@ std::shared_ptr<BaseInformationStream> StreamFactory::createStream(const std::st
 
   if ("int" == className)
   {
-    stream = std::make_shared<InformationStream<int>>(streamDescription, eventHandler, streamSize, sharingMaxCount);
+    stream = std::make_shared<InformationStream<int>>(streamDescription, eventHandler, streamSize);
   }
   else if ("long" == className)
   {
-    stream = std::make_shared<InformationStream<long>>(streamDescription, eventHandler, streamSize, sharingMaxCount);
+    stream = std::make_shared<InformationStream<long>>(streamDescription, eventHandler, streamSize);
   }
   else if ("double" == className)
   {
-    stream = std::make_shared<InformationStream<double>>(streamDescription, eventHandler, streamSize, sharingMaxCount);
+    stream = std::make_shared<InformationStream<double>>(streamDescription, eventHandler, streamSize);
   }
   else if ("float" == className)
   {
-    stream = std::make_shared<InformationStream<float>>(streamDescription, eventHandler, streamSize, sharingMaxCount);
+    stream = std::make_shared<InformationStream<float>>(streamDescription, eventHandler, streamSize);
   }
   else if ("bool" == className)
   {
-    stream = std::make_shared<InformationStream<float>>(streamDescription, eventHandler, streamSize, sharingMaxCount);
+    stream = std::make_shared<InformationStream<float>>(streamDescription, eventHandler, streamSize);
   }
   else if ("List[int]" == className)
   {
-    stream = std::make_shared<InformationStream<std::vector<int>>>(streamDescription, eventHandler, streamSize,
-    sharingMaxCount);
+    stream = std::make_shared<InformationStream<std::vector<int>>>(streamDescription, eventHandler, streamSize);
   }
   else if ("List[long]" == className)
   {
-    stream = std::make_shared<InformationStream<std::vector<long>>>(streamDescription, eventHandler, streamSize,
-    sharingMaxCount);
+    stream = std::make_shared<InformationStream<std::vector<long>>>(streamDescription, eventHandler, streamSize);
   }
   else if ("List[double]" == className)
   {
-    stream = std::make_shared<InformationStream<std::vector<double>>>(streamDescription, eventHandler, streamSize,
-    sharingMaxCount);
+    stream = std::make_shared<InformationStream<std::vector<double>>>(streamDescription, eventHandler, streamSize);
   }
   else if ("List[float]" == className)
   {
-    stream = std::make_shared<InformationStream<std::vector<float>>>(streamDescription, eventHandler, streamSize,
-    sharingMaxCount);
+    stream = std::make_shared<InformationStream<std::vector<float>>>(streamDescription, eventHandler, streamSize);
   }
   else if ("List[bool]" == className)
   {
-    stream = std::make_shared<InformationStream<std::vector<bool>>>(streamDescription, eventHandler, streamSize,
-    sharingMaxCount);
+    stream = std::make_shared<InformationStream<std::vector<bool>>>(streamDescription, eventHandler, streamSize);
   }
   else
   {
@@ -101,8 +96,7 @@ std::shared_ptr<BaseInformationStream> StreamFactory::createStream(const std::st
 
     if (rep != nullptr)
     {
-      stream = std::make_shared<InformationStream<GContainer>>(streamDescription, eventHandler, streamSize,
-      sharingMaxCount);
+      stream = std::make_shared<InformationStream<GContainer>>(streamDescription, eventHandler, streamSize);
     }
   }
 

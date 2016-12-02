@@ -123,45 +123,45 @@ void RosCommunication::sendMessage(std::shared_ptr<Message> msg)
   this->coordinationPublisher.publish(coordinationMsg);
 }
 
-std::shared_ptr<BaseInformationSender> RosCommunication::createSender(std::shared_ptr<BaseInformationStream> stream)
+std::shared_ptr<BaseInformationSender> RosCommunication::createSender(std::shared_ptr<InformationCollection> collection)
 {
-  auto type = stream->getTypeInfo();
+  auto type = collection->getTypeInfo();
 
   if (typeid(Position) == *type)
   { // ice::Position -> ice_msgs::Position
     _log->debug("Creating sender for stream %v with mapping ice::Position -> ice_msgs::Position",
-                stream->getName());
+                collection->getName());
     transformC2M<Position, ice_msgs::Position> method = &RosMessageTransform::transformC2MPosition;
-    return this->_createSender<Position, ice_msgs::Position>(stream, method);
+    return this->_createSender<Position, ice_msgs::Position>(collection, method);
   }
   else if (typeid(std::vector<Position>) == *type)
   { // ice::Position[] -> ice_msgs::Positions
     _log->debug("Creating sender for stream %v with mapping ice::Position[] -> ice_msgs::Positions",
-                stream->getName());
+                collection->getName());
     transformC2M<std::vector<Position>, ice_msgs::Positions> method = &RosMessageTransform::transformC2MPositions;
-    return this->_createSender<std::vector<Position>, ice_msgs::Positions>(stream, method);
+    return this->_createSender<std::vector<Position>, ice_msgs::Positions>(collection, method);
   }
 
   return nullptr;
 }
 
-std::shared_ptr<InformationReceiver> RosCommunication::createReceiver(std::shared_ptr<BaseInformationStream> stream)
+std::shared_ptr<InformationReceiver> RosCommunication::createReceiver(std::shared_ptr<InformationCollection> collection)
 {
-  auto type = stream->getTypeInfo();
+  auto type = collection->getTypeInfo();
 
   if (typeid(Position) == *type)
   { // ice_msgs::Position -> ice::Position
     _log->debug("Creating receiver for stream %v with mapping ice_msgs::Position -> ice::Position",
-                stream->getName());
+                collection->getName());
     transformM2C<Position, ice_msgs::Position> method = &RosMessageTransform::transformM2CPosition;
-    return this->_createReceiver<Position, ice_msgs::Position>(stream, method);
+    return this->_createReceiver<Position, ice_msgs::Position>(collection, method);
   }
   else if (typeid(std::vector<Position>) == *type)
   { // ice_msgs::Positions -> ice::Position[]
     _log->debug("Creating receiver for stream %v with mapping ice_msgs::Positions -> ice::Position[]",
-                stream->getName());
+                collection->getName());
     transformM2C<std::vector<Position>, ice_msgs::Positions> method = &RosMessageTransform::transformM2CPositions;
-    return this->_createReceiver<std::vector<Position>, ice_msgs::Positions>(stream, method);
+    return this->_createReceiver<std::vector<Position>, ice_msgs::Positions>(collection, method);
   }
 
   return nullptr;

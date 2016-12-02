@@ -20,6 +20,7 @@
 #include "ice/communication/messages/RequestMessage.h"
 #include "ice/communication/jobs/ComJobBase.h"
 #include "ice/communication/jobs/IdentityRequest.h"
+#include "ice/information/InformationCollection.h"
 #include "ice/information/InformationElement.h"
 #include "ice/information/InformationStore.h"
 #include "ice/representation/GContainer.h"
@@ -125,31 +126,31 @@ void CommunicationInterface::discoveredEntity(std::shared_ptr<Entity> const &ent
 //  this->send(m);
 //}
 
-std::shared_ptr<BaseInformationSender> CommunicationInterface::registerStreamAsSender(
-    std::shared_ptr<BaseInformationStream> stream)
+std::shared_ptr<BaseInformationSender> CommunicationInterface::registerCollectionAsSender(
+    std::shared_ptr<InformationCollection> collection)
 {
   std::shared_ptr<BaseInformationSender> ptr;
 
-  ptr = this->createSender(stream);
+  ptr = this->createSender(collection);
 
   if (ptr == nullptr)
   {
     _log->error("Sender could not be created for stream %v with type string %v",
-                stream->getName(), stream->getSpecification()->getTypeString());
+                collection->getName(), collection->getSpecification()->getTypeString());
   }
 
   return ptr;
 }
 
-std::shared_ptr<InformationReceiver> CommunicationInterface::registerStreamAsReceiver(
-    std::shared_ptr<BaseInformationStream> stream)
+std::shared_ptr<InformationReceiver> CommunicationInterface::registerCollectionAsReceiver(
+    std::shared_ptr<InformationCollection> collection)
 {
-  std::shared_ptr<InformationReceiver> ptr = this->createReceiver(stream);
+  std::shared_ptr<InformationReceiver> ptr = this->createReceiver(collection);
 
   if (ptr == nullptr)
   {
     _log->error("Receiver could not be created for stream %v with type string %v",
-                stream->getName(), stream->getSpecification()->getTypeString());
+                collection->getName(), collection->getSpecification()->getTypeString());
   }
 
   return ptr;

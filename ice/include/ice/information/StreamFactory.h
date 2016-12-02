@@ -59,10 +59,9 @@ public:
    * \param shared True if the stream is shared, else false.
    */
   virtual std::shared_ptr<BaseInformationStream> createStream(const std::string& className,
-                                                              std::shared_ptr<StreamDescription> streamDescription,
+                                                              std::shared_ptr<CollectionDescription> streamDescription,
                                                               std::shared_ptr<EventHandler> eventHandler,
-                                                              int streamSize,
-                                                              int sharingMaxCount = 0) const;
+                                                              int streamSize) const;
 
   protected:
   std::weak_ptr<ICEngine>               engine;
