@@ -80,7 +80,6 @@ void ICEngine::init()
   // Initialize update strategy
   this->updateStrategie->init();
 
-
   this->initialized = true;
   _log->info("Engine initialized '%v'", this->self->toString());
 }

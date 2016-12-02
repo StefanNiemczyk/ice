@@ -151,7 +151,7 @@ template<typename T>
      * \param func The filter function
      */
     const int getFilteredList(std::shared_ptr<std::vector<std::shared_ptr<InformationElement<T> > > > filteredList,
-                              std::function<bool(std::shared_ptr<InformationElement<T> >)> func);
+                              std::function<bool(std::shared_ptr<InformationElement<T>>&)> func);
 
 
   protected:
@@ -366,7 +366,7 @@ template<typename T>
 template<typename T>
   inline const int ice::InformationStream<T>::getFilteredList(
       std::shared_ptr<std::vector<std::shared_ptr<InformationElement<T>>>> filteredList,
-      std::function<bool(std::shared_ptr<InformationElement<T>>)> func)
+      std::function<bool(std::shared_ptr<InformationElement<T>>&)> func)
   {
     std::lock_guard<std::mutex> guard(_mtx);
     int count = 0;

@@ -19,6 +19,7 @@ namespace ice
 //Forward declarations
 class ICEngine;
 class InformationStore;
+class SetStore;
 class StreamStore;
 class OntologyInterface;
 
@@ -37,6 +38,7 @@ public:
   void readEntitiesFromOntology();
 
 public:
+  std::shared_ptr<SetStore>                     setStore;
   std::shared_ptr<StreamStore>                  streamStore;
   std::shared_ptr<InformationStore>             informationStore;
 

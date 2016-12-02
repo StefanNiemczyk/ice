@@ -12,6 +12,72 @@
 #include "ice/representation/Transformation.h"
 #include "ice/ICEngine.h"
 
+class SimpleTask : public ice::AsynchronousTask
+{
+public:
+  SimpleTask()
+  {
+    value = false;
+  }
+
+  int performTask()
+  {
+    value = true;
+
+    return 0;
+  }
+
+  bool value;
+};
+
+class SimpleListener : public ice::AbstractInformationListener<int>
+{
+public:
+  SimpleListener()
+  {
+    value = 0;
+  }
+
+  ~SimpleListener()
+  {
+
+  }
+
+  int value;
+
+  const int newEvent(std::shared_ptr<ice::InformationElement<int>> element,
+                     std::shared_ptr<ice::InformationCollection> stream)
+  {
+    value = *element->getInformation();
+
+    return 0;
+  }
+};
+
+class SimpleListener2 : public ice::AbstractInformationListener<int>
+{
+public:
+  SimpleListener2()
+  {
+    value = 0;
+  }
+
+  ~SimpleListener2()
+  {
+
+  }
+
+  int value;
+
+  const int newEvent(std::shared_ptr<ice::InformationElement<int> > element,
+                     std::shared_ptr<ice::InformationCollection> stream)
+  {
+    value = *element->getInformation() + 3;
+
+    return 0;
+  }
+};
+
 class TestFactory : public ice::CollectionFactory
 {
 public:

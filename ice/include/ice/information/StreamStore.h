@@ -12,7 +12,6 @@
 #include <memory>
 #include <mutex>
 
-
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/CollectionStore.h"
 #include "ice/information/InformationStream.h"

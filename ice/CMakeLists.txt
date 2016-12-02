@@ -126,6 +126,7 @@ add_library(${PROJECT_NAME}
   src/engine/InformationSpecification.cpp
   src/engine/InformationStore.cpp
   src/engine/KnowledgeBase.cpp
+  src/engine/SetStore.cpp
   src/engine/StreamStore.cpp
   
   src/engine/OntologyInterface.cpp

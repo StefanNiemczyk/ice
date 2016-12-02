@@ -213,16 +213,15 @@ template<typename T>
      * \param func The filter function
      */
     const int getFilteredList(std::shared_ptr<std::vector<std::shared_ptr<InformationElement<T> > > > filteredList,
-                              std::function<bool(std::shared_ptr<InformationElement<T> >)> func)
+                              std::function<bool(std::shared_ptr<InformationElement<T>>&)> func)
     {
       std::lock_guard<std::mutex> guard(_mtx);
       int count = 0;
       std::shared_ptr<InformationElement<T> > ptr;
 
-      for (int i = this->ringBuffer->getSize() - 1; i >= 0; --i)
+      for (auto &element : this->map)
       {
-        ptr = this->ringBuffer->getLast(i);
-        if (ptr && func(ptr))
+        if (func(element.second))
         {
           filteredList->push_back(ptr);
           ++count;

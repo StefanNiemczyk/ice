@@ -10,6 +10,7 @@
 #include "ice/ICEngine.h"
 #include "ice/information/InformationStore.h"
 #include "ice/information/StreamStore.h"
+#include "ice/information/SetStore.h"
 #include "ice/ontology/OntologyInterface.h"
 
 namespace ice
@@ -20,6 +21,7 @@ KnowledgeBase::KnowledgeBase(std::weak_ptr<ICEngine> engine) : engine(engine)
   this->_log = el::Loggers::getLogger("KnowledgeBase");
 
   this->informationStore = std::make_shared<InformationStore>(engine);
+  this->setStore = std::make_shared<SetStore>(engine);
   this->streamStore = std::make_shared<StreamStore>(engine);
 }
 
@@ -39,6 +41,7 @@ void KnowledgeBase::init()
   this->readEntitiesFromOntology();
 
   this->informationStore->init();
+  this->setStore->init();
   this->streamStore->init();
 }
 
@@ -49,12 +52,16 @@ void KnowledgeBase::cleanUp()
   if (this->informationStore)
     this->informationStore->cleanUp();
 
+  if (this->setStore)
+    this->setStore->cleanUp();
+
   if (this->streamStore)
     this->streamStore->cleanUp();
 }
 
 void KnowledgeBase::cleanUpStores()
 {
+  this->setStore->cleanUpUnused();
   this->streamStore->cleanUpUnused();
 }
 
