@@ -119,11 +119,13 @@ add_library(${PROJECT_NAME}
   src/engine/NodeStore.cpp
   src/engine/TransformationNode.cpp
   
+  src/engine/BaseInformationSet.cpp
   src/engine/BaseInformationStream.cpp
+  src/engine/CollectionFactory.cpp
   src/engine/InformationCollection.cpp
   src/engine/InformationSpecification.cpp
   src/engine/InformationStore.cpp
-  src/engine/StreamFactory.cpp
+  src/engine/KnowledgeBase.cpp
   src/engine/StreamStore.cpp
   
   src/engine/OntologyInterface.cpp

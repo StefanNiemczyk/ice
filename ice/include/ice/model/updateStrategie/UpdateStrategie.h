@@ -25,7 +25,7 @@ class CommunicationInterface;
 class Entity;
 class EntityDirectory;
 class ICEngine;
-class StreamStore;
+class KnowledgeBase;
 class ProcessingModelGenerator;
 class Node;
 class NodeStore;
@@ -88,7 +88,7 @@ protected:
   std::shared_ptr<Entity>                       self;                   /**< Engine state of the own engine */
   std::weak_ptr<ICEngine>                       engine;                 /**< The main engine */
   std::shared_ptr<NodeStore>                    nodeStore;              /**< The node store */
-  std::shared_ptr<StreamStore>                  streamStore;            /**< The information store */
+  std::shared_ptr<KnowledgeBase>                knowledgeBase;          /**< The knowledgeBase */
   std::shared_ptr<CommunicationInterface>       communication;          /**< Communication interface */
   std::shared_ptr<OntologyInterface>            ontology;               /**< Shared pointer to access the ontology */
   std::shared_ptr<ProcessingModelGenerator>     modelGenerator;         /**< The model generator */

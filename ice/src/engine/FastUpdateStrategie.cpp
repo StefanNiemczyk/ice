@@ -112,7 +112,7 @@ void FastUpdateStrategie::processModel(std::shared_ptr<ProcessingModel> const &m
   }
 
   this->nodeStore->cleanUpNodes();
-  this->streamStore->cleanUpStreams();
+  this->knowledgeBase->cleanUpStores();
 
   // sending sub models
   for (auto &subModel : model->getSubModels())

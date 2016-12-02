@@ -68,7 +68,7 @@ TEST(ASPRepComp, ontology1)
 
   engine->init();
 
-  engine->getASPTransformationGeneration()->synthesizeTransformations();
+  engine->getTransformationSynthesis()->synthesizeTransformations();
 
   // Test transformation
   std::string name = "autoTrans_http://vs.uni-kassel.de/Ice#Position_http://vs.uni-kassel.de/Ice#CoordinatePositionRep_http://vs.uni-kassel.de/IceTest#Pos3D";
@@ -127,7 +127,7 @@ TEST(ASPRepComp, ontology2)
 
   engine->init();
 
-  engine->getASPTransformationGeneration()->synthesizeTransformations();
+  engine->getTransformationSynthesis()->synthesizeTransformations();
 
   // Test transformation
   std::string name = "autoTrans_http://vs.uni-kassel.de/IceTest#TestScope1_http://vs.uni-kassel.de/IceTest#TestTransformation1_http://vs.uni-kassel.de/IceTest#TestTransformation2";

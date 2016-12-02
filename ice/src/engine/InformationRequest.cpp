@@ -13,6 +13,7 @@
 #include "ice/communication/messages/IntMessage.h"
 #include "ice/communication/messages/RequestMessage.h"
 #include "ice/information/InformationStore.h"
+#include "ice/information/KnowledgeBase.h"
 
 namespace ice
 {
@@ -26,7 +27,7 @@ InformationRequest::InformationRequest(std::weak_ptr<ICEngine> engine, std::shar
 {
   this->timeout = 2000;
   auto e = this->engine.lock();
-  this->informationStore = e->getInformationStore();
+  this->knowledgeBase = e->getKnowlegeBase();
   this->sendPerTickCount = e->getCommunicationInterface()->getMaxMessageSend();
 }
 
@@ -207,7 +208,7 @@ void InformationRequest::onRequestInformation(std::shared_ptr<RequestMessage> co
   {
     for (auto &request : message->getRequests())
     {
-      this->informationStore->getInformation(request, this->information);
+      this->knowledgeBase->informationStore->getInformation(request, this->information);
     }
 
     this->currentIndex = 0;
@@ -277,7 +278,7 @@ void InformationRequest::onInformation(std::shared_ptr<InformationMessage> const
     }
 
     this->received[info.first] = true;
-    this->informationStore->addInformation(info.second);
+    this->knowledgeBase->informationStore->addInformation(info.second);
     this->information.push_back(info.second);
     this->currentIndex++;
   }

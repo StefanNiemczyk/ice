@@ -1,3 +1,4 @@
+#include <ice/information/CollectionFactory.h>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -6,16 +7,15 @@
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationElement.h"
 #include "ice/information/InformationStream.h"
-#include "ice/information/StreamFactory.h"
 #include "ice/processing/Node.h"
 #include "ice/representation/GContainer.h"
 #include "ice/representation/Transformation.h"
 #include "ice/ICEngine.h"
 
-class TestFactory : public ice::StreamFactory
+class TestFactory : public ice::CollectionFactory
 {
 public:
-  TestFactory(std::weak_ptr<ice::ICEngine> engine) : ice::StreamFactory(engine) {}
+  TestFactory(std::weak_ptr<ice::ICEngine> engine) : ice::CollectionFactory(engine) {}
 
   std::shared_ptr<ice::BaseInformationStream> createStream(const std::string& className,
                                                            std::shared_ptr<ice::CollectionDescription> streamDescription,
@@ -45,7 +45,7 @@ public:
     }
 
     if (stream == nullptr)
-      stream = ice::StreamFactory::createStream(className, streamDescription, eventHandler, streamSize);
+      stream = ice::CollectionFactory::createStream(className, streamDescription, eventHandler, streamSize);
 
     if (stream)
       return stream;

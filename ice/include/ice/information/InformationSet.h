@@ -22,7 +22,7 @@
 #include "ice/communication/InformationSender.h"
 #include "ice/container/RingBuffer.h"
 #include "ice/information/AbstractInformationListener.h"
-#include "ice/information/InformationCollection.h"
+#include "ice/information/BaseInformationSet.h"
 #include "ice/information/InformationElement.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/processing/EventHandler.h"
@@ -41,7 +41,7 @@ class InformationReceiver;
  *
  */
 template<typename T>
-  class InformationSet : public InformationCollection, public std::enable_shared_from_this<InformationSet<T>>
+  class InformationSet : public BaseInformationSet, public std::enable_shared_from_this<InformationSet<T>>
   {
 
   public:
@@ -55,7 +55,7 @@ template<typename T>
      * \param eventHandler Handler to execute events asynchronously.
      */
     InformationSet(std::shared_ptr<CollectionDescription> description, std::shared_ptr<EventHandler> eventHandler) :
-      InformationCollection(description, eventHandler)
+      BaseInformationSet(description, eventHandler)
     {
       // currently nothing to do
     }

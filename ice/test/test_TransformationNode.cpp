@@ -29,7 +29,7 @@ TEST(TransformationNode, simpleTest)
   auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
   auto streamFactory = std::make_shared<TestFactory>(engine);
   engine->setTimeFactory(timeFactory);
-  engine->setStreamFactory(streamFactory);
+  engine->setCollectionFactory(streamFactory);
 
   engine->init();
 
@@ -60,11 +60,11 @@ TEST(TransformationNode, simpleTest)
 //  std::string sourceSystem
   auto spec = std::make_shared<ice::InformationSpecification>("test", "type", "scope", "http://vs.uni-kassel.de/IceTest#Pos2D");
   std::map<std::string, int> metadata;
-  auto streamIn = engine->getStreamStore()->registerStream<ice::GContainer>(spec, "inStream", 100, metadata, "handmade", "this");
+  auto streamIn = engine->getKnowlegeBase()->streamStore->registerStream<ice::GContainer>(spec, "inStream", 100, metadata, "handmade", "this");
   ASSERT_NE(nullptr, streamIn);
 
   spec = std::make_shared<ice::InformationSpecification>("test", "type", "scope", "http://vs.uni-kassel.de/IceTest#Pos3D");
-  auto streamOut = engine->getStreamStore()->registerStream<ice::GContainer>(spec, "outStream", 100, metadata, "handmade", "this");
+  auto streamOut = engine->getKnowlegeBase()->streamStore->registerStream<ice::GContainer>(spec, "outStream", 100, metadata, "handmade", "this");
   ASSERT_NE(nullptr, streamOut);
 
 //  NodeType type,

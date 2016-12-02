@@ -8,7 +8,7 @@
 #include "ice/information/StreamStore.h"
 
 #include "ice/ICEngine.h"
-#include "ice/information/StreamFactory.h"
+#include "ice/information/CollectionFactory.h"
 #include "ice/ontology/OntologyInterface.h"
 
 #include "easylogging++.h"
@@ -22,13 +22,11 @@ StreamStore::StreamStore(std::weak_ptr<ICEngine> engine)
   this->engine = engine;
 }
 
-StreamStore::StreamStore(std::shared_ptr<EventHandler> eventHandler, std::shared_ptr<StreamFactory> streamFactory,
-                                   std::shared_ptr<OntologyInterface> ontology)
+StreamStore::StreamStore(std::shared_ptr<EventHandler> eventHandler, std::shared_ptr<CollectionFactory> streamFactory)
 {
   this->_log = el::Loggers::getLogger("StreamStore");
   this->eventHandler = eventHandler;
-  this->streamFactory = streamFactory;
-  this->ontology = ontology;
+  this->factory = streamFactory;
 }
 
 void StreamStore::init()
@@ -38,16 +36,14 @@ void StreamStore::init()
     auto engineObject = engine.lock();
 
     this->eventHandler = engineObject->getEventHandler();
-    this->streamFactory = engineObject->getStreamFactory();
-    this->ontology = engineObject->getOntologyInterface();
+    this->factory = engineObject->getCollectionFactory();
   }
 }
 
 void StreamStore::cleanUp()
 {
   this->eventHandler.reset();
-  this->streamFactory.reset();
-  this->ontology.reset();
+  this->factory.reset();
 
   for(auto stream : this->streams)
   {
@@ -78,7 +74,7 @@ std::shared_ptr<BaseInformationStream> StreamStore::registerBaseStream(
 
   auto desc = std::make_shared<CollectionDescription>(specification, name, provider, sourceSystem, metadata);
   std::string type = dataType;
-  auto stream = this->streamFactory->createStream(type, desc, this->eventHandler, streamSize);
+  auto stream = this->factory->createStream(type, desc, this->eventHandler, streamSize);
 
   if (stream)
   {
@@ -92,16 +88,6 @@ std::shared_ptr<BaseInformationStream> StreamStore::registerBaseStream(
                 provider, sourceSystem, type);
   }
   return stream;
-}
-
-std::shared_ptr<EventHandler> StreamStore::getEventHandler() const
-{
-  return this->eventHandler;
-}
-
-std::shared_ptr<BaseInformationStream> StreamStore::getBaseStream(InformationSpecification *specification)
-{
-  return this->getBaseStream(specification, "", "");
 }
 
 std::shared_ptr<BaseInformationStream> StreamStore::getBaseStream(InformationSpecification *specification,
@@ -157,14 +143,7 @@ std::shared_ptr<BaseInformationStream> StreamStore::selectBestStream(
   return best;
 }
 
-std::shared_ptr<BaseInformationStream> StreamStore::getBaseStream(
-    const std::shared_ptr<CollectionDescription> streamDescription)
-{
-  return this->getBaseStream(streamDescription->getInformationSpecification().get(), streamDescription->getProvider(),
-                             streamDescription->getSourceSystem());
-}
-
-void StreamStore::cleanUpStreams()
+void StreamStore::cleanUpUnused()
 {
   std::lock_guard<std::mutex> guard(this->_mtx);
   _log->verbose(1, "Start removing unused streams");
@@ -188,46 +167,6 @@ void StreamStore::cleanUpStreams()
   }
 
   _log->info("Clean up information store: '%v' streams are removed", counter);
-}
-
-ont::entityType StreamStore::getEntityType(ont::entity entity)
-{
-  auto it = this->entityTypeMap.find(entity);
-  if (it != this->entityTypeMap.end())
-    return it->second;
-
-  return "";
-}
-
-void StreamStore::readEntitiesFromOntology()
-{
-  _log->verbose(1, "Read entities and types from ontology");
-
-  if (this->ontology->isLoadDirty())
-    this->ontology->loadOntologies();
-
-  std::stringstream ss;
-  ss.str(this->ontology->readInformationStructureAsASP());
-
-  _log->debug("Extracted entities from ontology");
-  _log->verbose(1, ss.str());
-
-  this->entityTypeMap.clear();
-
-  std::string item;
-
-  while (std::getline(ss, item, '\n'))
-  {
-    if (item.find("entity(") == 0)
-    {
-      int index1 = item.find(",");
-      int index2 = item.find(")");
-      auto entity = item.substr(7, index1 - 7);
-      auto entityType = item.substr(index1 + 1, index2 - index1 - 1);
-
-      this->entityTypeMap[entity] = entityType;
-    }
-  }
 }
 
 } /* namespace ice */

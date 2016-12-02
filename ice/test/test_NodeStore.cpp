@@ -19,7 +19,7 @@ TEST(NodeStoreTest, create)
   std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
   auto streamFactory = std::make_shared<TestFactory>(engine);
   engine->setTimeFactory(timeFactory);
-  engine->setStreamFactory(streamFactory);
+  engine->setCollectionFactory(streamFactory);
 
   engine->init();
 

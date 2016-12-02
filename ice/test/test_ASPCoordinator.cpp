@@ -2,6 +2,7 @@
 
 #include "ice/ICEngine.h"
 #include "ice/information/InformationSpecification.h"
+#include "ice/information/KnowledgeBase.h"
 #include "ice/information/StreamStore.h"
 #include "ice/model/aspModel/ASPModelGenerator.h"
 #include "ice/model/updateStrategie/UpdateStrategie.h"
@@ -21,7 +22,7 @@ TEST(ASPModelGenerator, simpleTest)
   std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
   auto streamFactory = std::make_shared<TestFactory>(engine);
   engine->setTimeFactory(timeFactory);
-  engine->setStreamFactory(streamFactory);
+  engine->setCollectionFactory(streamFactory);
 
   engine->init();
   engine->start();
@@ -35,9 +36,9 @@ TEST(ASPModelGenerator, simpleTest)
                                              "http://vs.uni-kassel.de/IceTest#TestScope1",
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation2");
 
-  auto stream1 = engine->getStreamStore()->getStream<ice::Position>(&spec1, "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
+  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1, "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                          "http://vs.uni-kassel.de/IceTest#TestSystem");
-  auto stream2 = engine->getStreamStore()->getStream<ice::Position>(&spec2, "http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd",
+  auto stream2 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec2, "http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd",
                                                                          "http://vs.uni-kassel.de/IceTest#TestSystem");
 
   ASSERT_TRUE((stream1 ? true : false));
@@ -77,7 +78,7 @@ TEST(ASPModelGenerator, transformationTest)
   std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
   auto streamFactory = std::make_shared<TestFactory>(engine);
   engine->setTimeFactory(timeFactory);
-  engine->setStreamFactory(streamFactory);
+  engine->setCollectionFactory(streamFactory);
 
   engine->init();
   engine->start();
@@ -91,9 +92,9 @@ TEST(ASPModelGenerator, transformationTest)
                                              "http://vs.uni-kassel.de/Ice#Position",
                                              "http://vs.uni-kassel.de/IceTest#Pos2D");
 
-  auto stream1 = engine->getStreamStore()->getStream<ice::GContainer>(&specPos3D, "http://vs.uni-kassel.de/IceTest#Pos3DSourceNodeInd",
+  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::GContainer>(&specPos3D, "http://vs.uni-kassel.de/IceTest#Pos3DSourceNodeInd",
                                                                          "http://vs.uni-kassel.de/IceTest#TestTransformSystem");
-  auto stream2 = engine->getStreamStore()->getStream<ice::GContainer>(&specPos2D, "transformation7",
+  auto stream2 = engine->getKnowlegeBase()->streamStore->getStream<ice::GContainer>(&specPos2D, "transformation7",
                                                                          "http://vs.uni-kassel.de/IceTest#TestTransformSystem");
 
   ASSERT_TRUE((stream1 ? true : false));
@@ -148,7 +149,7 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
   auto streamFactory = std::make_shared<TestFactory>(engine);
   engine->setTimeFactory(timeFactory);
-  engine->setStreamFactory(streamFactory);
+  engine->setCollectionFactory(streamFactory);
 
   engine->init();
   engine->start();
@@ -162,7 +163,7 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(config2);
   auto streamFactory2 = std::make_shared<TestFactory>(engine2);
   engine2->setTimeFactory(timeFactory);
-  engine2->setStreamFactory(streamFactory2);
+  engine2->setCollectionFactory(streamFactory2);
 
   engine2->init();
   engine2->start();
@@ -175,7 +176,7 @@ TEST(ASPModelGenerator, twoSystemsSimple)
                                              "http://vs.uni-kassel.de/IceTest#TestEntity",
                                              "http://vs.uni-kassel.de/IceTest#TestScope1",
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation1");
-  auto stream1 = engine->getStreamStore()->getStream<ice::Position>(&spec1,
+  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1,
                                                                     "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                     "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd1");
   ASSERT_TRUE((stream1 ? true : false));
@@ -185,7 +186,7 @@ TEST(ASPModelGenerator, twoSystemsSimple)
                                              "http://vs.uni-kassel.de/IceTest#TestEntity",
                                              "http://vs.uni-kassel.de/IceTest#TestScope1",
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation1");
-  auto stream2 = engine2->getStreamStore()->getStream<ice::Position>(&spec2,
+  auto stream2 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec2,
                                                                      "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                      "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd1");
   ASSERT_TRUE((stream2 ? true : false));
@@ -229,7 +230,7 @@ TEST(ASPModelGenerator, twoSystemsComplex)
   std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
   engine->setTimeFactory(timeFactory);
   auto streamFactory = std::make_shared<TestFactory>(engine);
-  engine->setStreamFactory(streamFactory);
+  engine->setCollectionFactory(streamFactory);
 
   engine->init();
   engine->start();
@@ -243,7 +244,7 @@ TEST(ASPModelGenerator, twoSystemsComplex)
   std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(config2);
   engine2->setTimeFactory(timeFactory);
   auto streamFactory2 = std::make_shared<TestFactory>(engine2);
-  engine2->setStreamFactory(streamFactory2);
+  engine2->setCollectionFactory(streamFactory2);
 
   engine2->init();
   engine2->start();
@@ -261,23 +262,23 @@ TEST(ASPModelGenerator, twoSystemsComplex)
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation2");
 
   // test processing system 1
-  auto stream11 = engine->getStreamStore()->getStream<ice::Position>(&spec1,
+  auto stream11 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1,
                                                                      "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                      "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd1");
   ASSERT_TRUE((stream11 ? true : false));
 
-  auto stream12 = engine2->getStreamStore()->getStream<ice::Position>(&spec2,
+  auto stream12 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec2,
                                                                       "http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd",
                                                                       "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd2");
   ASSERT_TRUE((stream12 ? true : false));
 
   // test processing system 2
-  auto stream21 = engine2->getStreamStore()->getStream<ice::Position>(&spec1,
+  auto stream21 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1,
                                                                       "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                       "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd1");
   ASSERT_TRUE((stream21 ? true : false));
 
-  auto stream22 = engine2->getStreamStore()->getStream<ice::Position>(&spec2,
+  auto stream22 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec2,
                                                                       "http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd",
                                                                       "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd2");
   ASSERT_TRUE((stream22 ? true : false));

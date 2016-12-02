@@ -8,6 +8,7 @@
 #ifndef ICENGINE_H_
 #define ICENGINE_H_
 
+#include <ice/information/CollectionFactory.h>
 #include <ice/representation/TransformationSynthesis.h>
 #include <exception>
 #include <iostream>
@@ -23,10 +24,10 @@
 #include "ice/Identifier.h"
 #include "ice/Time.h"
 #include "ice/communication/CommunicationInterface.h"
-#include "ice/information/BaseInformationStream.h"
-#include "ice/information/InformationStream.h"
+//#include "ice/information/BaseInformationStream.h"
+//#include "ice/information/InformationStream.h"
+#include "ice/information/KnowledgeBase.h"
 #include "ice/information/StreamStore.h"
-#include "ice/information/StreamFactory.h"
 #include "ice/model/ProcessingModelGenerator.h"
 #include "ice/ontology/OntologyInterface.h"
 #include "ice/processing/EventHandler.h"
@@ -123,18 +124,11 @@ public:
   std::shared_ptr<EventHandler> getEventHandler();
 
   /*!
-   * \brief Returns the stream store.
+   * \brief Returns the knowlege base.
    *
-   * Returns the stream store.
+   * Returns the knowlege base.
    */
-  std::shared_ptr<StreamStore> getStreamStore();
-
-  /*!
-   * \brief Returns the information store.
-   *
-   * Returns the information store.
-   */
-  std::shared_ptr<InformationStore> getInformationStore();
+  std::shared_ptr<KnowledgeBase> getKnowlegeBase();
 
   /*!
    * \brief Returns the node store.
@@ -157,9 +151,9 @@ public:
    *
    * Returns the stream factory.
    */
-  std::shared_ptr<StreamFactory> getStreamFactory();
+  std::shared_ptr<CollectionFactory> getCollectionFactory();
 
-  void setStreamFactory(std::shared_ptr<StreamFactory> const &factory);
+  void setCollectionFactory(std::shared_ptr<CollectionFactory> const &factory);
 
   /*!
    * \brief Returns the ontology interface.
@@ -185,7 +179,7 @@ public:
 
   std::shared_ptr<GContainerFactory> getGContainerFactory();
 
-  std::shared_ptr<TransformationSynthesis> getASPTransformationGeneration();
+  std::shared_ptr<TransformationSynthesis> getTransformationSynthesis();
 
 protected:
   bool                                          initialized;                    /**< True if the engine is initialized, else false */
@@ -193,16 +187,15 @@ protected:
   std::shared_ptr<TimeFactory>                  timeFactory;                    /**< time factory to create time stamps */
   std::shared_ptr<Configuration>                config;                         /**< The configuration object */
   std::shared_ptr<EventHandler>                 eventHandler;                   /**< Handler to execute asynchronous tasks */
-  std::shared_ptr<StreamStore>                  streamStore;                    /**< The Stream store */
-  std::shared_ptr<InformationStore>             informationStore;               /**< The information store */
+  std::shared_ptr<KnowledgeBase>                knowledgeBase;                  /**< The knowledge base */
   std::shared_ptr<NodeStore>                    nodeStore;                      /**< The node store */
   std::shared_ptr<CommunicationInterface>       communicationInterface;         /**< The communication interface */
-  std::shared_ptr<StreamFactory>                streamFactory;                  /**< Factory to create InformationStream objects */
+  std::shared_ptr<CollectionFactory>            factory;                        /**< Factory to create InformationStream objects */
   std::shared_ptr<OntologyInterface>            ontologyInterface;              /**< Interface to access the ontology */
   std::shared_ptr<ProcessingModelGenerator>     modelGenerator;                 /**< Processing model generator */
   std::shared_ptr<UpdateStrategie>              updateStrategie;                /**< Update strategie to modify the information processing */
   std::shared_ptr<GContainerFactory>            gcontainerFactory;              /**< Factory to create generic containers */
-  std::shared_ptr<TransformationSynthesis>  aspTransformationGenerator;     /**< Component to create transformations based on an asp programm */
+  std::shared_ptr<TransformationSynthesis>      transformationSynthesis;        /**< Component to create transformations based on an asp programm */
   std::shared_ptr<EntityDirectory>              entityDirectory;                /**< The directory for known entities */
   std::shared_ptr<Entity>                       self;                           /**< This engine */
   std::mutex                                    mtx_;                           /**< Mutex */

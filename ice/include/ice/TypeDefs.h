@@ -10,7 +10,6 @@
 
 #include <string>
 
-//#include "ice/information/InformationElement.h"
 
 namespace ice
 {

@@ -39,7 +39,7 @@ void UpdateStrategie::init()
   auto en = this->engine.lock();
   this->ontology = en->getOntologyInterface();
   this->nodeStore = en->getNodeStore();
-  this->streamStore = en->getStreamStore();
+  this->knowledgeBase = en->getKnowlegeBase();
   this->communication = en->getCommunicationInterface();
   this->modelGenerator = en->getProcessingModelGenerator();
   this->directory = en->getEntityDirector();
@@ -59,7 +59,7 @@ void UpdateStrategie::cleanUp()
 {
   this->ontology.reset();
   this->nodeStore.reset();
-  this->streamStore.reset();
+  this->knowledgeBase.reset();
   this->communication.reset();
   this->modelGenerator.reset();
 
@@ -173,7 +173,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shar
   {
     entity->clearReceived();
     this->nodeStore->cleanUpNodes();
-    this->streamStore->cleanUpStreams();
+    this->knowledgeBase->cleanUpStores();
 
     return false;
   }
@@ -196,7 +196,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shar
   {
     entity->clearReceived();
     this->nodeStore->cleanUpNodes();
-    this->streamStore->cleanUpStreams();
+    this->knowledgeBase->cleanUpStores();
 
     return false;
   }
@@ -219,7 +219,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shar
   {
     entity->clearReceived();
     this->nodeStore->cleanUpNodes();
-    this->streamStore->cleanUpStreams();
+    this->knowledgeBase->cleanUpStores();
 
     return false;
   }
@@ -233,7 +233,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shar
   }
 
   this->nodeStore->cleanUpNodes();
-  this->streamStore->cleanUpStreams();
+  this->knowledgeBase->cleanUpStores();
   return true;
 }
 
@@ -365,10 +365,10 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string &n
                                                                   std::string &rep, std::string &relatedEntity,
                                                                   std::map<std::string, int> &metadata)
 {
-  auto infoSpec = std::make_shared<InformationSpecification>(entity, this->streamStore->getEntityType(entity),
+  auto infoSpec = std::make_shared<InformationSpecification>(entity, this->knowledgeBase->getEntityType(entity),
                                                              scope, rep, relatedEntity);
 
-  auto stream = this->streamStore->getBaseStream(infoSpec.get(), nodeName, source);
+  auto stream = this->knowledgeBase->streamStore->getBaseStream(infoSpec.get(), nodeName, source);
 
   if (false == stream)
   {
@@ -379,7 +379,7 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string &n
     std::replace(name.begin(), name.end(), '/', '_');
     std::replace(name.begin(), name.end(), ':', '_');
     std::replace(name.begin(), name.end(), '-', '_');
-    stream = this->streamStore->registerBaseStream(dataType, infoSpec, name, 10, metadata, nodeName, source);
+    stream = this->knowledgeBase->streamStore->registerBaseStream(dataType, infoSpec, name, 10, metadata, nodeName, source);
   }
 
   return stream;

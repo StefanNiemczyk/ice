@@ -15,7 +15,7 @@ namespace ice
 
 class RequestMessage;
 class InformationMessage;
-class InformationStore;
+class KnowledgeBase;
 class IntMessage;
 
 class InformationRequest : public ComJob<InformationRequest>
@@ -44,7 +44,7 @@ private:
   void onInformation(std::shared_ptr<InformationMessage> const &message);
 
 private:
-  std::shared_ptr<InformationStore>                             informationStore;
+  std::shared_ptr<KnowledgeBase>                                knowledgeBase;
   int                                                           sendPerTickCount;
   int                                                           resendCount;
   int                                                           tryCount;

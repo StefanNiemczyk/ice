@@ -24,8 +24,7 @@
 namespace ice
 {
 class ICEngine;
-class StreamFactory;
-class OntologyInterface;
+class CollectionFactory;
 }
 
 namespace ice
@@ -49,18 +48,9 @@ public:
   StreamStore(std::weak_ptr<ICEngine> engine);
 
   /*!
-   * \brief The constructor creates an store object and uses the eventHandler object to
-   * notify listeners about new information elements.
-   *
-   * The constructor creates an store object and uses the eventHandler object to notify
-   * listeners about new information elements.
-   *
-   * \param eventHandler Handler to deal with events executed asynchronously.
-   * \param streamFactor Factor to create stream objects
-   * \param ontology Interface to access the ontology
+   * Constructor used for tests
    */
-  StreamStore(std::shared_ptr<EventHandler> eventHandler, std::shared_ptr<StreamFactory> streamFactory,
-                   std::shared_ptr<OntologyInterface> ontology);
+  StreamStore(std::shared_ptr<EventHandler> eventHandler, std::shared_ptr<CollectionFactory> streamFactory);
 
   /*!
    * \brief Default destructor
@@ -112,20 +102,6 @@ public:
                                                             std::string sourceSystem);
 
   /*!
-   * \brief Returns the configuration object.
-   *
-   *  Returns the configuration object.
-   */
-  std::shared_ptr<Configuration> getConfig() const;
-
-  /*!
-   * \brief Returns the event handler.
-   *
-   * Returns the event handler.
-   */
-  std::shared_ptr<EventHandler> getEventHandler() const;
-
-  /*!
    * \brief Returns a BaseInformationStream for the given stream name.
    *
    * Returns a BaseInformationStream with the given stream name. NULL is returned if no stream exists.
@@ -143,25 +119,10 @@ public:
    *
    * \param streamName The name of the searched stream.
    */
-  std::shared_ptr<BaseInformationStream> getBaseStream(InformationSpecification *specification);
+  std::shared_ptr<BaseInformationStream> getBaseStream(InformationSpecification *specification, std::string provider = "",
+                                                       std::string sourceSystem = "");
 
-  std::shared_ptr<BaseInformationStream> getBaseStream(InformationSpecification *specification, std::string provider,
-                                                       std::string sourceSystem);
-
-  /*!
-   * \brief Returns a BaseInformationStream for the given stream description.
-   *
-   * Returns a BaseInformationStream for the given stream description. NULL is returned if no stream exists.
-   *
-   * \param streamDescription The description of the searched stream.
-   */
-  std::shared_ptr<BaseInformationStream> getBaseStream(const std::shared_ptr<CollectionDescription> streamDescription);
-
-  void cleanUpStreams();
-
-  ont::entityType getEntityType(ont::entity entity);
-
-  void readEntitiesFromOntology();
+  void cleanUpUnused();
 
 private:
   std::shared_ptr<BaseInformationStream> selectBestStream(std::vector<std::shared_ptr<BaseInformationStream>> *streams);
@@ -170,9 +131,7 @@ private:
   std::weak_ptr<ICEngine>                               engine;         /**< Weak pointer to the engine */
   std::vector<std::shared_ptr<BaseInformationStream>>   streams;        /**< The information steams */
   std::shared_ptr<EventHandler>                         eventHandler;   /**< Handler to execute events asynchronously */
-  std::shared_ptr<StreamFactory>                        streamFactory;  /**< Stream factory to create streams */
-  std::shared_ptr<OntologyInterface>                    ontology;       /**< Interface to access the ontology */
-  std::map<ont::entity, ont::entityType>                entityTypeMap;  /**< Maps the entity type to each known entity */
+  std::shared_ptr<CollectionFactory>                    factory;        /**< Stream factory to create streams */
   std::mutex                                            _mtx;           /**< Mutex */
   el::Logger*                                           _log;           /**< Logger */
 };

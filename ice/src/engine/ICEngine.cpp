@@ -43,15 +43,14 @@ void ICEngine::init()
   this->entityDirectory = std::make_shared<EntityDirectory>(this->shared_from_this());
   this->communicationInterface = std::make_shared<RosCommunication>(this->shared_from_this());
   this->eventHandler = std::make_shared<EventHandler>(this->shared_from_this());
-//  this->informationStore = std::make_shared<InformationStore>(this->shared_from_this());
-  this->streamStore = std::make_shared<StreamStore>(this->shared_from_this());
   this->nodeStore = std::make_shared<NodeStore>(this->shared_from_this());
   this->modelGenerator = std::make_shared<ASPModelGenerator>(this->shared_from_this());
   this->updateStrategie = std::make_shared<FastUpdateStrategie>(this->shared_from_this());
   this->gcontainerFactory = std::make_shared<GContainerFactory>(this->shared_from_this());
-  this->aspTransformationGenerator = std::make_shared<TransformationSynthesis>(this->shared_from_this());
-  if (this->streamFactory == nullptr)
-    this->streamFactory = std::make_shared<StreamFactory>(this->shared_from_this());
+  this->transformationSynthesis = std::make_shared<TransformationSynthesis>(this->shared_from_this());
+  this->knowledgeBase = std::make_shared<KnowledgeBase>(this->shared_from_this());
+  if (this->factory == nullptr)
+    this->factory = std::make_shared<CollectionFactory>(this->shared_from_this());
 
   // Initialize entity directory
   this->entityDirectory->init();
@@ -70,18 +69,15 @@ void ICEngine::init()
   // Initialize components
   this->communicationInterface->init();
   this->eventHandler->init();
-//  this->informationStore->init();
   this->modelGenerator->init();
-  this->streamStore->init();
   this->gcontainerFactory->init();
-  this->aspTransformationGenerator->init();
-  this->streamFactory->init();
+  this->transformationSynthesis->init();
+  this->factory->init();
+  this->knowledgeBase->init();
 
   // Initialize update strategy
   this->updateStrategie->init();
 
-  // reading information structure from ontology
-  this->streamStore->readEntitiesFromOntology();
 
   this->initialized = true;
   _log->info("Engine initialized '%v'", this->self->toString());
@@ -90,7 +86,7 @@ void ICEngine::init()
 void ICEngine::start()
 {
   // generating transformation based on ontology
-  this->aspTransformationGenerator->synthesizeTransformations();
+  this->transformationSynthesis->synthesizeTransformations();
 
   // creating processing model
   this->updateStrategie->update(ModelUpdateEvent::MUE_INITIAL);
@@ -119,11 +115,8 @@ void ICEngine::cleanUp()
   if (this->eventHandler)
     this->eventHandler->cleanUp();
 
-  if (this->informationStore)
-    this->informationStore->cleanUp();
-
-  if (this->streamStore)
-    this->streamStore->cleanUp();
+  if (this->knowledgeBase)
+    this->knowledgeBase->cleanUp();
 
 //  this->nodeStore;
 
@@ -136,11 +129,11 @@ void ICEngine::cleanUp()
   if (this->gcontainerFactory)
     this->gcontainerFactory->cleanUp();
 
-  if (this->aspTransformationGenerator)
-    this->aspTransformationGenerator->cleanUp();
+  if (this->transformationSynthesis)
+    this->transformationSynthesis->cleanUp();
 
-  if (this->streamStore)
-    this->streamStore->cleanUp();
+  if (this->factory)
+    this->factory->cleanUp();
 }
 
 
@@ -169,14 +162,9 @@ std::shared_ptr<EventHandler> ICEngine::getEventHandler()
   return this->eventHandler;
 }
 
-std::shared_ptr<StreamStore> ICEngine::getStreamStore()
+std::shared_ptr<KnowledgeBase> ICEngine::getKnowlegeBase()
 {
-  return this->streamStore;
-}
-
-std::shared_ptr<InformationStore> ICEngine::getInformationStore()
-{
-  return this->informationStore;
+  return this->knowledgeBase;
 }
 
 std::shared_ptr<NodeStore> ICEngine::getNodeStore()
@@ -194,14 +182,14 @@ void ICEngine::setCommunicationInterface(std::shared_ptr<CommunicationInterface>
   this->communicationInterface = communication;
 }
 
-std::shared_ptr<StreamFactory> ICEngine::getStreamFactory()
+std::shared_ptr<CollectionFactory> ICEngine::getCollectionFactory()
 {
-  return this->streamFactory;
+  return this->factory;
 }
 
-void ICEngine::setStreamFactory(std::shared_ptr<StreamFactory> const &factory)
+void ICEngine::setCollectionFactory(std::shared_ptr<CollectionFactory> const &factory)
 {
-  this->streamFactory = factory;
+  this->factory = factory;
 }
 
 std::shared_ptr<OntologyInterface> ICEngine::getOntologyInterface()
@@ -239,9 +227,9 @@ std::shared_ptr<GContainerFactory> ICEngine::getGContainerFactory()
   return this->gcontainerFactory;
 }
 
-std::shared_ptr<TransformationSynthesis> ICEngine::getASPTransformationGeneration()
+std::shared_ptr<TransformationSynthesis> ICEngine::getTransformationSynthesis()
 {
-  return this->aspTransformationGenerator;
+  return this->transformationSynthesis;
 }
 
 } /* namespace ice */

@@ -105,7 +105,7 @@ protected:
   {
     start_time_ = time(NULL);
     auto eh = std::make_shared<ice::EventHandler>(1, 10);
-    store = std::make_shared<ice::StreamStore>(eh, nullptr, nullptr);
+    store = std::make_shared<ice::StreamStore>(eh, nullptr);
 
    // auto uuid = boost::uuids::random_generator()();
     //ont::entity entity, ont::entityType, ont::scope scope, ont::representation representation

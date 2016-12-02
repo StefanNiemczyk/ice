@@ -1,26 +1,23 @@
 /*
- * BaseInformationStream.h
+ * BaseInformationSet.h
  *
- *  Created on: May 15, 2014
+ *  Created on: Dec 2, 2016
  *      Author: sni
  */
 
-#ifndef BASEINFORMATIONSTREAM_H_
-#define BASEINFORMATIONSTREAM_H_
+#ifndef INCLUDE_ICE_INFORMATION_BASEINFORMATIONSET_H_
+#define INCLUDE_ICE_INFORMATION_BASEINFORMATIONSET_H_
 
 #include "ice/information/InformationCollection.h"
 
 namespace ice
 {
+
 // Forward declaration
 class CollectionDescription;
 class EventHandler;
 
-//* BaseInformationStream
-/**
- * This class provides the default interface of the information container.
- */
-class BaseInformationStream : public InformationCollection
+class BaseInformationSet : public InformationCollection
 {
 public:
   /*!
@@ -31,7 +28,7 @@ public:
    * \param description The description of this stream.
    * \param eventHandler Handler to execute events asynchronously.
    */
-  BaseInformationStream(std::shared_ptr<CollectionDescription> description,
+  BaseInformationSet(std::shared_ptr<CollectionDescription> description,
                         std::shared_ptr<EventHandler> eventHandler);
 
   /*!
@@ -39,9 +36,9 @@ public:
    *
    * Default destructor
    */
-  virtual ~BaseInformationStream();
+  virtual ~BaseInformationSet();
 };
 
 } /* namespace ice */
 
-#endif /* BASEINFORMATIONSTREAM_H_ */
+#endif /* INCLUDE_ICE_INFORMATION_BASEINFORMATIONSET_H_ */
