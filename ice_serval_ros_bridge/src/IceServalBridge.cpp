@@ -114,15 +114,6 @@ IceServalBridge::~IceServalBridge()
 
 void IceServalBridge::init()
 {
-  // set time factory
-  this->setTimeFactory(std::make_shared<SimpleTimeFactory>());
-
-  // init entity directory
-  this->entityDirectory = std::make_shared<EntityDirectory>(this->shared_from_this());
-  this->entityDirectory->init();
-  this->self = this->entityDirectory->self;
-  this->self->addId(EntityDirectory::ID_ONTOLOGY, this->params->ontologyIriSelf);
-  this->self->addId(EntityDirectory::ID_ICE, IDGenerator::toString(IDGenerator::getInstance()->getIdentifier()));
 
   // init communication
   this->communicationInterface = std::make_shared<ServalCommunication>(this->shared_from_this(),
@@ -132,6 +123,16 @@ void IceServalBridge::init()
                                                              this->params->servalUser,
                                                              this->params->servalPassword,
                                                              this->params->servalLocal);
+
+  // set time factory
+  this->setTimeFactory(std::make_shared<SimpleTimeFactory>());
+
+  // init entity directory
+  this->entityDirectory = std::make_shared<EntityDirectory>(this->shared_from_this());
+  this->entityDirectory->init();
+  this->self = this->entityDirectory->self;
+  this->self->addId(EntityDirectory::ID_ONTOLOGY, this->params->ontologyIriSelf);
+  this->self->addId(EntityDirectory::ID_ICE, IDGenerator::toString(IDGenerator::getInstance()->getIdentifier()));
 
   // init event handler
   this->eventHandler = std::make_shared<EventHandler>(2, 100);
@@ -156,9 +157,6 @@ void IceServalBridge::init()
   this->offeredInfos = reader.getOffered();
   this->requiredInfos = reader.getRequired();
 
-  // read known entities from ontology
-//  this->identityDirectory->initializeFromOntology(this->ontologyInterface);
-
   // init communication
   this->communicationInterface->init();
 
@@ -169,8 +167,9 @@ void IceServalBridge::init()
   this->communicationInterface->setGContainerFactory(this->gcontainerFactory);
 
   // init information store
-  this->informationStore = std::make_shared<InformationStore>(this->shared_from_this());
-  this->communicationInterface->setInformationStore(this->informationStore);
+  this->knowledgeBase = std::make_shared<KnowledgeBase>(this->shared_from_this());
+  this->knowledgeBase->init();
+  this->communicationInterface->setInformationStore(this->knowledgeBase->informationStore);
   if (this->params->jsonInformationPath != "")
   {
     this->json2Information(this->params->jsonInformationPath);
@@ -191,7 +190,7 @@ void IceServalBridge::init()
             std::shared_ptr<InformationElement<GContainer>> &container){
               this->publisher->publish(req, container->getInformation());
           };
-    this->informationStore->registerCallback(req->infoSpec, lambda);
+    this->knowledgeBase->informationStore->registerCallback(req->infoSpec, lambda);
   }
 
   _log->info("Bridge for identity '%v' initialized, requests: '%v', offers '%v'",
@@ -378,7 +377,7 @@ bool IceServalBridge::json2Information(std::string const &filePath)
       }
 
       auto informationElement = std::make_shared<InformationElement<GContainer>>(specification, information);
-      this->informationStore->addInformation(informationElement);
+      this->knowledgeBase->informationStore->addInformation(informationElement);
     }
 
     return true;

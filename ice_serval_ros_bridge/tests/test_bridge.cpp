@@ -119,7 +119,7 @@ TEST(Bridge, discovery)
 
   // check information store
   std::vector<std::shared_ptr<ice::InformationElement<ice::GContainer>>> infos;
-  int count = zwerg->getInformationStore()->getInformation(requ, infos);
+  int count = zwerg->getKnowlegeBase()->informationStore->getInformation(requ, infos);
 
   ASSERT_EQ(1, count);
   auto info = infos[0];

@@ -43,7 +43,7 @@ int main(int argc, char **argv)
   signal(SIGINT, mySigintHandler);
 
   // stuff
-  auto infoStore = node->getInformationStore();
+  auto infoStore = node->getKnowlegeBase()->informationStore;
   auto rep = node->getGContainerFactory()->getRepresentation("http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
   auto x = rep->accessPath({"http://vs.uni-kassel.de/Ice#XCoordinate"});
   auto y = rep->accessPath({"http://vs.uni-kassel.de/Ice#YCoordinate"});

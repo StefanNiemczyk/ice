@@ -262,12 +262,13 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
 //  std::cout << size << std::endl;
 }
 
-std::shared_ptr<BaseInformationSender> ServalCommunication::createSender(std::shared_ptr<BaseInformationStream> stream)
+
+std::shared_ptr<BaseInformationSender> ServalCommunication::createSender(std::shared_ptr<InformationCollection> collection)
 {
   return nullptr;
 }
 
-std::shared_ptr<InformationReceiver> ServalCommunication::createReceiver(std::shared_ptr<BaseInformationStream> stream)
+std::shared_ptr<InformationReceiver> ServalCommunication::createReceiver(std::shared_ptr<InformationCollection> collection)
 {
   return nullptr;
 }

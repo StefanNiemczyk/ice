@@ -67,7 +67,25 @@ public:
     std::shared_ptr<InformationStream<T>> registerStream(std::shared_ptr<InformationSpecification> specification,
                                                          const std::string name, const int streamSize,
                                                          std::map<std::string, int> metadata, std::string provider,
-                                                         std::string sourceSystem);
+                                                         std::string sourceSystem)
+    {
+      auto ptr = this->getStream<T>(specification.get(), provider, sourceSystem);
+
+      //stream already registered
+      if (ptr)
+      {
+        _log->warn("Duplicated Stream with '%v', '%v', '%v'", specification->toString(), provider, sourceSystem);
+        return ptr;
+      }
+
+      auto desc = std::make_shared<CollectionDescription>(specification, name, provider, sourceSystem, metadata);
+      auto stream = std::make_shared<InformationStream<T>>(desc, this->eventHandler, streamSize);
+
+      _log->debug("Created stream with '%v', '%v', '%v'", specification->toString(), provider, sourceSystem);
+      this->collections.push_back(stream);
+
+      return stream;
+    }
 
   /*!
    * \brief Registers an stream and returns a shared_ptr. Returns null if no matching information type exists.
@@ -97,41 +115,7 @@ public:
    */
   template<typename T>
     std::shared_ptr<InformationStream<T>> getStream(InformationSpecification *specification, std::string provider,
-                                                    std::string sourceSystem);
-};
-
-} /* namespace ice */
-
-//Implementing methods here
-
-template<typename T>
-  inline std::shared_ptr<ice::InformationStream<T>> ice::StreamStore::registerStream(
-      std::shared_ptr<InformationSpecification> specification, const std::string name, const int streamSize,
-      std::map<std::string, int> metadata, std::string provider, std::string sourceSystem)
-  {
-    auto ptr = this->getStream<T>(specification.get(), provider, sourceSystem);
-
-    //stream already registered
-    if (ptr)
-    {
-      _log->warn("Duplicated Stream with '%v', '%v', '%v'",
-                    specification->toString(), provider, sourceSystem);
-      return ptr;
-    }
-
-    auto desc = std::make_shared<CollectionDescription>(specification, name, provider, sourceSystem, metadata);
-    auto stream = std::make_shared<InformationStream<T>>(desc, this->eventHandler, streamSize);
-
-    _log->debug("Created stream with '%v', '%v', '%v'", specification->toString(),
-                provider, sourceSystem);
-    this->collections.push_back(stream);
-
-    return stream;
-  }
-
-template<typename T>
-  inline std::shared_ptr<ice::InformationStream<T>> ice::StreamStore::getStream(
-      InformationSpecification *specification, std::string provider, std::string sourceSystem)
+                                                    std::string sourceSystem)
   {
     auto stream = this->getBaseCollection(specification, provider, sourceSystem);
 
@@ -145,5 +129,8 @@ template<typename T>
 
     return nullptr;
   }
+};
+
+} /* namespace ice */
 
 #endif /* STREAMSTORE_H_ */

@@ -42,7 +42,8 @@ void ICEngine::init()
   std::string path = ros::package::getPath("ice");
 
   this->entityDirectory = std::make_shared<EntityDirectory>(this->shared_from_this());
-  this->communicationInterface = std::make_shared<RosCommunication>(this->shared_from_this());
+  if (this->communicationInterface == nullptr)
+    this->communicationInterface = std::make_shared<RosCommunication>(this->shared_from_this());
   this->eventHandler = std::make_shared<EventHandler>(this->shared_from_this());
   this->nodeStore = std::make_shared<NodeStore>(this->shared_from_this());
   this->modelGenerator = std::make_shared<ASPModelGenerator>(this->shared_from_this());
