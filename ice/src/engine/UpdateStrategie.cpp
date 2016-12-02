@@ -7,8 +7,10 @@
 
 #include <ice/model/updateStrategie/UpdateStrategie.h>
 
+#include "ice/information/BaseInformationSet.h"
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationSpecification.h"
+#include "ice/information/SetStore.h"
 #include "ice/information/StreamStore.h"
 #include "ice/model/ProcessingModelGenerator.h"
 #include "ice/processing/Node.h"
@@ -153,6 +155,8 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shar
   std::vector<std::shared_ptr<Node>> createdNodes;
   std::vector<std::shared_ptr<BaseInformationStream>> streamsSend;
   std::vector<std::shared_ptr<BaseInformationStream>> streamsReceived;
+  std::vector<std::shared_ptr<BaseInformationSet>> setsSend;
+  std::vector<std::shared_ptr<BaseInformationSet>> setsReceived;
 
   // TODO altes model prüfen und entsprechend handhaben
   entity->getReceivedSubModel().subModel = subModel;
@@ -179,6 +183,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shar
     return false;
   }
 
+  // streams
   for (auto &transferTo : subModel->send)
   {
     auto stream = this->getStream(transferTo);
@@ -214,6 +219,53 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shar
     }
 
     streamsReceived.push_back(stream);
+  }
+
+  if (false == valid)
+  {
+    entity->clearReceived();
+    this->nodeStore->cleanUpNodes();
+    this->knowledgeBase->cleanUpStores();
+
+    return false;
+  }
+
+  // sets
+  for (auto &transferTo : subModel->sendSet)
+  {
+    auto set = this->getSet(transferTo);
+
+    if (false == set)
+    {
+      _log->error("Set '%v' could not be found, sub model is invalid!", transferTo.nodeName);
+      valid = false;
+      break;
+    }
+
+    setsSend.push_back(set);
+  }
+
+  if (false == valid)
+  {
+    entity->clearReceived();
+    this->nodeStore->cleanUpNodes();
+    this->knowledgeBase->cleanUpStores();
+
+    return false;
+  }
+
+  for (auto &transferFrom : subModel->receiveSet)
+  {
+    auto set = this->getSet(transferFrom);
+
+    if (false == set)
+    {
+      _log->error("Set '%v' could not be found, sub model is invalid!", transferFrom.nodeName);
+      valid = false;
+      break;
+    }
+
+    setsReceived.push_back(set);
   }
 
   if (false == valid)
@@ -256,6 +308,7 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
     return nullptr;
   }
 
+  // streams
   for (auto &input : nodeDesc.inputs)
   {
     _log->debug("Look up connected stream for node '%v'", nodeDesc.aspName);
@@ -293,6 +346,44 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
     node->addOutput(stream);
   }
 
+  // sets
+  for (auto &input : nodeDesc.inputSets)
+  {
+    _log->debug("Look up connected set for node '%v'", nodeDesc.aspName);
+
+    auto set = this->getSet(input.nodeName, input.sourceSystem, input.entity, input.scope, input.representation,
+                                  input.relatedEntity, input.metadata);
+
+    if (false == set)
+    {
+      _log->error("Set '%v' could not be created, sub model is invalid!", nodeDesc.aspName);
+      return nullptr;
+    }
+
+    node->addInputSet(set, true); // TODO stream is trigger?
+  }
+
+  for (auto &output : nodeDesc.outputSets)
+  {
+
+    _log->debug("Look up output set for node '%v'", nodeDesc.aspName);
+
+    std::string iri;
+    this->self->getId(EntityDirectory::ID_ONTOLOGY, iri);
+
+    auto set = this->getSet(nodeDesc.aspName, iri,
+                                  output.entity, output.scope, output.representation,
+                                  output.relatedEntity, output.metadata);
+
+    if (false == set)
+    {
+      _log->error("Set '%v' could not be created, sub model is invalid!", nodeDesc.aspName);
+      return nullptr;
+    }
+
+    node->addOutputSet(set);
+  }
+
   return node;
 }
 
@@ -302,6 +393,8 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<Entity> &entity, i
   bool valid = true;
   std::vector<std::shared_ptr<BaseInformationStream>> streamsSend;
   std::vector<std::shared_ptr<BaseInformationStream>> streamsReceived;
+  std::vector<std::shared_ptr<BaseInformationSet>> setsSend;
+  std::vector<std::shared_ptr<BaseInformationSet>> setsReceived;
 
   _log->debug("Sub model accepted received from system '%v' with index '%v'", entity->toString(), modelIndex);
 
@@ -320,6 +413,7 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<Entity> &entity, i
     return false;
   }
 
+  // streams
   for (auto &transferTo : subModel->send)
   {
     auto stream = this->getStream(transferTo);
@@ -351,6 +445,45 @@ bool UpdateStrategie::processSubModelResponse(std::shared_ptr<Entity> &entity, i
     }
 
     streamsReceived.push_back(stream);
+  }
+
+  if (false == valid)
+  {
+    return false;
+  }
+
+  // sets
+  for (auto &transferTo : subModel->sendSet)
+  {
+    auto set = this->getSet(transferTo);
+
+    if (false == set)
+    {
+      _log->error("Set '%v' could not be found, sub model is invalid!", transferTo.nodeName);
+      valid = false;
+      break;
+    }
+
+    setsSend.push_back(set);
+  }
+
+  if (false == valid)
+  {
+    return false;
+  }
+
+  for (auto &transferFrom : subModel->receiveSet)
+  {
+    auto set = this->getSet(transferFrom);
+
+    if (false == set)
+    {
+      _log->error("Set '%v' could not be found, sub model is invalid!", transferFrom.nodeName);
+      valid = false;
+      break;
+    }
+
+    setsReceived.push_back(set);
   }
 
   if (false == valid)
@@ -390,6 +523,37 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(TransferStream
 {
   std::map<std::string, int> metadata; //TODO
   return this->getStream(desc.nodeName, desc.sourceSystem, desc.entity, desc.scope, desc.representation, desc.relatedEntity, metadata);
+}
+
+std::shared_ptr<BaseInformationSet> UpdateStrategie::getSet(std::string &nodeName, std::string &source,
+                                                                  std::string &entity, std::string &scope,
+                                                                  std::string &rep, std::string &relatedEntity,
+                                                                  std::map<std::string, int> &metadata)
+{
+  auto infoSpec = std::make_shared<InformationSpecification>(entity, this->knowledgeBase->getEntityType(entity),
+                                                             scope, rep, relatedEntity);
+
+  auto set = this->knowledgeBase->setStore->getBaseCollection(infoSpec.get(), nodeName, source);
+
+  if (false == set)
+  {
+    std::string dataType = this->dataTypeForRepresentation(rep);
+    std::string name = entity + "_" + nodeName + "_" + source;
+    std::replace(name.begin(), name.end(), '.', '_');
+    std::replace(name.begin(), name.end(), '#', '_');
+    std::replace(name.begin(), name.end(), '/', '_');
+    std::replace(name.begin(), name.end(), ':', '_');
+    std::replace(name.begin(), name.end(), '-', '_');
+    set = this->knowledgeBase->setStore->registerBaseSet(dataType, infoSpec, name, metadata, nodeName, source);
+  }
+
+  return set;
+}
+
+std::shared_ptr<BaseInformationSet> UpdateStrategie::getSet(TransferSetDesc &desc)
+{
+  std::map<std::string, int> metadata; //TODO
+  return this->getSet(desc.nodeName, desc.sourceSystem, desc.entity, desc.scope, desc.representation, desc.relatedEntity, metadata);
 }
 
 std::map<std::string, std::string> UpdateStrategie::readConfiguration(std::string const config)

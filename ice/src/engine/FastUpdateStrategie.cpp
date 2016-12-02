@@ -105,6 +105,47 @@ void FastUpdateStrategie::processModel(std::shared_ptr<ProcessingModel> const &m
     //TODO
   }
 
+  // sending sets
+  for (auto &send : model->getSendSet())
+  {
+    for (auto &transfer : send->transfer)
+    {
+      auto set = this->getSet(transfer);
+
+      if (false == set)
+      {
+//        _log->error("Stream '%v' could not be found, model is invalid!", std::get<1>(transferTo));
+        valid = false;
+        break;
+      }
+
+      set->registerRemoteListener(send->entity, this->communication);
+    }
+  }
+
+  // receiving sets
+  for (auto &receive : model->getReceiveSet())
+  {
+    for (auto &transfer : receive->transfer)
+    {
+      auto set = this->getSet(transfer);
+
+      if (false == set)
+      {
+//        _log->error("Stream '%v' could not be found, model is invalid!", std::get<1>(transferTo));
+        valid = false;
+        break;
+      }
+
+      set->setRemoteSource(receive->entity, this->communication);
+    }
+  }
+
+  if (false == valid)
+  {
+    //TODO
+  }
+
   for (auto node : nodes)
   {
     node->activate();

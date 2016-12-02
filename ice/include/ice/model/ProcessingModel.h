@@ -178,6 +178,8 @@ struct NodeDesc
   string                        config;
   vector<InputStreamDesc>       inputs;
   vector<OutputStreamDesc>      outputs;
+  vector<InputSetDesc>          inputSets;
+  vector<OutputSetDesc>         outputSets;
 
   friend class boost::serialization::access;
   template<class Archive>
@@ -192,6 +194,8 @@ struct NodeDesc
       ar & config;
       ar & inputs;
       ar & outputs;
+      ar & inputSets;
+      ar & outputSets;
     }
 };
 
