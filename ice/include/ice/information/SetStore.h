@@ -106,8 +106,8 @@ public:
    * \param setName The name of the searched set.
    */
   template<typename T>
-    std::shared_ptr<InformationSet<T>> getSet(InformationSpecification *specification, std::string provider,
-                                                    std::string sourceSystem)
+    std::shared_ptr<InformationSet<T>> getSet(InformationSpecification *specification, std::string provider = "",
+                                                    std::string sourceSystem = "")
   {
     auto set = this->getBaseCollection(specification, provider, sourceSystem);
 

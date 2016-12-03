@@ -87,7 +87,8 @@ void ICEngine::init()
 void ICEngine::start()
 {
   // generating transformation based on ontology
-  this->transformationSynthesis->synthesizeTransformations();
+  if (this->config->synthesizeTransformations)
+    this->transformationSynthesis->synthesizeTransformations();
 
   // creating processing model
   this->updateStrategie->update(ModelUpdateEvent::MUE_INITIAL);

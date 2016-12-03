@@ -4,6 +4,7 @@
 #include "ice/information/InformationSpecification.h"
 #include "ice/information/KnowledgeBase.h"
 #include "ice/information/StreamStore.h"
+#include "ice/information/SetStore.h"
 #include "ice/model/aspModel/ASPModelGenerator.h"
 #include "ice/model/updateStrategie/UpdateStrategie.h"
 #include "ice/representation/GContainer.h"
@@ -59,6 +60,53 @@ TEST(ASPModelGenerator, simpleTest)
   EXPECT_EQ(2, position2->getInformation()->x);
   EXPECT_EQ(1, position2->getInformation()->y);
   EXPECT_EQ(0, position2->getInformation()->z);
+
+  engine->cleanUp();
+  engine.reset();
+}
+
+TEST(ASPModelGenerator, simpleSetTest)
+{
+  ice::Node::clearNodeStore();
+  ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
+  ice::Node::registerNodeCreator("TestComputationalNodeGrounding", &SmothingNode::createNode);
+  ice::Node::registerNodeCreator("SetSourceNode", &SetSourceNode::createNode);
+
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSet_SimpleInd";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  auto streamFactory = std::make_shared<TestFactory>(engine);
+  engine->setTimeFactory(timeFactory);
+  engine->setCollectionFactory(streamFactory);
+
+  engine->getConfig()->synthesizeTransformations = false;
+  engine->init();
+  engine->start();
+
+  auto spec1 = ice::InformationSpecification("",
+                                             "http://vs.uni-kassel.de/IceTest#TestEntity",
+                                             "http://vs.uni-kassel.de/IceTest#TestScope1",
+                                             "http://vs.uni-kassel.de/IceTest#TestRepresentation1");
+
+  auto set = engine->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec1);
+
+  ASSERT_TRUE((set ? true : false));
+
+  auto node = engine->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSetSourceInd", "http://vs.uni-kassel.de/IceTest#TestEntity");
+  ASSERT_TRUE((node ? true : false));
+
+  node->performTask();
+
+  std::this_thread::sleep_for(std::chrono::milliseconds {10});
+
+  auto position2 = set->get("muh");
+
+  ASSERT_TRUE((position2 ? true : false));
+  EXPECT_EQ(1, position2->getInformation()->x);
+  EXPECT_EQ(21, position2->getInformation()->y);
+  EXPECT_EQ(31, position2->getInformation()->z);
 
   engine->cleanUp();
   engine.reset();

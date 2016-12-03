@@ -57,6 +57,8 @@ public:
   std::string ontologyIri;
   std::string ontologyIriOwnEntity;
 
+  bool synthesizeTransformations;
+
   //Static values
 public:
   static std::string INFORMATION_TYPE_NAME_SEPERATOR;

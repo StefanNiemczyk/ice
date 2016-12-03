@@ -676,6 +676,13 @@ std::shared_ptr<ASPElement> Entity::getASPElementByName(ASPElementType type, std
           return node;
       }
       break;
+    case ASP_SET_NODE:
+      for (auto node : this->aspSetNodes)
+      {
+        if (node->name == name)
+          return node;
+      }
+      break;
     case ASP_TRANSFORMATION_NODE:
       for (auto node : this->aspTransformation)
       {
@@ -716,6 +723,12 @@ std::shared_ptr<ASPElement> Entity::getASPElementByName(std::string const name)
       return node;
   }
 
+  for (auto node : this->aspSetNodes)
+  {
+    if (node->name == name)
+      return node;
+  }
+
   for (auto node : this->aspTransformation)
   {
     if (node->name == name)
@@ -746,6 +759,9 @@ void Entity::addASPElement(std::shared_ptr<ASPElement> node)
       break;
     case ASP_SOURCE_NODE:
       this->aspSourceNodes.push_back(node);
+      break;
+    case ASP_SET_NODE:
+      this->aspSetNodes.push_back(node);
       break;
     case ASP_TRANSFORMATION_NODE:
       this->aspTransformation.push_back(node);
@@ -793,9 +809,19 @@ bool Entity::updateExternals(bool activateRequired)
     element->external->assign(active);
   }
 
+  for (auto element : this->aspSetNodes)
+  {
+    element->external->assign(active);
+  }
+
   for (auto element : this->aspRequiredStreams)
   {
     element->external->assign(active && activateRequired);
+  }
+
+  for (auto element : this->aspRequiredSets)
+  {
+    element->external->assign(active);
   }
 
   return active;

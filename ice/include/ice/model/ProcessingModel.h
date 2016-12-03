@@ -103,7 +103,7 @@ struct InputSetDesc
   string                        nodeName;
   string                        nodeEntity;
   string                        nodeEntityRelated;
-  string                        entity;
+  string                        entityType;
   string                        scope;
   string                        representation;
   string                        relatedEntity;
@@ -118,7 +118,7 @@ struct InputSetDesc
       ar & nodeName;
       ar & nodeEntity;
       ar & nodeEntityRelated;
-      ar & entity;
+      ar & entityType;
       ar & scope;
       ar & representation;
       ar & relatedEntity;
@@ -149,7 +149,7 @@ struct OutputStreamDesc
 
 struct OutputSetDesc
 {
-  string                        entity;
+  string                        entityType;
   string                        scope;
   string                        representation;
   string                        relatedEntity;
@@ -160,7 +160,7 @@ struct OutputSetDesc
     void serialize(Archive & ar, const unsigned int version)
     {
       // serialize base class information
-      ar & entity;
+      ar & entityType;
       ar & scope;
       ar & representation;
       ar & relatedEntity;
@@ -232,7 +232,7 @@ struct TransferSetDesc
   string                        nodeName;
   string                        nodeEntity;
   string                        nodeEntityRelated;
-  string                        entity;
+  string                        entityType;
   string                        scope;
   string                        representation;
   string                        relatedEntity;
@@ -246,7 +246,7 @@ struct TransferSetDesc
       ar & nodeName;
       ar & nodeEntity;
       ar & nodeEntityRelated;
-      ar & entity;
+      ar & entityType;
       ar & scope;
       ar & representation;
       ar & relatedEntity;

@@ -6,6 +6,7 @@
 #include "ice/container/Position.h"
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationElement.h"
+#include "ice/information/InformationSet.h"
 #include "ice/information/InformationStream.h"
 #include "ice/processing/Node.h"
 #include "ice/representation/GContainer.h"
@@ -118,6 +119,41 @@ public:
 
     return stream;
   }
+
+  std::shared_ptr<ice::BaseInformationSet> createSet(const std::string& className,
+                                                             std::shared_ptr<ice::CollectionDescription> streamDescription,
+                                                             std::shared_ptr<ice::EventHandler> eventHandler) const
+    {
+      if (className == "")
+        return nullptr;
+
+      std::shared_ptr<ice::BaseInformationSet> set;
+
+      if ("Position" == className)
+      {
+        set = std::make_shared<ice::InformationSet<ice::Position>>(streamDescription, eventHandler);
+      }
+      else if ("http://vs.uni-kassel.de/IceTest#TestRepresentation1" == className)
+      {
+        set = std::make_shared<ice::InformationSet<ice::Position>>(streamDescription, eventHandler);
+      }
+      else if ("http://vs.uni-kassel.de/IceTest#TestRepresentation2" == className)
+      {
+        set = std::make_shared<ice::InformationSet<ice::Position>>(streamDescription, eventHandler);
+      }
+      else if ("List[Position]" == className)
+      {
+        set = std::make_shared<ice::InformationSet<std::vector<ice::Position>>>(streamDescription, eventHandler);
+      }
+
+      if (set == nullptr)
+        set = ice::CollectionFactory::createSet(className, streamDescription, eventHandler);
+
+      if (set)
+        return set;
+
+      return set;
+    }
 };
 
 class ObstacleFusion : public ice::Node
@@ -245,6 +281,53 @@ public:
     posNew->z = pos->z - 1;
 
     this->outputSet->add(infoEle->getSpecification()->getEntity(), std::move(posNew));
+
+    return 0;
+  }
+};
+
+class SetSourceNode : public ice::Node
+{
+public:
+  std::shared_ptr<ice::InformationSet<ice::Position>> outputSet;
+
+  static std::shared_ptr<ice::Node> createNode()
+  {
+    auto node = std::make_shared<SetSourceNode>();
+
+    return node;
+  }
+
+  SetSourceNode() : Node()
+  {
+
+  }
+
+  virtual std::string getClassName()
+  {
+    return "setTest";
+  }
+
+  int init()
+  {
+    if (this->outputSets.empty()){
+      return 1;
+    }
+
+    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->outputSets[0]);
+
+    return 0;
+  }
+
+  virtual int performNode()
+  {
+    std::unique_ptr<ice::Position> posNew(new ice::Position());
+
+    posNew->x = 1;
+    posNew->y = 21;
+    posNew->z = 31;
+
+    this->outputSet->add("muh", std::move(posNew));
 
     return 0;
   }

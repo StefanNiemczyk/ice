@@ -40,7 +40,7 @@ int NodeStore::addNode(std::shared_ptr<Node> node)
 
 std::shared_ptr<Node> NodeStore::getNode(const std::string nodeName, const ont::entity entity)
 {
-  if ("" == nodeName || entity == "")
+  if ("" == nodeName && entity == "")
   {
     return nullptr;
   }
@@ -51,7 +51,9 @@ std::shared_ptr<Node> NodeStore::getNode(const std::string nodeName, const ont::
   {
     auto desc = node->getNodeDescription();
     if (desc->getName() == nodeName && desc->getEntity() == entity)
+    {
       return node;
+    }
   }
 
   _log->info("No node found for nodename '%v'", nodeName);
@@ -89,6 +91,8 @@ std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::st
 
   node->setNodeDescription(desc);
   node->setConfiguration(config);
+
+  this->addNode(node);
 
   return node;
 }

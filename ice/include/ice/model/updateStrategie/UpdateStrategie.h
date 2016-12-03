@@ -78,7 +78,7 @@ protected:
   std::shared_ptr<BaseInformationStream> getStream(std::string &nodeName, std::string &source, std::string &entity,
                                                    std::string &scope, std::string &rep, std::string &relatedEntity, std::map<std::string, int> &metadata);
   std::shared_ptr<BaseInformationStream> getStream(TransferStreamDesc &desc);
-  std::shared_ptr<BaseInformationSet> getSet(std::string &nodeName, std::string &source, std::string &entity,
+  std::shared_ptr<BaseInformationSet> getSet(std::string &nodeName, std::string &source, std::string &entityType,
                                                    std::string &scope, std::string &rep, std::string &relatedEntity, std::map<std::string, int> &metadata);
   std::shared_ptr<BaseInformationSet> getSet(TransferSetDesc &desc);
 

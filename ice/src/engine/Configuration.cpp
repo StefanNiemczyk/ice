@@ -26,6 +26,9 @@ Configuration::Configuration()
   this->heartbeatTimeout = 3000; // 3 sec
   this->coordinationMessageTimeout = 5000; // 5 sec
   this->maxRetryCount = 5;
+
+  // synthesis
+  this->synthesizeTransformations = true;
 }
 
 Configuration::~Configuration()

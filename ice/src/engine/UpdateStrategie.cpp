@@ -351,7 +351,7 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
   {
     _log->debug("Look up connected set for node '%v'", nodeDesc.aspName);
 
-    auto set = this->getSet(input.nodeName, input.sourceSystem, input.entity, input.scope, input.representation,
+    auto set = this->getSet(input.nodeName, input.sourceSystem, input.entityType, input.scope, input.representation,
                                   input.relatedEntity, input.metadata);
 
     if (false == set)
@@ -372,7 +372,7 @@ std::shared_ptr<Node> UpdateStrategie::activateNode(NodeDesc &nodeDesc)
     this->self->getId(EntityDirectory::ID_ONTOLOGY, iri);
 
     auto set = this->getSet(nodeDesc.aspName, iri,
-                                  output.entity, output.scope, output.representation,
+                                  output.entityType, output.scope, output.representation,
                                   output.relatedEntity, output.metadata);
 
     if (false == set)
@@ -526,11 +526,11 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(TransferStream
 }
 
 std::shared_ptr<BaseInformationSet> UpdateStrategie::getSet(std::string &nodeName, std::string &source,
-                                                                  std::string &entity, std::string &scope,
+                                                                  std::string &entityType, std::string &scope,
                                                                   std::string &rep, std::string &relatedEntity,
                                                                   std::map<std::string, int> &metadata)
 {
-  auto infoSpec = std::make_shared<InformationSpecification>(entity, this->knowledgeBase->getEntityType(entity),
+  auto infoSpec = std::make_shared<InformationSpecification>("", entityType,
                                                              scope, rep, relatedEntity);
 
   auto set = this->knowledgeBase->setStore->getBaseCollection(infoSpec.get(), nodeName, source);
@@ -538,7 +538,7 @@ std::shared_ptr<BaseInformationSet> UpdateStrategie::getSet(std::string &nodeNam
   if (false == set)
   {
     std::string dataType = this->dataTypeForRepresentation(rep);
-    std::string name = entity + "_" + nodeName + "_" + source;
+    std::string name = entityType + "_" + nodeName + "_" + source;
     std::replace(name.begin(), name.end(), '.', '_');
     std::replace(name.begin(), name.end(), '#', '_');
     std::replace(name.begin(), name.end(), '/', '_');
@@ -553,7 +553,7 @@ std::shared_ptr<BaseInformationSet> UpdateStrategie::getSet(std::string &nodeNam
 std::shared_ptr<BaseInformationSet> UpdateStrategie::getSet(TransferSetDesc &desc)
 {
   std::map<std::string, int> metadata; //TODO
-  return this->getSet(desc.nodeName, desc.sourceSystem, desc.entity, desc.scope, desc.representation, desc.relatedEntity, metadata);
+  return this->getSet(desc.nodeName, desc.sourceSystem, desc.entityType, desc.scope, desc.representation, desc.relatedEntity, metadata);
 }
 
 std::map<std::string, std::string> UpdateStrategie::readConfiguration(std::string const config)

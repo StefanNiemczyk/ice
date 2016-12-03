@@ -229,6 +229,7 @@ private:
   std::shared_ptr<supplementary::External>              external;               /**< The external for the system */
   std::vector<std::shared_ptr<ASPElement>>              aspNodes;               /**< Vector of asp nodes */
   std::vector<std::shared_ptr<ASPElement>>              aspSourceNodes;         /**< Vector of asp source nodes */
+  std::vector<std::shared_ptr<ASPElement>>              aspSetNodes;            /**< Vector of asp set nodes */
   std::vector<std::shared_ptr<ASPElement>>              aspTransformation;      /**< Vector of transformation nodes */
   std::vector<std::shared_ptr<ASPElement>>              aspRequiredStreams;     /**< Vector of required streams */
   std::vector<std::shared_ptr<ASPElement>>              aspRequiredSets;        /**< Vector of required sets */

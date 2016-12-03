@@ -305,7 +305,6 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
 
     if (aspNode == nullptr && entity == this->self)
     {
-      std::cout << "here " << this->transformations.size();
       for (auto &transNode : this->transformations)
       {
         if (transNode.asp->name == nodeName)
@@ -417,7 +416,222 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
       break;
   }
 
-  // TODO interpret set
+  // set node
+  // setNode(QUERY_INDEX, SYSTEM, NODE, ENTITY_TYPE, ENTITY2)
+  values.clear();
+  values.push_back(this->queryIndex);
+  values.push_back(Gringo::Value(shortIri));
+  values.push_back("?");
+  values.push_back("?");
+  values.push_back("?");
+
+  Gringo::Value setNodeQuery("setNode", values);
+  queryResult = this->asp->queryAllTrue(&setNodeQuery);
+
+  for (auto &nodeValue : *queryResult)
+  {
+    std::string nodeName = *nodeValue.args()[2].name();
+    std::string nodeEntityType = *nodeValue.args()[3].name();
+    std::string nodeEntity2 = *nodeValue.args()[4].name();
+
+    _log->debug("Look up set node '%v' to process entity type '%v'", nodeName, nodeEntityType);
+
+    auto aspNode = entity->getASPElementByName(nodeName);
+
+    if (aspNode == nullptr && entity == this->self)
+    {
+      for (auto &transNode : this->transformations)
+      {
+        if (transNode.asp->name == nodeName)
+        {
+          aspNode = transNode.asp;
+          break;
+        }
+      }
+    }
+
+    if (aspNode == nullptr)
+    {
+      _log->error("No set node '%v' found, asp system description is invalid!", nodeName);
+      valid = false;
+      break;
+    }
+
+    NodeDesc nodeDesc;
+
+    // streams
+
+    // connectToSet(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), stream(k,SYSTEM,node(k,SOURCE,PROVIDER,ENTITY3,ENTITY4),INFO,STEP))
+    std::vector<Gringo::Value> nodeValues;
+    nodeValues.push_back(this->queryIndex);
+    nodeValues.push_back(Gringo::Value(shortIri));
+    nodeValues.push_back(Gringo::Value(aspNode->name));
+    nodeValues.push_back(Gringo::Value(nodeEntityType));
+    nodeValues.push_back(Gringo::Value(nodeEntity2));
+
+    std::vector<Gringo::Value> streamValues;
+    streamValues.push_back(this->queryIndex);
+    streamValues.push_back(Gringo::Value(shortIri));
+    streamValues.push_back("?");
+    streamValues.push_back("?");
+    streamValues.push_back("?");
+
+    std::vector<Gringo::Value> values;
+    values.push_back(Gringo::Value("setNode", nodeValues));
+    values.push_back(Gringo::Value("stream", streamValues));
+
+    Gringo::Value connectQuery("connectToSet", values);
+    auto connectResult = this->asp->queryAllTrue(&connectQuery);
+    nodeDesc.inputs.resize(connectResult->size());
+
+    for (int i=0; i < connectResult->size(); ++i)
+    {
+      _log->debug("Look up input stream for set node '%v'", nodeName);
+      auto &connect = connectResult->at(i);
+      InputStreamDesc &input = nodeDesc.inputs[i];
+
+      // get stream connected to node
+      auto &streamValue = connect.args()[1];
+
+      auto &node = streamValue.args()[2];
+      auto &info = streamValue.args()[3];
+
+      input.sourceSystem = this->ontology->toLongIri(*node.args()[1].name());
+      input.nodeName = this->ontology->toLongIri(*node.args()[2].name());
+      input.nodeEntity = this->ontology->toLongIri(*node.args()[3].name());
+      input.nodeEntityRelated = *node.args()[4].name() == "none" ? "" : this->ontology->toLongIri(*node.args()[4].name());
+
+      input.entity = this->ontology->toLongIri(*info.args()[0].name());
+      input.scope = this->ontology->toLongIri(*info.args()[1].name());
+      input.representation = this->ontology->toLongIri(*info.args()[2].name());
+      input.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
+
+      this->readMetadata(input.metadata, streamValue);
+    }
+
+    // stream(k,SYSTEM,setNode(k,SOURCE,NODE,ENTITY,ENTITY2),INFO,STEP)
+    values.clear();
+    values.push_back(this->queryIndex);
+    values.push_back(std::string(shortIri));
+    values.push_back(Gringo::Value("setNode", nodeValues));
+    values.push_back("?");
+    values.push_back("?");
+
+    Gringo::Value streamQuery("stream", values);
+    auto streamResult = this->asp->queryAllTrue(&streamQuery);
+    nodeDesc.outputs.resize(streamResult->size());
+
+    for (int i=0; i < streamResult->size(); ++i)
+    {
+      _log->debug("Look up output stream for set node '%v'", nodeName);
+      auto &stream = streamResult->at(i);
+      OutputStreamDesc &output = nodeDesc.outputs[i];
+
+      auto &info = stream.args()[3];
+
+      output.entity = this->ontology->toLongIri(*info.args()[0].name());
+      output.scope = this->ontology->toLongIri(*info.args()[1].name());
+      output.representation = this->ontology->toLongIri(*info.args()[2].name());
+      output.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
+
+      this->readMetadata(output.metadata, stream);
+    }
+
+    // sets
+    // connectToSet(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),
+    //              set(k,SYSTEM,setNode(k,SOURCE,PROVIDER,ENTITY_TYPE2,ENTITY4),INFO_TYPE,STEP))
+    nodeValues.clear();
+    nodeValues.push_back(this->queryIndex);
+    nodeValues.push_back(Gringo::Value(shortIri));
+    nodeValues.push_back(Gringo::Value(aspNode->name));
+    nodeValues.push_back(Gringo::Value(nodeEntityType));
+    nodeValues.push_back(Gringo::Value(nodeEntity2));
+
+    streamValues.clear();
+    streamValues.push_back(this->queryIndex);
+    streamValues.push_back(Gringo::Value(shortIri));
+    streamValues.push_back("?");
+    streamValues.push_back("?");
+    streamValues.push_back("?");
+
+    values.clear();
+    values.push_back(Gringo::Value("node", nodeValues));
+    values.push_back(Gringo::Value("set", streamValues));
+
+    Gringo::Value connectSetQuery("connectToSet", values);
+    connectResult = this->asp->queryAllTrue(&connectSetQuery);
+    nodeDesc.inputSets.resize(connectResult->size());
+
+    for (int i=0; i < connectResult->size(); ++i)
+    {
+      _log->debug("Look up input set for set node '%v'", nodeName);
+      auto &connect = connectResult->at(i);
+      InputSetDesc &input = nodeDesc.inputSets[i];
+
+      // get stream connected to node
+      auto &streamValue = connect.args()[1];
+
+      auto &node = streamValue.args()[2];
+      auto &info = streamValue.args()[3];
+
+      input.sourceSystem = this->ontology->toLongIri(*node.args()[1].name());
+      input.nodeName = this->ontology->toLongIri(*node.args()[2].name());
+      input.nodeEntity = this->ontology->toLongIri(*node.args()[3].name());
+      input.nodeEntityRelated = *node.args()[4].name() == "none" ? "" : this->ontology->toLongIri(*node.args()[4].name());
+
+      input.entityType = this->ontology->toLongIri(*info.args()[0].name());
+      input.scope = this->ontology->toLongIri(*info.args()[1].name());
+      input.representation = this->ontology->toLongIri(*info.args()[2].name());
+      input.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
+
+      this->readMetadata(input.metadata, streamValue);
+    }
+
+    // set(k,SYSTEM,setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),ENTITY_TYPE,STEP)
+    values.clear();
+    values.push_back(this->queryIndex);
+    values.push_back(std::string(shortIri));
+    values.push_back(Gringo::Value("setNode", nodeValues));
+    values.push_back("?");
+    values.push_back("?");
+
+    Gringo::Value setQuery("set", values);
+    auto setResult = this->asp->queryAllTrue(&setQuery);
+    nodeDesc.outputSets.resize(setResult->size());
+
+    for (int i=0; i < setResult->size(); ++i)
+    {
+      _log->debug("Look up output set for set node '%v'", nodeName);
+      auto &set = setResult->at(i);
+      OutputSetDesc &output = nodeDesc.outputSets[i];
+
+      auto &info = set.args()[3];
+
+      output.entityType = this->ontology->toLongIri(*info.args()[0].name());
+      output.scope = this->ontology->toLongIri(*info.args()[1].name());
+      output.representation = this->ontology->toLongIri(*info.args()[2].name());
+      output.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
+
+      this->readMetadata(output.metadata, set);
+    }
+
+    nodeDesc.type = aspNode->getNodeType();
+    nodeDesc.className = aspNode->className;
+    nodeDesc.aspName = this->ontology->toLongIri(aspNode->name);
+    nodeDesc.entity = (nodeEntityType == "none" ? "" : this->ontology->toLongIri(nodeEntityType));
+    nodeDesc.relatedEntity = (nodeEntity2 == "none" ? "" : this->ontology->toLongIri(nodeEntity2));
+    nodeDesc.config = aspNode->configAsString;
+
+    if (nodeDesc.aspName == "")
+      nodeDesc.aspName = aspNode->name;
+
+    nodes.push_back(nodeDesc);
+
+    if (false == valid)
+      break;
+  }
+
+
   // TODO selected stream
 
   return valid;
