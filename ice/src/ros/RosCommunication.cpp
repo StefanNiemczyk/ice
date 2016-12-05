@@ -229,7 +229,7 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
 
   std::string json(msg->bytes.begin(), msg->bytes.end());
 
-  auto message = Message::parse(msg->id, json, this->containerFactory);
+  auto message = Message::parse(msg->id, json, entity, this->containerFactory);
 
   if (message == nullptr)
   {
@@ -240,8 +240,6 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
 
   message->setJobId(msg->jobId);
   message->setJobIndex(msg->jobIndex);
-
-  message->setEntity(entity);
 
   this->handleMessage(message);
 }

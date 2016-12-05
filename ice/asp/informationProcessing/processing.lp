@@ -288,9 +288,9 @@ tset(k,SYSTEM,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY
 
 
 % computing theoretical inputs for sets
-tinput(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),MIN,MAX) :-
-	entity(ENTITY,ENTITY_TYPE),
-	tsetInput(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENT2),MIN,MAX).
+%tinput(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),information(ENTITY,SCOPE,REP,ENTITY2),MIN,MAX) :-
+%	entity(ENTITY,ENTITY_TYPE),
+%	tsetInput(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENT2),MIN,MAX).
 
 tsetInput(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),MIN,MAX) :- 
 	tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 

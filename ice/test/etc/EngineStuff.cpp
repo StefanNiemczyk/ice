@@ -333,6 +333,55 @@ public:
   }
 };
 
+class TestSetNode : public ice::Node
+{
+public:
+  std::shared_ptr<ice::InformationSet<ice::Position>> outputSet;
+
+  static std::shared_ptr<ice::Node> createNode()
+  {
+    auto node = std::make_shared<TestSetNode>();
+
+    return node;
+  }
+
+  TestSetNode() : Node()
+  {
+
+  }
+
+  virtual std::string getClassName()
+  {
+    return "testSetNode";
+  }
+
+  int init()
+  {
+    if (this->outputSets.empty() || this->inputs.empty()){
+      return 1;
+    }
+
+    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->outputSets[0]);
+
+    return 0;
+  }
+
+  virtual int performNode()
+  {
+    for (auto &in : this->inputs)
+    {
+      auto stream = std::static_pointer_cast<ice::InformationStream<ice::Position>>(in);
+      auto info = stream->getLast();
+      if (info != nullptr)
+      {
+        this->outputSet->add(info->getSpecification()->getEntity(), info->getInformation());
+      }
+    }
+
+    return 0;
+  }
+};
+
 class SimpleSourceNode : public ice::Node
 {
 public:

@@ -380,7 +380,7 @@ public class NodeVisitor extends IceVisitor {
 				} else if (this.isSubClassOf(ax.getSuperClass(), this.ii.entityScope)) {
 					this.currentScope = ce;
 				} else {
-					this.logDebug("Unknown class type for " + ax.toString());
+					// this.logDebug("Unknown class type for " + ax.toString());
 					others.add(ax);
 				}
 			}

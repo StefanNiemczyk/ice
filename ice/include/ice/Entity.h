@@ -187,8 +187,13 @@ public:
   void clearReceived();
   void clearSend();
 
+  void toShortIris(std::string &str);
+  void toLongIris(std::string &str);
+
 
   // ASP Stuff
+  bool isNodesExtracted();
+  void setNodesExtracted(bool value);
   std::shared_ptr<ASPElement> getASPElementByName(ASPElementType type, std::string const name);
   std::shared_ptr<ASPElement> getASPElementByName(std::string const name);
   void addASPElement(std::shared_ptr<ASPElement> node);
@@ -226,6 +231,7 @@ private:
   std::vector<std::pair<std::string,std::string>>       ontologyIriDiff;
 
   // ASP Stuff
+  bool                                                  nodesExtracted;         /**< True if the nodes are extrected */
   std::shared_ptr<supplementary::External>              external;               /**< The external for the system */
   std::vector<std::shared_ptr<ASPElement>>              aspNodes;               /**< Vector of asp nodes */
   std::vector<std::shared_ptr<ASPElement>>              aspSourceNodes;         /**< Vector of asp source nodes */

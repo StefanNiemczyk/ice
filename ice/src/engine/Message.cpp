@@ -30,7 +30,8 @@ namespace ice
 
 el::Logger* Message::_logFactory = el::Loggers::getLogger("Message");
 
-std::shared_ptr<Message> Message::parse(uint8_t id, std::string &jsonString, std::shared_ptr<GContainerFactory> factory)
+std::shared_ptr<Message> Message::parse(uint8_t id, std::string &jsonString, std::shared_ptr<Entity> &entity,
+                                        std::shared_ptr<GContainerFactory> factory)
 {
 
   std::shared_ptr<Message> message;
@@ -43,7 +44,7 @@ std::shared_ptr<Message> Message::parse(uint8_t id, std::string &jsonString, std
     case(IMI_OFFERS_REQUEST):
     case(IMI_FINISH):
     case(IMI_CANCLE_JOB):
-        return std::make_shared<CommandMessage>(id);
+        message =  std::make_shared<CommandMessage>(id);
         break;
     case(IMI_IDS_RESPONSE):
         message = std::make_shared<IdMessage>();
@@ -76,6 +77,8 @@ std::shared_ptr<Message> Message::parse(uint8_t id, std::string &jsonString, std
       return nullptr;
       break;
   }
+
+  message->setEntity(entity);
 
   if (message->isPayload())
   {

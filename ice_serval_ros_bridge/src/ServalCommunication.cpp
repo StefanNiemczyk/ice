@@ -163,7 +163,7 @@ void ServalCommunication::read()
     ++this->traffic.messageReceivedCount;
     std::string json(buffer+3, buffer+recCount);
 
-    auto message = Message::parse(buffer[0], json, this->containerFactory);
+    auto message = Message::parse(buffer[0], json, entity, this->containerFactory);
     message->setJobId(buffer[1]);
     message->setJobIndex(buffer[2]);
 
@@ -174,7 +174,6 @@ void ServalCommunication::read()
       continue;
     }
 
-    message->setEntity(entity);
 //    m.command = buffer[0];
 //    m.payload.clear();
 //    m.payload.reserve(recCount-1);

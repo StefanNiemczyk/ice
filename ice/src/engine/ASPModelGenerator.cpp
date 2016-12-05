@@ -148,6 +148,15 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
   auto all = this->directory->allEntities();
   for (auto &entity : *all)
   {
+    if (entity->isNodesExtracted() == false && entity->isCooperationPossible())
+    {
+      std::string ontSystem;
+      entity->getId(EntityDirectory::ID_ONTOLOGY, ontSystem);
+      auto nodes = this->ontology->readNodesAsASP(ontSystem);
+      this->toASP(nodes, entity, this->ontology->toShortIri(ontSystem));
+      entity->setNodesExtracted(true);
+    }
+
     if (this->self != entity && entity->updateExternals(false))
     {
       used.push_back(entity);
@@ -752,24 +761,27 @@ void ASPModelGenerator::readSystemsFromOntology()
   {
     _log->debug("Checking system " + std::string(ontSystem));
     entity = this->directory->lookup(EntityDirectory::ID_ONTOLOGY, ontSystem, true);
+    std::string iri = this->ontology->toShortIri(ontSystem);
 
     if (entity->getExternal() == nullptr)
     {
-      std::string iri = this->ontology->toShortIri(ontSystem);
       auto ext = this->asp->getExternal("system", {Gringo::Value(iri)}, "system", {Gringo::Value(iri)}, true);
       entity->setExternal(ext);
 
       this->asp->add("base", {}, "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ").");
     }
 
-    auto nodes = this->ontology->readNodesAsASP(ontSystem);
-
-    this->toASP(nodes, entity);
+    if (entity == this->self || entity->isCooperationPossible())
+    {
+      auto nodes = this->ontology->readNodesAsASP(ontSystem);
+      this->toASP(nodes, entity, iri);
+      entity->setNodesExtracted(true);
+    }
   }
 }
 
 void ASPModelGenerator::toASP(std::unique_ptr<std::vector<std::vector<std::string>>> &nodes,
-                              std::shared_ptr<Entity> &entity)
+                              std::shared_ptr<Entity> &entity, std::string entityIriShort)
 {
   auto &types = nodes->at(0);
   auto &names = nodes->at(1);
@@ -871,8 +883,9 @@ void ASPModelGenerator::toASP(std::unique_ptr<std::vector<std::vector<std::strin
       element->external = this->asp->getExternal(*value.name(), value.args());
       element->external->assign(false);
 
-      this->asp->add(element->name, {}, element->aspString);
-      this->asp->ground(element->name, {});
+      std::string nameProgramPart = entityIriShort + "_" + element->name;
+      this->asp->add(nameProgramPart, {}, element->aspString);
+      this->asp->ground(nameProgramPart, {});
 
       entity->addASPElement(element);
       this->groundingDirty = true;

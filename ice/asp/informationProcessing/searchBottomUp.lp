@@ -40,6 +40,17 @@ MIN { before(TNODE_BEFORE,TNODE,INFO,S) :
 	tinput(TNODE,INFO,MIN,MAX), 
 	query(k).
 
+MIN { before(TNODE_BEFORE,TNODE,information(ENTITY,SCOPE,REP,ENTITY2),S) : 
+		tstream(k,SYSTEM,TNODE_BEFORE,information(ENTITY,SCOPE,REP,ENTITY2)),
+		entity(ENTITY,ENTITY_TYPE) 
+		%not before(TNODE,TNODE_BEFORE,_,_)
+		} MAX :- 
+	flagged(k,TNODE,S), 
+	S < maxStepCount, 
+	nnode(TNODE),
+	tsetInput(TNODE,informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),MIN,MAX),
+	query(k).
+
 MIN { before(TNODE,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,S) : 
 		tset(k,SYSTEM,TNODE,INFO_TYPE) } MAX :- 
 	flagged(k,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),S), 

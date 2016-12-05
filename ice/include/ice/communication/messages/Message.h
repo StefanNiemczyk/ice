@@ -49,7 +49,8 @@ enum IceMessageIds
 class Message
 {
 public:
-  static std::shared_ptr<Message> parse(uint8_t id, std::string &jsonString, std::shared_ptr<GContainerFactory> factory);
+  static std::shared_ptr<Message> parse(uint8_t id, std::string &jsonString,
+                                        std::shared_ptr<Entity> &entity, std::shared_ptr<GContainerFactory> factory);
 private:
   static el::Logger*            _logFactory;
 

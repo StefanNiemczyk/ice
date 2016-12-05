@@ -13,6 +13,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
+#include "ice/Entity.h"
 #include "ice/model/ProcessingModel.h"
 
 namespace ice
@@ -44,7 +45,10 @@ void SubModelMessage::payloadToJson(rapidjson::Document &document)
   boost::archive::text_oarchive ar(ss);
   ar << this->subModel;
 
-  document.SetString(ss.str().c_str(), document.GetAllocator());
+  string str = ss.str();
+  this->entity->toShortIris(str);
+
+  document.SetString(str.c_str(), document.GetAllocator());
 }
 
 bool SubModelMessage::parsePayload(rapidjson::Document& value, std::shared_ptr<GContainerFactory> factory)
@@ -55,9 +59,12 @@ bool SubModelMessage::parsePayload(rapidjson::Document& value, std::shared_ptr<G
     return false;
   }
 
-  std::stringstream str;
-  str.str(value.GetString());
-  boost::archive::text_iarchive ar(str);
+  std::stringstream ss;
+  ss.str(value.GetString());
+  string str = ss.str();
+  this->entity->toLongIris(str);
+  ss.str(str);
+  boost::archive::text_iarchive ar(ss);
   ar >> this->subModel;
 
   return true;

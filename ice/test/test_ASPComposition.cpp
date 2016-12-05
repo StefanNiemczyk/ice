@@ -386,7 +386,7 @@ TEST(ASPComposition, requiredStreamsByEntityType)
   // sets
   cw->add("setNode", {}, "#external setNodeTemplate(system1,setNode,type).");
   auto node2 = cw->getExternal("setNodeTemplate", {"system1", "setNode", "type"}, "nodeTemplate", {}, true);
-  cw->add("setNode", {}, "input(system1,setNode,scope1,rep1,none,0,1) :- setNodeTemplate(system1,setNode,type).");
+  cw->add("setNode", {}, "input(system1,setNode,scope1,rep1,none,0,5) :- setNodeTemplate(system1,setNode,type).");
   cw->add("setNode", {}, "outputSet(system1,setNode,type,scope1,rep1,none).");
   cw->add("setNode", {}, "metadataOutput(delay,system1,setNode,max,1,0).");
   cw->add("setNode", {}, "metadataProcessing(cost,system1,setNode,1).");
@@ -1183,11 +1183,11 @@ TEST(ASPComposition, setFusionIslandTest)
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system1,in1,entity1,none),information(entity1,scope1,rep1,none),1)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system2,in2,entity2,none),information(entity2,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system3,in3,entity3,none),information(entity3,scope1,rep1,none),2)"));
-  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system4,in4,entity4,none),information(entity4,scope1,rep1,none),2)"));
-  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system5,in5,entity5,none),information(entity5,scope1,rep1,none),2)"));
-  EXPECT_EQ(true, cw->query("metadataSet(1,accuracy,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),110)"));
-  EXPECT_EQ(true, cw->query("metadataSet(1,density,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),5)"));
-  EXPECT_EQ(true, cw->query("metadataSet(1,delay,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),4005)"));
+//  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system4,in4,entity4,none),information(entity4,scope1,rep1,none),2)"));
+//  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system5,in5,entity5,none),information(entity5,scope1,rep1,none),2)"));
+  EXPECT_EQ(true, cw->query("metadataSet(1,accuracy,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),102)"));
+  EXPECT_EQ(true, cw->query("metadataSet(1,density,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),3)"));
+  EXPECT_EQ(true, cw->query("metadataSet(1,delay,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),105)"));
 }
 
 TEST(ASPComposition, islandCoverageTest)
@@ -1233,11 +1233,11 @@ TEST(ASPComposition, islandCoverageTest)
   auto cb51 = cw->getExternal("connectToBridge", {"system5", "island1"}, "connectToBridge", {"system5", "island1", 2, 2}, true);
 
   // inputs
-  cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
+  cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 95, 1});
   auto input1 = cw->getExternal("sourceNode", {"system1", "in1", "entity1"}, true);
   cw->ground("sourceNode", {"in2", "system2", "system1", "entity2", "scope1", "rep1", "none", 0, 90, 1});
   auto input2 = cw->getExternal("sourceNode", {"system2", "in2", "entity2"}, true);
-  cw->ground("sourceNode", {"in3", "system3", "system1", "entity3", "scope1", "rep1", "none", 0, 90, 1});
+  cw->ground("sourceNode", {"in3", "system3", "system1", "entity3", "scope1", "rep1", "none", 0, 95, 1});
   auto input3 = cw->getExternal("sourceNode", {"system3", "in3", "entity3"}, true);
   cw->ground("sourceNode", {"in4", "system4", "system1", "entity4", "scope1", "rep1", "none", 0, 90, 1});
   auto input4 = cw->getExternal("sourceNode", {"system4", "in4", "entity4"}, true);
@@ -1265,15 +1265,15 @@ TEST(ASPComposition, islandCoverageTest)
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
-  cw->printLastModel();
+//  cw->printLastModel();
 //  std::cout << cw->getSolvingTime() << " ms" << std::endl;
 
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system1,in1,entity1,none),information(entity1,scope1,rep1,none),1)"));
-  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system2,in2,entity2,none),information(entity2,scope1,rep1,none),2)"));
+//  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system2,in2,entity2,none),information(entity2,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system3,in3,entity3,none),information(entity3,scope1,rep1,none),2)"));
-  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system4,in4,entity4,none),information(entity4,scope1,rep1,none),2)"));
+//  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system4,in4,entity4,none),information(entity4,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system5,in5,entity5,none),information(entity5,scope1,rep1,none),2)"));
-  EXPECT_EQ(true, cw->query("metadataSet(1,accuracy,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),110)"));
+  EXPECT_EQ(true, cw->query("metadataSet(1,accuracy,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),105)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,delay,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),4005)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,islandCoverage,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),3)"));
 }

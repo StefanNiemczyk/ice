@@ -121,6 +121,17 @@ public:
     _log->info("Clean up collection store: '%v' collections are removed", counter);
   }
 
+  void print()
+  {
+    std::lock_guard<std::mutex> guard(this->_mtx);
+    std::cout << "------------------------------------------------------------" << std::endl;
+    for (auto &collection : this->collections)
+    {
+      std::cout << collection->toString() << std::endl;
+    }
+    std::cout << "------------------------------------------------------------" << std::endl;
+  }
+
 protected:
   std::shared_ptr<T> selectBest(std::vector<std::shared_ptr<T>> &collection)
   {

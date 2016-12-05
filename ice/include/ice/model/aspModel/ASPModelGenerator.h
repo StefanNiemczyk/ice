@@ -71,7 +71,7 @@ private:
   void readOntology();
   std::string dataTypeForRepresentation(std::string &representation);
   void toASP(std::unique_ptr<std::vector<std::vector<std::string>>> &nodes,
-             std::shared_ptr<Entity> &entity);
+             std::shared_ptr<Entity> &entity, std::string entityIriShort);
   void readTransformations();
   bool extractedSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModel> &subModel);
   bool extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<Entity> &entity, bool own);

@@ -556,6 +556,37 @@ void Entity::updateReceived(std::vector<std::shared_ptr<Node>> &nodes,
    this->clearContainer(this->sendSubModel);
  }
 
+ void Entity::toShortIris(std::string &str)
+ {
+   for (int i = 0; i < this->ontologyIds.size(); ++i)
+    {
+     auto &iri = this->ontologyIds[i].first;
+      size_t start_pos = 0;
+      std::string from = iri + "#";
+      std::string to = "o" + std::to_string(i) + "_";
+      while((start_pos = str.find(from, start_pos)) != std::string::npos)
+      {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+      }
+    }
+ }
+ void Entity::toLongIris(std::string &str)
+ {
+   for (int i = 0; i < this->ontologyIds.size(); ++i)
+   {
+    auto &iri = this->ontologyIds[i].first;
+     size_t start_pos = 0;
+     std::string to = iri + "#";
+     std::string from = "o" + std::to_string(i) + "_";
+     while((start_pos = str.find(from, start_pos)) != std::string::npos)
+     {
+       str.replace(start_pos, from.length(), to);
+       start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+     }
+   }
+ }
+
  void Entity::updateContainer(SharedSubModel &container,
                                    std::vector<std::shared_ptr<Node>> &nodes,
                                    std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
@@ -657,6 +688,16 @@ void Entity::updateReceived(std::vector<std::shared_ptr<Node>> &nodes,
 // -----------------------------------------------------------------------------------
 // ----------------------------------- ASP Stuff -------------------------------------
 // -----------------------------------------------------------------------------------
+
+bool Entity::isNodesExtracted()
+{
+  return this->nodesExtracted;
+}
+
+void Entity::setNodesExtracted(bool value)
+{
+  this->nodesExtracted = value;
+}
 
 std::shared_ptr<ASPElement> Entity::getASPElementByName(ASPElementType type, std::string const name)
 {
