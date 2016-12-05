@@ -204,6 +204,7 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
       model->getSubModels().push_back(subModel);
     }
 
+    // stream
     auto send = std::make_shared<StreamTransfer>();
     send->entity = entity;
 
@@ -229,6 +230,33 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
 
     if (receive->transfer.size() > 0)
       model->getReceive().push_back(receive);
+
+    // Set
+    auto sendSet = std::make_shared<SetTransfer>();
+    send->entity = entity;
+
+    if (false == this->extractSetTransfers(this->self, entity, sendSet->transfer))
+    {
+      _log->error("Optimizing failed, error by extracting set transfers from '%v' to '%v'", this->self->toString(),
+                  entity->toString());
+      return nullptr;
+    }
+
+    if (sendSet->transfer.size() > 0)
+      model->getSendSet().push_back(sendSet);
+
+    auto receiveSet = std::make_shared<SetTransfer>();
+    receiveSet->entity = entity;
+
+    if (false == this->extractSetTransfers(entity, this->self, receiveSet->transfer))
+    {
+      _log->error("Optimizing failed, error by extracting streams transfers from '%v' to '%v'", entity->toString(),
+                  this->self->toString());
+      return nullptr;
+    }
+
+    if (receiveSet->transfer.size() > 0)
+      model->getReceiveSet().push_back(receiveSet);
   }
 
   _log->info("Model successfully created");
@@ -262,6 +290,24 @@ bool ASPModelGenerator::extractedSubModel(std::shared_ptr<Entity> &entity, std::
 
   // identify streams send from system -> self
   if (false == this->extractStreamTransfers(this->self, entity, model->receive))
+  {
+    _log->error("Sub model extraction for system '%v' failed", entity->toString());
+    subModel->model = nullptr;
+
+    return false;
+  }
+
+  // identify sets send from self -> system
+  if (false == this->extractSetTransfers(entity, this->self, model->sendSet))
+  {
+    _log->error("Sub model extraction for system '%v' failed", entity->toString());
+    subModel->model = nullptr;
+
+    return false;
+  }
+
+  // identify sets send from system -> self
+  if (false == this->extractSetTransfers(this->self, entity, model->receiveSet))
   {
     _log->error("Sub model extraction for system '%v' failed", entity->toString());
     subModel->model = nullptr;
@@ -564,7 +610,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
     streamValues.push_back("?");
 
     values.clear();
-    values.push_back(Gringo::Value("node", nodeValues));
+    values.push_back(Gringo::Value("setNode", nodeValues));
     values.push_back(Gringo::Value("set", streamValues));
 
     Gringo::Value connectSetQuery("connectToSet", values);
@@ -689,6 +735,62 @@ bool ASPModelGenerator::extractStreamTransfers(std::shared_ptr<Entity> &from, st
     auto &info = streamValue.args()[3];
 
     transfer.entity = this->ontology->toLongIri(*info.args()[0].name());
+    transfer.scope = this->ontology->toLongIri(*info.args()[1].name());
+    transfer.representation = this->ontology->toLongIri(*info.args()[2].name());
+    transfer.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
+
+    transfer.sourceSystem = this->ontology->toLongIri(*node.args()[1].name());
+    transfer.nodeName = this->ontology->toLongIri(*node.args()[2].name());
+    transfer.nodeEntity = this->ontology->toLongIri(*node.args()[3].name());
+    transfer.nodeEntityRelated = *node.args()[4].name() == "none" ? "" : this->ontology->toLongIri(*node.args()[4].name());
+  }
+
+  return valid;
+}
+
+bool ASPModelGenerator::extractSetTransfers(std::shared_ptr<Entity> &from, std::shared_ptr<Entity> &to,
+                                           std::vector<TransferSetDesc> &transfers)
+{
+  bool valid = true;
+  std::string shortIriTo;
+  to->getId(EntityDirectory::ID_ONTOLOGY, shortIriTo);
+  shortIriTo = this->ontology->toShortIri(shortIriTo);
+
+  std::string shortIriFrom;
+  from->getId(EntityDirectory::ID_ONTOLOGY, shortIriFrom);
+  shortIriFrom = this->ontology->toShortIri(shortIriFrom);
+
+  _log->debug("Look up set transfered from '%v' to '%v'", shortIriFrom, shortIriTo);
+
+  // set(k,SYSTEM,setNode(k,SYSTEM_SOURCE,NODE2,ENTITY_TYPE,ENTITY4),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),STEP)
+  std::vector<Gringo::Value> values;
+  std::vector<Gringo::Value> nodeValues;
+  nodeValues.push_back(this->queryIndex);
+  nodeValues.push_back(std::string(shortIriFrom));
+  nodeValues.push_back("?");
+  nodeValues.push_back("?");
+  nodeValues.push_back("?");
+
+  values.push_back(this->queryIndex);
+  values.push_back(std::string(shortIriTo));
+  values.push_back(Gringo::Value("setNode", nodeValues));
+  values.push_back("?");
+  values.push_back("?");
+
+  Gringo::Value sendQuery("set", values);
+  auto results = this->asp->queryAllTrue(&sendQuery);
+  transfers.resize(results->size());
+
+  // get sets connected to the node
+  for (int i=0; i < results->size(); ++i)
+  {
+    auto &streamValue = results->at(i);
+    auto &transfer = transfers.at(i);
+
+    auto &node = streamValue.args()[2];
+    auto &info = streamValue.args()[3];
+
+    transfer.entityType = this->ontology->toLongIri(*info.args()[0].name());
     transfer.scope = this->ontology->toLongIri(*info.args()[1].name());
     transfer.representation = this->ontology->toLongIri(*info.args()[2].name());
     transfer.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());

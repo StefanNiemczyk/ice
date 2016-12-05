@@ -501,6 +501,32 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/IceTest#TestSetTransformNode -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestSetTransformNode">
+        <rdfs:subClassOf rdf:resource="&Ice;SetNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutputSet"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestSet2"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasInputSet"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestSet1"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;aboutEntity"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/IceTest#TestEntity"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
     <!-- http://vs.uni-kassel.de/IceTest#TestSourceNode -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNode">
@@ -1059,12 +1085,60 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/IceTest#TestSetTransformNodeGroundingCpp -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSetTransformNodeGroundingCpp">
+        <rdf:type rdf:resource="&Ice;CppGrounding"/>
+        <Ice:hasGroundingValue rdf:datatype="&xsd;string">TestSetTransformNode</Ice:hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSetTransformNodeInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSetTransformNodeInd">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/IceTest#TestSetTransformNode"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/IceTest#TestSetTransformNodeGroundingCpp"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://vs.uni-kassel.de/IceTest#TestSet_SimpleInd -->
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSet_SimpleInd">
         <rdf:type rdf:resource="&Ice;System"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSet1ReqInd"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSetSourceInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSet_TransferInd1 -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSet_TransferInd1">
+        <rdf:type rdf:resource="&Ice;System"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSetSourceInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSet_TransferInd2 -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSet_TransferInd2">
+        <rdf:type rdf:resource="&Ice;System"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSet2ReqInd"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSetTransformNodeInd"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSet_TransformInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSet_TransformInd">
+        <rdf:type rdf:resource="&Ice;System"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSet2ReqInd"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSetSourceInd"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSetTransformNodeInd"/>
     </owl:NamedIndividual>
     
 

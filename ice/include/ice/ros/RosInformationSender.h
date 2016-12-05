@@ -23,7 +23,7 @@ namespace ice
 {
 
 template<typename ICEType, typename ROSType>
-  using transformC2M = typename std::unique_ptr<ROSType> (*)(std::shared_ptr<InformationElement<ICEType> >);
+  using transformC2M = typename std::shared_ptr<ROSType> (*)(std::shared_ptr<InformationElement<ICEType> >);
 
 template<typename ICEType, typename ROSType>
   class RosInformationSender : public InformationSender<ICEType>
@@ -70,6 +70,7 @@ template<typename ICEType, typename ROSType>
     auto msg = this->messageTransform(informationElement);
 
     msg->header.senderId.value = this->engineId;
+    msg->header.entity = informationElement->getSpecification()->getEntity();
 
     for (auto &entity : sendTo)
     {

@@ -37,6 +37,9 @@ public:
    * Default destructor
    */
   virtual ~BaseInformationSet();
+
+
+  virtual CollectionType getCollectionType();
 };
 
 } /* namespace ice */

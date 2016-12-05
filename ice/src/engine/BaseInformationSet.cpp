@@ -25,4 +25,9 @@ BaseInformationSet::~BaseInformationSet()
   // currently nothing to do here
 }
 
+CollectionType BaseInformationSet::getCollectionType()
+{
+  return CollectionType::CT_SET;
+}
+
 } /* namespace ice */

@@ -278,7 +278,7 @@ bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shar
   }
 
   _log->info("Finished processing of received sub model from '%v'", entity->toString());
-  entity->updateReceived(createdNodes, streamsSend, streamsReceived);
+  entity->updateReceived(createdNodes, streamsSend, streamsReceived, setsSend, setsReceived);
 
   for (auto node : createdNodes)
   {

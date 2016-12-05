@@ -455,6 +455,9 @@ TEST(RepresentationTransformationTest, xmlReader)
   ASSERT_TRUE(foundP2toP3);
   ASSERT_TRUE(foundP3toP2);
   ASSERT_TRUE(foundP3Rot);
+
+  engine->cleanUp();
+  engine.reset();
 }
 
 TEST(RepresentationTransformationTest, handMadeTransformation)
@@ -506,6 +509,9 @@ TEST(RepresentationTransformationTest, handMadeTransformation)
   ASSERT_EQ(x, output->getValue<double>(p3dX));
   ASSERT_EQ(y, output->getValue<double>(p3dY));
   ASSERT_EQ(z, output->getValue<double>(p3dZ));
+
+  engine->cleanUp();
+  engine.reset();
 }
 
 }

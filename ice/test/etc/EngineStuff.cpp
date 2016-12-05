@@ -382,6 +382,58 @@ public:
   }
 };
 
+class TestSetTransformNode : public ice::Node
+{
+public:
+  std::shared_ptr<ice::InformationSet<ice::Position>> inputSet;
+  std::shared_ptr<ice::InformationSet<ice::Position>> outputSet;
+
+  static std::shared_ptr<ice::Node> createNode()
+  {
+    auto node = std::make_shared<TestSetTransformNode>();
+
+    return node;
+  }
+
+  TestSetTransformNode() : Node()
+  {
+
+  }
+
+  virtual std::string getClassName()
+  {
+    return "testSetNode";
+  }
+
+  int init()
+  {
+    if (this->outputSets.empty() || this->inputSets.empty()){
+      std::cout << "ERROR ################################################" << std::endl;
+      std::cout << this->inputSets.empty() << std::endl;
+      std::cout << this->outputSets.empty() << std::endl;
+      return 1;
+    }
+
+    this->inputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->inputSets[0]);
+    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->outputSets[0]);
+
+    return 0;
+  }
+
+  virtual int performNode()
+  {
+    auto info = this->inputSet->get("muh");
+    auto pos = info->getInformation();
+    auto newPos = std::make_shared<ice::Position>();
+    newPos->x = 100 + pos->x;
+    newPos->y = 100 + pos->y;
+    newPos->z = 100 + pos->z;
+    this->outputSet->add(info->getSpecification()->getEntity(), newPos);
+
+    return 0;
+  }
+};
+
 class SimpleSourceNode : public ice::Node
 {
 public:

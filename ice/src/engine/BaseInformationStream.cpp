@@ -25,5 +25,9 @@ BaseInformationStream::~BaseInformationStream()
   // currently nothing to do here
 }
 
+CollectionType BaseInformationStream::getCollectionType()
+{
+  return CollectionType::CT_STREAM;
+}
 
 } /* namespace ice */

@@ -12,10 +12,10 @@
 namespace ice
 {
 
-std::unique_ptr<ice_msgs::Position> RosMessageTransform::transformC2MPosition(
+std::shared_ptr<ice_msgs::Position> RosMessageTransform::transformC2MPosition(
     std::shared_ptr<InformationElement<Position> > informationElement)
 {
-  std::unique_ptr<ice_msgs::Position> pos(new ice_msgs::Position());
+  auto pos = std::make_shared<ice_msgs::Position>();
 
   auto info = informationElement->getInformation();
 
@@ -30,10 +30,10 @@ std::unique_ptr<ice_msgs::Position> RosMessageTransform::transformC2MPosition(
   return pos;
 }
 
-std::unique_ptr<Position> RosMessageTransform::transformM2CPosition(
+std::shared_ptr<Position> RosMessageTransform::transformM2CPosition(
     const boost::shared_ptr<ice_msgs::Position const> msg)
 {
-  std::unique_ptr<Position> pos(new Position());
+  auto pos = std::make_shared<Position>();
 
 #ifdef LOG_MESSAGE_TRANSFORM
   std::cout << "transformM2CPosition: " << msg->x << ", " << msg->y << ", " << msg->z << std::endl;
@@ -46,10 +46,10 @@ std::unique_ptr<Position> RosMessageTransform::transformM2CPosition(
   return pos;
 }
 
-std::unique_ptr<ice_msgs::Positions> RosMessageTransform::transformC2MPositions(std::shared_ptr<InformationElement<std::vector<Position>>> informationElement)
+std::shared_ptr<ice_msgs::Positions> RosMessageTransform::transformC2MPositions(std::shared_ptr<InformationElement<std::vector<Position>>> informationElement)
 {
   auto infoList = informationElement->getInformation();
-  std::unique_ptr<ice_msgs::Positions> positions(new ice_msgs::Positions());
+  auto positions = std::make_shared<ice_msgs::Positions>();
 
   for (auto infoPos : *infoList)
   {
@@ -65,9 +65,9 @@ std::unique_ptr<ice_msgs::Positions> RosMessageTransform::transformC2MPositions(
   return positions;
 }
 
-std::unique_ptr<std::vector<Position>> RosMessageTransform::transformM2CPositions(const boost::shared_ptr<ice_msgs::Positions const> msg)
+std::shared_ptr<std::vector<Position>> RosMessageTransform::transformM2CPositions(const boost::shared_ptr<ice_msgs::Positions const> msg)
 {
-  std::unique_ptr<std::vector<Position>> positions(new std::vector<Position>());
+  auto positions = std::make_shared<std::vector<Position>>();
 
   for (auto msgPos : msg->positions)
   {

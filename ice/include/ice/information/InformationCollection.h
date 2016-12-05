@@ -33,6 +33,11 @@ class Logger;
 namespace ice
 {
 
+enum CollectionType {
+  CT_SET,
+  CT_STREAM
+};
+
 class InformationCollection
 {
 public:
@@ -161,6 +166,8 @@ public:
   std::string toString();
 
   void destroy();
+
+  virtual CollectionType getCollectionType() = 0;
 
 protected:
   /*!

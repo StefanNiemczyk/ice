@@ -40,6 +40,8 @@ public:
    * Default destructor
    */
   virtual ~BaseInformationStream();
+
+  virtual CollectionType getCollectionType();
 };
 
 } /* namespace ice */

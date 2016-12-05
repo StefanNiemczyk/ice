@@ -17,6 +17,7 @@
 #include "ice/ontology/OntologyInterface.h"
 #include "ice/processing/Node.h"
 #include "ice/information/BaseInformationStream.h"
+#include "ice/information/BaseInformationSet.h"
 #include "ice/ICEngine.h"
 #include "ice/EntityDirectory.h"
 
@@ -534,16 +535,20 @@ std::vector<std::pair<std::string,std::string>>& Entity::getOntologyIriDiff()
 
 void Entity::updateReceived(std::vector<std::shared_ptr<Node>> &nodes,
                                   std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
-                                  std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived)
+                                  std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived,
+                                  std::vector<std::shared_ptr<BaseInformationSet>> &setsSend,
+                                  std::vector<std::shared_ptr<BaseInformationSet>> &setsReceived)
  {
-   this->updateContainer(this->receivedSubModel, nodes, streamsSend, streamsReceived);
+   this->updateContainer(this->receivedSubModel, nodes, streamsSend, streamsReceived, setsSend, setsReceived);
  }
 
  void Entity::updateSend(std::vector<std::shared_ptr<Node>> &nodes,
                                    std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
-                                   std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived)
+                                   std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived,
+                                   std::vector<std::shared_ptr<BaseInformationSet>> &setsSend,
+                                   std::vector<std::shared_ptr<BaseInformationSet>> &setsReceived)
  {
-   this->updateContainer(this->sendSubModel, nodes, streamsSend, streamsReceived);
+   this->updateContainer(this->sendSubModel, nodes, streamsSend, streamsReceived, setsSend, setsReceived);
  }
 
  void Entity::clearReceived()
@@ -590,7 +595,9 @@ void Entity::updateReceived(std::vector<std::shared_ptr<Node>> &nodes,
  void Entity::updateContainer(SharedSubModel &container,
                                    std::vector<std::shared_ptr<Node>> &nodes,
                                    std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
-                                   std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived)
+                                   std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived,
+                                   std::vector<std::shared_ptr<BaseInformationSet>> &setsSend,
+                                   std::vector<std::shared_ptr<BaseInformationSet>> &setsReceived)
  {
    auto ths = this->shared_from_this();
    auto engine = this->engine.lock();
@@ -647,6 +654,46 @@ void Entity::updateReceived(std::vector<std::shared_ptr<Node>> &nodes,
      if (stream->setRemoteSource(ths, communication) == 0)
      {
        container.streamsReceived.push_back(stream);
+     }
+   }
+
+   // update sets send
+   for (int i = 0; i < container.setsSend.size(); ++i)
+   {
+     auto set = container.setsSend[i];
+     if (std::find(setsSend.begin(), setsSend.end(), set) == setsSend.end())
+     {
+       container.setsSend.erase(container.setsSend.begin() + i);
+       --i;
+       set->unregisterRemoteListener(ths);
+     }
+   }
+
+   for (auto set : setsSend)
+   {
+     if (set->registerRemoteListener(ths, communication) == 0)
+     {
+       container.setsSend.push_back(set);
+     }
+   }
+
+   // update sets received
+   for (int i = 0; i < container.setsReceived.size(); ++i)
+   {
+     auto set = container.setsReceived[i];
+     if (std::find(setsReceived.begin(), setsReceived.end(), set) == setsReceived.end())
+     {
+       container.setsReceived.erase(container.setsReceived.begin() + i);
+       --i;
+       set->setRemoteSource(nullptr, communication);
+     }
+   }
+
+   for (auto set : setsReceived)
+   {
+     if (set->setRemoteSource(ths, communication) == 0)
+     {
+       container.setsReceived.push_back(set);
      }
    }
  }

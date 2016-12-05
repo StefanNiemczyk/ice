@@ -134,6 +134,9 @@ TEST(ASPModelGenerator, transformationTest)
   ASSERT_NE(nullptr, out);
   ASSERT_EQ(x, out->getInformation()->getValue<double>(p2dX));
   ASSERT_EQ(y, out->getInformation()->getValue<double>(p2dY));
+
+  engine->cleanUp();
+  engine.reset();
 }
 
 TEST(ASPModelGenerator, twoSystemsSimple)
@@ -214,6 +217,11 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   EXPECT_EQ(x, position2->getInformation()->x);
   EXPECT_EQ(y, position2->getInformation()->y);
   EXPECT_EQ(z, position2->getInformation()->z);
+
+  engine->cleanUp();
+  engine.reset();
+  engine2->cleanUp();
+  engine2.reset();
 }
 
 TEST(ASPModelGenerator, twoSystemsComplex)
@@ -306,6 +314,11 @@ TEST(ASPModelGenerator, twoSystemsComplex)
   EXPECT_EQ(x - 1, position2->getInformation()->x);
   EXPECT_EQ(y - 1, position2->getInformation()->y);
   EXPECT_EQ(z - 1, position2->getInformation()->z);
+
+  engine->cleanUp();
+  engine.reset();
+  engine2->cleanUp();
+  engine2.reset();
 }
 
 TEST(ASPModelGenerator, simpleSetTest)
@@ -465,4 +478,146 @@ TEST(ASPModelGenerator, streamsToSetTest)
   EXPECT_EQ(position2->x - 1, pos->getInformation()->x);
   EXPECT_EQ(position2->y - 1, pos->getInformation()->y);
   EXPECT_EQ(position2->z - 1, pos->getInformation()->z);
+
+  engine->cleanUp();
+  engine.reset();
+  engine2->cleanUp();
+  engine2.reset();
+}
+
+TEST(ASPModelGenerator, setTransformTest)
+{
+  ice::Node::clearNodeStore();
+  ice::Node::registerNodeCreator("SetSourceNode", &SetSourceNode::createNode);
+  ice::Node::registerNodeCreator("TestSetTransformNode", &TestSetTransformNode::createNode);
+
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSet_TransformInd";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  auto streamFactory = std::make_shared<TestFactory>(engine);
+  engine->setTimeFactory(timeFactory);
+  engine->setCollectionFactory(streamFactory);
+
+  engine->getConfig()->synthesizeTransformations = false;
+  engine->init();
+  engine->start();
+
+  auto spec1 = ice::InformationSpecification("",
+                                             "http://vs.uni-kassel.de/IceTest#TestEntity",
+                                             "http://vs.uni-kassel.de/IceTest#TestScope1",
+                                             "http://vs.uni-kassel.de/IceTest#TestRepresentation1");
+  auto spec2 = ice::InformationSpecification("",
+                                             "http://vs.uni-kassel.de/IceTest#TestEntity",
+                                             "http://vs.uni-kassel.de/IceTest#TestScope1",
+                                             "http://vs.uni-kassel.de/IceTest#TestRepresentation2");
+
+  auto set1 = engine->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec1);
+  ASSERT_TRUE((set1 ? true : false));
+  auto set2 = engine->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec2);
+  ASSERT_TRUE((set2 ? true : false));
+
+  auto nodeSource = engine->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSetSourceInd", "http://vs.uni-kassel.de/IceTest#TestEntity");
+  ASSERT_TRUE((nodeSource ? true : false));
+
+  auto nodeTransform = engine->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSetTransformNodeInd", "http://vs.uni-kassel.de/IceTest#TestEntity");
+  ASSERT_TRUE((nodeTransform ? true : false));
+
+  nodeSource->performTask();
+
+  std::this_thread::sleep_for(std::chrono::milliseconds {10});
+
+  ASSERT_EQ(1, set1->getSize());
+  ASSERT_EQ(1, set2->getSize());
+
+  auto position2 = set2->get("muh");
+
+  ASSERT_TRUE((position2 ? true : false));
+  EXPECT_EQ(101, position2->getInformation()->x);
+  EXPECT_EQ(121, position2->getInformation()->y);
+  EXPECT_EQ(131, position2->getInformation()->z);
+
+  engine->cleanUp();
+  engine.reset();
+}
+
+TEST(ASPModelGenerator, setTransferTest)
+{
+  ice::Node::clearNodeStore();
+  ice::Node::registerNodeCreator("SetSourceNode", &SetSourceNode::createNode);
+  ice::Node::registerNodeCreator("TestSetTransformNode", &TestSetTransformNode::createNode);
+
+  // create engine 1
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSet_TransferInd1";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  engine->setTimeFactory(timeFactory);
+  auto streamFactory = std::make_shared<TestFactory>(engine);
+  engine->setCollectionFactory(streamFactory);
+
+  engine->getConfig()->synthesizeTransformations = false;
+  engine->init();
+  engine->start();
+
+  // create engine 2
+  std::shared_ptr<ice::Configuration> config2 = std::make_shared<ice::Configuration>();
+  config2->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config2->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestSet_TransferInd2";
+  std::shared_ptr<ice::ICEngine> engine2 = std::make_shared<ice::ICEngine>(config2);
+  engine2->setTimeFactory(timeFactory);
+  auto streamFactory2 = std::make_shared<TestFactory>(engine2);
+  engine2->setCollectionFactory(streamFactory2);
+
+  engine2->getConfig()->synthesizeTransformations = false;
+  engine2->init();
+  engine2->start();
+
+  // wait some time to enable the engines to find each other
+  std::this_thread::sleep_for(std::chrono::milliseconds {2000});
+
+  auto spec1 = ice::InformationSpecification("",
+                                               "http://vs.uni-kassel.de/IceTest#TestEntity",
+                                               "http://vs.uni-kassel.de/IceTest#TestScope1",
+                                               "http://vs.uni-kassel.de/IceTest#TestRepresentation1");
+  auto spec2 = ice::InformationSpecification("",
+                                             "http://vs.uni-kassel.de/IceTest#TestEntity",
+                                             "http://vs.uni-kassel.de/IceTest#TestScope1",
+                                             "http://vs.uni-kassel.de/IceTest#TestRepresentation2");
+
+  auto set1 = engine->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec1);
+  ASSERT_TRUE((set1 ? true : false));
+  auto set11 = engine2->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec1);
+  ASSERT_TRUE((set1 ? true : false));
+  auto set2 = engine2->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec2);
+  ASSERT_TRUE((set2 ? true : false));
+
+  auto nodeSource = engine->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSetSourceInd", "http://vs.uni-kassel.de/IceTest#TestEntity");
+  ASSERT_TRUE((nodeSource ? true : false));
+
+  auto nodeTransform = engine2->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSetTransformNodeInd", "http://vs.uni-kassel.de/IceTest#TestEntity");
+  ASSERT_TRUE((nodeTransform ? true : false));
+
+  nodeSource->performTask();
+
+  std::this_thread::sleep_for(std::chrono::milliseconds {10});
+
+  ASSERT_EQ(1, set1->getSize());
+  ASSERT_EQ(1, set11->getSize());
+  ASSERT_EQ(1, set2->getSize());
+
+  auto position2 = set2->get("muh");
+
+  ASSERT_TRUE((position2 ? true : false));
+  EXPECT_EQ(101, position2->getInformation()->x);
+  EXPECT_EQ(121, position2->getInformation()->y);
+  EXPECT_EQ(131, position2->getInformation()->z);
+
+  engine->cleanUp();
+  engine.reset();
+  engine2->cleanUp();
+  engine2.reset();
 }

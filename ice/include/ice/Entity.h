@@ -28,6 +28,7 @@ namespace ice
 {
 
 class BaseInformationStream;
+class BaseInformationSet;
 class EntityDirectory;
 class ICEngine;
 class Node;
@@ -117,6 +118,8 @@ struct SharedSubModel
   std::shared_ptr<SubModelDesc>                         subModel;        /**< Sub model description */
   std::vector<std::shared_ptr<BaseInformationStream>>   streamsSend;     /**< List of streams send to this engine */
   std::vector<std::shared_ptr<BaseInformationStream>>   streamsReceived; /**< List of streams received from this engine */
+  std::vector<std::shared_ptr<BaseInformationSet>>      setsSend;        /**< List of streams send to this engine */
+  std::vector<std::shared_ptr<BaseInformationSet>>      setsReceived;    /**< List of streams received from this engine */
 };
 
 class Entity : public std::enable_shared_from_this<Entity>
@@ -180,10 +183,14 @@ public:
   std::vector<std::pair<std::string,std::string>>& getOntologyIriDiff();
   void updateReceived(std::vector<std::shared_ptr<Node>> &nodes,
                         std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
-                        std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived);
+                        std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived,
+                        std::vector<std::shared_ptr<BaseInformationSet>> &setsSend,
+                        std::vector<std::shared_ptr<BaseInformationSet>> &setsReceived);
   void updateSend(std::vector<std::shared_ptr<Node>> &nodes,
                        std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
-                       std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived);
+                       std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived,
+                       std::vector<std::shared_ptr<BaseInformationSet>> &setsSend,
+                       std::vector<std::shared_ptr<BaseInformationSet>> &setsReceived);
   void clearReceived();
   void clearSend();
 
@@ -204,7 +211,9 @@ public:
 private:
   void updateContainer(SharedSubModel &container, std::vector<std::shared_ptr<Node>> &nodes,
                        std::vector<std::shared_ptr<BaseInformationStream>> &streamsSend,
-                       std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived);
+                       std::vector<std::shared_ptr<BaseInformationStream>> &streamsReceived,
+                       std::vector<std::shared_ptr<BaseInformationSet>> &setsSend,
+                       std::vector<std::shared_ptr<BaseInformationSet>> &setsReceived);
   void clearContainer(SharedSubModel &container);
 
 private:

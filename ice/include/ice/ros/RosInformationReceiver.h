@@ -17,6 +17,7 @@
 
 #include "ice/communication/InformationReceiver.h"
 #include "ice/information/InformationCollection.h"
+#include "ice/information/InformationSet.h"
 #include "ice/information/InformationStream.h"
 
 #include "ice_msgs/ICEHeader.h"
@@ -26,7 +27,7 @@ namespace ice
 {
 
 template<typename ICEType, typename ROSType>
-  using transformM2C = typename std::unique_ptr<ICEType> (*)(const boost::shared_ptr<ROSType const>);
+  using transformM2C = typename std::shared_ptr<ICEType> (*)(const boost::shared_ptr<ROSType const>);
 
 template<typename ICEType, typename ROSType>
   class RosInformationReceiver : public InformationReceiver
@@ -47,7 +48,8 @@ template<typename ICEType, typename ROSType>
     int                                         bufferSize;             /**< Size of the buffer */
     transformM2C<ICEType, ROSType>              messageTransform;       /**< Function pointer to message Transform method */
     ros::Subscriber                             subscriber;             /**< Subscriber */
-    std::shared_ptr<InformationStream<ICEType>> informationStream;      /**< The stream which listenen to the channel */
+    std::shared_ptr<InformationStream<ICEType>> stream;                 /**< The stream which listenen to the channel */
+    std::shared_ptr<InformationSet<ICEType>>    set;                    /**< The stream which listenen to the channel */
   };
 
 template<typename ICEType, typename ROSType>
@@ -60,7 +62,11 @@ template<typename ICEType, typename ROSType>
     this->bufferSize = bufferSize;
     this->subscriber = nodeHandel->subscribe(topic, bufferSize, &RosInformationReceiver::onMessage, this);
     this->messageTransform = messageTransform;
-    this->informationStream = std::static_pointer_cast<InformationStream<ICEType>>(collection);
+
+    if (collection->getCollectionType() == CollectionType::CT_STREAM)
+      this->stream = std::static_pointer_cast<InformationStream<ICEType>>(collection);
+    else
+      this->set = std::static_pointer_cast<InformationSet<ICEType>>(collection);
   }
 
 template<typename ICEType, typename ROSType>
@@ -74,8 +80,12 @@ template<typename ICEType, typename ROSType>
   {
     if (false == this->checkReceiverIds(msg->header))
       return;
+
     auto contrainer = this->messageTransform(msg);
-    informationStream->add(std::move(contrainer));
+    if (stream)
+      stream->add(contrainer);
+    else
+      set->add(msg->header.entity, contrainer);
   }
 
 template<typename ICEType, typename ROSType>

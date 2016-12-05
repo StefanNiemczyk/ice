@@ -113,6 +113,9 @@ TEST(ASPRepComp, ontology1)
   EXPECT_EQ(out->getValue<double>(outX), x);
   EXPECT_EQ(out->getValue<double>(outY), y);
   EXPECT_EQ(out->getValue<double>(outZ), z);
+
+  engine->cleanUp();
+  engine.reset();
 }
 
 TEST(ASPRepComp, ontology2)
@@ -208,4 +211,7 @@ TEST(ASPRepComp, ontology2)
   EXPECT_EQ(out->getValue<double>(outOa), a);
   EXPECT_EQ(out->getValue<double>(outOb), b);
   EXPECT_EQ(out->getValue<double>(outOc), c);
+
+  engine->cleanUp();
+  engine.reset();
 }
