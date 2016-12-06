@@ -16,14 +16,11 @@
 #include "ice/information/CollectionFactory.h"
 #include "ice/information/InformationSpecification.h"
 #include "ice/processing/EventHandler.h"
+#include "ice/representation/GContainerFactory.h"
 #include "easylogging++.h"
 
 namespace ice
 {
-//Forward declarations
-//class ICEngine;
-class CollectionFactory;
-
 
 template <typename T>
 class CollectionStore
@@ -44,6 +41,7 @@ public:
 
       this->eventHandler = engineObject->getEventHandler();
       this->factory = engineObject->getCollectionFactory();
+      this->gcontainerFactory = engineObject->getGContainerFactory();
     }
   }
 
@@ -151,12 +149,13 @@ protected:
   }
 
 protected:
-  std::weak_ptr<ICEngine>               engine;         /**< Weak pointer to the engine */
-  std::vector<std::shared_ptr<T>>       collections;    /**< The information steams */
-  std::shared_ptr<EventHandler>         eventHandler;   /**< Handler to execute events asynchronously */
-  std::shared_ptr<CollectionFactory>    factory;        /**< Factory to create collections */
-  std::mutex                            _mtx;           /**< Mutex */
-  el::Logger*                           _log;           /**< Logger */
+  std::weak_ptr<ICEngine>               engine;                 /**< Weak pointer to the engine */
+  std::shared_ptr<GContainerFactory>    gcontainerFactory;      /**< The gcontainer factory */
+  std::vector<std::shared_ptr<T>>       collections;            /**< The information steams */
+  std::shared_ptr<EventHandler>         eventHandler;           /**< Handler to execute events asynchronously */
+  std::shared_ptr<CollectionFactory>    factory;                /**< Factory to create collections */
+  std::mutex                            _mtx;                   /**< Mutex */
+  el::Logger*                           _log;                   /**< Logger */
 };
 
 } /* namespace ice */

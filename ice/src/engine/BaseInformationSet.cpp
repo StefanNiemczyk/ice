@@ -30,4 +30,9 @@ CollectionType BaseInformationSet::getCollectionType()
   return CollectionType::CT_SET;
 }
 
+std::set<ont::entity> BaseInformationSet::getAllEntities()
+{
+  return this->getAllEntities();
+}
+
 } /* namespace ice */

@@ -128,6 +128,10 @@ public:
 
     return nullptr;
   }
+
+  int getInformation(std::shared_ptr<InformationSpecification> request,
+                     std::vector<std::shared_ptr<InformationElement<GContainer>>> &outInfo,
+                     bool useTransfromation);
 };
 
 } /* namespace ice */

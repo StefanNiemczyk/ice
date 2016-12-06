@@ -8,6 +8,8 @@
 #ifndef INCLUDE_ICE_INFORMATION_BASEINFORMATIONSET_H_
 #define INCLUDE_ICE_INFORMATION_BASEINFORMATIONSET_H_
 
+#include <set>
+
 #include "ice/information/InformationCollection.h"
 
 namespace ice
@@ -40,6 +42,11 @@ public:
 
 
   virtual CollectionType getCollectionType();
+
+  std::set<ont::entity> getAllEntities();
+
+protected:
+  std::set<ont::entity> entities;
 };
 
 } /* namespace ice */

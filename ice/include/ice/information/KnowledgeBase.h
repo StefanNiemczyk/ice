@@ -17,8 +17,12 @@
 namespace ice
 {
 //Forward declarations
+class GContainer;
 class ICEngine;
+template <typename T>
+  class InformationElement;
 class InformationStore;
+class InformationSpecification;
 class SetStore;
 class StreamStore;
 class OntologyInterface;
@@ -34,6 +38,9 @@ public:
 
   void cleanUpStores();
 
+  int getInformation(std::shared_ptr<InformationSpecification> request,
+                     std::vector<std::shared_ptr<InformationElement<GContainer>>> &outInfo,
+                     bool useTransfromation = false);
   ont::entityType getEntityType(ont::entity entity);
   void readEntitiesFromOntology();
 

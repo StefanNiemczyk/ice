@@ -103,6 +103,7 @@ template<typename T>
       auto informationElement = std::make_shared<InformationElement<T>>(
           spec, information, timeValidity, timeObservation, timeProcessed);
 
+      this->entities.insert(entity);
       this->map[entity] = informationElement;
 
       // notify listeners

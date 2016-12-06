@@ -12,6 +12,7 @@
 #include "ice/information/StreamStore.h"
 #include "ice/information/SetStore.h"
 #include "ice/ontology/OntologyInterface.h"
+#include "ice/representation/GContainer.h"
 
 namespace ice
 {
@@ -63,6 +64,23 @@ void KnowledgeBase::cleanUpStores()
 {
   this->setStore->cleanUpUnused();
   this->streamStore->cleanUpUnused();
+}
+
+
+int KnowledgeBase::getInformation(std::shared_ptr<InformationSpecification> request,
+                   std::vector<std::shared_ptr<InformationElement<GContainer>>> &outInfo,
+                   bool useTransfromation)
+{
+  // request from knowledge base
+  int count = this->informationStore->getInformation(request, outInfo, useTransfromation);
+
+  // stream store
+  count += this->streamStore->getInformation(request, outInfo, useTransfromation);
+
+  // stream store
+  count +=this->streamStore->getInformation(request, outInfo, useTransfromation);
+
+  return count;
 }
 
 ont::entityType KnowledgeBase::getEntityType(ont::entity entity)
