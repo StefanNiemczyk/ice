@@ -96,6 +96,7 @@ std::shared_ptr<BaseInformationStream> CollectionFactory::createStream(
     if (rep != nullptr)
     {
       stream = std::make_shared<InformationStream<GContainer>>(streamDescription, eventHandler, streamSize);
+      stream->setGContainer(true);
     }
   }
 
@@ -163,6 +164,7 @@ std::shared_ptr<BaseInformationSet> CollectionFactory::createSet(
     if (rep != nullptr)
     {
       set = std::make_shared<InformationSet<GContainer>>(streamDescription, eventHandler);
+      set->setGContainer(true);
     }
   }
 

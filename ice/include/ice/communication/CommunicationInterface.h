@@ -87,7 +87,6 @@ private:
 protected:
   std::weak_ptr<ICEngine>                     engine;
   std::shared_ptr<GContainerFactory>          containerFactory;
-  std::shared_ptr<InformationStore>           informationStore;
   std::shared_ptr<OntologyInterface>          ontology;
   std::shared_ptr<TimeFactory>                timeFactory;
   std::shared_ptr<EntityDirectory>            directory;

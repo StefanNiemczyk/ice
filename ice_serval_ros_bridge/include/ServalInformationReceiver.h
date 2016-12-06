@@ -11,26 +11,27 @@
 #include <memory>
 
 #include <ice/communication/InformationReceiver.h>
+#include <ice/TypeDefs.h>
 
 namespace ice
 {
-
-class BaseInformationStream;
+class GContainer;
+class InformationCollection;
 class ServalCommunication;
 
-class ServalInformationReceiver : InformationReceiver
+class ServalInformationReceiver : public InformationReceiver
 {
 public:
-  ServalInformationReceiver(std::shared_ptr<BaseInformationStream> const &stream,
+  ServalInformationReceiver(std::shared_ptr<InformationCollection> const &collection,
                             std::shared_ptr<ServalCommunication> const &communication);
   virtual ~ServalInformationReceiver();
 
-  const uint32_t getStreamHash() const;
-  std::shared_ptr<BaseInformationStream> getStream() const;
+  const uint32_t getHash() const;
+  std::shared_ptr<InformationCollection> getCollection() const;
+  void insertInformation(std::shared_ptr<GContainer> container, ont::entity entity);
 
 private:
-  std::shared_ptr<BaseInformationStream>        stream;
-  uint32_t                                      streamHash;
+  uint32_t                                      collectionHash;
   std::shared_ptr<ServalCommunication>          communication;
 };
 

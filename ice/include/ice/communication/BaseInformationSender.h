@@ -8,7 +8,10 @@
 #ifndef BASEINFORMATIONSENDER_H_
 #define BASEINFORMATIONSENDER_H_
 
+#include <memory>
 #include <typeinfo>
+
+#include "ice/information/InformationCollection.h"
 
 namespace ice
 {
@@ -16,7 +19,10 @@ namespace ice
 class BaseInformationSender
 {
 public:
-  BaseInformationSender() {};
+  BaseInformationSender(std::shared_ptr<InformationCollection> collection)
+  {
+    this->collection = collection;
+  };
   virtual ~BaseInformationSender() {};
 
   /*!
@@ -25,6 +31,9 @@ public:
    * Returns the type_info of the template type.
    */
   virtual const std::type_info* getTypeInfo() const = 0;
+
+protected:
+  std::shared_ptr<InformationCollection> collection;
 };
 
 } /* namespace ice */

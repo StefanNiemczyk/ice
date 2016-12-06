@@ -525,7 +525,7 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string &n
   if (false == stream)
   {
     std::string dataType = this->dataTypeForRepresentation(rep);
-    std::string name = entity + "_" + nodeName + "_" + source;
+    std::string name = this->ontology->toShortIri(entity) + "_" + this->ontology->toShortIri(nodeName) + "_" + this->ontology->toShortIri(source);
     std::replace(name.begin(), name.end(), '.', '_');
     std::replace(name.begin(), name.end(), '#', '_');
     std::replace(name.begin(), name.end(), '/', '_');

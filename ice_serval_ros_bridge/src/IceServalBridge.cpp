@@ -164,12 +164,10 @@ void IceServalBridge::init()
   this->gcontainerFactory = std::make_shared<GContainerFactory>();
   this->gcontainerFactory->setOntologyInterface(this->ontologyInterface);
   this->gcontainerFactory->init();
-  this->communicationInterface->setGContainerFactory(this->gcontainerFactory);
 
   // init information store
   this->knowledgeBase = std::make_shared<KnowledgeBase>(this->shared_from_this());
   this->knowledgeBase->init();
-  this->communicationInterface->setInformationStore(this->knowledgeBase->informationStore);
   if (this->params->jsonInformationPath != "")
   {
     this->json2Information(this->params->jsonInformationPath);

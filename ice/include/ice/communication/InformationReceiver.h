@@ -28,7 +28,7 @@ public:
    */
   virtual const std::type_info* getTypeInfo();
 
-private:
+protected:
   std::shared_ptr<InformationCollection>        collection;
 };
 

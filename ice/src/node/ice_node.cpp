@@ -1,24 +1,37 @@
 #include "ros/ros.h"
-#include "std_msgs/String.h"
 
 #include "ice/ICEngine.h"
 #include "ice/information/InformationElement.h"
 
-#include "boost/shared_ptr.hpp"
-#include "boost/uuid/uuid.hpp"
-#include "boost/uuid/uuid_generators.hpp"
 #include "easylogging++.h"
 
-#include <exception>
-#include <iostream>
 #include <memory>
+#include <typeinfo>
 
 INITIALIZE_EASYLOGGINGPP
+
+class A
+{
+
+};
+
+class B : public A
+{
+
+};
 
 
 int main(int argc, char **argv)
 {
   std::cout << "Start" << std::endl;
+
+  A a;
+  B b;
+  A ab = b;
+
+  std::cout << "A  " << typeid(a).name() << std::endl;
+  std::cout << "B  " << typeid(b).name() << std::endl;
+  std::cout << "AB " << typeid(ab).name() << std::endl;
 
   return 0;
 }

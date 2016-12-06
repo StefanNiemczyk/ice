@@ -257,4 +257,21 @@ bool RosCommunication::checkReceiverIds(ice_msgs::ICEHeader header)
   return false;
 }
 
+std::string RosCommunication::createTopic(std::shared_ptr<InformationCollection> &collection)
+{
+  auto &spec = collection->getDescription()->getInformationSpecification();
+  if (collection->getCollectionType() == CollectionType::CT_SET)
+  {
+    return this->ontology->toShortIriAll("ice/set/" + spec->getEntityType() + "/" + spec->getScope() + "/" + std::to_string(collection->getHash()));
+  }
+  else if (collection->getCollectionType() == CollectionType::CT_STREAM)
+  {
+    return this->ontology->toShortIriAll("ice/stream/" + spec->getEntity() + "/" + spec->getScope() + "/" + std::to_string(collection->getHash()));
+  }
+  else
+  {
+    return "";
+  }
+}
+
 } /* namespace ice */

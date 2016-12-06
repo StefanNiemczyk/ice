@@ -53,6 +53,8 @@ void CommunicationInterface::init()
   this->self = e->getSelf();
   this->timeFactory = e->getTimeFactory();
   this->initInternal();
+  this->containerFactory = e->getGContainerFactory();
+  this->ontology = e->getOntologyInterface();
 
   this->running = true;
   this->worker = std::thread(&CommunicationInterface::workerTask, this);
@@ -359,16 +361,6 @@ std::shared_ptr<GContainerFactory> CommunicationInterface::getGContainerFactory(
 void CommunicationInterface::setGContainerFactory(std::shared_ptr<GContainerFactory> factory)
 {
   this->containerFactory = factory;
-}
-
-std::shared_ptr<InformationStore> CommunicationInterface::getInformationStore()
-{
-  return this->informationStore;
-}
-
-void CommunicationInterface::setInformationStore(std::shared_ptr<InformationStore> store)
-{
-  this->informationStore = store;
 }
 
 std::shared_ptr<OntologyInterface> CommunicationInterface::getOntologyInterface()

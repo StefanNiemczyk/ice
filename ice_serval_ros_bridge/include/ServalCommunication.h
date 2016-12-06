@@ -18,10 +18,12 @@
 
 namespace ice
 {
-
+class Entity;
 class IceServalBridge;
-class serval_interface;
 class MDPSocket;
+class serval_interface;
+class ServalInformationSender;
+class ServalInformationReceiver;
 
 class ServalCommunication : public CommunicationInterface
 {
@@ -40,6 +42,7 @@ protected:
   virtual void cleanUpInternal();
   virtual void discover();
   virtual int  readMessage(std::vector<std::shared_ptr<Message>> &outMessages);
+          void sendMessage(std::shared_ptr<Entity> entity, unsigned char* buffer, size_t size);
   virtual void sendMessage(std::shared_ptr<Message> msg);
   virtual std::shared_ptr<BaseInformationSender> createSender(std::shared_ptr<InformationCollection> collection);
   virtual std::shared_ptr<InformationReceiver> createReceiver(std::shared_ptr<InformationCollection> collection);
@@ -51,6 +54,8 @@ private:
   std::thread                                   worker;
   bool                                          running;
   unsigned char                                 buffer[1024];
+  std::vector<std::shared_ptr<ServalInformationSender>> informationSenders;
+  std::vector<std::shared_ptr<ServalInformationReceiver>> informationReceivers;
 
   std::string                           const   configPath;
   std::string                           const   host;

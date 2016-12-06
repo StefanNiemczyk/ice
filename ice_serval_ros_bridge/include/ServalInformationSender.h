@@ -8,14 +8,28 @@
 #ifndef INCLUDE_SERVALINFORMATIONSENDER_H_
 #define INCLUDE_SERVALINFORMATIONSENDER_H_
 
+#include <ice/communication/InformationSender.h>
+#include <ice/representation/GContainer.h>
+
 namespace ice
 {
+class ServalCommunication;
 
-class ServalInformationSender
+class ServalInformationSender : public InformationSender<GContainer>
 {
 public:
-  ServalInformationSender();
+  ServalInformationSender(std::shared_ptr<ServalCommunication> communication,
+                          std::shared_ptr<InformationCollection> collection);
   virtual ~ServalInformationSender();
+
+
+  virtual void sendInformationElement(std::vector<std::shared_ptr<Entity>> &sendTo,
+                                      std::shared_ptr<InformationElement<GContainer>> informationElement);
+
+private:
+  unsigned char                                 buffer[1024];
+  uint32_t                                      collectionHash;
+  std::shared_ptr<ServalCommunication>          communication;
 };
 
 } /* namespace ice */

@@ -50,6 +50,7 @@ protected:
   virtual std::shared_ptr<InformationReceiver> createReceiver(std::shared_ptr<InformationCollection> collection);
 
 private:
+  std::string createTopic(std::shared_ptr<InformationCollection> &collection);
   template<typename ICEType, typename ROSType>
     std::shared_ptr<BaseInformationSender> _createSender(std::shared_ptr<InformationCollection> collection,
                                                          transformC2M<ICEType, ROSType> &messageTransform);
@@ -80,8 +81,8 @@ template<typename ICEType, typename ROSType>
     // std::string topic
     // int bufferSize
     // transform<ICEType, ROSType> &messageTransform
-    return std::make_shared<RosInformationSender<ICEType, ROSType>>(this->iceId, &this->nodeHandel,
-                                                                    "/ice/" + std::to_string(collection->getHash()),
+    return std::make_shared<RosInformationSender<ICEType, ROSType>>(collection, this->iceId, &this->nodeHandel,
+                                                                    this->createTopic(collection),
                                                                     100, messageTransform);
   }
 
@@ -96,7 +97,7 @@ template<typename ICEType, typename ROSType>
     // int bufferSize,
     // transformM2C<ICEType, ROSType> &messageTransform
     return std::make_shared<RosInformationReceiver<ICEType, ROSType>>(this->iceId, collection, &this->nodeHandel,
-                                                                      "/ice/" + std::to_string(collection->getHash()),
+                                                                      this->createTopic(collection),
                                                                       100, messageTransform);
   }
 

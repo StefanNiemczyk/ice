@@ -11,12 +11,14 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <ice/Entity.h>
 #include <ice/communication/messages/Message.h>
 #include <serval_interface.h>
 #include <serval_wrapper/MDPSocket.h>
 
-#include "ice/Entity.h"
 #include "IceServalBridge.h"
+#include "ServalInformationReceiver.h"
+#include "ServalInformationSender.h"
 
 // Short alias for this namespace
 namespace pt = boost::property_tree;
@@ -128,7 +130,6 @@ void ServalCommunication::read()
     if (recCount == 0)
     {
       // huge amount of emtpy messages, will be skipped
-//      _log->debug("Received empty message from sid %v", sid);
       continue;
     }
 
@@ -167,17 +168,16 @@ void ServalCommunication::read()
     message->setJobId(buffer[1]);
     message->setJobIndex(buffer[2]);
 
+    if (buffer[1] == 0 && buffer[2] == 0)
+    {
+      // TODO message handler
+    }
+
     if (message == nullptr)
     {
       this->_log->info("Received unknown or broken message from serval node '%v'", sid);
-
       continue;
     }
-
-//    m.command = buffer[0];
-//    m.payload.clear();
-//    m.payload.reserve(recCount-1);
-//    std::copy(buffer + 1, buffer + recCount, std::back_inserter(m.payload));
 
     this->handleMessage(message);
   }
@@ -217,6 +217,27 @@ void ServalCommunication::discover()
 int ServalCommunication::readMessage(std::vector<std::shared_ptr<Message>> &outMessages)
 {
   return 0; // reading messages is done in own thread
+}
+
+void ServalCommunication::sendMessage(std::shared_ptr<Entity> entity, unsigned char* buffer, size_t size)
+{
+  std::string sid;
+
+  if (false == entity->isAvailable())
+  {
+    this->_log->error("Dropped Msg: Trying to send message to not available serval instance %v", entity->toString());
+    return;
+  }
+
+  if (false == entity->getId(EntityDirectory::ID_SERVAL, sid))
+  {
+    this->_log->error("Trying to send message with serval to none serval instance %v", entity->toString());
+    return;
+  }
+
+  this->traffic.sendBytes += size;
+  ++this->traffic.messageSendCount;
+  this->socket->send(sid, buffer, size);
 }
 
 void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)

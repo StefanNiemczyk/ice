@@ -9,12 +9,14 @@
 #define BASEINFORMATIONSTREAM_H_
 
 #include "ice/information/InformationCollection.h"
+#include "ice/Time.h"
 
 namespace ice
 {
 // Forward declaration
 class CollectionDescription;
 class EventHandler;
+class GContainer;
 
 //* BaseInformationStream
 /**

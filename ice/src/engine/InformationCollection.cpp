@@ -20,7 +20,8 @@ int InformationCollection::IDENTIFIER_COUNTER = 0;
 
 InformationCollection::InformationCollection(std::shared_ptr<CollectionDescription> streamDescription,
                                              std::shared_ptr<EventHandler> eventHandler) :
-    streamDescription(streamDescription), iid(IDENTIFIER_COUNTER++), eventHandler(eventHandler), hash(0)
+    streamDescription(streamDescription), iid(IDENTIFIER_COUNTER++), eventHandler(eventHandler),
+    hash(0), gcontainer(false)
 {
   _log = nullptr;
 }
@@ -212,6 +213,16 @@ void InformationCollection::destroy()
 {
   this->dropSender();
   this->dropReceiver();
+}
+
+bool InformationCollection::isGContainer()
+{
+  return this->gcontainer;
+}
+
+void InformationCollection::setGContainer(bool value)
+{
+  this->gcontainer = value;
 }
 
 } /* namespace ice */

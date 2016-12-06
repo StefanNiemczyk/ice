@@ -24,6 +24,7 @@
 #include "ice/information/InformationSpecification.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/processing/InformationEvent.h"
+#include "ice/representation/GContainer.h"
 #include "easylogging++.h"
 
 //Forward declaration
