@@ -58,4 +58,15 @@ std::vector<std::shared_ptr<SubModel>>& ProcessingModel::getSubModels()
   return subModels;
 }
 
+std::shared_ptr<SubModel> ProcessingModel::getSubModel(std::shared_ptr<Entity> &entity)
+{
+  for (auto &subModel : subModels)
+  {
+    if (subModel->entity == entity)
+      return subModel;
+  }
+
+  return nullptr;
+}
+
 } /* namespace ice */

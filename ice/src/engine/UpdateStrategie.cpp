@@ -98,17 +98,19 @@ void UpdateStrategie::update(ModelUpdateEvent event, std::shared_ptr<void> objec
       synchrone = true;
       break;
     case MUE_NONE:
-      // TODO
+      this->deactivateModel(true);
+      return;
       break;
     case MUE_INSTANCE_NEW:
       trigger = true;
       break;
     case MUE_INSTANCE_VANISHED:
-      // TODO
       trigger = true;
       break;
     case MUE_NODE_FAILURE:
-      // TODO
+      trigger = true;
+      break;
+    case MUE_NODE_REPAIR:
       trigger = true;
       break;
     case MUE_INFORMATION_REQ:
@@ -146,6 +148,22 @@ void UpdateStrategie::processModel(std::shared_ptr<ProcessingModel> const &model
   this->model = model;
   this->valid = true;
   this->established = false;
+}
+
+void UpdateStrategie::deactivateModel(bool notifyOtherEngines)
+{
+  if (this->lastModel == nullptr)
+    return;
+
+  for (auto &node : this->lastModel->getNodes())
+  {
+    this->nodeStore->cleanUpNodes(this->self);
+  }
+
+  if (notifyOtherEngines)
+  {
+// TODO
+  }
 }
 
 bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel)
@@ -605,7 +623,104 @@ void UpdateStrategie::onEntityDiscovered(std::shared_ptr<Entity> entity)
 
 void UpdateStrategie::onEntityVanished(std::shared_ptr<Entity> entity)
 {
-  this->update(ModelUpdateEvent::MUE_INSTANCE_VANISHED, entity);
+  if (this->model->getSubModel(entity) != nullptr)
+    this->update(ModelUpdateEvent::MUE_INSTANCE_VANISHED, entity);
+}
+
+void UpdateStrategie::onNodeFailure(std::shared_ptr<Entity> entity, std::vector<std::string> &iris)
+{
+  _log->warn("Node failure for '%v' nodes of '%v' detected, check if update is required", iris.size(), entity->toString());
+  bool update = false;
+
+  for (auto &iri : iris)
+  {
+    auto node = entity->getASPElementByName(iri);
+    if (node->defect)
+      continue;
+
+    node->defect = true;
+    auto subModel = this->model->getSubModel(entity);
+
+    for (auto &desc : subModel->model->nodes)
+    {
+      if (desc.aspName == iri)
+      {
+        update = true;
+      }
+    }
+  }
+
+  if (update)
+  {
+    _log->warn("Node failure detected, update is required");
+    this->update(ModelUpdateEvent::MUE_NODE_FAILURE);
+  }
+}
+
+void UpdateStrategie::onNodeFailure(std::string className)
+{
+  _log->warn("Node failure for '%v' detected, check if update is required", className);
+  bool update = false;
+  std::vector<std::shared_ptr<ASPElement>> nodes;
+  this->self->getNodeForClass(className, nodes);
+
+  for (auto &node : nodes)
+  {
+    if (node->defect)
+      continue;
+
+    node->defect = true;
+    auto &aspNodes = this->model->getNodes();
+
+    for (auto &desc : aspNodes)
+    {
+      if (desc.aspName == this->ontology->toLongIri(node->name))
+      {
+        update = true;
+      }
+    }
+  }
+
+  // TODO notify
+
+  if (update)
+  {
+    _log->warn("Node failure detected, update is required");
+    this->update(ModelUpdateEvent::MUE_NODE_FAILURE);
+  }
+}
+
+void UpdateStrategie::onNodeRepair(std::shared_ptr<Entity> entity, std::vector<std::string> &iris)
+{
+  for (auto &iri : iris)
+  {
+    auto node = entity->getASPElementByName(iri);
+    if (node->defect == false)
+      continue;
+
+    node->defect = false;
+  }
+
+  this->update(ModelUpdateEvent::MUE_NODE_REPAIR);
+}
+
+void UpdateStrategie::onNodeRepair(std::string className)
+{
+  bool update = false;
+  std::vector<std::shared_ptr<ASPElement>> nodes;
+  this->self->getNodeForClass(className, nodes);
+
+  for (auto &node : nodes)
+  {
+    if (node->defect == false)
+      continue;
+
+    node->defect = false;
+  }
+
+  // TODO notify
+
+  this->update(ModelUpdateEvent::MUE_NODE_REPAIR);
 }
 
 void UpdateStrategie::workerTask()

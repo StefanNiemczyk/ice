@@ -44,7 +44,7 @@ void FastUpdateStrategie::processModel(std::shared_ptr<ProcessingModel> const &m
 
   if (this->lastModel != nullptr)
   {
-    // TODO
+    this->deactivateModel(false);
   }
 
   // change own information processing

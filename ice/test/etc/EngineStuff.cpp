@@ -459,6 +459,31 @@ public:
   }
 };
 
+class SimpleSourceNodeAlternative : public ice::Node
+{
+public:
+  static std::shared_ptr<ice::Node> createNode()
+  {
+    return std::make_shared<SimpleSourceNodeAlternative>();
+  }
+
+  SimpleSourceNodeAlternative() : Node()
+  {
+
+  }
+
+  virtual std::string getClassName()
+  {
+    return "SimpleSourceNodeAlternative";
+  }
+
+  virtual int performNode()
+  {
+    this->nodeStore->handleNodeFailure(this->getCreatorName());
+    return 0;
+  }
+};
+
 class TestTransformation : public ice::Transformation
 {
 public:

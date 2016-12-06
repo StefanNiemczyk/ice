@@ -42,6 +42,7 @@ enum ModelUpdateEvent {
   MUE_INSTANCE_NEW,
   MUE_INSTANCE_VANISHED,
   MUE_NODE_FAILURE,
+  MUE_NODE_REPAIR,
   MUE_INFORMATION_REQ,
   MUE_RESOURCE_REQ,
   MUE_OPTIMIZATION
@@ -57,6 +58,10 @@ public:
   void cleanUp();
   void onEntityDiscovered(std::shared_ptr<Entity> entity);
   void onEntityVanished(std::shared_ptr<Entity> entity);
+  void onNodeFailure(std::shared_ptr<Entity> entity, std::vector<std::string> &iris);
+  void onNodeFailure(std::string className);
+  void onNodeRepair(std::shared_ptr<Entity> entity, std::vector<std::string> &iris);
+  void onNodeRepair(std::string className);
 
   // update processing model
   virtual void update(ModelUpdateEvent event, std::shared_ptr<void> object = nullptr);
@@ -68,6 +73,7 @@ protected:
   virtual void initInternal() = 0;
   virtual void cleanUpInternal() = 0;
 
+  void deactivateModel(bool notifyOtherEngines);
   bool processSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel);
   bool processSubModelResponse(std::shared_ptr<Entity> &entity, int modelIndex);
   std::shared_ptr<SubModel> getSubModelDesc(std::shared_ptr<Entity> &entity);

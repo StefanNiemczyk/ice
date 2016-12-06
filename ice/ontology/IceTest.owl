@@ -920,6 +920,7 @@
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestEntity1">
         <rdf:type rdf:resource="http://vs.uni-kassel.de/IceTest#TestEntity"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeCppGroundingInd"/>
     </owl:NamedIndividual>
     
 
@@ -959,6 +960,17 @@
         <rdf:type rdf:resource="&Ice;Delay"/>
         <Ice:hasMetadataValue rdf:datatype="&xsd;int">50</Ice:hasMetadataValue>
         <Ice:hasGrounding rdf:resource="&Ice;RequiredMapDelayASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestNodeFailureInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestNodeFailureInd">
+        <rdf:type rdf:resource="&Ice;System"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeInd"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeInd"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/IceTest#TestStream1ReqInd"/>
     </owl:NamedIndividual>
     
 
@@ -1160,9 +1172,42 @@
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNodeAccuracyInd">
         <rdf:type rdf:resource="&Ice;Accuracy"/>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue>
-        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">90</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;integer">90</Ice:hasMetadataValue>
         <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyFixASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeAccuracyInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeAccuracyInd">
+        <rdf:type rdf:resource="&Ice;Accuracy"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">150</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyFixASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeCppGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeCppGrounding">
+        <rdf:type rdf:resource="&Ice;CppGrounding"/>
+        <Ice:hasGroundingValue rdf:datatype="&xsd;string">TestSourceNodeAlternativeGrounding</Ice:hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeInd -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeInd">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNode"/>
+        <Ice:aboutEntity rdf:resource="http://vs.uni-kassel.de/IceTest#TestEntity1"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeAccuracyInd"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeCppGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeCostInd"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/IceTest#TestSourceNodeDelayInd"/>
     </owl:NamedIndividual>
     
 

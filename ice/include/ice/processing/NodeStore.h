@@ -24,7 +24,7 @@ class ICEngine;
 /**
  * This class stores the nodes of the engine.
  */
-class NodeStore
+class NodeStore : public std::enable_shared_from_this<NodeStore>
 {
 public:
   /*!
@@ -40,6 +40,9 @@ public:
    * Default Destructor
    */
   virtual ~NodeStore();
+
+  void init();
+  void cleanUp();
 
   /*!
    * \brief Adds a note to list of nodes.
@@ -63,10 +66,13 @@ public:
                                      const ont::entity entity, const ont::entity entityRelated,
                                      std::map<std::string, std::string> &config, const std::string source = "");
 
+  void handleNodeFailure(std::string className);
+  void handleNodeRepair(std::string className);
   bool existNodeCreator(const std::string className);
   void unregisterAndCleanUp(std::shared_ptr<Entity> &entity,
                                  std::vector<std::shared_ptr<Node>> &nodesToCleanUp);
   void cleanUpNodes();
+  void cleanUpNodes(std::shared_ptr<Entity> &entity);
   void cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp);
 
 private:

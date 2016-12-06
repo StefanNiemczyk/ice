@@ -5,9 +5,11 @@
  *      Author: sni
  */
 
+#include "ice/model/updateStrategie/UpdateStrategie.h"
 #include "ice/processing/NodeStore.h"
 #include "ice/ICEngine.h"
 #include "easylogging++.h"
+
 
 namespace ice
 {
@@ -20,7 +22,23 @@ NodeStore::NodeStore(std::weak_ptr<ICEngine> engine)
 
 NodeStore::~NodeStore()
 {
+  this->cleanUp();
+}
+
+void NodeStore::init()
+{
   //
+}
+
+void NodeStore::cleanUp()
+{
+  for (auto &node : this->nodes)
+  {
+    node->deactivate();
+    node->destroy();
+  }
+
+  this->nodes.clear();
 }
 
 int NodeStore::addNode(std::shared_ptr<Node> node)
@@ -80,21 +98,87 @@ std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::st
     desc->setSource(source);
   }
 
-  node = Node::createNode(className);
+  auto creator = Node::getNodeCreator(className);
 
-  if (false == node)
+  if (creator== nullptr)
   {
     _log->error("Node '%v' could not be created for entity '%v'. Register missing?", name,
                 entity);
     return node;
   }
 
+  if (creator->defect)
+  {
+    _log->error("Node '%v' could not be created for entity '%v'. Node is marked as defekt", name,
+                entity);
+    return node;
+  }
+
+  node = (creator->func)();
+  node->setNodeStore(this->shared_from_this());
   node->setNodeDescription(desc);
   node->setConfiguration(config);
+  node->setCreatorName(className);
 
   this->addNode(node);
 
   return node;
+}
+
+void NodeStore::handleNodeFailure(std::string className)
+{
+  _log->info("Handle node failure for creator '%v'", className);
+  auto creator = Node::getNodeCreator(className);
+
+  if (creator == nullptr)
+  {
+    _log->info("Handle node failure for unknown creator '%v', skipped", className);
+    return;
+  }
+
+  if (creator->defect)
+  {
+    _log->info("Handle known node failure for creator '%v', skipped", className);
+    return;
+  }
+
+  creator->defect = true;
+
+  {
+    if (engine.expired())
+      return;
+
+    auto e = engine.lock();
+    e->getUpdateStrategie()->onNodeFailure(className);
+  }
+}
+
+void NodeStore::handleNodeRepair(std::string className)
+{
+  _log->info("Handle node repair for creator '%v'", className);
+  auto creator = Node::getNodeCreator(className);
+
+  if (creator == nullptr)
+  {
+    _log->info("Handle node repair for unknown creator '%v', skipped", className);
+    return;
+  }
+
+  if (creator->defect == false)
+  {
+    _log->info("Handle known node repair for creator '%v', skipped", className);
+    return;
+  }
+
+  creator->defect = false;
+
+  {
+    if (engine.expired())
+      return;
+
+    auto e = engine.lock();
+    e->getUpdateStrategie()->onNodeRepair(className);
+  }
 }
 
 bool NodeStore::existNodeCreator(const std::string className)
@@ -129,6 +213,28 @@ void NodeStore::cleanUpNodes()
 
   for (auto node : this->nodes)
   {
+    if (node->getRegisteredEngineCount() > 0)
+      continue;
+
+    _log->info("Remove node %v", node->toString());
+    counter++;
+
+    node->deactivate();
+    node->destroy();
+  }
+
+  _log->info("Clean up node store: '%v' nodes are removed", counter);
+}
+
+void NodeStore::cleanUpNodes(std::shared_ptr<Entity> &entity)
+{
+  _log->verbose(1, "Start removing nodes for entity '%v'", entity->toString());
+  int counter = 0;
+
+  for (auto node : this->nodes)
+  {
+    node->unregisterEntity(entity);
+
     if (node->getRegisteredEngineCount() > 0)
       continue;
 

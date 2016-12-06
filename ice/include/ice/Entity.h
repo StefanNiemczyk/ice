@@ -71,6 +71,7 @@ struct ASPElement
   std::string className;
   std::string configAsString;
   std::string raw;
+  bool defect;
   std::map<std::string, std::string> config;
   ASPElementState state;
   ASPElementType type;
@@ -207,6 +208,7 @@ public:
   void setExternal(std::shared_ptr<supplementary::External> &external);
   std::shared_ptr<supplementary::External>& getExternal();
   bool updateExternals(bool activateRequired);
+  int getNodeForClass(std::string className, std::vector<std::shared_ptr<ASPElement>> &result);
 
 private:
   void updateContainer(SharedSubModel &container, std::vector<std::shared_ptr<Node>> &nodes,

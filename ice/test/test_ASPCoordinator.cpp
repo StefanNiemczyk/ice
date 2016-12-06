@@ -603,7 +603,7 @@ TEST(ASPModelGenerator, setTransferTest)
 
   nodeSource->performTask();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds {10});
+  std::this_thread::sleep_for(std::chrono::milliseconds {100});
 
   ASSERT_EQ(1, set1->getSize());
   ASSERT_EQ(1, set11->getSize());
@@ -620,4 +620,51 @@ TEST(ASPModelGenerator, setTransferTest)
   engine.reset();
   engine2->cleanUp();
   engine2.reset();
+}
+
+TEST(ASPModelGenerator, nodeFailureTest)
+{
+  ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
+  ice::Node::registerNodeCreator("TestSourceNodeAlternativeGrounding", &SimpleSourceNodeAlternative::createNode);
+
+  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  std::shared_ptr<ice::Configuration> config = std::make_shared<ice::Configuration>();
+  config->ontologyIri = "http://vs.uni-kassel.de/IceTest";
+  config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/IceTest#TestNodeFailureInd";
+  std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
+  auto streamFactory = std::make_shared<TestFactory>(engine);
+  engine->setTimeFactory(timeFactory);
+  engine->setCollectionFactory(streamFactory);
+
+  engine->getConfig()->synthesizeTransformations = false;
+  engine->init();
+  engine->start();
+
+  auto spec1 = ice::InformationSpecification("http://vs.uni-kassel.de/IceTest#TestEntity1",
+                                             "http://vs.uni-kassel.de/IceTest#TestEntity",
+                                             "http://vs.uni-kassel.de/IceTest#TestScope1",
+                                             "http://vs.uni-kassel.de/IceTest#TestRepresentation1");
+
+  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1, "http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeInd",
+                                                                         "http://vs.uni-kassel.de/IceTest#TestNodeFailureInd");
+  ASSERT_TRUE((stream1 ? true : false));
+
+  auto nodeSource = engine->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeInd", "http://vs.uni-kassel.de/IceTest#TestEntity1");
+  ASSERT_TRUE((nodeSource ? true : false));
+
+  nodeSource->performNode();
+
+  std::this_thread::sleep_for(std::chrono::milliseconds {500});
+
+  EXPECT_FALSE(nodeSource->isActive());
+
+  auto stream2 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1, "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
+                                                                         "http://vs.uni-kassel.de/IceTest#TestNodeFailureInd");
+  EXPECT_TRUE((stream2 ? true : false));
+
+  auto nodeSource2 = engine->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSourceNodeInd", "http://vs.uni-kassel.de/IceTest#TestEntity1");
+  EXPECT_TRUE((nodeSource2 ? true : false));
+
+  engine->cleanUp();
+  engine.reset();
 }

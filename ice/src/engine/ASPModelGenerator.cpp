@@ -948,6 +948,7 @@ void ASPModelGenerator::toASP(std::unique_ptr<std::vector<std::vector<std::strin
       element->name = this->ontology->toShortIri(name);
       element->state = ASPElementState::ADDED_TO_ASP;
       element->type = type;
+      element->defect = false;
 
       if (cppStr != "")
       {

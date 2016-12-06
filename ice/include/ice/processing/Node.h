@@ -28,20 +28,28 @@ namespace ice
 class BaseInformationSet;
 class BaseInformationStream;
 class Entity;
+class NodeStore;
+
+struct NodeCreator
+{
+  bool defect;
+  std::function<std::shared_ptr<Node>()> func;
+};
 
 class Node : public AsynchronousTask, public std::enable_shared_from_this<Node>
 {
   // static part
 public:
   using creatorFunc = std::function<std::shared_ptr<Node>()>;
-//  typedef std::shared_ptr<Node> (*creatorFunc)();
+
   static int registerNodeCreator(const std::string &className, const creatorFunc &creator);
   static std::shared_ptr<Node> createNode(const std::string &className);
+  static NodeCreator* getNodeCreator(const std::string &className);
   static bool existNodeCreator(const std::string &className);
   static void clearNodeStore();
 
 private:
-  static std::map<std::string, creatorFunc> creators;
+  static std::map<std::string, NodeCreator> creators;
 
   // object part
 public:
@@ -52,9 +60,11 @@ public:
   virtual int cleanUp();
   virtual int destroy();
 
+  void setNodeStore(std::shared_ptr<NodeStore> nodeStore);
   std::shared_ptr<NodeDescription>& getNodeDescription();
   void setNodeDescription(std::shared_ptr<NodeDescription> &desc);
-
+  void setCreatorName(std::string creatorName);
+  std::string getCreatorName();
 
   virtual int performTask();
   virtual int performNode() = 0;
@@ -101,6 +111,8 @@ public:
   std::string toString();
 
 protected:
+  std::shared_ptr<NodeStore>                            nodeStore;              /**< The node store */
+  std::string                                           creatorName;            /**< Name of used creator */
   long                                                  cyclicTriggerTime;      /**< period time of triggering this node */
   bool                                                  valid;                  /**< True if node is valid, false otherwise */
   bool                                                  active;                 /**< True if the current node is active, else false */
@@ -110,7 +122,7 @@ protected:
   std::vector<std::shared_ptr<BaseInformationStream>>   outputs;                /**< Output streams */
   std::vector<std::shared_ptr<BaseInformationSet>>      inputSets;              /**< Input streams */
   std::vector<std::shared_ptr<BaseInformationSet>>      triggeredByInputSets;   /**< Input streams triggering this node */
-  std::vector<std::shared_ptr<BaseInformationSet>>      outputSets;                /**< Output streams */
+  std::vector<std::shared_ptr<BaseInformationSet>>      outputSets;             /**< Output streams */
   std::shared_ptr<EventHandler>                         eventHandler;           /**< The event handler */
   std::map<std::string, std::string>                    configuration;          /**< Node Configuration */
   std::shared_ptr<NodeDescription>                      nodeDescription;        /**< Description of the node, used communication with others */

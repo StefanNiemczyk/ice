@@ -76,6 +76,7 @@ void ICEngine::init()
   this->transformationSynthesis->init();
   this->factory->init();
   this->knowledgeBase->init();
+  this->nodeStore->init();
 
   // Initialize update strategy
   this->updateStrategie->init();
@@ -105,6 +106,9 @@ void ICEngine::cleanUp()
   if (this->running == false && this->initialized == false)
     return;
 
+  // stop processing model
+  this->updateStrategie->update(ModelUpdateEvent::MUE_NONE);
+
   this->running = false;
   this->initialized = false;
 
@@ -120,7 +124,8 @@ void ICEngine::cleanUp()
   if (this->knowledgeBase)
     this->knowledgeBase->cleanUp();
 
-//  this->nodeStore;
+  if (this->nodeStore)
+    this->nodeStore->cleanUp();
 
   if (this->modelGenerator)
     this->modelGenerator->cleanUp();

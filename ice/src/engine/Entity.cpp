@@ -26,7 +26,8 @@ namespace ice
 
 Entity::Entity(const std::initializer_list<Id> ids) :
     iceIdentity(false), directory(nullptr), timeFactory(nullptr), available(false), _log(
-        el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000), timestamp(0), superEngine(false)
+        el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000), timestamp(0), superEngine(false),
+        nodesExtracted(false)
 {
   if (ids.size() == 0)
   {
@@ -41,7 +42,8 @@ Entity::Entity(const std::initializer_list<Id> ids) :
 Entity::Entity(std::shared_ptr<EntityDirectory> const &directory, std::weak_ptr<ICEngine> engine,
                std::shared_ptr<TimeFactory> const &factory, const std::initializer_list<Id> ids) :
     iceIdentity(false), directory(directory), engine(engine), timeFactory(factory), available(false), _log(
-        el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000), superEngine(false)
+        el::Loggers::getLogger("Entity")), index(0), timeoutDuration(2000), superEngine(false),
+        nodesExtracted(false)
 {
   if (ids.size() == 0)
   {
@@ -884,35 +886,78 @@ bool Entity::updateExternals(bool activateRequired)
 
   for (auto element : this->aspTransformation)
   {
-    element->external->assign(active);
+    element->external->assign((element->defect == false && active));
   }
 
   for (auto element : this->aspNodes)
   {
-    element->external->assign(active);
+    element->external->assign((element->defect == false && active));
   }
 
   for (auto element : this->aspSourceNodes)
   {
-    element->external->assign(active);
+    element->external->assign((element->defect == false && active));
   }
 
   for (auto element : this->aspSetNodes)
   {
-    element->external->assign(active);
+    element->external->assign((element->defect == false && active));
   }
 
   for (auto element : this->aspRequiredStreams)
   {
-    element->external->assign(active && activateRequired);
+    element->external->assign((element->defect == false && active && activateRequired));
   }
 
   for (auto element : this->aspRequiredSets)
   {
-    element->external->assign(active);
+    element->external->assign((element->defect == false && active));
   }
 
   return active;
+}
+
+int Entity::getNodeForClass(std::string className, std::vector<std::shared_ptr<ASPElement>> &result)
+{
+  int count = 0;
+
+  for (auto element : this->aspTransformation)
+  {
+    if (element->className == className)
+    {
+      result.push_back(element);
+      ++count;
+    }
+  }
+
+  for (auto element : this->aspNodes)
+  {
+    if (element->className == className)
+    {
+      result.push_back(element);
+      ++count;
+    }
+  }
+
+  for (auto element : this->aspSourceNodes)
+  {
+    if (element->className == className)
+    {
+      result.push_back(element);
+      ++count;
+    }
+  }
+
+  for (auto element : this->aspSetNodes)
+  {
+    if (element->className == className)
+    {
+      result.push_back(element);
+      ++count;
+    }
+  }
+
+  return count;
 }
 
 } /* namespace ice */

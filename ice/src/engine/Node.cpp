@@ -13,18 +13,23 @@
 #include "ice/Entity.h"
 #include "ice/information/BaseInformationSet.h"
 #include "ice/information/BaseInformationStream.h"
+#include "ice/processing/NodeStore.h"
 
 namespace ice
 {
 // static part
-std::map<std::string, Node::creatorFunc> Node::creators;
+std::map<std::string, NodeCreator> Node::creators;
 
 int Node::registerNodeCreator(const std::string& className, const creatorFunc& creator)
 {
   if (Node::creators.find(className) != Node::creators.end())
     return 1;
 
-  auto p = std::pair<std::string, const creatorFunc&>(className, creator);
+  NodeCreator nc;
+  nc.defect = false;
+  nc.func = creator;
+
+  auto p = std::pair<std::string, NodeCreator>(className, nc);
   Node::creators.insert(p);
 
   return 0;
@@ -35,7 +40,15 @@ std::shared_ptr<Node> Node::createNode(const std::string& className)
   if (Node::creators.find(className) == Node::creators.end())
     return nullptr;
 
-  return (Node::creators[className])();
+  return (Node::creators[className].func)();
+}
+
+NodeCreator* Node::getNodeCreator(const std::string &className)
+{
+  if (Node::creators.find(className) == Node::creators.end())
+    return nullptr;
+
+  return &Node::creators[className];
 }
 
 bool Node::existNodeCreator(const std::string &className)
@@ -67,6 +80,16 @@ std::shared_ptr<NodeDescription>& Node::getNodeDescription()
 void Node::setNodeDescription(std::shared_ptr<NodeDescription> &desc)
 {
   this->nodeDescription = desc;
+}
+
+void Node::setCreatorName(std::string creatorName)
+{
+  this->creatorName = creatorName;
+}
+
+std::string Node::getCreatorName()
+{
+  return this->creatorName;
 }
 
 int Node::performTask()
@@ -290,17 +313,39 @@ int Node::cleanUp()
 
 int Node::destroy()
 {
+  this->nodeStore.reset();
   this->inputs.clear();
   this->outputs.clear();
+  this->inputSets.clear();
+  this->outputSets.clear();
 
   for (auto stream : this->triggeredByInputs)
   {
-    stream->registerTaskAsync(this->shared_from_this());
+    stream->unregisterTaskAsync(this->shared_from_this());
   }
 
   this->triggeredByInputs.clear();
 
+  for (auto set : this->triggeredByInputSets)
+  {
+    set->unregisterTaskAsync(this->shared_from_this());
+  }
+
+  this->triggeredByInputSets.clear();
+
+  for (auto &entity : this->registeredEngines)
+  {
+    entity->getNodes().erase(this->shared_from_this());
+  }
+
+  this->registeredEngines.clear();
+
   return 0;
+}
+
+void Node::setNodeStore(std::shared_ptr<NodeStore> nodeStore)
+{
+  this->nodeStore = nodeStore;
 }
 
 bool Node::isActive() const

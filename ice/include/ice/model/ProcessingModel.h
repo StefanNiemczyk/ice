@@ -306,6 +306,7 @@ public:
 
   int getIndex() const;
   std::vector<std::shared_ptr<SubModel>>& getSubModels();
+  std::shared_ptr<SubModel> getSubModel(std::shared_ptr<Entity> &entity);
   std::vector<NodeDesc>& getNodes();
 
   std::vector<std::shared_ptr<StreamTransfer>>& getReceive();
