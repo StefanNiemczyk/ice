@@ -52,6 +52,7 @@ add_message_files(
   ICECoordination.msg
   Position.msg
   Positions.msg 
+  GContainer.msg
 )
 
 ## Generate services in the 'srv' folder

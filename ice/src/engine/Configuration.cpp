@@ -29,6 +29,9 @@ Configuration::Configuration()
 
   // synthesis
   this->synthesizeTransformations = true;
+
+  // processing
+  this->generateInformationProcessing = true;
 }
 
 Configuration::~Configuration()

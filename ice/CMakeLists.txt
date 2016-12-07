@@ -198,6 +198,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/test_ASPComposition.cpp
   test/test_ASPRepComputation.cpp
   test/test_GContainer.cpp
+  test/test_GContainerTransfer.cpp
   test/test_RepresentationTransformation.cpp
   test/test_RepresentationJSON.cpp
   test/test_EulerRepTransformation.cpp

@@ -11,9 +11,11 @@
 #include <iostream>
 #include <typeinfo>
 
-#include "ros/ros.h"
+#include <ice_msgs/GContainer.h>
+#include <ros/ros.h>
 
 #include "ice/communication/InformationSender.h"
+#include "ice/representation/GContainer.h"
 #include "ice/Entity.h"
 #include "ice/EntityDirectory.h"
 
@@ -21,6 +23,59 @@
 
 namespace ice
 {
+class RosGContainerSender : public InformationSender<GContainer>
+  {
+  public:
+  RosGContainerSender(std::shared_ptr<InformationCollection> collection, identifier ownId,
+                         ros::NodeHandle* nodeHandel, const std::string topic, int bufferSize) :
+                           InformationSender<GContainer>(collection), topic(topic)
+    {
+     this->ownId = ownId;
+     this->publisher = nodeHandel->advertise<ice_msgs::GContainer>(topic, bufferSize);
+    }
+
+    virtual ~RosGContainerSender() {}
+
+    virtual void init()
+    {
+
+    }
+    virtual void cleanUp()
+    {
+
+    }
+
+    virtual void sendInformationElement(std::vector<std::shared_ptr<Entity>> &sendTo,
+                                        std::shared_ptr<InformationElement<GContainer>> informationElement)
+    {
+      auto msg = std::make_shared<ice_msgs::GContainer>();
+
+      msg->header.senderId.value = this->ownId;
+      if (this->collection->getCollectionType() == CollectionType::CT_SET)
+        msg->entity = informationElement->getSpecification()->getEntity();
+
+      for (auto &entity : sendTo)
+      {
+        ice_msgs::Identifier receiver;
+        std::string id;
+        entity->getId(EntityDirectory::ID_ICE, id);
+        receiver.value = std::stoi(id);
+        msg->header.receiverIds.push_back(receiver);
+      }
+
+      std::string json = informationElement->getInformation()->toJSON();
+      msg->bytes.resize(json.length());
+      std::copy(json.begin(), json.end(), msg->bytes.begin());
+
+      this->publisher.publish(*msg);
+    }
+
+  private:
+    identifier          ownId;          /**< ID of this engine, used as sender id */
+    const std::string   topic;          /**< Topic of the ros channel */
+    ros::Publisher      publisher;      /**< Publisher */
+  };
+
 
 template<typename ICEType, typename ROSType>
   using transformC2M = typename std::shared_ptr<ROSType> (*)(std::shared_ptr<InformationElement<ICEType> >);
@@ -57,7 +112,8 @@ template<typename ICEType, typename ROSType>
       auto msg = this->messageTransform(informationElement);
 
       msg->header.senderId.value = this->engineId;
-      msg->header.entity = informationElement->getSpecification()->getEntity();
+      if (this->collection->getCollectionType() == CollectionType::CT_SET)
+        msg->entity = informationElement->getSpecification()->getEntity();
 
       for (auto &entity : sendTo)
       {

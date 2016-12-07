@@ -113,8 +113,8 @@ public:
    * \param streamName The name of the searched stream.
    */
   template<typename T>
-    std::shared_ptr<InformationStream<T>> getStream(InformationSpecification *specification, std::string provider,
-                                                    std::string sourceSystem)
+    std::shared_ptr<InformationStream<T>> getStream(InformationSpecification *specification, std::string provider = "",
+                                                    std::string sourceSystem = "")
   {
     auto stream = this->getBaseCollection(specification, provider, sourceSystem);
 

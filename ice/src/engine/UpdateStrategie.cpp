@@ -17,6 +17,7 @@
 #include "ice/ICEngine.h"
 #include "ice/Entity.h"
 #include "ice/EntityDirectory.h"
+#include "ice/Configuration.h"
 
 namespace ice
 {
@@ -46,6 +47,7 @@ void UpdateStrategie::init()
   this->communication = en->getCommunicationInterface();
   this->modelGenerator = en->getProcessingModelGenerator();
   this->directory = en->getEntityDirector();
+  this->configuration = en->getConfig();
   this->worker = std::thread(&UpdateStrategie::workerTask, this);
 
   this->self = en->getSelf();
@@ -83,7 +85,7 @@ void UpdateStrategie::cleanUp()
 
 void UpdateStrategie::update(ModelUpdateEvent event, std::shared_ptr<void> object)
 {
-  if (false == this->running)
+  if (false == this->running || this->configuration->generateInformationProcessing == false)
   {
     return;
   }

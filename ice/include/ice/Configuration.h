@@ -58,6 +58,7 @@ public:
   std::string ontologyIriOwnEntity;
 
   bool synthesizeTransformations;
+  bool generateInformationProcessing;
 
   //Static values
 public:

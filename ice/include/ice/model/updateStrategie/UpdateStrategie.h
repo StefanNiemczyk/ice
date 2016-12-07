@@ -23,6 +23,7 @@ namespace ice
 class BaseInformationSet;
 class BaseInformationStream;
 class CommunicationInterface;
+class Configuration;
 class Entity;
 class EntityDirectory;
 class ICEngine;
@@ -103,6 +104,7 @@ protected:
   std::shared_ptr<OntologyInterface>            ontology;               /**< Shared pointer to access the ontology */
   std::shared_ptr<ProcessingModelGenerator>     modelGenerator;         /**< The model generator */
   std::shared_ptr<EntityDirectory>              directory;              /**< Directory to look up entities */
+  std::shared_ptr<Configuration>                configuration;          /**< The configuration of ICE */
   bool                                          valid;                  /**< True if the current model is valid, else false */
   bool                                          established;            /**< True if the current model was established, else false */
   std::mutex                                    mtx_;                   /**< Mutex */

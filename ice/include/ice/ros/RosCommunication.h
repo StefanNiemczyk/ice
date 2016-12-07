@@ -96,7 +96,7 @@ template<typename ICEType, typename ROSType>
     // const std::string topic
     // int bufferSize,
     // transformM2C<ICEType, ROSType> &messageTransform
-    return std::make_shared<RosInformationReceiver<ICEType, ROSType>>(this->iceId, collection, &this->nodeHandel,
+    return std::make_shared<RosInformationReceiver<ICEType, ROSType>>(collection, this->iceId, &this->nodeHandel,
                                                                       this->createTopic(collection),
                                                                       100, messageTransform);
   }
