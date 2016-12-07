@@ -17,6 +17,7 @@
 #include <serval_wrapper/MDPSocket.h>
 
 #include "IceServalBridge.h"
+#include "ServalInformationMessage.h"
 #include "ServalInformationReceiver.h"
 #include "ServalInformationSender.h"
 
@@ -162,16 +163,56 @@ void ServalCommunication::read()
 
     this->traffic.receivedBytes += recCount;
     ++this->traffic.messageReceivedCount;
-    std::string json(buffer+3, buffer+recCount);
 
-    auto message = Message::parse(buffer[0], json, entity, this->containerFactory);
+    // handling of incomming information element for stream/set
+    if (buffer[0] == 0)
+    {
+      std::lock_guard<std::mutex> lock (this->_mtxReceiver);
+      int index = 5;
+      int collectionHash = (buffer[1] << 24) + (buffer[2] << 16) + (buffer[3] << 8) + (buffer[4]);
+      std::shared_ptr<ServalInformationReceiver> receiver;
+      std::string ontEntity;
+
+      for (auto &rec : this->informationReceivers)
+      {
+        if (rec->getHash() == collectionHash)
+        {
+          receiver = rec;
+          break;
+        }
+      }
+
+      if (receiver == nullptr)
+      {
+        _log->error("Received information element for unknown receiver '%v'", collectionHash);
+        return;
+      }
+
+      if (receiver->isSet())
+      {
+        for (int i = 5; i < recCount; ++i)
+        {
+          if (buffer[i] == '\0')
+          {
+            index = i;
+            ontEntity = std::string(buffer[5], buffer[i-1]);
+            break;
+          }
+        }
+      }
+
+      std::string jsonString = std::string(buffer+index, buffer+recCount);
+      auto container = this->containerFactory->fromJSON(jsonString);
+
+      receiver->insertInformation(container, ontEntity);
+
+      return;
+    }
+
+    std::string json(buffer+3, buffer+recCount);
+    auto message = this->parse(buffer[0], json, entity);
     message->setJobId(buffer[1]);
     message->setJobIndex(buffer[2]);
-
-    if (buffer[1] == 0 && buffer[2] == 0)
-    {
-      // TODO message handler
-    }
 
     if (message == nullptr)
     {
@@ -219,27 +260,6 @@ int ServalCommunication::readMessage(std::vector<std::shared_ptr<Message>> &outM
   return 0; // reading messages is done in own thread
 }
 
-void ServalCommunication::sendMessage(std::shared_ptr<Entity> entity, unsigned char* buffer, size_t size)
-{
-  std::string sid;
-
-  if (false == entity->isAvailable())
-  {
-    this->_log->error("Dropped Msg: Trying to send message to not available serval instance %v", entity->toString());
-    return;
-  }
-
-  if (false == entity->getId(EntityDirectory::ID_SERVAL, sid))
-  {
-    this->_log->error("Trying to send message with serval to none serval instance %v", entity->toString());
-    return;
-  }
-
-  this->traffic.sendBytes += size;
-  ++this->traffic.messageSendCount;
-  this->socket->send(sid, buffer, size);
-}
-
 void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
 {
   std::string sid;
@@ -253,6 +273,54 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
   if (false == msg->getEntity()->getId(EntityDirectory::ID_SERVAL, sid))
   {
     this->_log->error("Trying to send message with serval to none serval instance %v", msg->getEntity()->toString());
+    return;
+  }
+
+  // handling of information send to streams/sets
+  if (msg->getId() == 100)
+  {
+    auto containerMsg = std::static_pointer_cast<ServalInformationMessage>(msg);
+    int hash = containerMsg->getCollectionHash();
+    std::string ontEntity = containerMsg->getOntEntity();
+
+    auto serialized = containerMsg->getContainer()->toJSON();
+    size_t size = 5;
+
+
+    buffer[0] = 0;
+    buffer[1] = (hash >> 24);
+    buffer[2] = (hash >> 16);
+    buffer[3] = (hash >> 8);
+    buffer[4] = (hash);
+
+    if (ontEntity != "")
+    {
+      if (size + ontEntity.length() > 1024)
+      {
+        this->_log->error("Message could not be send to instance '%v', to large '%v' byte", msg->getEntity()->toString(), size);
+        return;
+      }
+
+      std::copy(ontEntity.begin(), ontEntity.end(), buffer + size);
+      size += ontEntity.length();
+
+      buffer[size] = '\0';
+      ++size;
+    }
+
+    if (size + serialized.length() > 1024)
+    {
+      this->_log->error("Message could not be send to instance '%v', to large '%v' byte", msg->getEntity()->toString(), size);
+      return;
+    }
+
+    std::copy(serialized.begin(), serialized.end(), buffer + size);
+    size += serialized.length();
+
+    this->traffic.sendBytes += size;
+    ++this->traffic.messageSendCount;
+    this->socket->send(sid, buffer, size);
+
     return;
   }
 
@@ -279,18 +347,49 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
   this->traffic.sendBytes += size;
   ++this->traffic.messageSendCount;
   this->socket->send(sid, buffer, size);
-//  std::cout << size << std::endl;
 }
 
 
 std::shared_ptr<BaseInformationSender> ServalCommunication::createSender(std::shared_ptr<InformationCollection> collection)
 {
-  return nullptr;
+  std::lock_guard<std::mutex> lock (this->_mtxReceiver);
+  if (collection->isGContainer() == false)
+  {
+    _log->error("Information sender could not be created, Collection is not of type GContainer '%v'",
+                collection->toString());
+    return nullptr;
+  }
+
+  return std::make_shared<ServalInformationSender>(collection, this->shared_from_this());
 }
 
 std::shared_ptr<InformationReceiver> ServalCommunication::createReceiver(std::shared_ptr<InformationCollection> collection)
 {
-  return nullptr;
+  std::lock_guard<std::mutex> lock (this->_mtxReceiver);
+  if (collection->isGContainer() == false)
+  {
+    _log->error("Information receiver could not be created, Collection is not of type GContainer '%v'",
+                collection->toString());
+    return nullptr;
+  }
+
+  auto rec = std::make_shared<ServalInformationReceiver>(collection, this->shared_from_this());
+  this->informationReceivers.push_back(rec);
+  return rec;
+}
+
+void ServalCommunication::removeReceiver(std::shared_ptr<InformationReceiver> receiver)
+{
+  std::lock_guard<std::mutex> lock (this->_mtxReceiver);
+
+  for (int i=0; i < this->informationReceivers.size(); ++i)
+  {
+    if (this->informationReceivers[i] == receiver)
+    {
+      this->informationReceivers.erase(this->informationReceivers.begin() + i);
+      return;
+    }
+  }
 }
 
 } /* namespace ice */

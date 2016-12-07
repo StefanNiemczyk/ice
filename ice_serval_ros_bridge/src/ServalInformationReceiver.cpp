@@ -24,11 +24,21 @@ ServalInformationReceiver::ServalInformationReceiver(std::shared_ptr<Information
   : InformationReceiver(collection), communication(communication)
 {
   this->collectionHash = this->collection->getHash();
+  this->isASet = collection->getCollectionType() == CollectionType::CT_SET;
 }
 
 ServalInformationReceiver::~ServalInformationReceiver()
 {
   //
+}
+
+void ServalInformationReceiver::init()
+{
+
+}
+void ServalInformationReceiver::cleanUp()
+{
+  this->communication->removeReceiver(this->shared_from_this());
 }
 
 const uint32_t ServalInformationReceiver::getHash() const
@@ -41,17 +51,22 @@ std::shared_ptr<InformationCollection> ServalInformationReceiver::getCollection(
   return this->collection;
 }
 
+bool ServalInformationReceiver::isSet()
+{
+  return this->isASet;
+}
+
 void ServalInformationReceiver::insertInformation(std::shared_ptr<GContainer> container, ont::entity entity)
 {
   if (false == this->collection->isGContainer())
     return;
 
-  if (collection->getCollectionType() == CollectionType::CT_SET)
+  if (this->isASet)
   {
     auto stream = std::static_pointer_cast<InformationSet<GContainer>>(this->collection);
     stream->add(entity, container);
   }
-  else if (collection->getCollectionType() == CollectionType::CT_SET)
+  else
   {
     auto stream = std::static_pointer_cast<InformationStream<GContainer>>(this->collection);
     stream->add(container);

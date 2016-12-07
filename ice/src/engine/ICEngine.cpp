@@ -107,7 +107,8 @@ void ICEngine::cleanUp()
     return;
 
   // stop processing model
-  this->updateStrategie->update(ModelUpdateEvent::MUE_NONE);
+  if (this->updateStrategie)
+    this->updateStrategie->update(ModelUpdateEvent::MUE_NONE);
 
   this->running = false;
   this->initialized = false;

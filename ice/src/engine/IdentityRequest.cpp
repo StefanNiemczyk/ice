@@ -37,18 +37,25 @@ void IdentityRequest::init()
 
 void IdentityRequest::tick()
 {
-  if (this->timestampLastActive == 0 || this->state != CJState::CJ_WAITING)
+  if (this->timestampLastActive == 0 || this->state != CJState::CJ_WAITING || this->isOwnJob() == false)
   {
     return;
   }
 
   if (this->timeFactory->checkTimeout(this->timestampLastActive, 2000))
   {
-    if (++this->tryCount < 3)
+    if (++this->tryCount < 5)
     {
-      // TODO
-      // retry
-      this->sendRequestIds();
+      this->updateActiveTime();
+      switch (this->stateIR)
+      {
+        case IRS_REQUEST_IDS:
+          this->sendCommand(IceMessageIds::IMI_IDS_REQUEST);
+          break;
+        case IRS_REQUEST_ONT_IRI:
+          this->sendCommand(IceMessageIds::IMI_ONTOLOGY_IDS_REQUEST);
+          break;
+      }
     }
     else
     {
@@ -124,7 +131,7 @@ void IdentityRequest::onRequestIds(std::shared_ptr<Message> const &message)
 
   _log->info("Sending Ids to '%v'", entity->toString());
   this->updateActiveTime();
-  this->stateIR = IdentityRequestState::IRS_REQUEST_IDS;
+  this->stateIR = IdentityRequestState::IRS_RESPONS_IDS;
 
   auto m = std::make_shared<IdMessage>();
   this->self->pushIds(m->getIds());
@@ -175,6 +182,7 @@ void IdentityRequest::onResponsIds(std::shared_ptr<IdMessage> const &message)
   // request ontology ids
   this->stateIR = IdentityRequestState::IRS_REQUEST_ONT_IRI;
   this->sendCommand(IceMessageIds::IMI_ONTOLOGY_IDS_REQUEST);
+  this->state = CJState::CJ_WAITING;
 }
 
 void IdentityRequest::onRequestOntologyIds(std::shared_ptr<Message> const &message)
@@ -194,7 +202,7 @@ void IdentityRequest::onRequestOntologyIds(std::shared_ptr<Message> const &messa
 
   _log->info("Sending ontology ids to %v", this->entity->toString());
   this->updateActiveTime();
-  this->stateIR = IdentityRequestState::IRS_REQUEST_ONT_IRI;
+  this->stateIR = IdentityRequestState::IRS_RESPONS_ONT_IRI;
 
   // create and send system specification
   auto msg = std::make_shared<OntologyIdMessage>();
@@ -238,28 +246,26 @@ void IdentityRequest::checkOntologyIris()
     _log->info("Ontology ids do not match, received from %v", this->entity->toString());
 
     // done
-    this->sendCommand(IceMessageIds::IMI_FINISH);
     this->finish();
     return;
   }
 
-    // check if system is known in ontology
-    if (this->entity->initializeFromOntology(this->ontologyInterface) >= 0)
-    {
-      // system is known, cooperation is possible
-      _log->info("Entity '%v' known by ontology", this->entity->toString());
-    }
-    else
-    {
-      // system is unknown, request nodes
-      _log->info("Entity' %v' is unknown in ontology", this->entity->toString());
-      // TODO request nodes
-    }
+  // check if system is known in ontology
+  if (this->entity->initializeFromOntology(this->ontologyInterface) >= 0)
+  {
+    // system is known, cooperation is possible
+    _log->info("Entity '%v' known by ontology", this->entity->toString());
+  }
+  else
+  {
+    // system is unknown, request nodes
+    _log->info("Entity' %v' is unknown in ontology", this->entity->toString());
+    // TODO request nodes
+  }
 
-    // done
-    this->sendCommand(IceMessageIds::IMI_FINISH);
-    this->finish();
-    entity->checkIce();
+  // done
+  this->finish();
+  entity->checkIce();
 }
 
 } /* namespace ice */

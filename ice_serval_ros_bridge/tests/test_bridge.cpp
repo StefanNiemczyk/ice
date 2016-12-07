@@ -68,8 +68,9 @@ TEST(Bridge, discovery)
   auto mops = std::make_shared<ice::IceServalBridge>(nh_, pnh_, params1);
   auto zwerg = std::make_shared<ice::IceServalBridge>(nh_, pnh_, params2);
 
-  zwerg->init();
   mops->init();
+  sleep(1);
+  zwerg->init();
 
   // store information in information store
   std::string repStr = "http://vs.uni-kassel.de/Ice#CoordinatePositionRep";

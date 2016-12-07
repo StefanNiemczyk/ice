@@ -42,6 +42,15 @@ template<typename ICEType, typename ROSType>
 
     virtual ~RosInformationSender() {}
 
+    virtual void init()
+    {
+
+    }
+    virtual void cleanUp()
+    {
+
+    }
+
     virtual void sendInformationElement(std::vector<std::shared_ptr<Entity>> &sendTo,
                                         std::shared_ptr<InformationElement<ICEType>> informationElement)
     {

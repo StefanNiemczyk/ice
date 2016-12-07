@@ -46,11 +46,35 @@ enum IceMessageIds
   IMI_CANCLE_JOB                       = 255
 };
 
+inline const char* IceMessageIdsString(IceMessageIds v)
+{
+    switch (v)
+    {
+        case IMI_IDS_REQUEST:                   return "IMI_IDS_REQUEST";
+        case IMI_IDS_RESPONSE:                  return "IMI_IDS_RESPONSE";
+        case IMI_ID_REQUEST:                    return "IMI_ID_REQUEST";
+        case IMI_ID_RESPONSE:                   return "IMI_ID_RESPONSE";
+        case IMI_ONTOLOGY_IDS_REQUEST:          return "IMI_ONTOLOGY_IDS_REQUEST";
+        case IMI_ONTOLOGY_IDS_RESPONSE:         return "IMI_ONTOLOGY_IDS_RESPONSE";
+        case IMI_OFFERS_REQUEST:                return "IMI_OFFERS_REQUEST";
+        case IMI_OFFERS_RESPONSE:               return "IMI_OFFERS_RESPONSE";
+        case IMI_INFORMATION_REQUEST:           return "IMI_INFORMATION_REQUEST";
+        case IMI_INFORMATION_RESPONSE:          return "IMI_INFORMATION_RESPONSE";
+        case IMI_INFORMATION_REQUEST_INDEX:     return "IMI_INFORMATION_REQUEST_INDEX";
+        case IMI_SUBMODEL:                      return "IMI_SUBMODEL";
+        case IMI_SUBMODEL_RESPONSE:             return "IMI_SUBMODEL_RESPONSE";
+
+        case IMI_ACK:                           return "IMI_ACK";
+
+        case IMI_FINISH:                        return "IMI_FINISH";
+        case IMI_NO_RESULT:                     return "IMI_NO_RESULT";
+        case IMI_CANCLE_JOB:                    return "IMI_CANCLE_JOB";
+        default:                                return "Unknown";
+    }
+}
+
 class Message
 {
-public:
-  static std::shared_ptr<Message> parse(uint8_t id, std::string &jsonString,
-                                        std::shared_ptr<Entity> &entity, std::shared_ptr<GContainerFactory> factory);
 private:
   static el::Logger*            _logFactory;
 
@@ -68,8 +92,6 @@ public:
   std::shared_ptr<Entity> getEntity();
   void setEntity(std::shared_ptr<Entity> entity);
   bool isPayload();
-
-protected:
   virtual void payloadToJson(rapidjson::Document &document) = 0;
   virtual bool parsePayload(rapidjson::Document& value,  std::shared_ptr<GContainerFactory> factory) = 0;
 

@@ -157,9 +157,6 @@ void IceServalBridge::init()
   this->offeredInfos = reader.getOffered();
   this->requiredInfos = reader.getRequired();
 
-  // init communication
-  this->communicationInterface->init();
-
   //init gcontainer factory
   this->gcontainerFactory = std::make_shared<GContainerFactory>();
   this->gcontainerFactory->setOntologyInterface(this->ontologyInterface);
@@ -190,6 +187,9 @@ void IceServalBridge::init()
           };
     this->knowledgeBase->informationStore->registerCallback(req->infoSpec, lambda);
   }
+
+  // init communication
+  this->communicationInterface->init();
 
   _log->info("Bridge for identity '%v' initialized, requests: '%v', offers '%v'",
              this->self->toString(), this->requiredInfos.size(), this->offeredInfos.size());

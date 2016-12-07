@@ -21,6 +21,9 @@ public:
   InformationReceiver(std::shared_ptr<InformationCollection> const &collection);
   virtual ~InformationReceiver();
 
+  virtual void init() = 0;
+  virtual void cleanUp() = 0;
+
   /*!
    * \brief Returns the type_info of the template type.
    *

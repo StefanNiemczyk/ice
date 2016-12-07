@@ -150,8 +150,6 @@ add_library(${PROJECT_NAME}
   src/engine/ICEngine.cpp 
 
   src/ros/RosCommunication.cpp
-  src/ros/RosInformationSender.cpp
-  src/ros/RosInformationReceiver.cpp
   src/ros/RosMessageTransform.cpp
   src/ros/RosTimeFactory.cpp
 )

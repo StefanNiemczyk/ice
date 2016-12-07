@@ -67,6 +67,7 @@ add_library(${PROJECT_NAME}
   src/IceServalBridge.cpp
   src/RosGContainerPublisher.cpp
   src/ServalCommunication.cpp
+  src/ServalInformationMessage.cpp
   src/ServalInformationSender.cpp
   src/ServalInformationReceiver.cpp
   src/XMLInformationReader.cpp

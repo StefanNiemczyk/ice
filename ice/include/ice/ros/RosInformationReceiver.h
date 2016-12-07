@@ -35,12 +35,55 @@ template<typename ICEType, typename ROSType>
   public:
     RosInformationReceiver(identifier engineId, std::shared_ptr<InformationCollection> collection,
                            ros::NodeHandle* nodeHandel, const std::string topic, int bufferSize,
-                           transformM2C<ICEType, ROSType> &messageTransform);
-    virtual ~RosInformationReceiver();
+                           transformM2C<ICEType, ROSType> &messageTransform) :
+        InformationReceiver(collection), topic(topic)
 
-    virtual void onMessage(const boost::shared_ptr<ROSType const> msg);
+    {
+      this->engineId = engineId;
+      this->bufferSize = bufferSize;
+      this->subscriber = nodeHandel->subscribe(topic, bufferSize, &RosInformationReceiver::onMessage, this);
+      this->messageTransform = messageTransform;
 
-    bool checkReceiverIds(ice_msgs::ICEHeader header);
+      if (collection->getCollectionType() == CollectionType::CT_STREAM)
+        this->stream = std::static_pointer_cast<InformationStream<ICEType>>(collection);
+      else
+        this->set = std::static_pointer_cast<InformationSet<ICEType>>(collection);
+    }
+    virtual ~RosInformationReceiver() {}
+
+    virtual void init()
+    {
+
+    }
+    virtual void cleanUp()
+    {
+
+    }
+
+    virtual void onMessage(const boost::shared_ptr<ROSType const> msg)
+    {
+      if (false == this->checkReceiverIds(msg->header))
+        return;
+
+      auto contrainer = this->messageTransform(msg);
+      if (stream)
+        stream->add(contrainer);
+      else
+        set->add(msg->header.entity, contrainer);
+    }
+
+    bool checkReceiverIds(ice_msgs::ICEHeader header)
+    {
+      for (auto id : header.receiverIds)
+      {
+        identifier receiverId = id.value;
+
+        if (receiverId == this->engineId)
+          return true;
+      }
+
+      return false;
+    }
 
   private:
     identifier                                  engineId;               /**< ID of this engine, used as sender id */
@@ -51,56 +94,6 @@ template<typename ICEType, typename ROSType>
     std::shared_ptr<InformationStream<ICEType>> stream;                 /**< The stream which listenen to the channel */
     std::shared_ptr<InformationSet<ICEType>>    set;                    /**< The stream which listenen to the channel */
   };
-
-template<typename ICEType, typename ROSType>
-  inline RosInformationReceiver<ICEType, ROSType>::RosInformationReceiver(
-      identifier engineId, std::shared_ptr<InformationCollection> collection, ros::NodeHandle* nodeHandel,
-      const std::string topic, int bufferSize, transformM2C<ICEType, ROSType> &messageTransform) :
-      InformationReceiver(collection), topic(topic)
-  {
-    this->engineId = engineId;
-    this->bufferSize = bufferSize;
-    this->subscriber = nodeHandel->subscribe(topic, bufferSize, &RosInformationReceiver::onMessage, this);
-    this->messageTransform = messageTransform;
-
-    if (collection->getCollectionType() == CollectionType::CT_STREAM)
-      this->stream = std::static_pointer_cast<InformationStream<ICEType>>(collection);
-    else
-      this->set = std::static_pointer_cast<InformationSet<ICEType>>(collection);
-  }
-
-template<typename ICEType, typename ROSType>
-  inline RosInformationReceiver<ICEType, ROSType>::~RosInformationReceiver()
-  {
-    //
-  }
-
-template<typename ICEType, typename ROSType>
-  inline void RosInformationReceiver<ICEType, ROSType>::onMessage(const boost::shared_ptr<ROSType const> msg)
-  {
-    if (false == this->checkReceiverIds(msg->header))
-      return;
-
-    auto contrainer = this->messageTransform(msg);
-    if (stream)
-      stream->add(contrainer);
-    else
-      set->add(msg->header.entity, contrainer);
-  }
-
-template<typename ICEType, typename ROSType>
-  inline bool RosInformationReceiver<ICEType, ROSType>::checkReceiverIds(ice_msgs::ICEHeader header)
-  {
-    for (auto id : header.receiverIds)
-    {
-      identifier receiverId = id.value;//IDGenerator::getInstance()->getIdentifier(id.id);
-
-      if (receiverId == this->engineId)
-        return true;
-    }
-
-    return false;
-  }
 
 } /* namespace ice */
 

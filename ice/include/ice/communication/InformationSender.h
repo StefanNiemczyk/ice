@@ -29,6 +29,9 @@ template<typename T>
     InformationSender(std::shared_ptr<InformationCollection> collection) : BaseInformationSender(collection) {};
     virtual ~InformationSender() {};
 
+    virtual void init() = 0;
+    virtual void cleanUp() = 0;
+
     virtual void sendInformationElement(std::vector<std::shared_ptr<Entity>> &sendTo,
                                         std::shared_ptr<InformationElement<T>> informationElement) = 0;
 

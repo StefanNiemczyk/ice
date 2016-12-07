@@ -80,6 +80,7 @@ protected:
   virtual void cleanUpInternal() = 0;
 
   virtual void handleMessage(std::shared_ptr<Message> message);
+  virtual std::shared_ptr<Message> parse(uint8_t id, std::string &jsonString, std::shared_ptr<Entity> &entity);
 
 private:
   virtual void workerTask();

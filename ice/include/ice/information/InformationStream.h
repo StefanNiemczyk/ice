@@ -305,22 +305,23 @@ template<typename T>
 
     auto comResult = communication->registerCollectionAsSender(this->shared_from_this());
 
-    if (false == comResult)
+    if (comResult == nullptr)
     {
       _log->error("No sender returned for stream %v", this->streamDescription->getName());
-      std::shared_ptr<ice::BaseInformationSender> ptr;
-      return ptr;
+      return nullptr;
     }
 
     if (typeid(T) == *comResult->getTypeInfo())
     {
       this->sender = std::static_pointer_cast<InformationSender<T>>(comResult);
+      this->sender->init();
       return comResult;
     }
     else
     {
       _log->error("Incorrect type of sender %s for stream %s", comResult->getTypeInfo(),
                   this->streamDescription->getName());
+      comResult->cleanUp();
       return nullptr;
     }
   }
@@ -331,13 +332,14 @@ template<typename T>
   {
     auto comResult = communication->registerCollectionAsReceiver(this->shared_from_this());
 
-    if (false == comResult)
+    if (comResult == nullptr)
     {
       _log->error("No receiver returned for stream %s", this->streamDescription->getName());
       return nullptr;
     }
 
     this->receiver = comResult;
+    this->receiver->init();
 
     return comResult;
   }
@@ -389,13 +391,19 @@ template<typename T>
 template<typename T>
   inline void ice::InformationStream<T>::dropReceiver()
   {
-  this->receiver.reset();
+    if (this->receiver)
+      this->receiver->cleanUp();
+
+    this->receiver.reset();
   }
 
 template<typename T>
   inline void ice::InformationStream<T>::dropSender()
   {
-  this->sender.reset();
+    if (this->sender)
+      this->sender->cleanUp();
+
+    this->sender.reset();
   }
 
 #endif /* INFORMATIONSTREAM_H_ */

@@ -12,12 +12,15 @@
 
 #include "ice/communication/BaseInformationSender.h"
 #include "ice/communication/InformationReceiver.h"
-#include "ice/communication/messages/Message.h"
 #include "ice/communication/messages/CommandMessage.h"
 #include "ice/communication/messages/IdMessage.h"
 #include "ice/communication/messages/InformationMessage.h"
+#include "ice/communication/messages/IntMessage.h"
 #include "ice/communication/messages/OffersMessage.h"
+#include "ice/communication/messages/OntologyIdMessage.h"
 #include "ice/communication/messages/RequestMessage.h"
+#include "ice/communication/messages/SubModelMessage.h"
+#include "ice/communication/messages/SubModelResponseMessage.h"
 #include "ice/communication/jobs/ComJobBase.h"
 #include "ice/communication/jobs/IdentityRequest.h"
 #include "ice/information/InformationCollection.h"
@@ -52,10 +55,10 @@ void CommunicationInterface::init()
   this->directory = e->getEntityDirector();
   this->self = e->getSelf();
   this->timeFactory = e->getTimeFactory();
-  this->initInternal();
   this->containerFactory = e->getGContainerFactory();
   this->ontology = e->getOntologyInterface();
 
+  this->initInternal();
   this->running = true;
   this->worker = std::thread(&CommunicationInterface::workerTask, this);
 }
@@ -162,7 +165,8 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
 {
   auto entity = message->getEntity();
   entity->setActiveTimestamp();
-  _log->info("Received Message with id '%v', job id '%v' and index '%v' from %v", std::to_string(message->getId()),
+  _log->info("Received Message '%v', job id '%v' and index '%v' from %v",
+             IceMessageIdsString((IceMessageIds) message->getId()),
              std::to_string(message->getJobId()), std::to_string(message->getJobIndex()), entity->toString());
 
   // message for own job
@@ -172,7 +176,7 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
       std::lock_guard<std::mutex> guard(this->_jobMtx);
       for (auto &job : this->comJobsOwn)
       {
-        if (job->match(message->getJobId(), message->getJobIndex()))
+        if (job->getEntity() == message->getEntity() && job->match(message->getJobId(), message->getJobIndex()))
         {
           job->handleMessage(message);
           return;
@@ -217,6 +221,78 @@ void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
   job->init(message);
 
   this->comJobsIncomming.push_back(job);
+}
+
+std::shared_ptr<Message> CommunicationInterface::parse(uint8_t id, std::string &jsonString,
+                                                       std::shared_ptr<Entity> &entity)
+{
+
+ std::shared_ptr<Message> message;
+
+ switch(id)
+ {
+   case(IMI_IDS_REQUEST):
+   case(IMI_ID_REQUEST):
+   case(IMI_ONTOLOGY_IDS_REQUEST):
+   case(IMI_OFFERS_REQUEST):
+   case(IMI_FINISH):
+   case(IMI_CANCLE_JOB):
+       message =  std::make_shared<CommandMessage>(id);
+       break;
+   case(IMI_IDS_RESPONSE):
+       message = std::make_shared<IdMessage>();
+       break;
+   case(IMI_ONTOLOGY_IDS_RESPONSE):
+       message = std::make_shared<OntologyIdMessage>();
+       break;
+   case(IMI_OFFERS_RESPONSE):
+       message = std::make_shared<OffersMessage>();
+       break;
+   case(IMI_INFORMATION_REQUEST):
+       message = std::make_shared<RequestMessage>();
+       break;
+   case(IMI_INFORMATION_RESPONSE):
+       message = std::make_shared<InformationMessage>();
+       break;
+   case(IMI_ACK):
+   case(IMI_INFORMATION_REQUEST_INDEX):
+       message = std::make_shared<IntMessage>(id);
+       break;
+   case(IMI_SUBMODEL):
+       message = std::make_shared<SubModelMessage>();
+       break;
+   case(IMI_SUBMODEL_RESPONSE):
+       message = std::make_shared<SubModelResponseMessage>();
+       break;
+
+   default:
+     _log->error("Message could not be parsed, unknown ID '%v'", id);
+     return nullptr;
+     break;
+ }
+
+ message->setEntity(entity);
+
+ if (message->isPayload())
+ {
+   rapidjson::Document document;
+
+   document.Parse(jsonString.c_str());
+
+   if (document.GetType() == 0)
+   {
+     _log->error("Message '%v' could not be parsed, Json is broken '%v'", std::to_string(id), jsonString.c_str());
+     return nullptr;
+   }
+
+   if (false == message->parsePayload(document, this->containerFactory))
+   {
+     _log->error("Message could not be parsed, Error while parsing payload for Message ID '%v'", std::to_string(id));
+     return nullptr;
+   }
+ }
+
+ return message;
 }
 
 void CommunicationInterface::workerTask()

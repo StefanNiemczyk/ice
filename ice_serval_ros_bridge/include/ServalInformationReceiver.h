@@ -19,18 +19,23 @@ class GContainer;
 class InformationCollection;
 class ServalCommunication;
 
-class ServalInformationReceiver : public InformationReceiver
+class ServalInformationReceiver : public InformationReceiver, public std::enable_shared_from_this<ServalInformationReceiver>
 {
 public:
   ServalInformationReceiver(std::shared_ptr<InformationCollection> const &collection,
                             std::shared_ptr<ServalCommunication> const &communication);
   virtual ~ServalInformationReceiver();
 
+  virtual void init();
+  virtual void cleanUp();
+
   const uint32_t getHash() const;
   std::shared_ptr<InformationCollection> getCollection() const;
+  bool isSet();
   void insertInformation(std::shared_ptr<GContainer> container, ont::entity entity);
 
 private:
+  bool                                          isASet;
   uint32_t                                      collectionHash;
   std::shared_ptr<ServalCommunication>          communication;
 };

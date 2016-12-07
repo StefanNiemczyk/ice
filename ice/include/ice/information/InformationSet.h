@@ -257,12 +257,14 @@ template<typename T>
       if (typeid(T) == *comResult->getTypeInfo())
       {
         this->sender = std::static_pointer_cast<InformationSender<T>>(comResult);
+        this->sender->init();
         return comResult;
       }
       else
       {
         _log->error("Incorrect type of sender %s for stream %s", comResult->getTypeInfo(),
                     this->streamDescription->getName());
+        comResult->cleanUp();
         return nullptr;
       }
     }
@@ -284,6 +286,7 @@ template<typename T>
       }
 
       this->receiver = comResult;
+      this->receiver->init();
 
       return comResult;
     }
@@ -295,6 +298,9 @@ template<typename T>
      */
     virtual void dropReceiver()
     {
+      if (this->receiver)
+        this->receiver->cleanUp();
+
       this->receiver.reset();
     }
 
@@ -305,6 +311,9 @@ template<typename T>
      */
     virtual void dropSender()
     {
+      if (this->sender)
+        this->sender->cleanUp();
+
       this->sender.reset();
     }
 

@@ -86,11 +86,6 @@ public:
     return entity;
   }
 
-  void setEntity(const std::shared_ptr<Entity>& entity)
-  {
-    this->entity = entity;
-  }
-
   bool isOwnJob()
   {
     return ownJob;

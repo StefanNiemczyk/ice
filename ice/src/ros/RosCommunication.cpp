@@ -229,7 +229,7 @@ void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr&
 
   std::string json(msg->bytes.begin(), msg->bytes.end());
 
-  auto message = Message::parse(msg->id, json, entity, this->containerFactory);
+  auto message = this->parse(msg->id, json, entity);
 
   if (message == nullptr)
   {
