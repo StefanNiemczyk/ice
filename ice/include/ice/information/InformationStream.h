@@ -334,7 +334,7 @@ template<typename T>
 
     if (comResult == nullptr)
     {
-      _log->error("No receiver returned for stream %s", this->streamDescription->getName());
+      _log->error("No receiver returned for stream %v", this->streamDescription->getName());
       return nullptr;
     }
 

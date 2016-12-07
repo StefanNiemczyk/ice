@@ -239,7 +239,7 @@ std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::string repName)
 
 std::shared_ptr<GContainer> GContainerFactory::makeInstance(std::shared_ptr<Representation> representation)
 {
-  // check costum creators
+  // check costume creators
   auto custom = this->customGContainer.find(representation->name);
   if (custom != this->customGContainer.end())
   {
@@ -322,6 +322,19 @@ std::shared_ptr<GContainer> GContainerFactory::fromJSON(Value& name, Value& valu
 
   gc = makeInstance(rep);
 
+  if (false == gc->isGeneric())
+  {
+    if (gc->readFromJSON(value))
+    {
+      return gc;
+    }
+    else
+    {
+      _log->error("Error while initializing GContainer from json for Representation '%v', no GContainer created", repStr);
+      return nullptr;
+    }
+  }
+
   std::vector<int> ap;
 
   bool result = this->fromJSONValue(value, gc, gc->representation, &ap);
@@ -332,7 +345,7 @@ std::shared_ptr<GContainer> GContainerFactory::fromJSON(Value& name, Value& valu
   }
   else
   {
-    _log->error("Error while creating GContainer for Representation '%v', no GContainer created", repStr);
+    _log->error("Error creating GContainer for Representation '%v', no GContainer created", repStr);
     return nullptr;
   }
 }

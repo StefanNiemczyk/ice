@@ -32,9 +32,9 @@ TEST(GPSTransformation, gpspostion)
   std::shared_ptr<ice::ICEngine> engine = std::make_shared<ice::ICEngine>(config);
 
   auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
-  auto streamFactory = std::make_shared<ice::StreamFactory>(engine);
+  auto streamFactory = std::make_shared<ice::CollectionFactory>(engine);
   engine->setTimeFactory(timeFactory);
-  engine->setStreamFactory(streamFactory);
+  engine->setCollectionFactory(streamFactory);
 
   engine->init();
 
@@ -42,7 +42,7 @@ TEST(GPSTransformation, gpspostion)
 
   auto creator = [](std::shared_ptr<ice::GContainerFactory> factory){
     auto rep = factory->getRepresentation("http://vs.uni-kassel.de/Ice#WGS84Rep");
-    return std::make_shared<ice::GPSPosition>(rep);
+    return std::make_shared<ice::Pos3D>(rep);
   };
   bool result = factory->registerCustomCreator("http://vs.uni-kassel.de/Ice#WGS84Rep", creator);
 
@@ -57,11 +57,11 @@ TEST(GPSTransformation, gpspostion)
   ASSERT_NE(nullptr, lon);
   ASSERT_NE(nullptr, alt);
 
-  auto pos1 = std::static_pointer_cast<ice::GPSPosition>(factory->makeInstance(rep));
+  auto pos1 = std::static_pointer_cast<ice::Pos3D>(factory->makeInstance(rep));
 
-  pos1->latitude = 11.111;
-  pos1->longitude = 22.222;
-  pos1->altitude = 33.333;
+  pos1->x = 11.111;
+  pos1->y = 22.222;
+  pos1->z = 33.333;
 
   ASSERT_EQ(11.111, pos1->getValue<double>(lat));
   ASSERT_EQ(22.222, pos1->getValue<double>(lon));
@@ -75,9 +75,9 @@ TEST(GPSTransformation, gpspostion)
   pos1->set(lon, &dLon);
   pos1->set(alt, &dAlt);
 
-  ASSERT_EQ(dLat, pos1->latitude);
-  ASSERT_EQ(dLon, pos1->longitude);
-  ASSERT_EQ(dAlt, pos1->altitude);
+  ASSERT_EQ(dLat, pos1->x);
+  ASSERT_EQ(dLon, pos1->y);
+  ASSERT_EQ(dAlt, pos1->z);
 }
 
 

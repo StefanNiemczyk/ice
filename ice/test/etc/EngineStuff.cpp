@@ -13,6 +13,8 @@
 #include "ice/representation/Transformation.h"
 #include "ice/ICEngine.h"
 
+#include "Pos3D.h"
+
 class SimpleTask : public ice::AsynchronousTask
 {
 public:
@@ -106,10 +108,6 @@ public:
     {
       stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize);
     }
-    else if ("List[Position]" == className)
-    {
-      stream = std::make_shared<ice::InformationStream<std::vector<ice::Position>>>(streamDescription, eventHandler, streamSize);
-    }
 
     if (stream == nullptr)
       stream = ice::CollectionFactory::createStream(className, streamDescription, eventHandler, streamSize);
@@ -141,9 +139,60 @@ public:
       {
         set = std::make_shared<ice::InformationSet<ice::Position>>(streamDescription, eventHandler);
       }
-      else if ("List[Position]" == className)
+
+      if (set == nullptr)
+        set = ice::CollectionFactory::createSet(className, streamDescription, eventHandler);
+
+      if (set)
+        return set;
+
+      return set;
+    }
+};
+
+class GContainerTestFactory : public ice::CollectionFactory
+{
+public:
+  GContainerTestFactory(std::weak_ptr<ice::ICEngine> engine) : ice::CollectionFactory(engine) {}
+
+  std::shared_ptr<ice::BaseInformationStream> createStream(const std::string& className,
+                                                           std::shared_ptr<ice::CollectionDescription> streamDescription,
+                                                           std::shared_ptr<ice::EventHandler> eventHandler,
+                                                           int streamSize) const
+  {
+    if (className == "")
+      return nullptr;
+
+    std::shared_ptr<ice::BaseInformationStream> stream;
+
+    if ("http://vs.uni-kassel.de/IceTest#Pos3D" == className)
+    {
+      stream = std::make_shared<ice::InformationStream<ice::Pos3D>>(streamDescription, eventHandler, streamSize);
+      stream->setGContainer(true);
+    }
+
+    if (stream == nullptr)
+      stream = ice::CollectionFactory::createStream(className, streamDescription, eventHandler, streamSize);
+
+    if (stream)
+      return stream;
+
+    return stream;
+  }
+
+  std::shared_ptr<ice::BaseInformationSet> createSet(const std::string& className,
+                                                             std::shared_ptr<ice::CollectionDescription> streamDescription,
+                                                             std::shared_ptr<ice::EventHandler> eventHandler) const
+    {
+      if (className == "")
+        return nullptr;
+
+      std::shared_ptr<ice::BaseInformationSet> set;
+
+      if ("http://vs.uni-kassel.de/IceTest#Pos3D" == className)
       {
-        set = std::make_shared<ice::InformationSet<std::vector<ice::Position>>>(streamDescription, eventHandler);
+        set = std::make_shared<ice::InformationSet<ice::Pos3D>>(streamDescription, eventHandler);
+        set->setGContainer(true);
       }
 
       if (set == nullptr)
@@ -155,6 +204,7 @@ public:
       return set;
     }
 };
+
 
 class ObstacleFusion : public ice::Node
 {

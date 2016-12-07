@@ -5,8 +5,8 @@
  *      Author: sni
  */
 
-#ifndef INCLUDE_GPSPOSITION_H_
-#define INCLUDE_GPSPOSITION_H_
+#ifndef INCLUDE_POS3D_H_
+#define INCLUDE_POS3D_H_
 
 #include <ice/representation/GContainer.h>
 
@@ -33,6 +33,9 @@ public:
   virtual bool set(std::vector<int> *indices, int index, const void* value);
   virtual std::string toJSON();
   virtual Value toJSONValue(Document &d);
+
+  virtual bool readFromJSON(Value& value);
+  virtual bool isGeneric();
 
 public:
   double x;

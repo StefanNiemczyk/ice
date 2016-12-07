@@ -37,7 +37,7 @@ int TransformationNode::init()
 
     for (auto &stream : this->inputs)
     {
-      if (typeid(GContainer) == *stream->getTypeInfo())
+      if (stream->isGContainer())
       {
         auto gstream = std::static_pointer_cast<InformationStream<GContainer>>(stream);
 
@@ -52,26 +52,25 @@ int TransformationNode::init()
         _log->error("Added none GContainer stream '%v' to transformation node '%v'",
                     stream->toString(),this->toString());
       }
+    }
 
-      if (this->inputStreams.at(i) == nullptr)
-      {
-        _log->error("No input stream found with representation '%v', node '%v' is invalid",
-                    tinput.at(i)->name, this->toString());
-        this->valid = false;
-        return 1;
-      }
+    if (this->inputStreams.at(i) == nullptr)
+    {
+      _log->error("No input stream found with representation '%v', node '%v' is invalid",
+                  tinput.at(i)->name, this->toString());
+      this->valid = false;
+      return 1;
     }
   }
 
   if (this->outputs.size() != 1)
   {
-    _log->error("Invalid output size '%v', node '%v' is invalid",
-                this->outputs.size(), this->toString());
+    _log->error("Invalid output size '%v', node '%v' is invalid", this->outputs.size(), this->toString());
     this->valid = false;
     return 1;
   }
 
-  if (typeid(GContainer) == *this->outputs[0]->getTypeInfo())
+  if (this->outputs[0]->isGContainer())
   {
     auto gstream = std::static_pointer_cast<InformationStream<GContainer>>(this->outputs[0]);
 

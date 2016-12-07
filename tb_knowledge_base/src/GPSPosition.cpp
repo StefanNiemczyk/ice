@@ -10,101 +10,103 @@
 namespace ice
 {
 
-int GPSPosition::ALTITUDE_PATH = 0;
-int GPSPosition::LATITUDE_PATH = 1;
-int GPSPosition::LONGITUDE_PATH = 2;
+int Pos3D::Z_COORDINATE_PATH = 0;
+int Pos3D::X_COORDINATE_PATH = 1;
+int Pos3D::Y_COORDINATE_PATH = 2;
 
-GPSPosition::GPSPosition(std::shared_ptr<Representation> const &representation) :
-    GContainer(representation), latitude(0), longitude(0), altitude(0)
+Pos3D::Pos3D(std::shared_ptr<Representation> const &representation) :
+    GContainer(representation), x(0), y(0), z(0)
 {
   //
 }
 
-GPSPosition::~GPSPosition()
+Pos3D::~Pos3D()
 {
   //
 }
 
-GContainer* GPSPosition::clone()
+GContainer* Pos3D::clone()
 {
-  auto pos = new GPSPosition(this->representation);
+  auto pos = new Pos3D(this->representation);
 
-  pos->latitude = this->latitude;
-  pos->longitude = this->longitude;
-  pos->altitude = this->altitude;
+  pos->x = this->x;
+  pos->y = this->y;
+  pos->z = this->z;
 
   return pos;
 }
 
-void GPSPosition::print(int level, std::string dimension)
+void Pos3D::print(int level, std::string dimension)
 {
   // TODO
 }
 
-std::pair<BasicRepresentationType, void*> GPSPosition::getPair(std::vector<int> *indices, int index)
+std::pair<BasicRepresentationType, void*> Pos3D::getPair(std::vector<int> *indices, int index)
 {
-  if (indices->at(index) == ALTITUDE_PATH)
+  if (indices->at(index) == Z_COORDINATE_PATH)
   {
-    return std::make_pair(BasicRepresentationType::DOUBLE, &this->altitude);
+    return std::make_pair(BasicRepresentationType::DOUBLE, &this->z);
   }
-  else if (indices->at(index) == LATITUDE_PATH)
+  else if (indices->at(index) == X_COORDINATE_PATH)
   {
-    return std::make_pair(BasicRepresentationType::DOUBLE, &this->latitude);
+    return std::make_pair(BasicRepresentationType::DOUBLE, &this->x);
   }
-  else if (indices->at(index) == LONGITUDE_PATH)
+  else if (indices->at(index) == Y_COORDINATE_PATH)
   {
-    return std::make_pair(BasicRepresentationType::DOUBLE, &this->longitude);
+    return std::make_pair(BasicRepresentationType::DOUBLE, &this->y);
   }
 
   return std::make_pair(BasicRepresentationType::UNSET, nullptr);
 }
 
-void* GPSPosition::get(std::vector<int> *indices, int index)
+void* Pos3D::get(std::vector<int> *indices, int index)
 {
-  if(indices->at(index) == ALTITUDE_PATH)
+  if(indices->at(index) == Z_COORDINATE_PATH)
   {
-    return &this->altitude;
+    return &this->z;
   }
-  else if (indices->at(index) == LATITUDE_PATH)
+  else if (indices->at(index) == X_COORDINATE_PATH)
   {
-    return &this->latitude;
+    return &this->x;
   }
-  else if (indices->at(index) == LONGITUDE_PATH)
+  else if (indices->at(index) == Y_COORDINATE_PATH)
   {
-    return &this->longitude;
+    return &this->y;
   }
 
   return nullptr;
 }
 
-bool GPSPosition::set(std::vector<int> *indices, int index, const void* value)
+bool Pos3D::set(std::vector<int> *indices, int index, const void* value)
 {
-  if(indices->at(index) == ALTITUDE_PATH)
+  if(indices->at(index) == Z_COORDINATE_PATH)
   {
-    this->altitude = *((double*) value);
+    this->z = *((double*) value);
     return true;
   }
-  else if (indices->at(index) == LATITUDE_PATH)
+  else if (indices->at(index) == X_COORDINATE_PATH)
   {
-    this->latitude = *((double*) value);
+    this->x = *((double*) value);
     return true;
   }
-  else if (indices->at(index) == LONGITUDE_PATH)
+  else if (indices->at(index) == Y_COORDINATE_PATH)
   {
-    this->longitude = *((double*) value);
+    this->y = *((double*) value);
     return true;
   }
 
   return false;
 }
 
-std::string GPSPosition::toJSON()
+std::string Pos3D::toJSON()
 {
   // TODO
+  // {"http://vs.uni-kassel.de/IceTest#Pos3D":{"http://vs.uni-kassel.de/Ice#XCoordinate":{"http://vs.uni-kassel.de/Ice#DoubleRep":5.0},"http://vs.uni-kassel.de/Ice#YCoordinate":{"http://vs.uni-kassel.de/Ice#DoubleRep":6.0},"http://vs.uni-kassel.de/Ice#ZCoordinate":{"http://vs.uni-kassel.de/Ice#DoubleRep":7.0}}}
+
   return "";
 }
 
-Value GPSPosition::toJSONValue(Document &d)
+Value Pos3D::toJSONValue(Document &d)
 {
   // TODO
   Value value;

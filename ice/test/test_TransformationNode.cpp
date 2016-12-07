@@ -67,6 +67,9 @@ TEST(TransformationNode, simpleTest)
   auto streamOut = engine->getKnowlegeBase()->streamStore->registerStream<ice::GContainer>(spec, "outStream", 100, metadata, "handmade", "this");
   ASSERT_NE(nullptr, streamOut);
 
+  streamIn->setGContainer(true);
+  streamOut->setGContainer(true);
+
 //  NodeType type,
 //  const std::string className,
 //  const std::string name,

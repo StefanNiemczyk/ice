@@ -225,7 +225,7 @@ void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
   if (senderId == this->iceId)
     return;
 
-  _log->info("Heartbeat received from engine %v", IDGenerator::toString(senderId));
+  _log->debug("Heartbeat received from engine %v", IDGenerator::toString(senderId));
 }
 
 void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr& msg)

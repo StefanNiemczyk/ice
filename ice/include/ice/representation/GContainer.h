@@ -72,6 +72,8 @@ public:
 	virtual bool set(std::vector<int> *indices, int index, const void* value) = 0;
 	virtual std::string toJSON() = 0;
 	virtual Value toJSONValue(Document &d) = 0;
+	virtual bool readFromJSON(Value& value) {return false;}
+        virtual bool isGeneric() {return true;}
 
 public:
 	std::shared_ptr<Representation> representation;

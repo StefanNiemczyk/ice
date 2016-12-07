@@ -193,6 +193,8 @@ target_link_libraries(eval_node
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test  
   test/etc/EngineStuff.cpp
+  test/etc/Pos3D.cpp
+  
   test/test_ASPCoordinator.cpp
   test/test_JNI.cpp
   test/test_ASPComposition.cpp
