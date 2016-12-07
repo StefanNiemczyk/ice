@@ -107,6 +107,7 @@ target_link_libraries(agent_node ${PROJECT_NAME})
 catkin_add_gtest(${PROJECT_NAME}-test 
   tests/test_entity.cpp
   tests/test_xml.cpp
+  tests/test_GContainerTransfer.cpp
  # tests/test_gmessagePublisher.cpp
   tests/test_bridge.cpp
   tests/test_main.cpp

@@ -35,7 +35,7 @@ namespace ice
 {
 
 CommunicationInterface::CommunicationInterface(std::weak_ptr<ICEngine> engine) :
-    running(false), engine(engine), maxMessageSend(10), discoveryInterval(20)
+    running(false), engine(engine), maxMessageSend(10), discoveryInterval(100)
 {
   _log = el::Loggers::getLogger("CommunicationInterface");
 }

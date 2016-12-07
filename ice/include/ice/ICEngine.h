@@ -142,7 +142,7 @@ public:
    */
   std::shared_ptr<CommunicationInterface> getCommunicationInterface();
 
-  void setCommunicationInterface(std::shared_ptr<CommunicationInterface> &communication);
+  void setCommunicationInterface(std::shared_ptr<CommunicationInterface> communication);
 
   /*!
    * \brief Returns the stream factory.

@@ -185,7 +185,7 @@ std::shared_ptr<CommunicationInterface> ICEngine::getCommunicationInterface()
   return this->communicationInterface;
 }
 
-void ICEngine::setCommunicationInterface(std::shared_ptr<CommunicationInterface> &communication)
+void ICEngine::setCommunicationInterface(std::shared_ptr<CommunicationInterface> communication)
 {
   this->communicationInterface = communication;
 }

@@ -43,7 +43,7 @@ TEST(GMessagePublisher, simpleTest)
   bridge.init();
 
   std::string repStr = "http://vs.uni-kassel.de/Ice#CoordinatePositionRep";
-  auto rep = bridge.gcontainerFactory->getRepresentation(repStr);
+  auto rep = bridge.getGContainerFactory()->getRepresentation(repStr);
   std::shared_ptr<ice::RequiredInfo> reqInfo = bridge.getRequiredInfors()[0]; // TODO
 
   ASSERT_NE(nullptr, rep);
@@ -56,7 +56,7 @@ TEST(GMessagePublisher, simpleTest)
   ASSERT_NE(nullptr, y);
   ASSERT_NE(nullptr, z);
 
-  auto instance = bridge.gcontainerFactory->makeInstance(rep);
+  auto instance = bridge.getGContainerFactory()->makeInstance(rep);
   ASSERT_NE(nullptr, instance);
 
   double xVal = 1.2;

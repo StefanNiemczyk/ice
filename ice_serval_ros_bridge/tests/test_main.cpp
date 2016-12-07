@@ -11,7 +11,7 @@ INITIALIZE_EASYLOGGINGPP
 void setup()
 {
   // cleanup
-  system("killall servald");
+  system("killall -9 servald");
   system("rm -r /tmp/mops");
 
   // create folder
@@ -37,6 +37,9 @@ int main(int argc, char **argv)
 
   ros::init(argc, argv, "ice_serval_bridge_test");
   ::testing::InitGoogleTest(&argc, argv);
+  int result = RUN_ALL_TESTS();
 
-  return RUN_ALL_TESTS();
+  int kill = 5 / 0;
+
+  return result;
 }

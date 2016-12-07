@@ -50,12 +50,14 @@ void ServalInformationSender::sendInformationElement(std::vector<std::shared_ptr
       auto msg = std::make_shared<ServalInformationMessage>(informationElement->getInformation(),
                                                             informationElement->getSpecification()->getEntity(),
                                                             this->collectionHash);
+      msg->setEntity(entity);
       this->communication->send(msg);
     }
     else
     {
       auto msg = std::make_shared<ServalInformationMessage>(informationElement->getInformation(),
                                                             "", this->collectionHash);
+      msg->setEntity(entity);
       this->communication->send(msg);
     }
   }
