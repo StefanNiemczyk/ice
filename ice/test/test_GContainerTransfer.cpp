@@ -98,7 +98,7 @@ TEST(GContainerTransfer, transferSimple)
   element->set(p3dY, &y);
   element->set(p3dZ, &z);
 
-  stream1->add(element);
+  stream1->add(element, 100, 200, 300);
 
   sleep(2);
 
@@ -108,6 +108,9 @@ TEST(GContainerTransfer, transferSimple)
   ASSERT_EQ(x, out->getInformation()->getValue<double>(p3dX));
   ASSERT_EQ(y, out->getInformation()->getValue<double>(p3dY));
   ASSERT_EQ(z, out->getInformation()->getValue<double>(p3dZ));
+  ASSERT_EQ(100, out->getTimeValidity());
+  ASSERT_EQ(200, out->getTimeObservation());
+  ASSERT_LT(1000000, out->getTimeProcessed());
 
   engine->cleanUp();
   engine.reset();

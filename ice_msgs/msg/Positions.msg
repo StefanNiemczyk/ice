@@ -1,2 +1,0 @@
-ICEHeader header
-Position[] positions

@@ -95,12 +95,27 @@ template<typename T>
       return this->specification;
     }
 
+    time getTimeValidity()
+    {
+      return timeValidity;
+    }
+
+    time getTimeObservation()
+    {
+      return timeObservation;
+    }
+
+    time getTimeProcessed()
+    {
+      return timeProcessed;
+    }
+
   private:
-    time timeValidity; /**< validity time of the information */
-    time timeObservation; /**< observation time of the information */
-    time timeProcessed; /**< time of the processing of the information */
-    std::shared_ptr<InformationSpecification> specification; /**< Specification of the information stored in this container */
-    const std::shared_ptr<T> information; /**< the stored information */
+    time                                        timeValidity;           /**< validity time of the information */
+    time                                        timeObservation;        /**< observation time of the information */
+    time                                        timeProcessed;          /**< time of the processing of the information */
+    std::shared_ptr<InformationSpecification>   specification;          /**< Specification of the information stored in this container */
+    const std::shared_ptr<T>                    information;            /**< the stored information */
   };
 
 } /* namespace ice */

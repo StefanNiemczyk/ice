@@ -11,6 +11,7 @@
 #include <iostream>
 #include <typeinfo>
 
+#include <ice_msgs/InformationHeader.h>
 #include <ice_msgs/GContainer.h>
 #include <ros/ros.h>
 
@@ -50,9 +51,12 @@ class RosGContainerSender : public InformationSender<GContainer>
     {
       auto msg = std::make_shared<ice_msgs::GContainer>();
 
-      msg->header.senderId.value = this->ownId;
+      msg->info.header.senderId.value = this->ownId;
       if (this->collection->getCollectionType() == CollectionType::CT_SET)
-        msg->entity = informationElement->getSpecification()->getEntity();
+        msg->info.entity = informationElement->getSpecification()->getEntity();
+
+      msg->info.timestamp = informationElement->getTimeObservation();
+      msg->info.validityTime = informationElement->getTimeValidity();
 
       for (auto &entity : sendTo)
       {
@@ -60,7 +64,7 @@ class RosGContainerSender : public InformationSender<GContainer>
         std::string id;
         entity->getId(EntityDirectory::ID_ICE, id);
         receiver.value = std::stoi(id);
-        msg->header.receiverIds.push_back(receiver);
+        msg->info.header.receiverIds.push_back(receiver);
       }
 
       std::string json = informationElement->getInformation()->toJSON();
@@ -111,9 +115,12 @@ template<typename ICEType, typename ROSType>
     {
       auto msg = this->messageTransform(informationElement);
 
-      msg->header.senderId.value = this->engineId;
+      msg->info.header.senderId.value = this->engineId;
       if (this->collection->getCollectionType() == CollectionType::CT_SET)
-        msg->entity = informationElement->getSpecification()->getEntity();
+        msg->info.entity = informationElement->getSpecification()->getEntity();
+
+      msg->info.timestamp = informationElement->getTimeObservation();
+      msg->info.validityTime = informationElement->getTimeValidity();
 
       for (auto &entity : sendTo)
       {
@@ -121,7 +128,7 @@ template<typename ICEType, typename ROSType>
         std::string id;
         entity->getId(EntityDirectory::ID_ICE, id);
         receiver.value = std::stoi(id);
-        msg->header.receiverIds.push_back(receiver);
+        msg->info.header.receiverIds.push_back(receiver);
       }
 
       this->publisher.publish(*msg);

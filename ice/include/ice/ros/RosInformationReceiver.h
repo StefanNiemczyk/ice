@@ -11,6 +11,7 @@
 #include <iostream>
 #include <memory>
 
+#include <ice_msgs/InformationHeader.h>
 #include <ice_msgs/ICEHeader.h>
 #include <ice_msgs/Identifier.h>
 #include <ice_msgs/GContainer.h>
@@ -28,10 +29,11 @@ namespace ice
 class RosGContainerReceiver : public InformationReceiver
 {
 public:
-  RosGContainerReceiver(std::shared_ptr<InformationCollection> collection, identifier ownId,
-                         ros::NodeHandle* nodeHandel, const std::string topic, int bufferSize,
-                         std::shared_ptr<GContainerFactory> factory) :
-      InformationReceiver(collection), topic(topic), factory(factory)
+  RosGContainerReceiver(std::shared_ptr<InformationCollection> collection,
+                        std::shared_ptr<TimeFactory> const &timeFactory, identifier ownId,
+                        ros::NodeHandle* nodeHandel, const std::string topic, int bufferSize,
+                        std::shared_ptr<GContainerFactory> factory) :
+      InformationReceiver(collection, timeFactory), topic(topic), factory(factory)
 
   {
     this->ownId = ownId;
@@ -55,7 +57,7 @@ public:
 
   virtual void onMessage(const boost::shared_ptr<ice_msgs::GContainer const> msg)
   {
-    if (false == this->checkReceiverIds(msg->header))
+    if (false == this->checkReceiverIds(msg->info.header))
       return;
 
     std::string json(msg->bytes.begin(), msg->bytes.end());
@@ -68,9 +70,9 @@ public:
     }
 
     if (stream)
-      stream->add(contrainer);
+      stream->add(contrainer, msg->info.validityTime, msg->info.timestamp, this->timeFactory->createTime());
     else
-      set->add(msg->entity, contrainer);
+      set->add(msg->info.entity, contrainer, msg->info.validityTime, msg->info.timestamp, this->timeFactory->createTime());
   }
 
   bool checkReceiverIds(ice_msgs::ICEHeader header)
@@ -102,10 +104,11 @@ template<typename ICEType, typename ROSType>
   class RosInformationReceiver : public InformationReceiver
   {
   public:
-    RosInformationReceiver(std::shared_ptr<InformationCollection> collection, identifier engineId,
+    RosInformationReceiver(std::shared_ptr<InformationCollection> collection,
+                           std::shared_ptr<TimeFactory> const &timeFactory, identifier engineId,
                            ros::NodeHandle* nodeHandel, const std::string topic, int bufferSize,
                            transformM2C<ICEType, ROSType> &messageTransform) :
-        InformationReceiver(collection), topic(topic)
+        InformationReceiver(collection, timeFactory), topic(topic)
 
     {
       this->engineId = engineId;
@@ -131,14 +134,14 @@ template<typename ICEType, typename ROSType>
 
     virtual void onMessage(const boost::shared_ptr<ROSType const> msg)
     {
-      if (false == this->checkReceiverIds(msg->header))
+      if (false == this->checkReceiverIds(msg->info.header))
         return;
 
       auto contrainer = this->messageTransform(msg);
       if (stream)
-        stream->add(contrainer);
+        stream->add(contrainer, msg->info.validityTime, msg->info.timestamp, this->timeFactory->createTime());
       else
-        set->add(msg->entity, contrainer);
+        set->add(msg->info.entity, contrainer, msg->info.validityTime, msg->info.timestamp, this->timeFactory->createTime());
     }
 
     bool checkReceiverIds(ice_msgs::ICEHeader header)

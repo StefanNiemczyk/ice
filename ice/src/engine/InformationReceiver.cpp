@@ -12,7 +12,9 @@
 namespace ice
 {
 
-InformationReceiver::InformationReceiver(std::shared_ptr<InformationCollection> const &collection) : collection(collection)
+InformationReceiver::InformationReceiver(std::shared_ptr<InformationCollection> const &collection,
+                                         std::shared_ptr<TimeFactory> const &timeFactory)
+      : collection(collection), timeFactory(timeFactory)
 {
   //
 }

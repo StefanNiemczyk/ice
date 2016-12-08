@@ -1,5 +1,4 @@
-ICEHeader header
-string entity
+InformationHeader info
 int32 x
 int32 y
 int32 z

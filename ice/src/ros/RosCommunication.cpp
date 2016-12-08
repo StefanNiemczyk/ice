@@ -145,13 +145,6 @@ std::shared_ptr<BaseInformationSender> RosCommunication::createSender(std::share
     transformC2M<Position, ice_msgs::Position> method = &RosMessageTransform::transformC2MPosition;
     return this->_createSender<Position, ice_msgs::Position>(collection, method);
   }
-//  else if (typeid(std::vector<Position>) == *type)
-//  { // ice::Position[] -> ice_msgs::Positions
-//    _log->debug("Creating sender for stream %v with mapping ice::Position[] -> ice_msgs::Positions",
-//                collection->getName());
-//    transformC2M<std::vector<Position>, ice_msgs::Positions> method = &RosMessageTransform::transformC2MPositions;
-//    return this->_createSender<std::vector<Position>, ice_msgs::Positions>(collection, method);
-//  }
 
   return nullptr;
 }
@@ -163,7 +156,7 @@ std::shared_ptr<InformationReceiver> RosCommunication::createReceiver(std::share
     _log->debug("Creating sender for stream %v with GContainer",
                 collection->getName());
 
-    auto receiver = std::make_shared<RosGContainerReceiver>(collection, this->iceId, &this->nodeHandel,
+    auto receiver = std::make_shared<RosGContainerReceiver>(collection, this->timeFactory, this->iceId, &this->nodeHandel,
                                                         this->createTopic(collection), 100, this->containerFactory);
 
     return receiver;
@@ -178,13 +171,6 @@ std::shared_ptr<InformationReceiver> RosCommunication::createReceiver(std::share
     transformM2C<Position, ice_msgs::Position> method = &RosMessageTransform::transformM2CPosition;
     return this->_createReceiver<Position, ice_msgs::Position>(collection, method);
   }
-//  else if (typeid(std::vector<Position>) == *type)
-//  { // ice_msgs::Positions -> ice::Position[]
-//    _log->debug("Creating receiver for stream %v with mapping ice_msgs::Positions -> ice::Position[]",
-//                collection->getName());
-//    transformM2C<std::vector<Position>, ice_msgs::Positions> method = &RosMessageTransform::transformM2CPositions;
-//    return this->_createReceiver<std::vector<Position>, ice_msgs::Positions>(collection, method);
-//  }
 
   return nullptr;
 }

@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <ice/communication/InformationReceiver.h>
+#include <ice/Time.h>
 #include <ice/TypeDefs.h>
 
 namespace ice
@@ -23,6 +24,7 @@ class ServalInformationReceiver : public InformationReceiver, public std::enable
 {
 public:
   ServalInformationReceiver(std::shared_ptr<InformationCollection> const &collection,
+                            std::shared_ptr<TimeFactory> const &timeFactory,
                             std::shared_ptr<ServalCommunication> const &communication);
   virtual ~ServalInformationReceiver();
 
@@ -32,7 +34,8 @@ public:
   const uint32_t getHash() const;
   std::shared_ptr<InformationCollection> getCollection() const;
   bool isSet();
-  void insertInformation(std::shared_ptr<GContainer> container, ont::entity entity);
+  void insertInformation(std::shared_ptr<GContainer> container, ont::entity entity, time timeValidity,
+                         time timeObservation, time timeProcessed);
 
 private:
   bool                                          isASet;

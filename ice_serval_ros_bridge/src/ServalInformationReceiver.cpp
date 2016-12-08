@@ -20,8 +20,9 @@ namespace ice
 {
 
 ServalInformationReceiver::ServalInformationReceiver(std::shared_ptr<InformationCollection> const &collection,
+                                                     std::shared_ptr<TimeFactory> const &timeFactory,
                                                      std::shared_ptr<ServalCommunication> const &communication)
-  : InformationReceiver(collection), communication(communication)
+  : InformationReceiver(collection, timeFactory), communication(communication)
 {
   this->collectionHash = this->collection->getHash();
   this->isASet = collection->getCollectionType() == CollectionType::CT_SET;
@@ -56,7 +57,9 @@ bool ServalInformationReceiver::isSet()
   return this->isASet;
 }
 
-void ServalInformationReceiver::insertInformation(std::shared_ptr<GContainer> container, ont::entity entity)
+void ServalInformationReceiver::insertInformation(std::shared_ptr<GContainer> container,
+                                                  ont::entity entity, time timeValidity, time timeObservation,
+                                                  time timeProcessed)
 {
   if (false == this->collection->isGContainer())
     return;
@@ -64,12 +67,12 @@ void ServalInformationReceiver::insertInformation(std::shared_ptr<GContainer> co
   if (this->isASet)
   {
     auto stream = std::static_pointer_cast<InformationSet<GContainer>>(this->collection);
-    stream->add(entity, container);
+    stream->add(entity, container, timeValidity, timeObservation, timeProcessed);
   }
   else
   {
     auto stream = std::static_pointer_cast<InformationStream<GContainer>>(this->collection);
-    stream->add(container);
+    stream->add(container, timeValidity, timeObservation, timeProcessed);
   }
 }
 } /* namespace ice */

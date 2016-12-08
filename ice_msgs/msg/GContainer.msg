@@ -1,3 +1,2 @@
-ICEHeader header
-string entity
+InformationHeader info
 uint8[] bytes

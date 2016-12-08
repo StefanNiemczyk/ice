@@ -14,11 +14,13 @@ namespace ice
 {
 
 class InformationCollection;
+class TimeFactory;
 
 class InformationReceiver
 {
 public:
-  InformationReceiver(std::shared_ptr<InformationCollection> const &collection);
+  InformationReceiver(std::shared_ptr<InformationCollection> const &collection,
+                      std::shared_ptr<TimeFactory> const &timeFactory);
   virtual ~InformationReceiver();
 
   virtual void init() = 0;
@@ -33,6 +35,7 @@ public:
 
 protected:
   std::shared_ptr<InformationCollection>        collection;
+  std::shared_ptr<TimeFactory>                  timeFactory;
 };
 
 } /* namespace ice */

@@ -168,8 +168,14 @@ void ServalCommunication::read()
     if (buffer[0] == 0)
     {
       std::lock_guard<std::mutex> lock (this->_mtxReceiver);
-      int index = 5;
+      int index = 21;
       int collectionHash = (buffer[1] << 24) + (buffer[2] << 16) + (buffer[3] << 8) + (buffer[4]);
+      time vadilityTime = (((unsigned long) buffer[5]) << 56) + (((unsigned long) buffer[6]) << 48)
+          + (((unsigned long) buffer[7]) << 40) + (((unsigned long) buffer[8]) << 32) +
+          (buffer[9] << 24) + (buffer[10] << 16) + (buffer[11] << 8) + (buffer[12]);
+      time timestamp = (((unsigned long) buffer[13]) << 56) + (((unsigned long) buffer[14]) << 48)
+              + (((unsigned long) buffer[15]) << 40) + (((unsigned long) buffer[16]) << 32) +
+          (buffer[17] << 24) + (buffer[18] << 16) + (buffer[19] << 8) + (buffer[20]);
       std::shared_ptr<ServalInformationReceiver> receiver;
       std::string ontEntity;
 
@@ -190,7 +196,7 @@ void ServalCommunication::read()
 
       if (receiver->isSet())
       {
-        for (int i = 5; i < recCount; ++i)
+        for (int i = 21; i < recCount; ++i)
         {
           if (buffer[i] == '\0')
           {
@@ -204,7 +210,7 @@ void ServalCommunication::read()
       std::string jsonString = std::string(buffer+index, buffer+recCount);
       auto container = this->containerFactory->fromJSON(jsonString);
 
-      receiver->insertInformation(container, ontEntity);
+      receiver->insertInformation(container, ontEntity, vadilityTime, timestamp, this->timeFactory->createTime());
 
       return;
     }
@@ -284,14 +290,33 @@ void ServalCommunication::sendMessage(std::shared_ptr<Message> msg)
     std::string ontEntity = containerMsg->getOntEntity();
 
     auto serialized = containerMsg->getContainer()->toJSON();
-    size_t size = 5;
-
+    size_t size = 21;
+    time valid = containerMsg->getTimeValidity();
+    time timestamp = containerMsg->getTimeObservation();
 
     buffer[0] = 0;
     buffer[1] = (hash >> 24);
     buffer[2] = (hash >> 16);
     buffer[3] = (hash >> 8);
     buffer[4] = (hash);
+
+    buffer[5] = (valid >> 56);
+    buffer[6] = (valid >> 48);
+    buffer[7] = (valid >> 40);
+    buffer[8] = (valid >> 32);
+    buffer[9] = (valid >> 24);
+    buffer[10] = (valid >> 16);
+    buffer[11] = (valid >> 8);
+    buffer[12] = (valid);
+
+    buffer[13] = (timestamp >> 56);
+    buffer[14] = (timestamp >> 48);
+    buffer[15] = (timestamp >> 40);
+    buffer[16] = (timestamp >> 32);
+    buffer[17] = (timestamp >> 24);
+    buffer[18] = (timestamp >> 16);
+    buffer[19] = (timestamp >> 8);
+    buffer[20] = (timestamp);
 
     if (ontEntity != "")
     {
@@ -373,7 +398,7 @@ std::shared_ptr<InformationReceiver> ServalCommunication::createReceiver(std::sh
     return nullptr;
   }
 
-  auto rec = std::make_shared<ServalInformationReceiver>(collection, this->shared_from_this());
+  auto rec = std::make_shared<ServalInformationReceiver>(collection, this->timeFactory, this->shared_from_this());
   this->informationReceivers.push_back(rec);
   return rec;
 }
