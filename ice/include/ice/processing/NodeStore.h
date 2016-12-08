@@ -19,6 +19,8 @@ namespace ice
 {
 //Forward declarations
 class ICEngine;
+class GContainerFactory;
+class TimeFactory;
 
 //* NodeStore
 /**
@@ -76,10 +78,12 @@ public:
   void cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp);
 
 private:
-  std::weak_ptr<ICEngine>               engine;         /**< Weak ptr to the engine */
-  std::vector<std::shared_ptr<Node>>    nodes;          /**< Nodes registered in this store */
-  std::mutex                            mtx_;           /** Mutex */
-  el::Logger*                           _log;           /**< Logger */
+  std::weak_ptr<ICEngine>               engine;                 /**< Weak ptr to the engine */
+  std::shared_ptr<GContainerFactory>    gcontainerFactory;      /**< The factory to create GContainer instances */
+  std::shared_ptr<TimeFactory>          timeFactory;            /**< The time factory */
+  std::vector<std::shared_ptr<Node>>    nodes;                  /**< Nodes registered in this store */
+  std::mutex                            mtx_;                   /** Mutex */
+  el::Logger*                           _log;                   /**< Logger */
 };
 
 } /* namespace ice */

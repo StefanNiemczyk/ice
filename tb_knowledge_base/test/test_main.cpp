@@ -11,6 +11,12 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "tb_knowledge_base_test");
   ::testing::InitGoogleTest(&argc, argv);
+  el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
+//  el::Loggers::setLoggingLevel(el::Level::Info);
 
-  return RUN_ALL_TESTS();
+  int result = RUN_ALL_TESTS();
+
+  int kill = 5 / 0;
+
+  return result;
 }

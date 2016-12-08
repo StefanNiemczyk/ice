@@ -20,6 +20,7 @@
 #include "ice/Time.h"
 #include "ice/communication/CommunicationInterface.h"
 #include "ice/communication/InformationSender.h"
+#include "ice/communication/InformationReceiver.h"
 #include "ice/container/RingBuffer.h"
 #include "ice/information/AbstractInformationListener.h"
 #include "ice/information/BaseInformationSet.h"

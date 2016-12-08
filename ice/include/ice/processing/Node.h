@@ -28,7 +28,9 @@ namespace ice
 class BaseInformationSet;
 class BaseInformationStream;
 class Entity;
+class GContainerFactory;
 class NodeStore;
+class TimeFactory;
 
 struct NodeCreator
 {
@@ -61,6 +63,9 @@ public:
   virtual int destroy();
 
   void setNodeStore(std::shared_ptr<NodeStore> nodeStore);
+  void setTimeFactory(std::shared_ptr<TimeFactory> timeFactory);
+  void setGContainerFactory(std::shared_ptr<GContainerFactory> gcontainerFactory);
+
   std::shared_ptr<NodeDescription>& getNodeDescription();
   void setNodeDescription(std::shared_ptr<NodeDescription> &desc);
   void setCreatorName(std::string creatorName);
@@ -112,6 +117,8 @@ public:
 
 protected:
   std::shared_ptr<NodeStore>                            nodeStore;              /**< The node store */
+  std::shared_ptr<TimeFactory>                          timeFactory;            /**< The factory to create timestamps */
+  std::shared_ptr<GContainerFactory>                    gcontainerFactory;      /**< The factory to GContainer instances */
   std::string                                           creatorName;            /**< Name of used creator */
   long                                                  cyclicTriggerTime;      /**< period time of triggering this node */
   bool                                                  valid;                  /**< True if node is valid, false otherwise */

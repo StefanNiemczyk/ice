@@ -43,7 +43,9 @@ include_directories(
 
 add_library(${PROJECT_NAME}
   src/GPSPosition.cpp
-  src/InformationMap.cpp
+  src/TBCollectionFactory.cpp
+  src/TBKnowledgeBase.cpp
+  src/TBLocalization.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ice)
@@ -61,6 +63,7 @@ target_link_libraries(${PROJECT_NAME}
 ## Add gtest based cpp test target and link libraries
  catkin_add_gtest(${PROJECT_NAME}-test 
    test/test_GPSTransformation.cpp
+   test/test_TBKnowledgeBase.cpp
    
    test/test_main.cpp
  )

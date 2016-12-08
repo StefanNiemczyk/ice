@@ -14,6 +14,7 @@
 #include "ice/information/BaseInformationSet.h"
 #include "ice/information/BaseInformationStream.h"
 #include "ice/processing/NodeStore.h"
+#include "ice/representation/GContainerFactory.h"
 
 namespace ice
 {
@@ -346,6 +347,16 @@ int Node::destroy()
 void Node::setNodeStore(std::shared_ptr<NodeStore> nodeStore)
 {
   this->nodeStore = nodeStore;
+}
+
+void Node::setTimeFactory(std::shared_ptr<TimeFactory> timeFactory)
+{
+  this->timeFactory = timeFactory;
+}
+
+void Node::setGContainerFactory(std::shared_ptr<GContainerFactory> gcontainerFactory)
+{
+  this->gcontainerFactory = gcontainerFactory;
 }
 
 bool Node::isActive() const

@@ -8,6 +8,7 @@
 #include "ice/model/updateStrategie/UpdateStrategie.h"
 #include "ice/processing/NodeStore.h"
 #include "ice/ICEngine.h"
+#include "ice/Time.h"
 #include "easylogging++.h"
 
 
@@ -27,7 +28,9 @@ NodeStore::~NodeStore()
 
 void NodeStore::init()
 {
-  //
+  auto e = this->engine.lock();
+  this->timeFactory = e->getTimeFactory();
+  this->gcontainerFactory = e->getGContainerFactory();
 }
 
 void NodeStore::cleanUp()
@@ -119,6 +122,8 @@ std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::st
   node->setNodeDescription(desc);
   node->setConfiguration(config);
   node->setCreatorName(className);
+  node->setTimeFactory(this->timeFactory);
+  node->setGContainerFactory(this->gcontainerFactory);
 
   this->addNode(node);
 

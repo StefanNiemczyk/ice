@@ -66,7 +66,7 @@ public:
    * \param iri The iri of this engine.
    * \param config The configuration object.
    */
-  ICEngine(std::shared_ptr<Configuration> config = std::shared_ptr<Configuration>());
+  ICEngine(std::shared_ptr<Configuration> config = std::make_shared<Configuration>());
 
   /*!
    * \brief Default destructor
