@@ -46,6 +46,7 @@ add_library(${PROJECT_NAME}
   src/TBCollectionFactory.cpp
   src/TBKnowledgeBase.cpp
   src/TBLocalization.cpp
+  src/VictimDetection.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ice)

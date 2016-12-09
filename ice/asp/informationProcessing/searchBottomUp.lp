@@ -21,8 +21,8 @@
 % flagging nodes during search, identifies that a node will be before another node in the resulting processing graph
 MIN { before(TNODE_BEFORE,TNODE,INFO,S) : 
 		tstream(k,SYSTEM,TNODE_BEFORE,INFO), 
-		%not before(TNODE,TNODE_BEFORE,_,_), 
-		nnode(TNODE_BEFORE)} MAX :- 
+		nnode(TNODE_BEFORE)
+		} MAX :- 
 	flagged(k,TNODE,S), 
 	snode(TNODE), 
 	S < maxStepCount, 
@@ -30,20 +30,17 @@ MIN { before(TNODE_BEFORE,TNODE,INFO,S) :
 	query(k).
 
 MIN { before(TNODE_BEFORE,TNODE,INFO,S) : 
-		tstream(k,SYSTEM,TNODE_BEFORE,INFO) 
-		%not before(TNODE,TNODE_BEFORE,_,_)
-		} MAX :- 
+		tstream(k,SYSTEM,TNODE_BEFORE,INFO)
+		} MAX :-  
 	flagged(k,TNODE,S), 
 	S < maxStepCount, 
 	nnode(TNODE),
-	%not snode(TNODE), 
 	tinput(TNODE,INFO,MIN,MAX), 
 	query(k).
 
 MIN { before(TNODE_BEFORE,TNODE,information(ENTITY,SCOPE,REP,ENTITY2),S) : 
 		tstream(k,SYSTEM,TNODE_BEFORE,information(ENTITY,SCOPE,REP,ENTITY2)),
-		entity(ENTITY,ENTITY_TYPE) 
-		%not before(TNODE,TNODE_BEFORE,_,_)
+		entity(ENTITY,ENTITY_TYPE)
 		} MAX :- 
 	flagged(k,TNODE,S), 
 	S < maxStepCount, 
@@ -52,7 +49,10 @@ MIN { before(TNODE_BEFORE,TNODE,information(ENTITY,SCOPE,REP,ENTITY2),S) :
 	query(k).
 
 MIN { before(TNODE,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,S) : 
-		tset(k,SYSTEM,TNODE,INFO_TYPE) } MAX :- 
+		tset(k,SYSTEM,TNODE,INFO_TYPE),
+		before(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),TNODE2,_,S-1),
+		TNODE != TNODE2
+		} MAX :- 
 	flagged(k,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),S), 
 	S < maxStepCount, 
 	tsetInputSet(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,MIN,MAX), 
@@ -60,7 +60,7 @@ MIN { before(TNODE,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,S) :
 
 
 % flag node as to used
-:- flagged(k,TNODE,S1), flagged(k,TNODE,S2), S1 != S2, query(k).
+%:- flagged(k,TNODE,S1), flagged(k,TNODE,S2), S1 != S2, query(k).
 flagged(k,TNODE,S+1) :- before(TNODE,_,_,S), query(k).
 
 
@@ -68,16 +68,15 @@ flagged(k,TNODE,S+1) :- before(TNODE,_,_,S), query(k).
 node(k,SYSTEM,NODE,ENTITY,ENTITY2) :- 
 	flagged(k,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),S),
 	query(k).
-
-setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2) :- 
-	flagged(k,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),S),
+setNode(k,SYSTEM,NODE,ENTITY_TYPE,none) :-
+	flagged(k,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,none),S),
 	query(k).
 
 % detect loops
 %cycle(k,TNODE,TNODE2) :- before(TNODE,TNODE2,_,_).
 %cycle(k,TNODE,TNODE2) :- 
-% 	cycle(TNODE,TNODE_BEFORE),
-% 	cycle(TNODE_BEFORE,TNODE2).
+%	cycle(k,TNODE,TNODE_BEFORE),
+% 	cycle(k,TNODE_BEFORE,TNODE2).
 %:- cycle(k,TNODE,TNODE).
 
 % transfer streams if nodes are from different systems

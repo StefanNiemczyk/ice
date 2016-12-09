@@ -399,16 +399,16 @@ TEST(ASPComposition, requiredStreamsByEntityType)
   auto required = cw->getExternal("requiredSet", {"system1", Gringo::Value("informationType", {"type", "scope1", "rep1", "none"})}, true);
 
   // add transfer
-  auto transfer1_2 = cw->getExternal("transfer", {"system1", "system2"}, "transfer", {"system1", "system2", 4000, 2}, true);
-  auto transfer1_3 = cw->getExternal("transfer", {"system1", "system3"}, "transfer", {"system1", "system3", 4000, 3}, true);
-  auto transfer1_4 = cw->getExternal("transfer", {"system1", "system4"}, "transfer", {"system1", "system4", 4000, 4}, true);
-  auto transfer1_5 = cw->getExternal("transfer", {"system1", "system5"}, "transfer", {"system1", "system5", 4000, 5}, true);
-  auto transfer2_3 = cw->getExternal("transfer", {"system2", "system3"}, "transfer", {"system2", "system3", 4000, 5}, true);
-  auto transfer2_4 = cw->getExternal("transfer", {"system2", "system4"}, "transfer", {"system2", "system4", 4000, 5}, true);
-  auto transfer2_5 = cw->getExternal("transfer", {"system2", "system5"}, "transfer", {"system2", "system5", 4000, 5}, true);
-  auto transfer3_4 = cw->getExternal("transfer", {"system3", "system4"}, "transfer", {"system3", "system4", 4000, 5}, true);
-  auto transfer3_5 = cw->getExternal("transfer", {"system3", "system5"}, "transfer", {"system3", "system5", 4000, 5}, true);
-  auto transfer5_5 = cw->getExternal("transfer", {"system4", "system5"}, "transfer", {"system4", "system5", 4000, 5}, true);
+  auto transfer1_2 = cw->getExternal("transfer", {"system1", "system2"}, "transfer", {"system1", "system2", 400, 2}, true);
+  auto transfer1_3 = cw->getExternal("transfer", {"system1", "system3"}, "transfer", {"system1", "system3", 400, 3}, true);
+  auto transfer1_4 = cw->getExternal("transfer", {"system1", "system4"}, "transfer", {"system1", "system4", 400, 4}, true);
+  auto transfer1_5 = cw->getExternal("transfer", {"system1", "system5"}, "transfer", {"system1", "system5", 400, 5}, true);
+  auto transfer2_3 = cw->getExternal("transfer", {"system2", "system3"}, "transfer", {"system2", "system3", 400, 5}, true);
+  auto transfer2_4 = cw->getExternal("transfer", {"system2", "system4"}, "transfer", {"system2", "system4", 400, 5}, true);
+  auto transfer2_5 = cw->getExternal("transfer", {"system2", "system5"}, "transfer", {"system2", "system5", 400, 5}, true);
+  auto transfer3_4 = cw->getExternal("transfer", {"system3", "system4"}, "transfer", {"system3", "system4", 400, 5}, true);
+  auto transfer3_5 = cw->getExternal("transfer", {"system3", "system5"}, "transfer", {"system3", "system5", 400, 5}, true);
+  auto transfer5_5 = cw->getExternal("transfer", {"system4", "system5"}, "transfer", {"system4", "system5", 400, 5}, true);
 
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
@@ -422,7 +422,7 @@ TEST(ASPComposition, requiredStreamsByEntityType)
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system4,in4,entity4,none),information(entity4,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system5,in5,entity5,none),information(entity5,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,accuracy,set(1,system1,setNode(1,system1,setNode,type,none),informationType(type,scope1,rep1,none),3),110)"));
-  EXPECT_EQ(true, cw->query("metadataSet(1,delay,set(1,system1,setNode(1,system1,setNode,type,none),informationType(type,scope1,rep1,none),3),4001)"));
+  EXPECT_EQ(true, cw->query("metadataSet(1,delay,set(1,system1,setNode(1,system1,setNode,type,none),informationType(type,scope1,rep1,none),3),401)"));
 }
 
 TEST(ASPComposition, setFusion)
@@ -1129,7 +1129,7 @@ TEST(ASPComposition, setFusionIslandTest)
   auto island2 = cw->getExternal("island", {"island2"}, true);
   auto island3 = cw->getExternal("island", {"island3"}, true);
   auto bridge12 = cw->getExternal("bridge", {"island1", "island2"}, "bridge", {"island1", "island2", 100, 22}, true);
-  auto bridge13 = cw->getExternal("bridge", {"island1", "island3"}, "bridge", {"island1", "island3", 4000, 22}, true);
+  auto bridge13 = cw->getExternal("bridge", {"island1", "island3"}, "bridge", {"island1", "island3", 200, 22}, true);
 
   // systems
   auto system1 = cw->getExternal("system", {"system1", "island1"}, "system", {"system1", 100, "island1"}, true);
@@ -1151,7 +1151,7 @@ TEST(ASPComposition, setFusionIslandTest)
   auto input2 = cw->getExternal("sourceNode", {"system2", "in2", "entity2"}, true);
   cw->ground("sourceNode", {"in3", "system3", "system1", "entity3", "scope1", "rep1", "none", 0, 90, 1});
   auto input3 = cw->getExternal("sourceNode", {"system3", "in3", "entity3"}, true);
-  cw->ground("sourceNode", {"in4", "system4", "system1", "entity4", "scope1", "rep1", "none", 0, 90, 1});
+  cw->ground("sourceNode", {"in4", "system4", "system1", "entity4", "scope1", "rep1", "none", 0, 85, 1});
   auto input4 = cw->getExternal("sourceNode", {"system4", "in4", "entity4"}, true);
   cw->ground("sourceNode", {"in5", "system5", "system1", "entity5", "scope1", "rep1", "none", 0, 90, 1});
   auto input5 = cw->getExternal("sourceNode", {"system5", "in5", "entity5"}, true);
@@ -1177,7 +1177,7 @@ TEST(ASPComposition, setFusionIslandTest)
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
-//  cw->printLastModel();
+  cw->printLastModel();
 //  std::cout << cw->getSolvingTime() << " ms" << std::endl;
 
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system1,in1,entity1,none),information(entity1,scope1,rep1,none),1)"));
@@ -1212,7 +1212,7 @@ TEST(ASPComposition, islandCoverageTest)
   auto island2 = cw->getExternal("island", {"island2"}, true);
   auto island3 = cw->getExternal("island", {"island3"}, true);
   auto bridge12 = cw->getExternal("bridge", {"island1", "island2"}, "bridge", {"island1", "island2", 100, 22}, true);
-  auto bridge13 = cw->getExternal("bridge", {"island1", "island3"}, "bridge", {"island1", "island3", 4000, 22}, true);
+  auto bridge13 = cw->getExternal("bridge", {"island1", "island3"}, "bridge", {"island1", "island3", 400, 22}, true);
 
   // systems
   cw->add("base", {}, "system(system1).");
@@ -1274,6 +1274,6 @@ TEST(ASPComposition, islandCoverageTest)
 //  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system4,in4,entity4,none),information(entity4,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system5,in5,entity5,none),information(entity5,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,accuracy,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),105)"));
-  EXPECT_EQ(true, cw->query("metadataSet(1,delay,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),4005)"));
+  EXPECT_EQ(true, cw->query("metadataSet(1,delay,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),405)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,islandCoverage,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),3)"));
 }

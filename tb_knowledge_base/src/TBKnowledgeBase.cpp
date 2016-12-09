@@ -11,6 +11,7 @@
 
 #include "TBCollectionFactory.h"
 #include "node/TBLocalization.h"
+#include "node/VictimDetection.h"
 
 namespace ice
 {
@@ -21,6 +22,11 @@ TBKnowledgeBase::TBKnowledgeBase()
 
   // register nodes
   ice::Node::registerNodeCreator("TBLocalization", &TBLocalization::createNode);
+  ice::Node::registerNodeCreator("VictimDetection", &VictimDetection::createNode);
+  ice::Node::registerNodeCreator("Pos3D2RelativeToLandmark", &VictimDetection::createNode);
+  ice::Node::registerNodeCreator("RelativeToLandmark2Pos3D", &VictimDetection::createNode);
+  ice::Node::registerNodeCreator("Pos3D2RelativeToLandmarkSet", &VictimDetection::createNode);
+  ice::Node::registerNodeCreator("RelativeToLandmark2Pos3DSet", &VictimDetection::createNode);
 }
 
 TBKnowledgeBase::~TBKnowledgeBase()

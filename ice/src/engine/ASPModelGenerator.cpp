@@ -1034,7 +1034,7 @@ void ASPModelGenerator::readTransformations()
     }
 
     ss << "metadataProcessing(cost," << system << "," << name << ",10)." << std::endl;
-    ss << "metadataOutput(delay," << system << "," << name << ",max,1,0)." << std::endl;
+    ss << "metadataOutput(delay," << system << "," << name << ",max,25,0)." << std::endl;
     ss << "metadataOutput(accuracy," << system << "," << name << ",max,-5,0)." << std::endl;
 
     auto element = std::make_shared<ASPElement>();

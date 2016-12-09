@@ -1,12 +1,12 @@
 /*
- * TBLocalization.h
+ * VictimDetection.h
  *
  *  Created on: Dec 8, 2016
  *      Author: sni
  */
 
-#ifndef INCLUDE_NODE_TBLOCALIZATION_H_
-#define INCLUDE_NODE_TBLOCALIZATION_H_
+#ifndef INCLUDE_NODE_VICTIMDETECTION_H_
+#define INCLUDE_NODE_VICTIMDETECTION_H_
 
 #include <memory>
 
@@ -16,16 +16,16 @@ namespace ice
 {
 class GContainer;
 template <typename T>
-class InformationStream;
+class InformationSet;
 
-class TBLocalization : public Node
+class VictimDetection : public Node
 {
 public:
   static std::shared_ptr<Node> createNode();
 
 public:
-  TBLocalization();
-  virtual ~TBLocalization();
+  VictimDetection();
+  virtual ~VictimDetection();
 
   int init();
 
@@ -36,9 +36,8 @@ private:
   static std::string POS_REP;
 
 private:
-  std::shared_ptr<InformationStream<GContainer>>   output;
+  std::shared_ptr<InformationSet<GContainer>>   output;
 };
-
 } /* namespace ice */
 
-#endif /* INCLUDE_NODE_TBLOCALIZATION_H_ */
+#endif /* INCLUDE_NODE_VICTIMDETECTION_H_ */

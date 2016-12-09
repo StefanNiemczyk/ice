@@ -93,7 +93,7 @@ tnode(k,SYSTEM,NODE,ENTITY,none) :-
 snode(tnode(k, SYSTEM, NODE, ENTITY, ENTITY2)) :-
 	tstream(k, SYSTEM,tnode(k, SYSTEM, NODE, ENTITY, ENTITY2), INFO),
 	tinput(tnode(k, SYSTEM, NODE, ENTITY, ENTITY2), INFO, _, _).
-snode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
+nnode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
 	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),
 	autoTrans(SYSTEM,NODE,_,_).
 nnode(tnode(k, SYSTEM, NODE, ENTITY, ENTITY2)) :-
@@ -258,20 +258,27 @@ tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,none) :-
 
 tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2) :- 
 	setNodeTemplate(SYSTEM,NODE,any),
-	entity(ENTITY,ENTITY_TYPE), 
 	hasScope(ENTITY_TYPE,SCOPE), 
 	input(SYSTEM,NODE,SCOPE,REP,ENTITY2,_,_),
 	query(k).
 
 tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2) :- 
 	setNodeTemplate(SYSTEM,NODE,any),
+	hasScope(ENTITY_TYPE,SCOPE), 
+	inputSet(SYSTEM,NODE,any,SCOPE,_,ENTITY2,_,_),
+	query(k).
+
+
+tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2) :- 
+	setNodeTemplate(SYSTEM,NODE,any),
+	ENTITY_TYPE != any,
 	inputSet(SYSTEM,NODE,ENTITY_TYPE,_,_,ENTITY2,_,_),
 	query(k).
 
 % identify special nodes
 snode(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2)) :-
 	tset(k,SYSTEM,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE),
-	tsetInputSet(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE2,_,_).
+	tsetInputSet(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,_,_).
 nnode(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2)) :-
 	tset(k,SYSTEM,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE),
 	tsetInputSet(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE2,_,_),
@@ -284,7 +291,7 @@ nnode(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2)) :-
 % computing theoretical sets
 tset(k,SYSTEM,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2)) :- 
 	tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 
-	outputSet(SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2).
+	outputSet(SYSTEM,NODE,_,SCOPE,REP,ENTITY2).
 
 
 % computing theoretical inputs for sets
@@ -324,7 +331,7 @@ tsetInput(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),information(ENTITY2,SCOPE,
 
 tsetInputSet(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),MIN,MAX) :- 
 	tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 
-	inputSet(SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2,MIN,MAX).
+	inputSet(SYSTEM,NODE,_,SCOPE,REP,ENTITY2,MIN,MAX).
 
 
 % inputs
@@ -383,7 +390,7 @@ setMeta(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 0, 0) :-
 % computing set output
 set(k,SYSTEM,setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),STEP_MAX+1) :- 
 	setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 
-	outputSet(SYSTEM,NODE,ENTITY_TYPE,SCOPE,REP,ENTITY2),
+	outputSet(SYSTEM,NODE,_,SCOPE,REP,ENTITY2),
 	setMeta(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), STEP_MAX, COUNT).
 
 % Speed up ASP

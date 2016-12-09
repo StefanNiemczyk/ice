@@ -38,7 +38,6 @@ metadataOutput(METADATA,SYSTEM_SOURCE,SYSTEM_TARGET,VALUE1+VALUE2+VALUE3) :-
 
 % metadata computation: islandCoverage
 % definition
-metadata(stream,islandCoverage,maximize).
 metadata(set,islandCoverage,maximize).
 
 % Propagation rule
