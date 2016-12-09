@@ -54,10 +54,22 @@ MIN { before(TNODE,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,S) :
 		TNODE != TNODE2
 		} MAX :- 
 	flagged(k,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),S), 
+	nnode(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2)),
 	S < maxStepCount, 
 	tsetInputSet(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,MIN,MAX), 
 	query(k).
 
+MIN { before(TNODE,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,S) : 
+		tset(k,SYSTEM,TNODE,INFO_TYPE),
+		before(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),TNODE2,_,S-1),
+		TNODE != TNODE2,
+		nnode(TNODE)
+		} MAX :- 
+	flagged(k,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),S), 
+	snode(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2)),
+	S < maxStepCount, 
+	tsetInputSet(tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,MIN,MAX), 
+	query(k).
 
 % flag node as to used
 %:- flagged(k,TNODE,S1), flagged(k,TNODE,S2), S1 != S2, query(k).

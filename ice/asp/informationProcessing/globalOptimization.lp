@@ -123,6 +123,7 @@ metadataSet(k,METADATA,set(k,SYSTEM,setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),I
 	metadataOutput(METADATA,SYSTEM,NODE,max,FIX_VALUE,MOD_VALUE),
 	VALUE = #max{D : inputMetaSetNode(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),METADATA,D)}, 
 	setMeta(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),STEP-1,COUNT),
+	VALUE < 1000,
 	COUNT != 0.
 
 % no input
@@ -140,6 +141,7 @@ metadataSet(k,density,set(k,SYSTEM,setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),in
 	VALUE_SUM = #sum{D,SET_NODE,INFO_TYPE2,STEP2 : 
 		connectToSet(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),set(k,SYSTEM,SET_NODE,INFO_TYPE2,STEP2)),
 		metadataSet(k,density,set(k,SYSTEM,SET_NODE,INFO_TYPE2,STEP2),D)}, 
+	VALUE_SUM < 1000,
 	query(k).
 
 metadataElement(k,METADATA,STREAM,D) :- metadataStream(k,METADATA,STREAM,D).
