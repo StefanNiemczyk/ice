@@ -132,7 +132,7 @@ metadataSet(k,METADATA,set(k,SYSTEM,setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),I
 metadataSet(k,density,set(k,SYSTEM,setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),STEP),VALUE+VALUE_SUM) :- 
 	set(k,SYSTEM,setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),STEP), 
 	metadataOutput(density,SYSTEM,NODE,sum,_,_),
-	VALUE = #count{ ENTITY : connectToSet(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),stream(k,_,_,information(ENTITY,_,_,_),_))}, 
+	VALUE = #count{ENTITY : inputMetaSetNode(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),_,stream(k,_,_,information(ENTITY,_,_,_),_),STEP,_)}, 
 	VALUE_SUM = #sum{D,CONNECTED : inputMetaSetNode(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),density,CONNECTED,STEP,D)}, 
 	query(k).
 

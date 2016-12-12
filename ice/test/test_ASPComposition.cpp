@@ -502,7 +502,7 @@ TEST(ASPComposition, setFusion)
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
-  cw->printLastModel();
+//  cw->printLastModel();
 //  std::cout << cw->getSolvingTime() << " ms" << std::endl;
 
   EXPECT_EQ(true, cw->query("set(1,system2,setNode(1,system2,setInput1,type,none),informationType(type,scope1,rep1,none),1)"));
