@@ -431,7 +431,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
       input.representation = this->ontology->toLongIri(*info.args()[2].name());
       input.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
 
-      this->readMetadata(input.metadata, streamValue);
+      this->readMetadata(input.metadata, streamValue, true);
     }
 
     // stream(k,SYSTEM,node(k,SOURCE,NODE,ENTITY,ENTITY2),INFO,STEP)
@@ -459,7 +459,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
       output.representation = this->ontology->toLongIri(*info.args()[2].name());
       output.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
 
-      this->readMetadata(output.metadata, stream);
+      this->readMetadata(output.metadata, stream, true);
     }
 
     nodeDesc.type = aspNode->getNodeType();
@@ -568,7 +568,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
       input.representation = this->ontology->toLongIri(*info.args()[2].name());
       input.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
 
-      this->readMetadata(input.metadata, streamValue);
+      this->readMetadata(input.metadata, streamValue, true);
     }
 
     // stream(k,SYSTEM,setNode(k,SOURCE,NODE,ENTITY,ENTITY2),INFO,STEP)
@@ -596,7 +596,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
       output.representation = this->ontology->toLongIri(*info.args()[2].name());
       output.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
 
-      this->readMetadata(output.metadata, stream);
+      this->readMetadata(output.metadata, stream, true);
     }
 
     // sets
@@ -646,7 +646,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
       input.representation = this->ontology->toLongIri(*info.args()[2].name());
       input.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
 
-      this->readMetadata(input.metadata, streamValue);
+      this->readMetadata(input.metadata, streamValue, false);
     }
 
     // set(k,SYSTEM,setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),ENTITY_TYPE,STEP)
@@ -674,7 +674,7 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
       output.representation = this->ontology->toLongIri(*info.args()[2].name());
       output.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
 
-      this->readMetadata(output.metadata, set);
+      this->readMetadata(output.metadata, set, false);
     }
 
     nodeDesc.type = aspNode->getNodeType();
@@ -1080,6 +1080,11 @@ std::shared_ptr<supplementary::ClingWrapper> ASPModelGenerator::getClingWrapper(
 std::map<std::string, std::string> ASPModelGenerator::readConfiguration(std::string const &config)
 {
   std::map<std::string, std::string> configuration;
+  std::string cleared = config;
+
+  if (cleared[cleared.length()] == '\n')
+    cleared.pop_back();
+
   std::stringstream ss(config);
   std::string item;
 
@@ -1099,15 +1104,15 @@ std::map<std::string, std::string> ASPModelGenerator::readConfiguration(std::str
   return configuration;
 }
 
-void ASPModelGenerator::readMetadata(std::map<std::string, int>  &metadata, const Gringo::Value &element)
+void ASPModelGenerator::readMetadata(std::map<std::string, int>  &metadata, const Gringo::Value &element, bool isStream)
 {
   // TODO read metadata from ontology
-  this->readMetadata("delay", metadata, element);
-  this->readMetadata("accuracy", metadata, element);
+  this->readMetadata("delay", metadata, element, isStream);
+  this->readMetadata("accuracy", metadata, element, isStream);
 }
 
 void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int> &metadata,
-                                     const Gringo::Value &element)
+                                     const Gringo::Value &element, bool isStream)
 {
   // metadataStream(k,METADATA,stream(k,SYSTEM,node(k,SOURCE,NODE,ENTITY,ENTITY2),INFO,STEP),VALUE)
   std::vector<Gringo::Value> values;
@@ -1116,14 +1121,16 @@ void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int
   values.push_back(element);
   values.push_back("?");
 
-  Gringo::Value query("metadataStream", values);
+  std::string collection = (isStream ? "metadataStream" : "metadataSet");
+
+  Gringo::Value query(collection, values);
   auto result = this->asp->queryAllTrue(&query);
 
   if (result->size() != 1)
   {
     std::stringstream o;
     o << element;
-    _log->warn("Wrong size '%v' for metadata '%v' of stream '%v'", result->size(), name, o.str());
+    _log->warn("Wrong size '%v' for metadata '%v' of '%v'", result->size(), name, o.str());
     return;
   }
 
@@ -1134,7 +1141,7 @@ void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int
     std::stringstream o, o2;
     o << element;
     o2 << value;
-    _log->warn("Wrong type '%v' of '%v' for metadata '%v' of stream '%v'", value.type(), o2.str(), name,
+    _log->warn("Wrong type '%v' of '%v' for metadata '%v' of '%v'", value.type(), o2.str(), name,
                o.str());
     return;
   }

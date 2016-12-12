@@ -29,6 +29,8 @@ public:
   virtual int cleanUp();
 
   virtual int performNode();
+  virtual const int newEvent(std::shared_ptr<InformationElement<GContainer>> element,
+                             std::shared_ptr<InformationCollection> collection);
   virtual std::string getClassName();
 
 private:

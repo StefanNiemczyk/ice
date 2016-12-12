@@ -43,8 +43,15 @@ int TBLocalization::init()
     return 1;
   }
 
-  this->output = std::static_pointer_cast<ice::InformationStream<GContainer>>(this->outputs[0]);
+  this->out = std::static_pointer_cast<ice::InformationStream<GContainer>>(this->outputs[0]);
 
+  return 0;
+}
+
+const int TBLocalization::newEvent(std::shared_ptr<InformationElement<GContainer>> element,
+                           std::shared_ptr<InformationCollection> collection)
+{
+  // source node, not necessary
   return 0;
 }
 
@@ -56,7 +63,7 @@ int TBLocalization::performNode()
 //  posNew->y = 21;
 //  posNew->z = 31;
 
-  this->output->add(instance);
+  this->out->add(instance);
 
   return 0;
 }

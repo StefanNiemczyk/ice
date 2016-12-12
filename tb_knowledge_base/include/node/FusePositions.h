@@ -1,12 +1,12 @@
 /*
- * TBLocalization.h
+ * FuseVictims.h
  *
- *  Created on: Dec 8, 2016
+ *  Created on: Dec 9, 2016
  *      Author: sni
  */
 
-#ifndef INCLUDE_NODE_TBLOCALIZATION_H_
-#define INCLUDE_NODE_TBLOCALIZATION_H_
+#ifndef INCLUDE_NODE_FUSEPOSITIONS_H_
+#define INCLUDE_NODE_FUSEPOSITIONS_H_
 
 #include <memory>
 
@@ -16,16 +16,18 @@ namespace ice
 {
 class GContainer;
 template <typename T>
+class InformationSet;
+template <typename T>
 class InformationStream;
 
-class TBLocalization : public Node
+class FusePositions : public Node
 {
 public:
   static std::shared_ptr<Node> createNode();
 
 public:
-  TBLocalization();
-  virtual ~TBLocalization();
+  FusePositions();
+  virtual ~FusePositions();
 
   int init();
 
@@ -38,9 +40,11 @@ private:
   static std::string POS_REP;
 
 private:
-  std::shared_ptr<InformationStream<GContainer>>   out;
+  std::vector<std::shared_ptr<InformationSet<GContainer>>>      inSets;
+  std::vector<std::shared_ptr<InformationStream<GContainer>>>   ins;
+  std::shared_ptr<InformationSet<GContainer>>                   out;
 };
 
 } /* namespace ice */
 
-#endif /* INCLUDE_NODE_TBLOCALIZATION_H_ */
+#endif /* INCLUDE_NODE_FUSEPOSITIONS_H_ */

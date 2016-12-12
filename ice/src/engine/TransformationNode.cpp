@@ -123,6 +123,12 @@ int TransformationNode::performNode()
   return 0;
 }
 
+const int TransformationNode::newEvent(std::shared_ptr<InformationElement<GContainer>> element,
+                           std::shared_ptr<InformationCollection> collection)
+{
+  return this->performNode();
+}
+
 std::string TransformationNode::getClassName()
 {
   return this->transformation->getName();

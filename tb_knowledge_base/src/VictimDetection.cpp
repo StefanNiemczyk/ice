@@ -43,8 +43,15 @@ int VictimDetection::init()
     return 1;
   }
 
-  this->output = std::static_pointer_cast<ice::InformationSet<GContainer>>(this->outputSets[0]);
+  this->out = std::static_pointer_cast<ice::InformationSet<GContainer>>(this->outputSets[0]);
 
+  return 0;
+}
+
+const int VictimDetection::newEvent(std::shared_ptr<InformationElement<GContainer>> element,
+                           std::shared_ptr<InformationCollection> collection)
+{
+  // source node, not necessary
   return 0;
 }
 
@@ -56,7 +63,7 @@ int VictimDetection::performNode()
 //  posNew->y = 21;
 //  posNew->z = 31;
 
-  this->output->add("name", instance);
+  this->out->add("name", instance);
 
   return 0;
 }

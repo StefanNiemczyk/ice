@@ -5,14 +5,16 @@
  *      Author: sni
  */
 
+#include <node/FusePositions.h>
 #include <TBKnowledgeBase.h>
 
 #include <ros/package.h>
 
 #include "TBCollectionFactory.h"
 #include "node/TBLocalization.h"
+#include "node/Pos3D2RelativeToLandmark.h"
+#include "node/RelativeToLandmark2Pos3D.h"
 #include "node/VictimDetection.h"
-#include "node/FuseVictims.h"
 
 namespace ice
 {
@@ -24,9 +26,9 @@ TBKnowledgeBase::TBKnowledgeBase()
   // register nodes
   ice::Node::registerNodeCreator("TBLocalization", &TBLocalization::createNode);
   ice::Node::registerNodeCreator("VictimDetection", &VictimDetection::createNode);
-  ice::Node::registerNodeCreator("Pos3D2RelativeToLandmark", &VictimDetection::createNode);
-  ice::Node::registerNodeCreator("RelativeToLandmark2Pos3D", &VictimDetection::createNode);
-  ice::Node::registerNodeCreator("FuseVictims", &VictimDetection::createNode);
+  ice::Node::registerNodeCreator("Pos3D2RelativeToLandmark", &Pos3D2RelativeToLandmark::createNode);
+  ice::Node::registerNodeCreator("RelativeToLandmark2Pos3D", &RelativeToLandmark2Pos3D::createNode);
+  ice::Node::registerNodeCreator("FusePositions", &FusePositions::createNode);
 }
 
 TBKnowledgeBase::~TBKnowledgeBase()

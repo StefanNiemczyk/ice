@@ -15,6 +15,7 @@
 #include <vector>
 #include <sys/time.h>
 
+#include "ice/information/AbstractInformationListener.h"
 #include "ice/information/InformationStream.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/processing/NodeDescription.h"
@@ -38,7 +39,7 @@ struct NodeCreator
   std::function<std::shared_ptr<Node>()> func;
 };
 
-class Node : public AsynchronousTask, public std::enable_shared_from_this<Node>
+class Node : public AsynchronousTask, public std::enable_shared_from_this<Node>, public AbstractInformationListener<GContainer>
 {
   // static part
 public:
@@ -73,6 +74,8 @@ public:
 
   virtual int performTask();
   virtual int performNode() = 0;
+  virtual const int newEvent(std::shared_ptr<InformationElement<GContainer>> element,
+                             std::shared_ptr<InformationCollection> collection) = 0;
 
   virtual std::string getClassName() = 0;
 

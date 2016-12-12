@@ -225,6 +225,12 @@ public:
     return "ObstacleFusing";
   }
 
+  virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
+                             std::shared_ptr<ice::InformationCollection> collection)
+  {
+    return 0;
+  }
+
   virtual int performNode()
   {
     return 0;
@@ -263,6 +269,12 @@ public:
     this->inputStream = std::static_pointer_cast<ice::InformationStream<ice::Position>>(this->inputs[0]);
     this->outputStream = std::static_pointer_cast<ice::InformationStream<ice::Position>>(this->outputs[0]);
 
+    return 0;
+  }
+
+  virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
+                             std::shared_ptr<ice::InformationCollection> collection)
+  {
     return 0;
   }
 
@@ -320,6 +332,12 @@ public:
     return 0;
   }
 
+  virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
+                             std::shared_ptr<ice::InformationCollection> collection)
+  {
+    return 0;
+  }
+
   virtual int performNode()
   {
     auto infoEle = this->inputSet->get("muh");
@@ -369,6 +387,12 @@ public:
     return 0;
   }
 
+  virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
+                             std::shared_ptr<ice::InformationCollection> collection)
+  {
+    return 0;
+  }
+
   virtual int performNode()
   {
     std::unique_ptr<ice::Position> posNew(new ice::Position());
@@ -413,6 +437,12 @@ public:
 
     this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->outputSets[0]);
 
+    return 0;
+  }
+
+  virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
+                             std::shared_ptr<ice::InformationCollection> collection)
+  {
     return 0;
   }
 
@@ -470,6 +500,12 @@ public:
     return 0;
   }
 
+  virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
+                             std::shared_ptr<ice::InformationCollection> collection)
+  {
+    return 0;
+  }
+
   virtual int performNode()
   {
     auto info = this->inputSet->get("muh");
@@ -503,6 +539,12 @@ public:
     return "SimpleSourceNode";
   }
 
+  virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
+                             std::shared_ptr<ice::InformationCollection> collection)
+  {
+    return 0;
+  }
+
   virtual int performNode()
   {
     return 0;
@@ -525,6 +567,12 @@ public:
   virtual std::string getClassName()
   {
     return "SimpleSourceNodeAlternative";
+  }
+
+  virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
+                             std::shared_ptr<ice::InformationCollection> collection)
+  {
+    return 0;
   }
 
   virtual int performNode()

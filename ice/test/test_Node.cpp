@@ -40,6 +40,12 @@ public:
     return "";
   }
 
+  virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
+                             std::shared_ptr<ice::InformationCollection> collection)
+  {
+    return 0;
+  }
+
   virtual int performNode()
   {
     return 0;

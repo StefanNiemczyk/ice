@@ -30,13 +30,15 @@ public:
   int init();
 
   virtual std::string getClassName();
+  virtual const int newEvent(std::shared_ptr<InformationElement<GContainer>> element,
+                             std::shared_ptr<InformationCollection> collection);
   virtual int performNode();
 
 private:
   static std::string POS_REP;
 
 private:
-  std::shared_ptr<InformationSet<GContainer>>   output;
+  std::shared_ptr<InformationSet<GContainer>>   out;
 };
 } /* namespace ice */
 

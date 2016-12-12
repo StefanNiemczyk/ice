@@ -13,6 +13,8 @@
 #include "ice/Entity.h"
 #include "ice/information/BaseInformationSet.h"
 #include "ice/information/BaseInformationStream.h"
+#include "ice/information/InformationSet.h"
+#include "ice/information/InformationStream.h"
 #include "ice/processing/NodeStore.h"
 #include "ice/representation/GContainerFactory.h"
 
@@ -147,7 +149,15 @@ bool Node::addInput(std::shared_ptr<BaseInformationStream> stream, bool trigger)
   if (trigger)
   {
     this->triggeredByInputs.push_back(stream);
-    stream->registerTaskAsync(this->shared_from_this());
+    if (stream->isGContainer())
+    {
+      auto gs = std::static_pointer_cast<InformationStream<GContainer>>(stream);
+      gs->registerListenerAsync(this->shared_from_this());
+    }
+    else
+    {
+      stream->registerTaskAsync(this->shared_from_this());
+    }
   }
 
   return true;
@@ -177,6 +187,15 @@ bool Node::removeInput(std::shared_ptr<BaseInformationStream> stream)
     auto streamItr = this->triggeredByInputs[i];
     if (streamItr == stream)
     {
+      if (stream->isGContainer())
+      {
+        auto gs = std::static_pointer_cast<InformationStream<GContainer>>(stream);
+        gs->unregisterListenerAsync(this->shared_from_this());
+      }
+      else
+      {
+        stream->unregisterTaskAsync(this->shared_from_this());
+      }
       this->triggeredByInputs.erase(this->triggeredByInputs.begin() + i);
       break;
     }
@@ -233,7 +252,15 @@ bool Node::addInputSet(std::shared_ptr<BaseInformationSet> set, bool trigger)
   if (trigger)
   {
     this->triggeredByInputSets.push_back(set);
-    set->registerTaskAsync(this->shared_from_this());
+    if (set->isGContainer())
+    {
+      auto gs = std::static_pointer_cast<InformationSet<GContainer>>(set);
+      gs->registerListenerAsync(this->shared_from_this());
+    }
+    else
+    {
+      set->registerTaskAsync(this->shared_from_this());
+    }
   }
 
   return true;
@@ -262,6 +289,15 @@ bool Node::removeInputSet(std::shared_ptr<BaseInformationSet> set)
     auto &setItr = this->triggeredByInputSets[i];
     if (setItr == set)
     {
+      if (set->isGContainer())
+      {
+        auto gs = std::static_pointer_cast<InformationSet<GContainer>>(set);
+        gs->unregisterListenerAsync(this->shared_from_this());
+      }
+      else
+      {
+        set->unregisterTaskAsync(this->shared_from_this());
+      }
       this->triggeredByInputSets.erase(this->triggeredByInputSets.begin() + i);
       break;
     }

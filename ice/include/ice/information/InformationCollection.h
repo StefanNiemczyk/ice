@@ -213,6 +213,7 @@ protected:
   bool                                                  gcontainer;             /**< True if stream is stream of gcontainers, else false */
   el::Logger*                                           _log;                   /**< Logger */
   std::mutex                                            _mtx;                   /**< Mutex */
+  std::mutex                                            _mtxRegister;           /**< Mutex tho synchronize register process */
 
 private:
   static int IDENTIFIER_COUNTER;

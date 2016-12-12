@@ -186,9 +186,27 @@ template<typename T>
      */
     int registerListenerAsync(std::shared_ptr<AbstractInformationListener<T>> listener)
     {
+      std::lock_guard<std::mutex> guard(this->_mtxRegister);
       this->listenersAsynchronous.push_back(listener);
 
       return 0;
+    }
+
+    int unregisterListenerAsync(std::shared_ptr<AbstractInformationListener<T>> listener)
+    {
+      std::lock_guard<std::mutex> guard(this->_mtxRegister);
+
+      for (int i = 0; i < this->listenersAsynchronous.size(); ++i)
+      {
+        if (this->listenersAsynchronous[i] == listener)
+        {
+          this->listenersAsynchronous.erase(this->listenersAsynchronous.begin() + i);
+
+          return 0;
+        }
+      }
+
+      return 1;
     }
 
     /*!
@@ -198,6 +216,7 @@ template<typename T>
      */
     int registerListenerSync(std::shared_ptr<AbstractInformationListener<T>> listener)
     {
+      std::lock_guard<std::mutex> guard(this->_mtxRegister);
       this->listenersSynchronous.push_back(listener);
 
       return 0;

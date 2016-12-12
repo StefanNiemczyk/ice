@@ -42,7 +42,10 @@ include_directories(
 )  
 
 add_library(${PROJECT_NAME}
+  src/FusePositions.cpp
   src/GPSPosition.cpp
+  src/Pos3D2RelativeToLandmark.cpp
+  src/RelativeToLandmark2Pos3D.cpp
   src/TBCollectionFactory.cpp
   src/TBKnowledgeBase.cpp
   src/TBLocalization.cpp
