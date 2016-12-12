@@ -453,6 +453,24 @@ namespace supplementary
 		return ss.str();
 	}
 
+        string ClingWrapper::symbolTableToString()
+        {
+                stringstream ss;
+
+                if (!lastModel)
+                {
+                        ss << "No model found" << std::endl;
+                        return ss.str();
+                }
+
+                for (auto value : this->lastSolver->symbolTable())
+                {
+                        ss << value.second.name.c_str() << std::endl;
+                }
+
+                return ss.str();
+        }
+
 	std::shared_ptr<External> const ClingWrapper::getExternal(const char* p_value)
         {
 	  Gringo::Value value = ClingWrapper::stringToValue(p_value);

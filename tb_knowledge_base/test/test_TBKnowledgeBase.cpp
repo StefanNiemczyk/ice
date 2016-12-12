@@ -5,6 +5,7 @@
  *      Author: sni
  */
 #include <gtest/gtest.h>
+#include <fstream>
 
 #include "ice/ICEngine.h"
 #include "ice/information/InformationSpecification.h"

@@ -169,6 +169,13 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
   auto solveResult = this->asp->solve();
   _log->info("Solving finished: %v", (Gringo::SolveResult::SAT == solveResult) ? "SAT" : "UNSAT");
 
+
+//  ofstream file;
+//  file.open("/tmp/test.txt");
+//
+//  file << this->asp->symbolTableToString() << std::endl;
+//  file.close();
+
   if (solveResult != Gringo::SolveResult::SAT)
   {
     _log->error("Optimizing failed, no processing was created");

@@ -347,11 +347,6 @@ connectToSet(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),set(k,SYSTEM,setNode(k,S
 	PROVIDER != NODE,
 	set(k,SYSTEM,setNode(k,SOURCE,PROVIDER,ENTITY_TYPE2,ENTITY4),INFO_TYPE,STEP).
 
-
-% outputs
-setCount(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2), 0, 100) :- 
-	setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2).
-
 -maxStep(NODE,STEP) :-
 	connectToSet(NODE,stream(k,_,_,_,STEP)),
 	connectToSet(NODE,stream(k,_,_,_,STEP2)),
