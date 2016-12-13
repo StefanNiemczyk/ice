@@ -12,7 +12,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "ice_engine_test");
   ::testing::InitGoogleTest(&argc, argv);
   el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
-  el::Loggers::setLoggingLevel(el::Level::Info);
+//  el::Loggers::setLoggingLevel(el::Level::Info);
 
   int result = RUN_ALL_TESTS();
 

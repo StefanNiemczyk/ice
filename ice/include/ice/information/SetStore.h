@@ -122,6 +122,22 @@ public:
     return nullptr;
   }
 
+  template<typename T>
+    std::shared_ptr<InformationSet<T>> getSelectedSet(InformationSpecification *specification)
+  {
+    auto set = this->getSelectedBaseCollection(specification);
+
+    if (false == set)
+      return nullptr;
+
+    if (typeid(T) == *set->getTypeInfo())
+      return std::static_pointer_cast<InformationSet<T>>(set);
+    else
+      throw std::bad_cast();
+
+    return nullptr;
+  }
+
   int getInformation(std::shared_ptr<InformationSpecification> request,
                                   std::vector<std::shared_ptr<InformationElement<GContainer>>> &outInfo,
                                   bool useTransfromation);

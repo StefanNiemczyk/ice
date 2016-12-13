@@ -11,7 +11,7 @@
 
 #include "etc/EngineStuff.cpp"
 
-TEST(ASPModelGenerator, simpleTest)
+TEST(ASPCoordinator, simpleTest)
 {
   ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
   ice::Node::registerNodeCreator("TestComputationalNodeGrounding", &SmothingNode::createNode);
@@ -42,8 +42,11 @@ TEST(ASPModelGenerator, simpleTest)
   auto stream2 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec2, "http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd",
                                                                          "http://vs.uni-kassel.de/IceTest#TestSystem");
 
+  auto selected = engine->getKnowlegeBase()->streamStore->getSelectedStream<ice::Position>(&spec2);
+
   ASSERT_TRUE((stream1 ? true : false));
   ASSERT_TRUE((stream2 ? true : false));
+  ASSERT_TRUE((selected ? true : false));
 
   auto position1 = std::make_shared<ice::Position>();
   position1->x = 3;
@@ -61,11 +64,18 @@ TEST(ASPModelGenerator, simpleTest)
   EXPECT_EQ(1, position2->getInformation()->y);
   EXPECT_EQ(0, position2->getInformation()->z);
 
+  auto position3 = selected->getLast();
+
+  ASSERT_TRUE((position3 ? true : false));
+  EXPECT_EQ(2, position3->getInformation()->x);
+  EXPECT_EQ(1, position3->getInformation()->y);
+  EXPECT_EQ(0, position3->getInformation()->z);
+
   engine->cleanUp();
   engine.reset();
 }
 
-TEST(ASPModelGenerator, transformationTest)
+TEST(ASPCoordinator, transformationTest)
 {
   ice::Node::clearNodeStore();
   ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
@@ -139,7 +149,7 @@ TEST(ASPModelGenerator, transformationTest)
   engine.reset();
 }
 
-TEST(ASPModelGenerator, twoSystemsSimple)
+TEST(ASPCoordinator, twoSystemsSimple)
 {
   ice::Node::clearNodeStore();
   ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
@@ -224,7 +234,7 @@ TEST(ASPModelGenerator, twoSystemsSimple)
   engine2.reset();
 }
 
-TEST(ASPModelGenerator, twoSystemsComplex)
+TEST(ASPCoordinator, twoSystemsComplex)
 {
   ice::Node::clearNodeStore();
   ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
@@ -321,7 +331,7 @@ TEST(ASPModelGenerator, twoSystemsComplex)
   engine2.reset();
 }
 
-TEST(ASPModelGenerator, simpleSetTest)
+TEST(ASPCoordinator, simpleSetTest)
 {
   ice::Node::clearNodeStore();
   ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
@@ -368,7 +378,7 @@ TEST(ASPModelGenerator, simpleSetTest)
   engine.reset();
 }
 
-TEST(ASPModelGenerator, streamsToSetTest)
+TEST(ASPCoordinator, streamsToSetTest)
 {
   ice::Node::clearNodeStore();
   ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
@@ -429,7 +439,8 @@ TEST(ASPModelGenerator, streamsToSetTest)
   auto set = engine->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec2,
                                                                       "http://vs.uni-kassel.de/IceTest#TestSetNodeInd",
                                                                       "http://vs.uni-kassel.de/IceTest#TestSet1_SystemInd1");
-  ASSERT_TRUE((set ? true : false));
+  auto selected = engine->getKnowlegeBase()->setStore->getSelectedSet<ice::Position>(&spec2);
+  ASSERT_TRUE((selected ? true : false));
 
   // test processing system 2
   auto stream2 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec12,
@@ -479,13 +490,20 @@ TEST(ASPModelGenerator, streamsToSetTest)
   EXPECT_EQ(position2->y - 1, pos->getInformation()->y);
   EXPECT_EQ(position2->z - 1, pos->getInformation()->z);
 
+  pos = selected->get("http://vs.uni-kassel.de/IceTest#TestEntity1");
+
+  ASSERT_TRUE((pos ? true : false));
+  EXPECT_EQ(position2->x - 1, pos->getInformation()->x);
+  EXPECT_EQ(position2->y - 1, pos->getInformation()->y);
+  EXPECT_EQ(position2->z - 1, pos->getInformation()->z);
+
   engine->cleanUp();
   engine.reset();
   engine2->cleanUp();
   engine2.reset();
 }
 
-TEST(ASPModelGenerator, setTransformTest)
+TEST(ASPCoordinator, setTransformTest)
 {
   ice::Node::clearNodeStore();
   ice::Node::registerNodeCreator("SetSourceNode", &SetSourceNode::createNode);
@@ -542,7 +560,7 @@ TEST(ASPModelGenerator, setTransformTest)
   engine.reset();
 }
 
-TEST(ASPModelGenerator, setTransferTest)
+TEST(ASPCoordinator, setTransferTest)
 {
   ice::Node::clearNodeStore();
   ice::Node::registerNodeCreator("SetSourceNode", &SetSourceNode::createNode);
@@ -622,7 +640,7 @@ TEST(ASPModelGenerator, setTransferTest)
   engine2.reset();
 }
 
-TEST(ASPModelGenerator, nodeFailureTest)
+TEST(ASPCoordinator, nodeFailureTest)
 {
   ice::Node::registerNodeCreator("TestSourceNodeGrounding", &SimpleSourceNode::createNode);
   ice::Node::registerNodeCreator("TestSourceNodeAlternativeGrounding", &SimpleSourceNodeAlternative::createNode);
@@ -647,7 +665,23 @@ TEST(ASPModelGenerator, nodeFailureTest)
 
   auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1, "http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeInd",
                                                                          "http://vs.uni-kassel.de/IceTest#TestNodeFailureInd");
+  auto selected = engine->getKnowlegeBase()->streamStore->getSelectedStream<ice::Position>(&spec1);
   ASSERT_TRUE((stream1 ? true : false));
+  ASSERT_TRUE((selected ? true : false));
+
+  auto pos = std::make_shared<ice::Position>();
+  pos->x = 1;
+  pos->y = 2;
+  pos->z = 3;
+
+  stream1->add(pos);
+
+  auto position1 = selected->getLast();
+
+  ASSERT_TRUE((position1 ? true : false));
+  EXPECT_EQ(1, position1->getInformation()->x);
+  EXPECT_EQ(2, position1->getInformation()->y);
+  EXPECT_EQ(3, position1->getInformation()->z);
 
   auto nodeSource = engine->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeInd", "http://vs.uni-kassel.de/IceTest#TestEntity1");
   ASSERT_TRUE((nodeSource ? true : false));
@@ -664,6 +698,20 @@ TEST(ASPModelGenerator, nodeFailureTest)
 
   auto nodeSource2 = engine->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSourceNodeInd", "http://vs.uni-kassel.de/IceTest#TestEntity1");
   EXPECT_TRUE((nodeSource2 ? true : false));
+
+  auto pos2 = std::make_shared<ice::Position>();
+  pos2->x = 4;
+  pos2->y = 5;
+  pos2->z = 6;
+
+  stream2->add(pos2);
+
+  auto position2 = selected->getLast();
+
+  ASSERT_TRUE((position2 ? true : false));
+  EXPECT_EQ(4, position2->getInformation()->x);
+  EXPECT_EQ(5, position2->getInformation()->y);
+  EXPECT_EQ(6, position2->getInformation()->z);
 
   engine->cleanUp();
   engine.reset();

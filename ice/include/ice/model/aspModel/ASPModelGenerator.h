@@ -75,6 +75,7 @@ private:
   void readTransformations();
   bool extractedSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModel> &subModel);
   bool extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<Entity> &entity, bool own);
+  bool extractSelected(std::shared_ptr<Entity> &entity, vector<SelectedSetDesc> &sets, vector<SelectedStreamDesc> &streams);
   bool extractStreamTransfers(std::shared_ptr<Entity> &from, std::shared_ptr<Entity> &to, std::vector<TransferStreamDesc> &transfers);
   bool extractSetTransfers(std::shared_ptr<Entity> &from, std::shared_ptr<Entity> &to, std::vector<TransferSetDesc> &transfers);
   std::map<std::string, std::string> readConfiguration(std::string const &config);
@@ -86,7 +87,7 @@ private:
   std::shared_ptr<GContainerFactory>            gcontainerFactory;      /**< Factory for representations and transformations */
   std::shared_ptr<EntityDirectory>              directory;              /**< Directory of entities */
   std::shared_ptr<Entity>                       self;                   /**< Pointer to the own asp description */
-  std::vector<std::string>                      entities;               /**< The entites as strings */
+  std::vector<std::string>                      entities;               /**< The entities as strings */
   std::vector<ASPTransformation>                transformations;        /**< List of transformations */
   bool                                          groundingDirty;         /**< Flag to check if the grounding is dirty */
   int                                           queryIndex;             /**< Index of the query */

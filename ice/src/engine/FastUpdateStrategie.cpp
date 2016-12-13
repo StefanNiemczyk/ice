@@ -152,6 +152,9 @@ void FastUpdateStrategie::processModel(std::shared_ptr<ProcessingModel> const &m
     node->registerEntity(this->self);
   }
 
+  // update selected
+  this->processSelectedCollections(model);
+
   this->nodeStore->cleanUpNodes();
   this->knowledgeBase->cleanUpStores();
 

@@ -43,6 +43,7 @@ public:
                      bool useTransfromation = false);
   ont::entityType getEntityType(ont::entity entity);
   void readEntitiesFromOntology();
+  std::string dataTypeForRepresentation(std::string representation);
 
 public:
   std::shared_ptr<SetStore>                     setStore;

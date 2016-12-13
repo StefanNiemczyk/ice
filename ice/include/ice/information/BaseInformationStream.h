@@ -44,6 +44,9 @@ public:
   virtual ~BaseInformationStream();
 
   virtual CollectionType getCollectionType();
+
+  virtual int registerBaseListenerSync(std::shared_ptr<BaseInformationStream> listener) = 0;
+  virtual int unregisterBaseListenerSync(std::shared_ptr<BaseInformationStream> listener) = 0;
 };
 
 } /* namespace ice */

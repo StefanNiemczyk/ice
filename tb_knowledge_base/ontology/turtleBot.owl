@@ -699,12 +699,73 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/TurtleBot#FusePositionsCppGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FusePositionsCppGrounding">
+        <rdf:type rdf:resource="&Ice;CppGrounding"/>
+        <Ice:hasGroundingValue rdf:datatype="&xsd;string">FusePositions</Ice:hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseTBPositions -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseTBPositions">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseTBPositions"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#FusePositionsCppGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsAccuracyGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsAccuracyGrounding">
+        <rdf:type rdf:resource="&Ice;Accuracy"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">0</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyAvgASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsCostGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsCostGrounding">
+        <rdf:type rdf:resource="&Ice;Cost"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">10</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeCostASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsDelayGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsDelayGrounding">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">5</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeDelayASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsDensityGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsDensityGrounding">
+        <rdf:type rdf:resource="&Ice;Density"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">0</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasGrounding rdf:resource="&Ice;SetDensitySumASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://vs.uni-kassel.de/TurtleBot#FuseVictims -->
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseVictims">
         <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseVictims"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#FusePositionsCppGrounding"/>
         <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseVictimsCostGrounding"/>
-        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseVictimsCppGrounding"/>
         <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseVictimsDelayGrounding"/>
         <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseVictimsDensityGrounding"/>
     </owl:NamedIndividual>
@@ -728,15 +789,6 @@
         <rdf:type rdf:resource="&Ice;Cost"/>
         <Ice:hasMetadataValue rdf:datatype="&xsd;int">20</Ice:hasMetadataValue>
         <Ice:hasGrounding rdf:resource="&Ice;NodeCostASPGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#FuseVictimsCppGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseVictimsCppGrounding">
-        <rdf:type rdf:resource="&Ice;CppGrounding"/>
-        <Ice:hasGroundingValue rdf:datatype="&xsd;string">FusePositions</Ice:hasGroundingValue>
     </owl:NamedIndividual>
     
 
@@ -776,6 +828,7 @@
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#Pos3D2RelativeToLandmarkSet"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark2Pos3D"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark2Pos3DSet"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBotReqSet"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#VictimPositionReqSet"/>
     </owl:NamedIndividual>
     

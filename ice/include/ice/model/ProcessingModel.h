@@ -276,6 +276,50 @@ struct SubModelDesc
     }
 };
 
+struct SelectedStreamDesc
+{
+  string                        entity;
+  string                        scope;
+  string                        representation;
+  string                        relatedEntity;
+  string                        provider;
+  string                        system;
+
+  friend class boost::serialization::access;
+  template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+      // serialize base class information
+      ar & entity;
+      ar & scope;
+      ar & representation;
+      ar & provider;
+      ar & provider;
+    }
+};
+
+struct SelectedSetDesc
+{
+  string                        entityType;
+  string                        scope;
+  string                        representation;
+  string                        relatedEntity;
+  string                        provider;
+  string                        system;
+
+  friend class boost::serialization::access;
+  template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+      // serialize base class information
+      ar & entityType;
+      ar & scope;
+      ar & representation;
+      ar & provider;
+      ar & provider;
+    }
+};
+
 struct SubModel
 {
   std::shared_ptr<Entity>       entity;
@@ -305,23 +349,27 @@ public:
   virtual ~ProcessingModel();
 
   int getIndex() const;
-  std::vector<std::shared_ptr<SubModel>>& getSubModels();
-  std::shared_ptr<SubModel> getSubModel(std::shared_ptr<Entity> &entity);
-  std::vector<NodeDesc>& getNodes();
+  std::vector<std::shared_ptr<SubModel>>&       getSubModels();
+  std::shared_ptr<SubModel>                     getSubModel(std::shared_ptr<Entity> &entity);
+  std::vector<NodeDesc>&                        getNodes();
 
   std::vector<std::shared_ptr<StreamTransfer>>& getReceive();
   std::vector<std::shared_ptr<StreamTransfer>>& getSend();
-  std::vector<std::shared_ptr<SetTransfer>>& getReceiveSet();
-  std::vector<std::shared_ptr<SetTransfer>>& getSendSet();
+  std::vector<std::shared_ptr<SetTransfer>>&    getReceiveSet();
+  std::vector<std::shared_ptr<SetTransfer>>&    getSendSet();
+  std::vector<SelectedSetDesc>&                 getSelectedSets();
+  std::vector<SelectedStreamDesc>&              getSelectedStreams();
 
 private:
-  const int index; /**< Index of the processing model */
-  std::vector<std::shared_ptr<SubModel>> subModels; /**< Sub models that needs to be estableshed by other engines */
-  std::vector<NodeDesc> nodes; /**< Nodes required by this model */
-  std::vector<std::shared_ptr<StreamTransfer>> send; /**< Streams that needs to be send to other engines */
-  std::vector<std::shared_ptr<StreamTransfer>> receive; /**< Streams that needs to be received from other engines */
-  std::vector<std::shared_ptr<SetTransfer>> sendSet; /**< Streams that needs to be send to other engines */
-  std::vector<std::shared_ptr<SetTransfer>> receiveSet; /**< Streams that needs to be received from other engines */
+  const int                                     index;          /**< Index of the processing model */
+  std::vector<std::shared_ptr<SubModel>>        subModels;      /**< Sub models that needs to be established by other engines */
+  std::vector<NodeDesc>                         nodes;          /**< Nodes required by this model */
+  std::vector<std::shared_ptr<StreamTransfer>>  send;           /**< Streams that needs to be send to other engines */
+  std::vector<std::shared_ptr<StreamTransfer>>  receive;        /**< Streams that needs to be received from other engines */
+  std::vector<std::shared_ptr<SetTransfer>>     sendSet;        /**< Set that needs to be send to other engines */
+  std::vector<std::shared_ptr<SetTransfer>>     receiveSet;     /**< Set that needs to be received from other engines */
+  std::vector<SelectedSetDesc>                  selectedSets;   /**< Selected sets */
+  std::vector<SelectedStreamDesc>               selectedStreams;/**< Selected streams */
 };
 
 } /* namespace ice */

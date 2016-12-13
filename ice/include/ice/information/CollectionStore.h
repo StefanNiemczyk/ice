@@ -15,12 +15,19 @@
 #include "ice/information/CollectionDescription.h"
 #include "ice/information/CollectionFactory.h"
 #include "ice/information/InformationSpecification.h"
+#include "ice/information/KnowledgeBase.h"
 #include "ice/processing/EventHandler.h"
 #include "ice/representation/GContainerFactory.h"
 #include "easylogging++.h"
 
 namespace ice
 {
+template <typename T>
+struct SelectedCollection
+{
+  std::shared_ptr<T> selected;
+  std::shared_ptr<T> current;
+};
 
 template <typename T>
 class CollectionStore
@@ -42,6 +49,7 @@ public:
       this->eventHandler = engineObject->getEventHandler();
       this->factory = engineObject->getCollectionFactory();
       this->gcontainerFactory = engineObject->getGContainerFactory();
+      this->knowledgeBase = engineObject->getKnowlegeBase();
     }
   }
 
@@ -49,6 +57,8 @@ public:
   {
     this->eventHandler.reset();
     this->factory.reset();
+    this->gcontainerFactory.reset();
+    this->knowledgeBase.reset();
 
     for(auto collection : this->collections)
     {
@@ -59,9 +69,9 @@ public:
   }
 
   /*!
-   * \brief Returns a T for the given specification.
+   * \brief Returns a collection for the given specification.
    *
-   * Returns a T for the given specification. NULL is returned if no stream exists.
+   * Returns a collection for the given specification. NULL is returned if no stream exists.
    */
   std::shared_ptr<T> getBaseCollection(InformationSpecification *specification,
                                        std::string provider, std::string sourceSystem)
@@ -83,6 +93,34 @@ public:
         continue;
 
       selected.push_back(collection);
+    }
+
+    if (selected.size() == 0)
+    {
+      return nullptr;
+    }
+
+    return selectBest(selected);
+  }
+
+  /*!
+   * \brief Returns a selected collection for the given specification.
+   *
+   * Returns a selected collection for the given specification. NULL is returned if no stream exists.
+   */
+  std::shared_ptr<T> getSelectedBaseCollection(InformationSpecification *specification)
+  {
+    _log->debug("Get selected collection by '%v'", specification->toString());
+
+    std::vector<std::shared_ptr<T>> selected;
+
+    for (auto collection : this->selected)
+    {
+      auto spec = collection.selected->getDescription();
+      if (false == (*spec->getInformationSpecification() == *specification))
+        continue;
+
+      selected.push_back(collection.selected);
     }
 
     if (selected.size() == 0)
@@ -130,6 +168,50 @@ public:
     std::cout << "------------------------------------------------------------" << std::endl;
   }
 
+
+  int registerSelected(std::shared_ptr<T> collection)
+  {
+    std::lock_guard<std::mutex> guard(this->_mtx);
+    _log->info("Register selected collection for '%v'", collection->getSpecification()->toString());
+
+    for (auto &selected : this->selected)
+    {
+      if (*selected.selected->getDescription()->getInformationSpecification()  == *collection->getSpecification())
+      {
+        if (selected.current != nullptr)
+        {
+          selected.current->unregisterBaseListenerSync(selected.selected);
+        }
+
+        collection->registerBaseListenerSync(selected.selected);
+        selected.current = collection;
+
+        return 0;
+      }
+    }
+
+    std::map<std::string, int> metadatas;
+    auto desc = std::make_shared<CollectionDescription>(collection->getSpecification(),
+                                                        "selecte_set", "selected", "selected", metadatas);
+
+    SelectedCollection<T> selected;
+    auto dataType = this->knowledgeBase->dataTypeForRepresentation(collection->getSpecification()->getRepresentation());
+    std::shared_ptr<InformationCollection> ic;
+
+    if (collection->getCollectionType() == CollectionType::CT_SET)
+      ic = this->factory->createSet(dataType, desc, this->eventHandler);
+    else
+      ic = this->factory->createStream(dataType, desc, this->eventHandler, 100);
+
+    selected.selected = std::static_pointer_cast<T>(ic);
+    selected.current = collection;
+    collection->registerBaseListenerSync(selected.selected);
+
+    this->selected.push_back(selected);
+
+    return 1;
+  }
+
 protected:
   std::shared_ptr<T> selectBest(std::vector<std::shared_ptr<T>> &collection)
   {
@@ -152,8 +234,10 @@ protected:
   std::weak_ptr<ICEngine>               engine;                 /**< Weak pointer to the engine */
   std::shared_ptr<GContainerFactory>    gcontainerFactory;      /**< The gcontainer factory */
   std::vector<std::shared_ptr<T>>       collections;            /**< The information steams */
+  std::vector<SelectedCollection<T>>    selected;               /**< The selected information collections */
   std::shared_ptr<EventHandler>         eventHandler;           /**< Handler to execute events asynchronously */
   std::shared_ptr<CollectionFactory>    factory;                /**< Factory to create collections */
+  std::shared_ptr<KnowledgeBase>        knowledgeBase;          /**< The knowledge base */
   std::mutex                            _mtx;                   /**< Mutex */
   el::Logger*                           _log;                   /**< Logger */
 };

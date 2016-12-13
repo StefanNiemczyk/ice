@@ -266,6 +266,9 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
       model->getReceiveSet().push_back(receiveSet);
   }
 
+  // selected
+  this->extractSelected(this->self, model->getSelectedSets(), model->getSelectedStreams());
+
   _log->info("Model successfully created");
 
   return model;
@@ -332,6 +335,74 @@ bool ASPModelGenerator::extractedSubModel(std::shared_ptr<Entity> &entity, std::
     _log->info("Sub model extraction for system '%v' successfully completed", entity->toString());
     // create sub model description
     subModel->model = model;
+  }
+
+  return true;
+}
+
+
+bool ASPModelGenerator::extractSelected(std::shared_ptr<Entity> &entity, vector<SelectedSetDesc> &sets,
+                                        vector<SelectedStreamDesc> &streams)
+{
+  bool valid = true;
+  std::string shortIri;
+  entity->getId(EntityDirectory::ID_ONTOLOGY, shortIri);
+  shortIri = this->ontology->toShortIri(shortIri);
+
+  // selectedSet(k,SYSTEM,setNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO_TYPE,STEP)
+  std::vector<Gringo::Value> values;
+  values.push_back(this->queryIndex);
+  values.push_back(Gringo::Value(shortIri));
+  values.push_back("?");
+  values.push_back("?");
+  values.push_back("?");
+
+  Gringo::Value selectedSetQuery("selectedSet", values);
+  auto querySelectedSet = this->asp->queryAllTrue(&selectedSetQuery);
+  sets.resize(querySelectedSet->size());
+
+  for (int i=0; i < querySelectedSet->size(); ++i)
+  {
+    auto &selectedStream = querySelectedSet->at(i);
+    auto &desc = sets[i];
+
+    auto &node = selectedStream.args()[2];
+    auto &info = selectedStream.args()[3];
+
+    desc.entityType = this->ontology->toLongIri(*info.args()[0].name());
+    desc.scope = this->ontology->toLongIri(*info.args()[1].name());
+    desc.representation = this->ontology->toLongIri(*info.args()[2].name());
+    desc.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
+    desc.provider = this->ontology->toLongIri(*node.args()[2].name());
+    desc.system = this->ontology->toLongIri(*node.args()[1].name());
+  }
+
+  // selectedStream(k,SYSTEM,node(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO,STEP)
+  values.clear();
+  values.push_back(this->queryIndex);
+  values.push_back(Gringo::Value(shortIri));
+  values.push_back("?");
+  values.push_back("?");
+  values.push_back("?");
+
+  Gringo::Value selectedStreamQuery("selectedStream", values);
+  auto querySelectedStream = this->asp->queryAllTrue(&selectedStreamQuery);
+  streams.resize(querySelectedStream->size());
+
+  for (int i=0; i < querySelectedStream->size(); ++i)
+  {
+    auto &selectedStream = querySelectedStream->at(i);
+    auto &desc = streams[i];
+
+    auto &node = selectedStream.args()[2];
+    auto &info = selectedStream.args()[3];
+
+    desc.entity = this->ontology->toLongIri(*info.args()[0].name());
+    desc.scope = this->ontology->toLongIri(*info.args()[1].name());
+    desc.representation = this->ontology->toLongIri(*info.args()[2].name());
+    desc.relatedEntity = *info.args()[3].name() == "none" ? "" : this->ontology->toLongIri(*info.args()[3].name());
+    desc.provider = this->ontology->toLongIri(*node.args()[2].name());
+    desc.system = this->ontology->toLongIri(*node.args()[1].name());
   }
 
   return true;
@@ -692,9 +763,6 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
     if (false == valid)
       break;
   }
-
-
-  // TODO selected stream
 
   return valid;
 }

@@ -58,6 +58,10 @@ void KnowledgeBase::cleanUp()
 
   if (this->streamStore)
     this->streamStore->cleanUp();
+
+  this->informationStore.reset();
+  this->setStore.reset();
+  this->streamStore.reset();
 }
 
 void KnowledgeBase::cleanUpStores()
@@ -121,6 +125,12 @@ void KnowledgeBase::readEntitiesFromOntology()
       this->entityTypeMap[entity] = entityType;
     }
   }
+}
+
+std::string KnowledgeBase::dataTypeForRepresentation(std::string representation)
+{
+  // TODO
+  return representation;
 }
 
 } /* namespace ice */

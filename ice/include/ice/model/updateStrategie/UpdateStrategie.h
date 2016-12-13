@@ -75,13 +75,13 @@ protected:
   virtual void cleanUpInternal() = 0;
 
   void deactivateModel(bool notifyOtherEngines);
+  bool processSelectedCollections(std::shared_ptr<ProcessingModel> const &model);
   bool processSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel);
   bool processSubModelResponse(std::shared_ptr<Entity> &entity, int modelIndex);
   std::shared_ptr<SubModel> getSubModelDesc(std::shared_ptr<Entity> &entity);
 
   std::shared_ptr<Node> activateNode(NodeDesc &nodeDesc);
   std::map<std::string, std::string> readConfiguration(std::string const config);
-  std::string dataTypeForRepresentation(std::string representation);
   std::shared_ptr<BaseInformationStream> getStream(std::string &nodeName, std::string &source, std::string &entity,
                                                    std::string &scope, std::string &rep, std::string &relatedEntity, std::map<std::string, int> &metadata);
   std::shared_ptr<BaseInformationStream> getStream(TransferStreamDesc &desc);

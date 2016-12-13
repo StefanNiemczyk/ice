@@ -42,7 +42,8 @@ class InformationReceiver;
  *
  */
 template<typename T>
-  class InformationSet : public BaseInformationSet, public std::enable_shared_from_this<InformationSet<T>>
+  class InformationSet : public BaseInformationSet, public std::enable_shared_from_this<InformationSet<T>>,
+                         public AbstractInformationListener<T>
   {
 
   public:
@@ -146,6 +147,15 @@ template<typename T>
       return 0;
     }
 
+    virtual const int newEvent(std::shared_ptr<InformationElement<T>> element,
+                               std::shared_ptr<InformationCollection> stream)
+    {
+      this->add(element->getSpecification()->getEntity(), element->getInformation(), element->getTimeValidity(),
+                     element->getTimeObservation(), element->getTimeProcessed());
+
+      return 0;
+    }
+
     /*!
      * \brief Return the buffer size.
      *
@@ -220,6 +230,41 @@ template<typename T>
       this->listenersSynchronous.push_back(listener);
 
       return 0;
+    }
+
+    int unregisterListenerSync(std::shared_ptr<AbstractInformationListener<T>> listener)
+    {
+      std::lock_guard<std::mutex> guard(this->_mtxRegister);
+
+      for (int i = 0; i < this->listenersSynchronous.size(); ++i)
+      {
+        if (this->listenersSynchronous[i] == listener)
+        {
+          this->listenersSynchronous.erase(this->listenersSynchronous.begin() + i);
+
+          return 0;
+        }
+      }
+
+      return 1;
+    }
+
+    virtual int registerBaseListenerSync(std::shared_ptr<BaseInformationSet> listener)
+    {
+      if (typeid(T).hash_code() != listener->getTypeInfo()->hash_code())
+        throw std::bad_cast();
+
+      auto set = std::static_pointer_cast<InformationSet<T>>(listener);
+      return this->registerListenerSync(set);
+    }
+
+    virtual int unregisterBaseListenerSync(std::shared_ptr<BaseInformationSet> listener)
+    {
+      if (typeid(T).hash_code() != listener->getTypeInfo()->hash_code())
+        throw std::bad_cast();
+
+      auto set = std::static_pointer_cast<InformationSet<T>>(listener);
+      return this->unregisterListenerSync(set);
     }
 
     /*!

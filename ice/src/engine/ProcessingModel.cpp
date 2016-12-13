@@ -53,6 +53,16 @@ std::vector<std::shared_ptr<SetTransfer>>& ProcessingModel::getSendSet()
   return sendSet;
 }
 
+std::vector<SelectedSetDesc>& ProcessingModel::getSelectedSets()
+{
+  return selectedSets;
+}
+
+std::vector<SelectedStreamDesc>& ProcessingModel::getSelectedStreams()
+{
+  return selectedStreams;
+}
+
 std::vector<std::shared_ptr<SubModel>>& ProcessingModel::getSubModels()
 {
   return subModels;

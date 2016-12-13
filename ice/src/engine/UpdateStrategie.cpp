@@ -168,6 +168,56 @@ void UpdateStrategie::deactivateModel(bool notifyOtherEngines)
   }
 }
 
+bool UpdateStrategie::processSelectedCollections(std::shared_ptr<ProcessingModel> const &model)
+{
+
+  auto &selectedSets = model->getSelectedSets();
+  auto &selectedStreams = model->getSelectedStreams();
+
+  _log->debug("Processing selected collections, '%v' sets and '%v' streams", selectedSets.size(), selectedStreams.size());
+
+  for (auto &set : selectedSets)
+  {
+    _log->debug("Check selected set for '%v', '%v', '%v', '%v'", set.entityType, set.scope,
+                set.representation, set.relatedEntity);
+
+    auto desc = InformationSpecification("", set.entityType, set.scope, set.representation, set.relatedEntity);
+
+    // get collection
+    auto col = this->knowledgeBase->setStore->getBaseCollection(&desc, set.provider, set.system);
+
+    if (col == nullptr)
+    {
+      _log->error("Processing selected collections failed, no set found for '%v', '%v', '%v', '%v', '%v', '%v'",
+                  set.entityType, set.scope, set.representation, set.relatedEntity, set.provider, set.system);
+      continue;
+    }
+
+    this->knowledgeBase->setStore->registerSelected(col);
+  }
+
+  for (auto &stream : selectedStreams)
+  {
+    _log->debug("Check selected stream for '%v', '%v', '%v', '%v'", stream.entity, stream.scope,
+                stream.representation, stream.relatedEntity);
+
+    auto desc = InformationSpecification(stream.entity, this->knowledgeBase->getEntityType(stream.entity),
+                                         stream.scope, stream.representation, stream.relatedEntity);
+
+    // get collection
+    auto col = this->knowledgeBase->streamStore->getBaseCollection(&desc, stream.provider, stream.system);
+
+    if (col == nullptr)
+    {
+      _log->error("Processing selected collections failed, no stream found for '%v', '%v', '%v', '%v', '%v', '%v'",
+                  stream.entity, stream.scope, stream.representation, stream.relatedEntity, stream.provider, stream.system);
+      continue;
+    }
+
+    this->knowledgeBase->streamStore->registerSelected(col);
+  }
+}
+
 bool UpdateStrategie::processSubModel(std::shared_ptr<Entity> &entity, std::shared_ptr<SubModelDesc> &subModel)
 {
   _log->debug("Processing sub model description received from '%v'", entity->toString());
@@ -526,7 +576,7 @@ std::shared_ptr<BaseInformationStream> UpdateStrategie::getStream(std::string &n
 
   if (false == stream)
   {
-    std::string dataType = this->dataTypeForRepresentation(rep);
+    std::string dataType = this->knowledgeBase->dataTypeForRepresentation(rep);
     std::string name = this->ontology->toShortIri(entity) + "_" + this->ontology->toShortIri(nodeName) + "_" + this->ontology->toShortIri(source);
     std::replace(name.begin(), name.end(), '.', '_');
     std::replace(name.begin(), name.end(), '#', '_');
@@ -557,7 +607,7 @@ std::shared_ptr<BaseInformationSet> UpdateStrategie::getSet(std::string &nodeNam
 
   if (false == set)
   {
-    std::string dataType = this->dataTypeForRepresentation(rep);
+    std::string dataType = this->knowledgeBase->dataTypeForRepresentation(rep);
     std::string name = entityType + "_" + nodeName + "_" + source;
     std::replace(name.begin(), name.end(), '.', '_');
     std::replace(name.begin(), name.end(), '#', '_');
@@ -596,12 +646,6 @@ std::map<std::string, std::string> UpdateStrategie::readConfiguration(std::strin
   }
 
   return configuration;
-}
-
-std::string UpdateStrategie::dataTypeForRepresentation(std::string representation)
-{
-  // TODO
-  return representation;
 }
 
 std::shared_ptr<SubModel> UpdateStrategie::getSubModelDesc(std::shared_ptr<Entity> &entity)

@@ -17,7 +17,10 @@
 #include <vector>
 
 #include "ice/Time.h"
+#include "ice/communication/CommunicationInterface.h"
+#include "ice/communication/InformationSender.h"
 #include "ice/container/RingBuffer.h"
+#include "ice/information/AbstractInformationListener.h"
 #include "ice/information/CollectionDescription.h"
 #include "ice/information/BaseInformationStream.h"
 #include "ice/information/InformationElement.h"
@@ -31,12 +34,7 @@
 namespace ice
 {
 class BaseInformationSender;
-template<typename T>
-  class AbstractInformationListener;
-class CommunicationInterface;
 class InformationReceiver;
-template<typename T>
-  class InformationSender;
 } /* namespace ice */
 
 namespace ice
@@ -48,7 +46,8 @@ namespace ice
  *
  */
 template<typename T>
-  class InformationStream : public BaseInformationStream, public std::enable_shared_from_this<InformationStream<T>>
+  class InformationStream : public BaseInformationStream, public std::enable_shared_from_this<InformationStream<T>>,
+                            public AbstractInformationListener<T>
   {
 
   public:
@@ -62,22 +61,30 @@ template<typename T>
      * \param eventHandler Handler to execute events asynchronously.
      * \param streamSize The count of information elements within this stream.
      */
-  InformationStream(std::shared_ptr<CollectionDescription> streamDescription,
-                        std::shared_ptr<EventHandler> eventHandler, int streamSize);
+    InformationStream(std::shared_ptr<CollectionDescription> streamDescription,
+                          std::shared_ptr<EventHandler> eventHandler, int streamSize)
+            : BaseInformationStream(streamDescription, eventHandler)
+    {
+      this->ringBuffer = std::unique_ptr<RingBuffer<InformationElement<T>>>(
+      new RingBuffer<InformationElement<T>>(streamSize));
+    }
 
     /*!
      * \brief Default destructor
      *
      * Default destructor
      */
-    virtual ~InformationStream();
+    virtual ~InformationStream() {};
 
     /*!
      * \brief Returns the last stream element or NULL if no element exists.
      *
      * Returns the last stream element or NULL if no element exists.
      */
-    std::shared_ptr<InformationElement<T>> getLast();
+    std::shared_ptr<InformationElement<T>> getLast()
+    {
+      return this->getLast(0);
+    }
 
     /*!
      * \brief Returns the n-th last stream element or NULL.
@@ -86,7 +93,11 @@ template<typename T>
      *
      * \param n The n-th last information element, 0 will return the newest one.
      */
-    std::shared_ptr<InformationElement<T>> getLast(int n);
+    std::shared_ptr<InformationElement<T>> getLast(int n)
+    {
+      std::lock_guard<std::mutex> guard(_mtx);
+      return this->ringBuffer->getLast(n);
+    }
 
     /*!
      * \brief Creates and adds a new information to the stream and returns the identifier.
@@ -100,14 +111,73 @@ template<typename T>
      * \param timeProcessed time of the processing of the information.
      */
     int add(std::shared_ptr<T> information, time timeValidity = NO_TIME, time timeObservation = NO_TIME,
-            time timeProcessed = NO_TIME);
+            time timeProcessed = NO_TIME)
+    {
+      std::lock_guard<std::mutex> guard(_mtx);
+      auto informationElement = std::make_shared<InformationElement<T>>(
+          this->streamDescription->getInformationSpecification(), information, timeValidity, timeObservation,
+          timeProcessed);
+
+      int returnValue = this->ringBuffer->add(informationElement);
+
+      // notify listeners
+      for (auto listener : this->listenersAsynchronous)
+      {
+        auto event = std::make_shared<InformationEvent<T> >(listener, informationElement, this->shared_from_this());
+
+        this->eventHandler->addTask(event);
+      }
+
+      for (auto listener : this->listenersSynchronous)
+      {
+        listener->newEvent(informationElement, this->shared_from_this());
+      }
+
+      // execute tasks
+      for (auto task : this->taskAsynchronous)
+      {
+        this->eventHandler->addTask(task);
+      }
+
+      for (auto task : this->taskSynchronous)
+      {
+        task->performTask();
+      }
+
+      // send information
+      if (this->remoteListeners.size() > 0)
+      {
+        if (this->sender)
+        {
+          this->sender->sendInformationElement(this->remoteListeners, informationElement);
+        }
+        else
+        {
+          _log->error("No sender for stream %v", this->streamDescription->getName());
+        }
+      }
+
+      return returnValue;
+    }
+
+   virtual const int newEvent(std::shared_ptr<InformationElement<T>> element,
+                              std::shared_ptr<InformationCollection> stream)
+   {
+     this->add(element->getInformation(), element->getTimeValidity(),
+                    element->getTimeObservation(), element->getTimeProcessed());
+
+     return 0;
+   }
 
     /*!
      * \brief Return the buffer size.
      *
      * Return the buffer size.
      */
-    int getStreamSize() const;
+    int getStreamSize() const
+    {
+      return this->ringBuffer->getBufferSize();
+    }
 
     /*!
      * \brief Clears the stream.
@@ -118,30 +188,99 @@ template<typename T>
      *
      * \param cleanBuffer True to clear the buffer.
      */
-    int clear(bool cleanBuffer);
+    int clear(bool cleanBuffer)
+    {
+      std::lock_guard<std::mutex> guard(_mtx);
+      return ringBuffer->clear(cleanBuffer);
+    }
 
     /*!
      *\brief Returns the type_info of the used template type.
      *
      * Returns the type_info of the used template type.
      */
-    const std::type_info* getTypeInfo() const;
+    const std::type_info* getTypeInfo() const
+    {
+      return &typeid(T);
+    }
 
     /*!
      * \brief Registered a listener which is asynchronous triggered if a new information element is added.
      *
      *  Registered a listener which is asynchronous triggered if a new information element is added.
      */
-    int registerListenerAsync(std::shared_ptr<AbstractInformationListener<T>> listener);
+    int registerListenerAsync(std::shared_ptr<AbstractInformationListener<T>> listener)
+    {
+    std::lock_guard<std::mutex> guard(this->_mtxRegister);
+      this->listenersAsynchronous.push_back(listener);
 
-    int unregisterListenerAsync(std::shared_ptr<AbstractInformationListener<T>> listener);
+      return 0;
+    }
+
+    int unregisterListenerAsync(std::shared_ptr<AbstractInformationListener<T>> listener)
+    {
+      std::lock_guard<std::mutex> guard(this->_mtxRegister);
+
+      for (int i = 0; i < this->listenersAsynchronous.size(); ++i)
+      {
+        if (this->listenersAsynchronous[i] == listener)
+        {
+          this->listenersAsynchronous.erase(this->listenersAsynchronous.begin() + i);
+
+          return 0;
+        }
+      }
+
+      return 1;
+    }
 
     /*!
      * \brief Registered a listener which is synchronous triggered if a new information element is added.
      *
      *  Registered a listener which is synchronous triggered if a new information element is added.
      */
-    int registerListenerSync(std::shared_ptr<AbstractInformationListener<T>> listener);
+    int registerListenerSync(std::shared_ptr<AbstractInformationListener<T>> listener)
+    {
+    std::lock_guard<std::mutex> guard(this->_mtxRegister);
+      this->listenersSynchronous.push_back(listener);
+
+      return 0;
+    }
+
+    int unregisterListenerSync(std::shared_ptr<AbstractInformationListener<T>> listener)
+    {
+      std::lock_guard<std::mutex> guard(this->_mtxRegister);
+
+      for (int i = 0; i < this->listenersSynchronous.size(); ++i)
+      {
+        if (this->listenersSynchronous[i] == listener)
+        {
+          this->listenersSynchronous.erase(this->listenersSynchronous.begin() + i);
+
+          return 0;
+        }
+      }
+
+      return 1;
+    }
+
+    virtual int registerBaseListenerSync(std::shared_ptr<BaseInformationStream> listener)
+    {
+      if (typeid(T).hash_code() != listener->getTypeInfo()->hash_code())
+        throw std::bad_cast();
+
+      auto stream = std::static_pointer_cast<InformationStream<T>>(listener);
+      return this->registerListenerSync(stream);
+    }
+
+    virtual int unregisterBaseListenerSync(std::shared_ptr<BaseInformationStream> listener)
+    {
+      if (typeid(T).hash_code() != listener->getTypeInfo()->hash_code())
+        throw std::bad_cast();
+
+      auto stream = std::static_pointer_cast<InformationStream<T>>(listener);
+      return this->unregisterListenerSync(stream);
+    }
 
     /*!
      * \brief Filters the existing elements within the stream and add these to filteredList.
@@ -153,8 +292,25 @@ template<typename T>
      * \param filteredList List of resulting filtered elements
      * \param func The filter function
      */
-    const int getFilteredList(std::shared_ptr<std::vector<std::shared_ptr<InformationElement<T> > > > filteredList,
-                              std::function<bool(std::shared_ptr<InformationElement<T>>&)> func);
+    const int getFilteredList(std::shared_ptr<std::vector<std::shared_ptr<InformationElement<T>>>> filteredList,
+                              std::function<bool(std::shared_ptr<InformationElement<T>>&)> func)
+    {
+      std::lock_guard<std::mutex> guard(_mtx);
+      int count = 0;
+      std::shared_ptr<InformationElement<T> > ptr;
+
+      for (int i = this->ringBuffer->getSize() - 1; i >= 0; --i)
+      {
+        ptr = this->ringBuffer->getLast(i);
+        if (ptr && func(ptr))
+        {
+          filteredList->push_back(ptr);
+          ++count;
+        }
+      }
+
+      return count;
+    }
 
 
   protected:
@@ -163,269 +319,94 @@ template<typename T>
      *
      * Registers this stream in the communication class as sending stream.
      */
-    virtual std::shared_ptr<BaseInformationSender> registerSender(std::shared_ptr<CommunicationInterface> &communication);
+    virtual std::shared_ptr<BaseInformationSender> registerSender(std::shared_ptr<CommunicationInterface> &communication)
+    {
+      if (this->sender)
+      {
+        return this->sender;
+      }
+
+      auto comResult = communication->registerCollectionAsSender(this->shared_from_this());
+
+      if (comResult == nullptr)
+      {
+        _log->error("No sender returned for stream %v", this->streamDescription->getName());
+        return nullptr;
+      }
+
+      if (typeid(T) == *comResult->getTypeInfo())
+      {
+        this->sender = std::static_pointer_cast<InformationSender<T>>(comResult);
+        this->sender->init();
+        return comResult;
+      }
+      else
+      {
+        _log->error("Incorrect type of sender %s for stream %s", comResult->getTypeInfo(),
+                    this->streamDescription->getName());
+        comResult->cleanUp();
+        return nullptr;
+      }
+    }
 
     /*!
      * \brief Registers this stream in the communication class as receiving stream.
      *
      * Registers this stream in the communication class as receiving stream.
      */
-    virtual std::shared_ptr<InformationReceiver> registerReceiver(std::shared_ptr<CommunicationInterface> &communication);
+    virtual std::shared_ptr<InformationReceiver> registerReceiver(std::shared_ptr<CommunicationInterface> &communication)
+    {
+      auto comResult = communication->registerCollectionAsReceiver(this->shared_from_this());
+
+      if (comResult == nullptr)
+      {
+        _log->error("No receiver returned for stream %v", this->streamDescription->getName());
+        return nullptr;
+      }
+
+      this->receiver = comResult;
+      this->receiver->init();
+
+      return comResult;
+    }
 
     /*!
      * \brief Removes the receiver of this stream.
      *
      * Removes the receiver of this stream.
      */
-    virtual void dropReceiver();
+    virtual void dropReceiver()
+    {
+      if (this->receiver)
+        this->receiver->cleanUp();
+
+      this->receiver.reset();
+    }
 
     /*!
      * \brief This method is calls if the last engine state will be unregistered.
      *
      * This method is calls if the last engine state will be unregistered.
      */
-    virtual void dropSender();
+    virtual void dropSender()
+    {
+      if (this->sender)
+        this->sender->cleanUp();
+
+      this->sender.reset();
+    }
 
   private:
-    std::unique_ptr<RingBuffer<InformationElement<T>>> ringBuffer; /**< Ring buffer of information elements */
-    std::vector<std::shared_ptr<AbstractInformationListener<T>>> listenersAsynchronous; /**< List of asynchronous triggered listeners */
-    std::vector<std::shared_ptr<AbstractInformationListener<T>>> listenersSynchronous; /**< List of synchronous triggered listeners */
-    std::shared_ptr<InformationSender<T>> sender; /**< Sender to send information elements */
-    std::shared_ptr<InformationReceiver> receiver; /**< Receiver to receive information elements */
+    std::unique_ptr<RingBuffer<InformationElement<T>>>  ringBuffer;             /**< Ring buffer of information elements */
+    std::vector<std::shared_ptr<
+            AbstractInformationListener<T>>>            listenersAsynchronous;  /**< List of asynchronous triggered listeners */
+    std::vector<std::shared_ptr<
+            AbstractInformationListener<T>>>            listenersSynchronous;   /**< List of synchronous triggered listeners */
+    std::shared_ptr<InformationSender<T>>               sender;                 /**< Sender to send information elements */
+    std::shared_ptr<InformationReceiver>                receiver;               /**< Receiver to receive information elements */
   };
 
 }
 /* namespace ice */
-
-//Include after forward declaration
-#include "ice/communication/CommunicationInterface.h"
-#include "ice/communication/InformationSender.h"
-#include "ice/information/AbstractInformationListener.h"
-
-//Implementing methods here
-
-template<typename T>
-  ice::InformationStream<T>::InformationStream(std::shared_ptr<CollectionDescription> streamDescription,
-                                               std::shared_ptr<EventHandler> eventHandler, int streamSize) :
-      BaseInformationStream(streamDescription, eventHandler)
-  {
-    this->ringBuffer = std::unique_ptr<RingBuffer<InformationElement<T>>>(
-    new RingBuffer<InformationElement<T>>(streamSize));
-  }
-
-template<typename T>
-  ice::InformationStream<T>::~InformationStream()
-  {
-    // currently nothing to do
-  }
-
-template<typename T>
-  std::shared_ptr<ice::InformationElement<T> > ice::InformationStream<T>::getLast()
-  {
-    return this->getLast(0);
-  }
-
-template<typename T>
-  std::shared_ptr<ice::InformationElement<T> > ice::InformationStream<T>::getLast(int n)
-  {
-    std::lock_guard<std::mutex> guard(_mtx);
-    return this->ringBuffer->getLast(n);
-  }
-
-template<typename T>
-  int ice::InformationStream<T>::add(std::shared_ptr<T> information, time timeValidity, time timeObservation,
-                                     time timeProcessed)
-  {
-    std::lock_guard<std::mutex> guard(_mtx);
-    auto informationElement = std::make_shared<InformationElement<T>>(
-        this->streamDescription->getInformationSpecification(), information, timeValidity, timeObservation,
-        timeProcessed);
-
-    int returnValue = this->ringBuffer->add(informationElement);
-
-    // notify listeners
-    for (auto listener : this->listenersAsynchronous)
-    {
-      auto event = std::make_shared<InformationEvent<T> >(listener, informationElement, this->shared_from_this());
-
-      this->eventHandler->addTask(event);
-    }
-
-    for (auto listener : this->listenersSynchronous)
-    {
-      listener->newEvent(informationElement, this->shared_from_this());
-    }
-
-    // execute tasks
-    for (auto task : this->taskAsynchronous)
-    {
-      this->eventHandler->addTask(task);
-    }
-
-    for (auto task : this->taskSynchronous)
-    {
-      task->performTask();
-    }
-
-    // send information
-    if (this->remoteListeners.size() > 0)
-    {
-      if (this->sender)
-      {
-        this->sender->sendInformationElement(this->remoteListeners, informationElement);
-      }
-      else
-      {
-        _log->error("No sender for stream %v", this->streamDescription->getName());
-      }
-    }
-
-    return returnValue;
-  }
-
-template<typename T>
-  int ice::InformationStream<T>::getStreamSize() const
-  {
-    return this->ringBuffer->getBufferSize();
-  }
-
-template<typename T>
-  int ice::InformationStream<T>::clear(bool cleanBuffer)
-  {
-    std::lock_guard<std::mutex> guard(_mtx);
-    return ringBuffer->clear(cleanBuffer);
-  }
-
-template<typename T>
-  std::shared_ptr<ice::BaseInformationSender> ice::InformationStream<T>::registerSender(
-      std::shared_ptr<CommunicationInterface> &communication)
-  {
-    if (this->sender)
-    {
-      return this->sender;
-    }
-
-    auto comResult = communication->registerCollectionAsSender(this->shared_from_this());
-
-    if (comResult == nullptr)
-    {
-      _log->error("No sender returned for stream %v", this->streamDescription->getName());
-      return nullptr;
-    }
-
-    if (typeid(T) == *comResult->getTypeInfo())
-    {
-      this->sender = std::static_pointer_cast<InformationSender<T>>(comResult);
-      this->sender->init();
-      return comResult;
-    }
-    else
-    {
-      _log->error("Incorrect type of sender %s for stream %s", comResult->getTypeInfo(),
-                  this->streamDescription->getName());
-      comResult->cleanUp();
-      return nullptr;
-    }
-  }
-
-template<typename T>
-  std::shared_ptr<ice::InformationReceiver> ice::InformationStream<T>::registerReceiver(
-      std::shared_ptr<CommunicationInterface> &communication)
-  {
-    auto comResult = communication->registerCollectionAsReceiver(this->shared_from_this());
-
-    if (comResult == nullptr)
-    {
-      _log->error("No receiver returned for stream %v", this->streamDescription->getName());
-      return nullptr;
-    }
-
-    this->receiver = comResult;
-    this->receiver->init();
-
-    return comResult;
-  }
-
-template<typename T>
-  const std::type_info* ice::InformationStream<T>::getTypeInfo() const
-  {
-    return &typeid(T);
-  }
-
-template<typename T>
-  int ice::InformationStream<T>::registerListenerAsync(std::shared_ptr<AbstractInformationListener<T>> listener)
-  {
-  std::lock_guard<std::mutex> guard(this->_mtxRegister);
-    this->listenersAsynchronous.push_back(listener);
-
-    return 0;
-  }
-
-template<typename T>
-  int ice::InformationStream<T>::unregisterListenerAsync(std::shared_ptr<AbstractInformationListener<T>> listener)
-  {
-    std::lock_guard<std::mutex> guard(this->_mtxRegister);
-
-    for (int i = 0; i < this->listenersAsynchronous.size(); ++i)
-    {
-      if (this->listenersAsynchronous[i] == listener)
-      {
-        this->listenersAsynchronous.erase(this->listenersAsynchronous.begin() + i);
-
-        return 0;
-      }
-    }
-
-    return 1;
-  }
-
-template<typename T>
-  int ice::InformationStream<T>::registerListenerSync(std::shared_ptr<AbstractInformationListener<T>> listener)
-  {
-  std::lock_guard<std::mutex> guard(this->_mtxRegister);
-    this->listenersSynchronous.push_back(listener);
-
-    return 0;
-  }
-
-template<typename T>
-  inline const int ice::InformationStream<T>::getFilteredList(
-      std::shared_ptr<std::vector<std::shared_ptr<InformationElement<T>>>> filteredList,
-      std::function<bool(std::shared_ptr<InformationElement<T>>&)> func)
-  {
-    std::lock_guard<std::mutex> guard(_mtx);
-    int count = 0;
-    std::shared_ptr<InformationElement<T> > ptr;
-
-    for (int i = this->ringBuffer->getSize() - 1; i >= 0; --i)
-    {
-      ptr = this->ringBuffer->getLast(i);
-      if (ptr && func(ptr))
-      {
-        filteredList->push_back(ptr);
-        ++count;
-      }
-    }
-
-    return count;
-  }
-
-template<typename T>
-  inline void ice::InformationStream<T>::dropReceiver()
-  {
-    if (this->receiver)
-      this->receiver->cleanUp();
-
-    this->receiver.reset();
-  }
-
-template<typename T>
-  inline void ice::InformationStream<T>::dropSender()
-  {
-    if (this->sender)
-      this->sender->cleanUp();
-
-    this->sender.reset();
-  }
 
 #endif /* INFORMATIONSTREAM_H_ */
