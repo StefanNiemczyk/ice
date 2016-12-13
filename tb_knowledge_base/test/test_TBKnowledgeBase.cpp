@@ -20,7 +20,7 @@
 
 TEST(TBKnowledgeBase, oneBot)
 {
-  auto tbKnowledgeBase = std::make_shared<ice::TBKnowledgeBase>();
+  auto tbKnowledgeBase = std::make_shared<ice::TBKnowledgeBase>("Leonardo");
 
   tbKnowledgeBase->init();
   tbKnowledgeBase->start();
@@ -49,13 +49,11 @@ TEST(TBKnowledgeBase, oneBot)
   auto p3dA = p3dRep->accessPath( {"http://vs.uni-kassel.de/Ice#Alpha"});
 
   // test processing
-  auto ownPos = streamStore->getStream<ice::GContainer>(&specPosLeonardo,
-                                                        "http://vs.uni-kassel.de/TurtleBot#LeonardoLocalization",
-                                                        "http://vs.uni-kassel.de/TurtleBot#Leonardo");
-  ASSERT_TRUE((ownPos ? true : false));
+  ASSERT_TRUE((tbKnowledgeBase->positionOwn ? true : false));
+  ASSERT_TRUE((tbKnowledgeBase->positionAll ? true : false));
 
   // generate new element
-//  auto element = tbKnowledgeBase->getGContainerFactory()->makeInstance("http://vs.uni-kassel.de/IceTest#Pos3D");
+  auto element = tbKnowledgeBase->getGContainerFactory()->makeInstance("http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
 
   tbKnowledgeBase->cleanUp();
   tbKnowledgeBase.reset();

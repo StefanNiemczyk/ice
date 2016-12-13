@@ -16,8 +16,7 @@
 #include "ice/representation/GContainer.h"
 #include "ice/representation/GContainerFactory.h"
 
-#include "GPSPosition.h"
-
+#include "container/Pos3D.h"
 
 TEST(GPSTransformation, gpspostion)
 {
@@ -41,21 +40,21 @@ TEST(GPSTransformation, gpspostion)
   auto factory = engine->getGContainerFactory();
 
   auto creator = [](std::shared_ptr<ice::GContainerFactory> factory){
-    auto rep = factory->getRepresentation("http://vs.uni-kassel.de/Ice#WGS84Rep");
+    auto rep = factory->getRepresentation("http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
     return std::make_shared<ice::Pos3D>(rep);
   };
-  bool result = factory->registerCustomCreator("http://vs.uni-kassel.de/Ice#WGS84Rep", creator);
+  bool result = factory->registerCustomCreator("http://vs.uni-kassel.de/Ice#CoordinatePositionRep", creator);
 
   ASSERT_TRUE(result);
 
-  auto rep = factory->getRepresentation("http://vs.uni-kassel.de/Ice#WGS84Rep");
-  auto lat = rep->accessPath({"http://vs.uni-kassel.de/Ice#Latitude"});
-  auto lon = rep->accessPath({"http://vs.uni-kassel.de/Ice#Longitude"});
-  auto alt = rep->accessPath({"http://vs.uni-kassel.de/Ice#Altitude"});
+  auto rep = factory->getRepresentation("http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
+  auto x = rep->accessPath({"http://vs.uni-kassel.de/Ice#XCoordinate"});
+  auto y = rep->accessPath({"http://vs.uni-kassel.de/Ice#YCoordinate"});
+  auto z = rep->accessPath({"http://vs.uni-kassel.de/Ice#ZCoordinate"});
 
-  ASSERT_NE(nullptr, lat);
-  ASSERT_NE(nullptr, lon);
-  ASSERT_NE(nullptr, alt);
+  ASSERT_NE(nullptr, x);
+  ASSERT_NE(nullptr, y);
+  ASSERT_NE(nullptr, z);
 
   auto pos1 = std::static_pointer_cast<ice::Pos3D>(factory->makeInstance(rep));
 
@@ -63,17 +62,17 @@ TEST(GPSTransformation, gpspostion)
   pos1->y = 22.222;
   pos1->z = 33.333;
 
-  ASSERT_EQ(11.111, pos1->getValue<double>(lat));
-  ASSERT_EQ(22.222, pos1->getValue<double>(lon));
-  ASSERT_EQ(33.333, pos1->getValue<double>(alt));
+  ASSERT_EQ(11.111, pos1->getValue<double>(x));
+  ASSERT_EQ(22.222, pos1->getValue<double>(y));
+  ASSERT_EQ(33.333, pos1->getValue<double>(z));
 
   double dLat = 99;
   double dLon = 9990;
   double dAlt = 999999;
 
-  pos1->set(lat, &dLat);
-  pos1->set(lon, &dLon);
-  pos1->set(alt, &dAlt);
+  pos1->set(x, &dLat);
+  pos1->set(y, &dLon);
+  pos1->set(z, &dAlt);
 
   ASSERT_EQ(dLat, pos1->x);
   ASSERT_EQ(dLon, pos1->y);

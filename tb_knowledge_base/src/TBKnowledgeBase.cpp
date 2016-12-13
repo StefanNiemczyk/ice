@@ -5,12 +5,20 @@
  *      Author: sni
  */
 
-#include <node/FusePositions.h>
-#include <TBKnowledgeBase.h>
+#include "node/FusePositions.h"
 
 #include <ros/package.h>
+#include <ice/information/InformationSet.h>
+#include <ice/information/InformationStream.h>
+#include <ice/information/SetStore.h>
+#include <ice/information/StreamStore.h>
+#include <ice/representation/GContainer.h>
 
 #include "TBCollectionFactory.h"
+#include "TBKnowledgeBase.h"
+#include "container/Pos3D.h"
+#include "container/PositionOrientation3D.h"
+#include "container/RTLandmark.h"
 #include "node/TBLocalization.h"
 #include "node/Pos3D2RelativeToLandmark.h"
 #include "node/RelativeToLandmark2Pos3D.h"
@@ -19,7 +27,7 @@
 namespace ice
 {
 
-TBKnowledgeBase::TBKnowledgeBase()
+TBKnowledgeBase::TBKnowledgeBase(std::string robotName) : robotName(robotName)
 {
   _log = el::Loggers::getLogger("TBKnowledgeBase");
 
@@ -42,7 +50,7 @@ void TBKnowledgeBase::init()
 
   // set configuration values
   this->config->ontologyIri = "http://vs.uni-kassel.de/TurtleBot";
-  this->config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/TurtleBot#Leonardo"; // TODO
+  this->config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/TurtleBot#" + this->robotName;
   this->config->ontologyIriMapper = path + "/ontology/";
 
   // Set time factory
@@ -50,14 +58,57 @@ void TBKnowledgeBase::init()
   this->setTimeFactory(timeFactory);
 
   // Set collection factory
-  auto collectionFactory = std::make_shared<CollectionFactory>(this->shared_from_this());
-  this->setCollectionFactory(factory);
+  auto collectionFactory = std::make_shared<TBCollectionFactory>(this->shared_from_this());
+  this->setCollectionFactory(collectionFactory);
 
   // Call super init
   ICEngine::init();
 
   // Register creator for GContainer
-  // TODO
+  // http://vs.uni-kassel.de/Ice#CoordinatePositionRep
+  auto creatorPos3D = [](std::shared_ptr<ice::GContainerFactory> factory) {
+    auto rep = factory->getRepresentation("http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
+    return std::make_shared<Pos3D>(rep);
+  };
+  bool result = this->gcontainerFactory->registerCustomCreator("http://vs.uni-kassel.de/Ice#CoordinatePositionRep",
+                                                               creatorPos3D);
+
+  // http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D
+  auto creatorPosOri3D = [](std::shared_ptr<ice::GContainerFactory> factory) {
+    auto rep = factory->getRepresentation("http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
+    return std::make_shared<PositionOrientation3D>(rep);
+  };
+  result = this->gcontainerFactory->registerCustomCreator("http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D",
+                                                               creatorPosOri3D);
+
+  // http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark
+  auto rtLandmarkCreator = [](std::shared_ptr<ice::GContainerFactory> factory) {
+    auto rep = factory->getRepresentation("http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
+    return std::make_shared<RTLandmark>(rep);
+  };
+  result = this->gcontainerFactory->registerCustomCreator("http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark",
+                                                          rtLandmarkCreator);
+}
+
+void TBKnowledgeBase::start()
+{
+  ICEngine::start();
+
+  // get selected sets and streams
+  // position of own robot
+  auto ownPos = ice::InformationSpecification("http://vs.uni-kassel.de/TurtleBot#" + this->robotName,
+                                              "http://vs.uni-kassel.de/TurtleBot#TurtleBot",
+                                              "http://vs.uni-kassel.de/Ice#Position",
+                                              "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
+  this->positionOwn = this->knowledgeBase->streamStore->getSelectedStream<PositionOrientation3D>(&ownPos);
+
+
+  // position set of all robots
+  auto allPos = ice::InformationSpecification("",
+                                              "http://vs.uni-kassel.de/TurtleBot#TurtleBot",
+                                              "http://vs.uni-kassel.de/Ice#Position",
+                                              "http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
+  this->positionAll = this->knowledgeBase->setStore->getSelectedSet<RTLandmark>(&allPos);
 }
 
 } /* namespace ice */

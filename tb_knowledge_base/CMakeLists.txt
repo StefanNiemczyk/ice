@@ -42,14 +42,18 @@ include_directories(
 )  
 
 add_library(${PROJECT_NAME}
+  src/Pos3D.cpp
+  src/PositionOrientation3D.cpp
+  src/RTLandmark.cpp
+  
   src/FusePositions.cpp
-  src/GPSPosition.cpp
   src/Pos3D2RelativeToLandmark.cpp
   src/RelativeToLandmark2Pos3D.cpp
-  src/TBCollectionFactory.cpp
-  src/TBKnowledgeBase.cpp
   src/TBLocalization.cpp
   src/VictimDetection.cpp
+  
+  src/TBCollectionFactory.cpp
+  src/TBKnowledgeBase.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ice)

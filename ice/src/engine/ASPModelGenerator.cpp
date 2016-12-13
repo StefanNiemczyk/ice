@@ -166,9 +166,12 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
 
   // Solving
   _log->debug("Start solving");
+  auto start = std::chrono::system_clock::now();
   auto solveResult = this->asp->solve();
-  _log->info("Solving finished: %v", (Gringo::SolveResult::SAT == solveResult) ? "SAT" : "UNSAT");
-
+  auto end = std::chrono::system_clock::now();
+  _log->info("Solving finished after %v ms with %v",
+             std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count(),
+             (Gringo::SolveResult::SAT == solveResult) ? "SAT" : "UNSAT");
 
 //  ofstream file;
 //  file.open("/tmp/test.txt");

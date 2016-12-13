@@ -1,26 +1,26 @@
 /*
- * GPSPosition.h
+ * PositionOrientation3D.h
  *
- *  Created on: 14.09.2016
+ *  Created on: Dec 13, 2016
  *      Author: sni
  */
 
-#ifndef INCLUDE_GPSPOSITION_H_
-#define INCLUDE_GPSPOSITION_H_
+#ifndef INCLUDE_CONTAINER_POSITIONORIENTATION3D_H_
+#define INCLUDE_CONTAINER_POSITIONORIENTATION3D_H_
 
 #include <ice/representation/GContainer.h>
 
 namespace ice
 {
 
-class Pos3D : public GContainer
+class PositionOrientation3D : public GContainer
 {
 private:
-  static int X_COORDINATE_PATH, Y_COORDINATE_PATH, Z_COORDINATE_PATH;
+  static int ALPHA_PATH, X_COORDINATE_PATH, Y_COORDINATE_PATH, Z_COORDINATE_PATH;
 
 public:
-  Pos3D(std::shared_ptr<Representation> const &representation);
-  virtual ~Pos3D();
+  PositionOrientation3D(std::shared_ptr<Representation> const &representation);
+  virtual ~PositionOrientation3D();
 
   virtual GContainer* clone();
   virtual void print(int level, std::string dimension = "");
@@ -34,7 +34,11 @@ public:
   virtual std::string toJSON();
   virtual Value toJSONValue(Document &d);
 
+  virtual bool readFromJSON(Value& value);
+  virtual bool isGeneric();
+
 public:
+  double alpha;
   double x;
   double y;
   double z;
@@ -42,4 +46,4 @@ public:
 
 } /* namespace ice */
 
-#endif /* INCLUDE_GPSPOSITION_H_ */
+#endif /* INCLUDE_CONTAINER_POSITIONORIENTATION3D_H_ */

@@ -9,6 +9,8 @@
 
 #include <ice/information/InformationSet.h>
 
+#include "container/Pos3D.h"
+
 namespace ice
 {
 
@@ -43,7 +45,7 @@ int VictimDetection::init()
     return 1;
   }
 
-  this->out = std::static_pointer_cast<ice::InformationSet<GContainer>>(this->outputSets[0]);
+  this->out = std::static_pointer_cast<ice::InformationSet<Pos3D>>(this->outputSets[0]);
 
   return 0;
 }
@@ -57,7 +59,7 @@ const int VictimDetection::newEvent(std::shared_ptr<InformationElement<GContaine
 
 int VictimDetection::performNode()
 {
-  auto instance = this->gcontainerFactory->makeInstance(POS_REP);
+  auto instance = std::make_shared<Pos3D>(this->gcontainerFactory->getRepresentation(POS_REP));
 
 //  posNew->x = 1;
 //  posNew->y = 21;

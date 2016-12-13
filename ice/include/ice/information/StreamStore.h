@@ -121,10 +121,20 @@ public:
     if (false == stream)
       return nullptr;
 
-    if (typeid(T) == *stream->getTypeInfo())
+
+//    if (typeid(T).hash_code() == typeid(GContainer).hash_code() && stream->isGContainer())
+//    {
+      // evil
+//      return std::static_pointer_cast<InformationStream<void>>(stream);
+//      return (std::shared_ptr<InformationStream<GContainer>>)s;
+//    }
+//    else
+    if (typeid(T).hash_code() == stream->getTypeInfo()->hash_code())
+    {
       return std::static_pointer_cast<InformationStream<T>>(stream);
-    else
-      throw std::bad_cast();
+    }
+
+    _log->error("Bad type '%v' of stream '%v'", typeid(T).name(), stream->getTypeInfo()->name());
 
     return nullptr;
   }
@@ -132,15 +142,18 @@ public:
   template<typename T>
     std::shared_ptr<InformationStream<T>> getSelectedStream(InformationSpecification *specification)
   {
-    auto set = this->getSelectedBaseCollection(specification);
+    auto stream = this->getSelectedBaseCollection(specification);
 
-    if (false == set)
+    if (false == stream)
       return nullptr;
 
-    if (typeid(T) == *set->getTypeInfo())
-      return std::static_pointer_cast<InformationStream<T>>(set);
-    else
-      throw std::bad_cast();
+//    if (typeid(T).hash_code() == typeid(GContainer).hash_code() && stream->isGContainer())
+//      return std::dynamic_pointer_cast<InformationStream<GContainer>>(stream);
+//    else
+    if (typeid(T).hash_code() == stream->getTypeInfo()->hash_code())
+      return std::static_pointer_cast<InformationStream<T>>(stream);
+
+    _log->error("Bad type '%v' of selected stream '%v'", typeid(T).name(), stream->getTypeInfo()->name());
 
     return nullptr;
   }

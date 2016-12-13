@@ -10,6 +10,10 @@
 #include <ice/information/InformationSet.h>
 #include <ice/information/InformationStream.h>
 
+#include "container/Pos3D.h"
+#include "container/PositionOrientation3D.h"
+#include "container/RTLandmark.h"
+
 namespace ice
 {
 
@@ -27,40 +31,58 @@ std::shared_ptr<BaseInformationStream> TBCollectionFactory::createStream(
     const std::string& className, std::shared_ptr<CollectionDescription> streamDescription,
     std::shared_ptr<EventHandler> eventHandler, int streamSize) const
 {
-  std::shared_ptr<BaseInformationStream> stream;
-
   if (className == "")
     return nullptr;
 
-  if ("int" == className)
+  if ("http://vs.uni-kassel.de/Ice#CoordinatePositionRep" == className)
   {
-    stream = std::make_shared<InformationStream<int>>(streamDescription, eventHandler, streamSize);
+    auto stream = std::make_shared<InformationStream<Pos3D>>(streamDescription, eventHandler, streamSize);
+    stream->setGContainer(true);
+    return stream;
+  }
+  else if ("http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D" == className)
+  {
+    auto stream = std::make_shared<InformationStream<PositionOrientation3D>>(streamDescription, eventHandler, streamSize);
+    stream->setGContainer(true);
+    return stream;
+  }
+  else if ("http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark" == className)
+  {
+    auto set = std::make_shared<InformationStream<RTLandmark>>(streamDescription, eventHandler, 100);
+    set->setGContainer(true);
+    return set;
   }
 
-  if (stream == nullptr)
-        stream = ice::CollectionFactory::createStream(className, streamDescription, eventHandler, streamSize);
-
-  return stream;
+  return ice::CollectionFactory::createStream(className, streamDescription, eventHandler, streamSize);
 }
 
 std::shared_ptr<BaseInformationSet> TBCollectionFactory::createSet(
     const std::string& className, std::shared_ptr<CollectionDescription> streamDescription,
     std::shared_ptr<EventHandler> eventHandler) const
 {
-  std::shared_ptr<BaseInformationSet> set;
-
   if (className == "")
     return nullptr;
 
-  if ("int" == className)
+  if ("http://vs.uni-kassel.de/Ice#CoordinatePositionRep" == className)
   {
-    set = std::make_shared<InformationSet<int>>(streamDescription, eventHandler);
+    auto set = std::make_shared<InformationSet<Pos3D>>(streamDescription, eventHandler);
+    set->setGContainer(true);
+    return set;
+  }
+  else if ("http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D" == className)
+  {
+    auto set = std::make_shared<InformationSet<PositionOrientation3D>>(streamDescription, eventHandler);
+    set->setGContainer(true);
+    return set;
+  }
+  else if ("http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark" == className)
+  {
+    auto set = std::make_shared<InformationSet<RTLandmark>>(streamDescription, eventHandler);
+    set->setGContainer(true);
+    return set;
   }
 
-  if (set == nullptr)
-    set = ice::CollectionFactory::createSet(className, streamDescription, eventHandler);
-
-  return set;
+  return ice::CollectionFactory::createSet(className, streamDescription, eventHandler);
 }
 
 } /* namespace ice */

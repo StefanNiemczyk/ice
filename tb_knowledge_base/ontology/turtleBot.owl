@@ -142,6 +142,22 @@
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseTBPositions">
         <rdfs:subClassOf rdf:resource="&Ice;SetNode"/>
         <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                        <owl:onClass rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmarkStream"/>
+                        <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasInput"/>
+                        <owl:onClass rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmarkStream"/>
+                        <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">20</owl:maxQualifiedCardinality>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;aboutEntity"/>
                 <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBot"/>
@@ -153,12 +169,6 @@
                 <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmarkSet"/>
             </owl:Restriction>
         </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasInput"/>
-                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmarkStream"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -167,6 +177,12 @@
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseVictims">
         <rdfs:subClassOf rdf:resource="&Ice;SetNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;aboutEntity"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#Victim"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasOutputSet"/>
@@ -256,14 +272,14 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                <owl:allValuesFrom rdf:resource="&Ice;LongRep"/>
+                <owl:onClass rdf:resource="&Ice;StringRep"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                <owl:onClass rdf:resource="&Ice;LongRep"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:allValuesFrom rdf:resource="&Ice;StringRep"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -324,17 +340,12 @@
                     </owl:Restriction>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="&Ice;hasDimension"/>
-                        <owl:onClass>
-                            <owl:Class>
-                                <owl:intersectionOf rdf:parseType="Collection">
-                                    <rdf:Description rdf:about="&Ice;Position"/>
-                                    <owl:Restriction>
-                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                                        <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CoordinatePosition2DRep"/>
-                                    </owl:Restriction>
-                                </owl:intersectionOf>
-                            </owl:Class>
-                        </owl:onClass>
+                        <owl:onClass rdf:resource="&Ice;XCoordinate"/>
+                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                        <owl:onClass rdf:resource="&Ice;YCoordinate"/>
                         <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
                     </owl:Restriction>
                 </owl:intersectionOf>
@@ -382,17 +393,17 @@
                     </owl:Restriction>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="&Ice;hasDimension"/>
-                        <owl:onClass>
-                            <owl:Class>
-                                <owl:intersectionOf rdf:parseType="Collection">
-                                    <rdf:Description rdf:about="&Ice;Position"/>
-                                    <owl:Restriction>
-                                        <owl:onProperty rdf:resource="&Ice;hasRepresentation"/>
-                                        <owl:someValuesFrom rdf:resource="&Ice;CoordinatePositionRep"/>
-                                    </owl:Restriction>
-                                </owl:intersectionOf>
-                            </owl:Class>
-                        </owl:onClass>
+                        <owl:onClass rdf:resource="&Ice;XCoordinate"/>
+                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                        <owl:onClass rdf:resource="&Ice;YCoordinate"/>
+                        <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&Ice;hasDimension"/>
+                        <owl:onClass rdf:resource="&Ice;ZCoordinate"/>
                         <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
                     </owl:Restriction>
                 </owl:intersectionOf>
@@ -566,6 +577,18 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;hasScope"/>
+                <owl:someValuesFrom rdf:resource="&Ice;Orientation"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasScope"/>
+                <owl:someValuesFrom rdf:resource="&Ice;Position"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasScope"/>
                 <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#Identifier"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -713,6 +736,10 @@
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseTBPositions">
         <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseTBPositions"/>
         <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#FusePositionsCppGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsAccuracyGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsCostGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsDelayGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseTBPositionsDensityGrounding"/>
     </owl:NamedIndividual>
     
 
@@ -821,6 +848,7 @@
         <rdf:type rdf:resource="&Ice;System"/>
         <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBot"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DefaultVictimDetection"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseTBPositions"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseVictims"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LeonardoLocalization"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LeonardoPositionReqStream"/>

@@ -114,10 +114,13 @@ public:
     if (false == set)
       return nullptr;
 
-    if (typeid(T) == *set->getTypeInfo())
+//    if (typeid(T).hash_code() == typeid(GContainer).hash_code() && set->isGContainer())
+//      return dynamic_cast<std::shared_ptr<InformationSet<GContainer>>>(set);
+//    else
+    if (typeid(T).hash_code() == set->getTypeInfo()->hash_code())
       return std::static_pointer_cast<InformationSet<T>>(set);
-    else
-      throw std::bad_cast();
+
+    _log->error("Bad type '%v' of set '%v'", typeid(T).name(), set->getTypeInfo()->name());
 
     return nullptr;
   }
@@ -130,10 +133,13 @@ public:
     if (false == set)
       return nullptr;
 
-    if (typeid(T) == *set->getTypeInfo())
+//    if (typeid(T).hash_code() == typeid(GContainer).hash_code() && set->isGContainer())
+//      return (std::shared_ptr<InformationSet<GContainer>>) set;
+//    else
+    if (typeid(T).hash_code() == set->getTypeInfo()->hash_code())
       return std::static_pointer_cast<InformationSet<T>>(set);
-    else
-      throw std::bad_cast();
+
+    _log->error("Bad type '%v' of selected set '%v'", typeid(T).name(), set->getTypeInfo()->name());
 
     return nullptr;
   }

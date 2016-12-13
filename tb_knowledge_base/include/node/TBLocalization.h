@@ -14,9 +14,9 @@
 
 namespace ice
 {
-class GContainer;
 template <typename T>
 class InformationStream;
+class PositionOrientation3D;
 
 class TBLocalization : public Node
 {
@@ -38,7 +38,7 @@ private:
   static std::string POS_REP;
 
 private:
-  std::shared_ptr<InformationStream<GContainer>>   out;
+  std::shared_ptr<InformationStream<PositionOrientation3D>>   out;
 };
 
 } /* namespace ice */

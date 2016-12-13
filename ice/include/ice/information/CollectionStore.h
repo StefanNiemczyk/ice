@@ -112,23 +112,18 @@ public:
   {
     _log->debug("Get selected collection by '%v'", specification->toString());
 
-    std::vector<std::shared_ptr<T>> selected;
-
     for (auto collection : this->selected)
     {
       auto spec = collection.selected->getDescription();
       if (false == (*spec->getInformationSpecification() == *specification))
         continue;
 
-      selected.push_back(collection.selected);
+      return collection.selected;
     }
 
-    if (selected.size() == 0)
-    {
-      return nullptr;
-    }
+    _log->warn("No selected collection found for '%v'", specification->toString());
 
-    return selectBest(selected);
+    return nullptr;
   }
 
   void cleanUpUnused()

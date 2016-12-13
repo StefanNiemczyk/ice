@@ -14,9 +14,9 @@
 
 namespace ice
 {
-class GContainer;
 template <typename T>
 class InformationSet;
+class Pos3D;
 
 class VictimDetection : public Node
 {
@@ -38,7 +38,7 @@ private:
   static std::string POS_REP;
 
 private:
-  std::shared_ptr<InformationSet<GContainer>>   out;
+  std::shared_ptr<InformationSet<Pos3D>>   out;
 };
 } /* namespace ice */
 

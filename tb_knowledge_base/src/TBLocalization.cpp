@@ -9,6 +9,8 @@
 
 #include <ice/information/InformationStream.h>
 
+#include "container/PositionOrientation3D.h"
+
 namespace ice
 {
 
@@ -43,7 +45,7 @@ int TBLocalization::init()
     return 1;
   }
 
-  this->out = std::static_pointer_cast<ice::InformationStream<GContainer>>(this->outputs[0]);
+  this->out = std::static_pointer_cast<ice::InformationStream<PositionOrientation3D>>(this->outputs[0]);
 
   return 0;
 }
@@ -57,7 +59,8 @@ const int TBLocalization::newEvent(std::shared_ptr<InformationElement<GContainer
 
 int TBLocalization::performNode()
 {
-  auto instance = this->gcontainerFactory->makeInstance(POS_REP);
+  //auto instance = this->gcontainerFactory->makeInstance(POS_REP);
+  auto instance = std::make_shared<PositionOrientation3D>(this->gcontainerFactory->getRepresentation(POS_REP));
 
 //  posNew->x = 1;
 //  posNew->y = 21;

@@ -18,13 +18,13 @@ namespace ice
 
 TransformationSynthesis::TransformationSynthesis()
 {
-  _log = el::Loggers::getLogger("ASPTransformationGeneration");
+  _log = el::Loggers::getLogger("TransformationSynthesis");
 }
 
 TransformationSynthesis::TransformationSynthesis(std::weak_ptr<ICEngine> engine) :
     engine(engine)
 {
-  _log = el::Loggers::getLogger("ASPTransformationGeneration");
+  _log = el::Loggers::getLogger("TransformationSynthesis");
 }
 
 TransformationSynthesis::~TransformationSynthesis()
@@ -173,7 +173,7 @@ void TransformationSynthesis::synthesizeTransformations()
     if (false == resultExtraction)
       continue;
 
-    _log->info("Created transformation '%v' from ontology", name);
+    _log->info("Created transformation: '%v' -> '%v'", rep1->name, rep2->name);
     this->containerFactory->addTransformation(name, transformation, true);
   }
 }
