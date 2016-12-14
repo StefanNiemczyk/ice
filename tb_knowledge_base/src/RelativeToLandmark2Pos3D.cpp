@@ -10,6 +10,11 @@
 #include <ice/information/InformationSet.h>
 #include <ice/information/InformationStream.h>
 
+#include "TBKnowledgeBase.h"
+
+#include "container/PositionOrientation3D.h"
+#include "container/RTLandmark.h"
+
 namespace ice
 {
 
@@ -69,26 +74,52 @@ int RelativeToLandmark2Pos3D::init()
     this->outStream = std::static_pointer_cast<ice::InformationStream<GContainer>>(this->outputs[0]);
   }
 
+  // get landmark map
+  if (this->engine.expired())
+    return 1;
+
+  auto e = this->engine.lock();
+  auto tbkb = std::dynamic_pointer_cast<TBKnowledgeBase>(e);
+  this->positionLandmarks = tbkb->positionLandmarks;
+
   return 0;
 }
 
 const int RelativeToLandmark2Pos3D::newEvent(std::shared_ptr<InformationElement<GContainer>> element,
                            std::shared_ptr<InformationCollection> collection)
 {
-  auto instance = this->gcontainerFactory->makeInstance(REP_OUT);
+  auto info = std::dynamic_pointer_cast<RTLandmark>(element->getInformation());
 
-  auto old = element->getInformation();
+  auto eval = [info](std::shared_ptr<InformationElement<PositionOrientation3D>>& element) {
+    return info->landmark == element->getSpecification()->getEntity();
+  };
 
-  // TODO transformation!!!
+  auto list = std::make_shared<std::vector<std::shared_ptr<InformationElement<PositionOrientation3D>>>>();
+  auto result = this->positionLandmarks->getFilteredList(list, eval);
+
+  if (list->size() != 0)
+  {
+    _log->error("Position could not be transformation, landmark '%v' is unknown", info->landmark);
+    return 1;
+  }
+
+  auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(list->at(0));
+  auto instance = std::dynamic_pointer_cast<RTLandmark>(this->gcontainerFactory->makeInstance(REP_OUT));
+
+  // rotate
+  instance->x = cos(-landmark->alpha) * info->x - sin(-landmark->alpha) * info->y;
+  instance->x = sin(-landmark->alpha) * info->x + cos(-landmark->alpha) * info->y;
+
+  // translate
+  instance->x = info->x + landmark->x;
+  instance->y = info->y + landmark->y;
+  instance->z = info->z + landmark->z;
+
 
   if (this->isSet)
-  {
     this->outSet->add(element->getSpecification()->getEntity(), instance);
-  }
   else
-  {
     this->outStream->add(instance);
-  }
 
   return 0;
 }

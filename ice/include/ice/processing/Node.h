@@ -30,6 +30,7 @@ class BaseInformationSet;
 class BaseInformationStream;
 class Entity;
 class GContainerFactory;
+class ICEngine;
 class NodeStore;
 class TimeFactory;
 
@@ -63,6 +64,7 @@ public:
   virtual int cleanUp();
   virtual int destroy();
 
+  void setICEngine(std::weak_ptr<ICEngine> engine);
   void setNodeStore(std::shared_ptr<NodeStore> nodeStore);
   void setTimeFactory(std::shared_ptr<TimeFactory> timeFactory);
   void setGContainerFactory(std::shared_ptr<GContainerFactory> gcontainerFactory);
@@ -119,6 +121,7 @@ public:
   std::string toString();
 
 protected:
+  std::weak_ptr<ICEngine>                               engine;                 /**< THe ice engine */
   std::shared_ptr<NodeStore>                            nodeStore;              /**< The node store */
   std::shared_ptr<TimeFactory>                          timeFactory;            /**< The factory to create timestamps */
   std::shared_ptr<GContainerFactory>                    gcontainerFactory;      /**< The factory to GContainer instances */

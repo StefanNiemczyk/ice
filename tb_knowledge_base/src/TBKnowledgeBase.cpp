@@ -23,7 +23,8 @@
 #include "node/TBLocalization.h"
 #include "node/Pos3D2RelativeToLandmark.h"
 #include "node/RelativeToLandmark2Pos3D.h"
-#include "node/VictimDetection.h"
+#include "node/DetectLandmarks.h"
+#include "node/DetectVictims.h"
 
 namespace ice
 {
@@ -34,7 +35,8 @@ TBKnowledgeBase::TBKnowledgeBase(std::string robotName) : robotName(robotName)
 
   // register nodes
   ice::Node::registerNodeCreator("TBLocalization", &TBLocalization::createNode);
-  ice::Node::registerNodeCreator("VictimDetection", &VictimDetection::createNode);
+  ice::Node::registerNodeCreator("DetectVictims", &DetectVictims::createNode);
+  ice::Node::registerNodeCreator("DetectLandmarks", &DetectLandmarks::createNode);
   ice::Node::registerNodeCreator("Pos3D2RelativeToLandmark", &Pos3D2RelativeToLandmark::createNode);
   ice::Node::registerNodeCreator("RelativeToLandmark2Pos3D", &RelativeToLandmark2Pos3D::createNode);
   ice::Node::registerNodeCreator("FusePositions", &FusePositions::createNode);
@@ -117,7 +119,7 @@ void TBKnowledgeBase::start()
                                               "http://vs.uni-kassel.de/TurtleBot#TurtleBot",
                                               "http://vs.uni-kassel.de/Ice#Position",
                                               "http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
-  this->positionAll = this->knowledgeBase->setStore->getSelectedSet<RTLandmark>(&allPos);
+  this->positionRobots = this->knowledgeBase->setStore->getSelectedSet<RTLandmark>(&allPos);
 
   // position set of victims
   auto victimPos = ice::InformationSpecification("",
@@ -125,6 +127,13 @@ void TBKnowledgeBase::start()
                                                  "http://vs.uni-kassel.de/Ice#Position",
                                                  "http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
   this->positionVictims = this->knowledgeBase->setStore->getSelectedSet<RTLandmark>(&victimPos);
+
+  // position set of landmarks
+  auto landmarkPos = ice::InformationSpecification("",
+                                                   "http://vs.uni-kassel.de/TurtleBot#Landmark",
+                                                   "http://vs.uni-kassel.de/Ice#Position",
+                                                   "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
+  this->positionLandmarks = this->knowledgeBase->setStore->getSelectedSet<PositionOrientation3D>(&landmarkPos);
 }
 
 } /* namespace ice */

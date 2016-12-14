@@ -50,8 +50,9 @@ TEST(TBKnowledgeBase, oneBot)
 
   // test processing
   ASSERT_TRUE((tbKnowledgeBase->positionOwn ? true : false));
-  ASSERT_TRUE((tbKnowledgeBase->positionAll ? true : false));
+  ASSERT_TRUE((tbKnowledgeBase->positionRobots ? true : false));
   ASSERT_TRUE((tbKnowledgeBase->positionVictims ? true : false));
+  ASSERT_TRUE((tbKnowledgeBase->positionLandmarks ? true : false));
 
   // generate new element
   auto element = tbKnowledgeBase->getGContainerFactory()->makeInstance("http://vs.uni-kassel.de/Ice#WGS84Rep");

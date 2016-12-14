@@ -118,6 +118,7 @@ std::shared_ptr<Node> NodeStore::registerNode(const NodeType type, const std::st
   }
 
   node = (creator->func)();
+  node->setICEngine(this->engine);
   node->setNodeStore(this->shared_from_this());
   node->setNodeDescription(desc);
   node->setConfiguration(config);

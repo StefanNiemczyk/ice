@@ -13,8 +13,8 @@
 namespace ice
 {
 
-int WGS84::ALTITUDE_PATH = 0;
-int WGS84::LATITUDE_PATH = 1;
+int WGS84::ALTITUDE_PATH  = 0;
+int WGS84::LATITUDE_PATH  = 1;
 int WGS84::LONGITUDE_PATH = 2;
 
 WGS84::WGS84(std::shared_ptr<Representation> const &representation) :

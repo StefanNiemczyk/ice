@@ -5,8 +5,8 @@
  *      Author: sni
  */
 
-#ifndef INCLUDE_NODE_VICTIMDETECTION_H_
-#define INCLUDE_NODE_VICTIMDETECTION_H_
+#ifndef INCLUDE_NODE_DETECTLANDMARKS_H_
+#define INCLUDE_NODE_DETECTLANDMARKS_H_
 
 #include <memory>
 
@@ -18,14 +18,14 @@ template <typename T>
 class InformationSet;
 class Pos3D;
 
-class VictimDetection : public Node
+class DetectLandmarks : public Node
 {
 public:
   static std::shared_ptr<Node> createNode();
 
 public:
-  VictimDetection();
-  virtual ~VictimDetection();
+  DetectLandmarks();
+  virtual ~DetectLandmarks();
 
   int init();
 
@@ -42,4 +42,4 @@ private:
 };
 } /* namespace ice */
 
-#endif /* INCLUDE_NODE_VICTIMDETECTION_H_ */
+#endif /* INCLUDE_NODE_DETECTLANDMARKS_H_ */

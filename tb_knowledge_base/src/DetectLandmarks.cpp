@@ -5,7 +5,7 @@
  *      Author: sni
  */
 
-#include "node/VictimDetection.h"
+#include "node/DetectLandmarks.h"
 
 #include <ice/information/InformationSet.h>
 
@@ -14,31 +14,31 @@
 namespace ice
 {
 
-std::string VictimDetection::POS_REP = "http://vs.uni-kassel.de/TurtleBot#CoordinatePositionRep";
+std::string DetectLandmarks::POS_REP = "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D";
 
-std::shared_ptr<ice::Node> VictimDetection::createNode()
+std::shared_ptr<ice::Node> DetectLandmarks::createNode()
 {
-  auto node = std::make_shared<VictimDetection>();
+  auto node = std::make_shared<DetectLandmarks>();
 
   return node;
 }
 
-VictimDetection::VictimDetection()
+DetectLandmarks::DetectLandmarks()
 {
   //
 }
 
-VictimDetection::~VictimDetection()
+DetectLandmarks::~DetectLandmarks()
 {
   //
 }
 
-std::string VictimDetection::getClassName()
+std::string DetectLandmarks::getClassName()
 {
-  return "VictimDetection";
+  return "DetectLandmarks";
 }
 
-int VictimDetection::init()
+int DetectLandmarks::init()
 {
   if (this->outputSets.empty())
   {
@@ -50,14 +50,14 @@ int VictimDetection::init()
   return 0;
 }
 
-const int VictimDetection::newEvent(std::shared_ptr<InformationElement<GContainer>> element,
+const int DetectLandmarks::newEvent(std::shared_ptr<InformationElement<GContainer>> element,
                            std::shared_ptr<InformationCollection> collection)
 {
   // source node, not necessary
   return 0;
 }
 
-int VictimDetection::performNode()
+int DetectLandmarks::performNode()
 {
   auto instance = std::make_shared<Pos3D>(this->gcontainerFactory->getRepresentation(POS_REP));
 

@@ -380,6 +380,11 @@ int Node::destroy()
   return 0;
 }
 
+void Node::setICEngine(std::weak_ptr<ICEngine> engine)
+{
+  this->engine = engine;
+}
+
 void Node::setNodeStore(std::shared_ptr<NodeStore> nodeStore)
 {
   this->nodeStore = nodeStore;

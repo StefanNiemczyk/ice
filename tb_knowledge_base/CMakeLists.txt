@@ -47,11 +47,12 @@ add_library(${PROJECT_NAME}
   src/RTLandmark.cpp
   src/WGS84.cpp
   
+  src/DetectLandmarks.cpp
+  src/DetectVictims.cpp
   src/FusePositions.cpp
   src/Pos3D2RelativeToLandmark.cpp
   src/RelativeToLandmark2Pos3D.cpp
   src/TBLocalization.cpp
-  src/VictimDetection.cpp
   
   src/TBCollectionFactory.cpp
   src/TBKnowledgeBase.cpp

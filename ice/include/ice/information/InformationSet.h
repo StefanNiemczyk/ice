@@ -277,23 +277,43 @@ template<typename T>
      * \param filteredList List of resulting filtered elements
      * \param func The filter function
      */
-    const int getFilteredList(std::shared_ptr<std::vector<std::shared_ptr<InformationElement<T> > > > filteredList,
+    const int getFilteredList(std::shared_ptr<std::vector<std::shared_ptr<InformationElement<T>>>> filteredList,
                               std::function<bool(std::shared_ptr<InformationElement<T>>&)> func)
     {
       std::lock_guard<std::mutex> guard(_mtx);
       int count = 0;
-      std::shared_ptr<InformationElement<T> > ptr;
 
       for (auto &element : this->map)
       {
         if (func(element.second))
         {
-          filteredList->push_back(ptr);
+          filteredList->push_back(element.second);
           ++count;
         }
       }
 
       return count;
+    }
+
+    std::shared_ptr<InformationElement<T>> getOptimal(std::function<bool(std::shared_ptr<InformationElement<T>>&, std::shared_ptr<InformationElement<T>>&)> func)
+    {
+      std::lock_guard<std::mutex> guard(_mtx);
+      int count = 0;
+      std::shared_ptr<InformationElement<T>> optimal = nullptr;
+
+      for (auto &element : this->map)
+      {
+        if (optimal == nullptr)
+          optimal = element.second;
+
+        if (func(optimal, element.second))
+        {
+          optimal = element.second;
+          ++count;
+        }
+      }
+
+      return optimal;
     }
 
   protected:

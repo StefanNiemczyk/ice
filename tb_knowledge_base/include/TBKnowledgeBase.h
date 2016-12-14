@@ -34,8 +34,9 @@ public:
 
 public:
   std::shared_ptr<InformationStream<PositionOrientation3D>>     positionOwn;
-  std::shared_ptr<InformationSet<RTLandmark>>                   positionAll;
+  std::shared_ptr<InformationSet<RTLandmark>>                   positionRobots;
   std::shared_ptr<InformationSet<RTLandmark>>                   positionVictims;
+  std::shared_ptr<InformationSet<PositionOrientation3D>>        positionLandmarks;
 
 private:
   std::string const                                     robotName;
