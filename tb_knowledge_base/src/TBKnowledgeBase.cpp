@@ -19,6 +19,7 @@
 #include "container/Pos3D.h"
 #include "container/PositionOrientation3D.h"
 #include "container/RTLandmark.h"
+#include "container/WGS84.h"
 #include "node/TBLocalization.h"
 #include "node/Pos3D2RelativeToLandmark.h"
 #include "node/RelativeToLandmark2Pos3D.h"
@@ -88,6 +89,14 @@ void TBKnowledgeBase::init()
   };
   result = this->gcontainerFactory->registerCustomCreator("http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark",
                                                           rtLandmarkCreator);
+
+  // http://vs.uni-kassel.de/Ice#WGS84Rep
+  auto wgs84Creator = [](std::shared_ptr<ice::GContainerFactory> factory) {
+    auto rep = factory->getRepresentation("http://vs.uni-kassel.de/Ice#WGS84Rep");
+    return std::make_shared<WGS84>(rep);
+  };
+  result = this->gcontainerFactory->registerCustomCreator("http://vs.uni-kassel.de/Ice#WGS84Rep",
+                                                          wgs84Creator);
 }
 
 void TBKnowledgeBase::start()
@@ -109,6 +118,13 @@ void TBKnowledgeBase::start()
                                               "http://vs.uni-kassel.de/Ice#Position",
                                               "http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
   this->positionAll = this->knowledgeBase->setStore->getSelectedSet<RTLandmark>(&allPos);
+
+  // position set of victims
+  auto victimPos = ice::InformationSpecification("",
+                                                 "http://vs.uni-kassel.de/TurtleBot#Victim",
+                                                 "http://vs.uni-kassel.de/Ice#Position",
+                                                 "http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
+  this->positionVictims = this->knowledgeBase->setStore->getSelectedSet<RTLandmark>(&victimPos);
 }
 
 } /* namespace ice */

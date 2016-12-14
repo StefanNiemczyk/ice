@@ -7,6 +7,9 @@
 
 #include "container/PositionOrientation3D.h"
 
+#include <iomanip>
+#include <limits>
+
 namespace ice
 {
 
@@ -115,6 +118,7 @@ bool PositionOrientation3D::set(std::vector<int> *indices, int index, const void
 std::string PositionOrientation3D::toJSON()
 {
   std::stringstream ss;
+  ss << std::setprecision (std::numeric_limits<double>::digits10 + 1);
   ss << "{\"http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D\":{\"http://vs.uni-kassel.de/Ice#Alpha\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
      << this->alpha
      << "},\"http://vs.uni-kassel.de/Ice#XCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"

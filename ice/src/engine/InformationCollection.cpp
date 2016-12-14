@@ -147,7 +147,7 @@ int InformationCollection::registerRemoteListener(std::shared_ptr<Entity> &entit
 
   if (this->remoteListeners.size() > 0)
   {
-    _log->info("Register sender for stream '%v'", this->toString());
+    _log->info("Register sender for collection '%v'", this->toString());
     this->registerSender(communication);
   }
 
@@ -204,7 +204,18 @@ std::string InformationCollection::toString()
 {
   std::stringstream ss;
 
-  ss << "stream(" << this->streamDescription->toString() << "," << this->iid << ")";
+  switch (this->getCollectionType())
+  {
+    case CT_SET:
+      ss << "set(" << this->streamDescription->toString() << "," << this->iid << ")";
+      break;
+    case CT_STREAM:
+      ss << "stream(" << this->streamDescription->toString() << "," << this->iid << ")";
+      break;
+    default:
+      ss << "unknown(" << this->streamDescription->toString() << "," << this->iid << ")";
+      break;
+  }
 
   return ss.str();
 }

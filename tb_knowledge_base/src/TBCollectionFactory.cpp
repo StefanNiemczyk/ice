@@ -13,6 +13,7 @@
 #include "container/Pos3D.h"
 #include "container/PositionOrientation3D.h"
 #include "container/RTLandmark.h"
+#include "container/WGS84.h"
 
 namespace ice
 {
@@ -52,6 +53,12 @@ std::shared_ptr<BaseInformationStream> TBCollectionFactory::createStream(
     set->setGContainer(true);
     return set;
   }
+  else if ("http://vs.uni-kassel.de/Ice#WGS84Rep" == className)
+  {
+    auto set = std::make_shared<InformationStream<WGS84>>(streamDescription, eventHandler, 100);
+    set->setGContainer(true);
+    return set;
+  }
 
   return ice::CollectionFactory::createStream(className, streamDescription, eventHandler, streamSize);
 }
@@ -78,6 +85,12 @@ std::shared_ptr<BaseInformationSet> TBCollectionFactory::createSet(
   else if ("http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark" == className)
   {
     auto set = std::make_shared<InformationSet<RTLandmark>>(streamDescription, eventHandler);
+    set->setGContainer(true);
+    return set;
+  }
+  else if ("http://vs.uni-kassel.de/Ice#WGS84Rep" == className)
+  {
+    auto set = std::make_shared<InformationSet<WGS84>>(streamDescription, eventHandler);
     set->setGContainer(true);
     return set;
   }

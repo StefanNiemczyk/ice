@@ -7,8 +7,22 @@
 
 #include "container/RTLandmark.h"
 
+#include <iomanip>
+#include <limits>
+
 namespace ice
 {
+
+void replaceAll(std::string &s, const std::string &search, const std::string &replace ) {
+    for( size_t pos = 0; ; pos += replace.length() ) {
+        // Locate the substring to replace
+        pos = s.find( search, pos );
+        if( pos == std::string::npos ) break;
+        // Replace by erasing and inserting
+        s.erase( pos, search.length() );
+        s.insert( pos, replace );
+    }
+}
 
 int RTLandmark::LANDMARK_PATH = 0;
 int RTLandmark::POSITION_PATH = 1;
@@ -124,7 +138,12 @@ bool RTLandmark::set(std::vector<int> *indices, int index, const void* value)
 
 std::string RTLandmark::toJSON()
 {
+  std::string landmark = this->landmark;
+  replaceAll(landmark, "\"", "\\\"");
+  replaceAll(landmark, "\\", "\\");
+
   std::stringstream ss;
+  ss << std::setprecision (std::numeric_limits<double>::digits10 + 1);
   ss << "{\"http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark\":{\"http://vs.uni-kassel.de/Ice#Position\":{\"http://vs.uni-kassel.de/Ice#XCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
       << this->x
       << "},\"http://vs.uni-kassel.de/Ice#YCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
@@ -132,7 +151,7 @@ std::string RTLandmark::toJSON()
       << "},\"http://vs.uni-kassel.de/Ice#ZCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
       << this->z
       << "}},\"http://vs.uni-kassel.de/TurtleBot#LandmarkId\":{\"http://vs.uni-kassel.de/Ice#StringRep\":\""
-      << this->landmark
+      << landmark
       <<    "\"}}}";
 
   return ss.str();

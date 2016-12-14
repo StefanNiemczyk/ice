@@ -7,6 +7,9 @@
 
 #include "container/Pos3D.h"
 
+#include <iomanip>
+#include <limits>
+
 namespace ice
 {
 
@@ -101,12 +104,14 @@ bool Pos3D::set(std::vector<int> *indices, int index, const void* value)
 std::string Pos3D::toJSON()
 {
   std::stringstream ss;
-  ss << "{\"http://vs.uni-kassel.de/Ice#CoordinatePositionRep\":{\"http://vs.uni-kassel.de/Ice#XCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\""
+  ss << std::setprecision (std::numeric_limits<double>::digits10 + 1);
+  ss << "{\"http://vs.uni-kassel.de/Ice#CoordinatePositionRep\":{\"http://vs.uni-kassel.de/Ice#XCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
      << this->x
-     << "},\"http://vs.uni-kassel.de/Ice#YCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\""
+     << "},\"http://vs.uni-kassel.de/Ice#YCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
      << this->y
      << "},\"http://vs.uni-kassel.de/Ice#ZCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
-     << this->z << "}}}";
+     << this->z
+     << "}}}";
 
   return ss.str();
 }

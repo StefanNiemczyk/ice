@@ -45,6 +45,7 @@ add_library(${PROJECT_NAME}
   src/Pos3D.cpp
   src/PositionOrientation3D.cpp
   src/RTLandmark.cpp
+  src/WGS84.cpp
   
   src/FusePositions.cpp
   src/Pos3D2RelativeToLandmark.cpp
@@ -70,6 +71,7 @@ target_link_libraries(${PROJECT_NAME}
 
 ## Add gtest based cpp test target and link libraries
  catkin_add_gtest(${PROJECT_NAME}-test 
+   test/test_Containers.cpp
    test/test_GPSTransformation.cpp
    test/test_TBKnowledgeBase.cpp
    
