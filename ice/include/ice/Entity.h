@@ -72,7 +72,6 @@ struct ASPElement
   std::string configAsString;
   std::string raw;
   bool defect;
-  std::map<std::string, std::string> config;
   ASPElementState state;
   ASPElementType type;
 

@@ -172,10 +172,10 @@ template<typename T>
     }
 
   private:
-    std::unique_ptr<std::shared_ptr<T>[]> ringBuffer; /**< Ring buffer of elements */
-    int bufferSize; /**< number of stored elements */
-    ulong identifierCounter; /**< Counter of elements added to the ring buffer */
-    long index; /**< Current index of the last added element */
+    std::unique_ptr<std::shared_ptr<T>[]>       ringBuffer;             /**< Ring buffer of elements */
+    int                                         bufferSize;             /**< number of stored elements */
+    ulong                                       identifierCounter;      /**< Counter of elements added to the ring buffer */
+    long                                        index;                  /**< Current index of the last added element */
   };
 
 } /* namespace ice */

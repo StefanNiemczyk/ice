@@ -12,6 +12,7 @@
 
 #include "TBKnowledgeBase.h"
 
+#include "container/Pos3D.h"
 #include "container/PositionOrientation3D.h"
 #include "container/RTLandmark.h"
 
@@ -53,10 +54,12 @@ int Pos3D2RelativeToLandmark::init()
 
   this->isSet = iter->second == "true";
 
-  if (this->inSet)
+  if (this->isSet)
   {
     if (this->inputSets.size() != 1 || this->outputSets.size() != 1)
     {
+      _log->error("Pos3D2RelativeToLandmark could not be initialized, '%v' inputSets, '%v' outputSets, '%v'",
+                  this->inputSets.size(), this->outputSets.size(), this->nodeDescription->toString());
       return 1;
     }
 
@@ -67,6 +70,8 @@ int Pos3D2RelativeToLandmark::init()
   {
     if (this->inputs.size() != 1 || this->outputs.size() != 1)
     {
+      _log->error("Pos3D2RelativeToLandmark could not be initialized, '%v' inputs, '%v' outputs, '%v'",
+                  this->inputs.size(), this->outputs.size(), this->nodeDescription->toString());
       return 1;
     }
 
@@ -76,7 +81,10 @@ int Pos3D2RelativeToLandmark::init()
 
   // get landmark map
   if (this->engine.expired())
+  {
+    _log->error("Pos3D2RelativeToLandmark '%v' could not be initialized, engine expired", this->nodeDescription->toString());
     return 1;
+  }
 
   auto e = this->engine.lock();
   auto tbkb = std::dynamic_pointer_cast<TBKnowledgeBase>(e);
@@ -88,7 +96,7 @@ int Pos3D2RelativeToLandmark::init()
 const int Pos3D2RelativeToLandmark::newEvent(std::shared_ptr<InformationElement<GContainer>> element,
                            std::shared_ptr<InformationCollection> collection)
 {
-  auto info = std::dynamic_pointer_cast<PositionOrientation3D>(element->getInformation());
+  auto info = std::dynamic_pointer_cast<Pos3D>(element->getInformation());
 
   auto eval = [info](std::shared_ptr<InformationElement<PositionOrientation3D>>& pos1,
                      std::shared_ptr<InformationElement<PositionOrientation3D>>& pos2) {
@@ -103,19 +111,34 @@ const int Pos3D2RelativeToLandmark::newEvent(std::shared_ptr<InformationElement<
   };
 
   auto result = this->positionLandmarks->getOptimal(eval);
-  auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(result);
+
+  if (result == nullptr)
+  {
+    _log->error("Position could not be transformation, no landmark found");
+    return 1;
+  }
+
+  auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(result->getInformation());
+
+  if (landmark == nullptr)
+  {
+    _log->error("Position could not be transformation, landmark is not a PositionOrientation3D, '%v' generic",
+                result->getInformation()->isGeneric());
+    return 1;
+  }
+
   auto instance = std::dynamic_pointer_cast<RTLandmark>(this->gcontainerFactory->makeInstance(REP_OUT));
 
   instance->landmark = result->getSpecification()->getEntity();
 
   // translate
-  instance->x = info->x - landmark->x;
-  instance->y = info->y - landmark->y;
+  auto x = info->x - landmark->x;
+  auto y = info->y - landmark->y;
   instance->z = info->z - landmark->z;
 
   // rotate
-  instance->x = cos(landmark->alpha) * instance->x - sin(landmark->alpha) * instance->y;
-  instance->x = sin(landmark->alpha) * instance->x + cos(landmark->alpha) * instance->y;
+  instance->x = cos(landmark->alpha) * x - sin(landmark->alpha) * y;
+  instance->y = sin(landmark->alpha) * x + cos(landmark->alpha) * y;
 
   if (this->isSet)
     this->outSet->add(element->getSpecification()->getEntity(), instance);

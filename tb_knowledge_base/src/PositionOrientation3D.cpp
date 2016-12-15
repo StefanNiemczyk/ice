@@ -14,9 +14,9 @@ namespace ice
 {
 
 int PositionOrientation3D::ALPHA_PATH = 0;
-int PositionOrientation3D::X_COORDINATE_PATH = 0;
-int PositionOrientation3D::Y_COORDINATE_PATH = 1;
-int PositionOrientation3D::Z_COORDINATE_PATH = 2;
+int PositionOrientation3D::X_COORDINATE_PATH = 1;
+int PositionOrientation3D::Y_COORDINATE_PATH = 2;
+int PositionOrientation3D::Z_COORDINATE_PATH = 3;
 
 PositionOrientation3D::PositionOrientation3D(std::shared_ptr<Representation> const &representation) :
     GContainer(representation), alpha(0), x(0), y(0), z(0)

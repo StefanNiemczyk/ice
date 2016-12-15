@@ -70,6 +70,12 @@ public:
   bool registerCustomCreator(std::string representation, const creatorFunction& creator);
   std::shared_ptr<GContainer> makeInstance(std::string name);
   std::shared_ptr<GContainer> makeInstance(std::shared_ptr<Representation> representation);
+
+  template <typename T>
+  std::shared_ptr<T> makeInstance(std::string name);
+  template <typename T>
+  std::shared_ptr<T> makeInstance(std::shared_ptr<Representation> representation);
+
   std::shared_ptr<GContainer> fromJSON(std::string jsonStr);
   std::shared_ptr<GContainer> fromJSON(Value& jsonValue);
   std::shared_ptr<GContainer> fromJSON(Value& name, Value& value);
@@ -114,6 +120,35 @@ private:
   int                                                           transIter;
   std::map<std::string, std::shared_ptr<TransNode>>             transformations;
 };
+
+template <typename T>
+std::shared_ptr<T> GContainerFactory::makeInstance(std::string repName)
+{
+  auto rep = this->getRepresentation(repName);
+
+  if (nullptr == rep)
+  {
+    _log->error("Unknown representation '%v', no container created", repName);
+    return nullptr;
+  }
+
+  return this->makeInstance<T>(rep);
+}
+
+template <typename T>
+std::shared_ptr<T> GContainerFactory::makeInstance(std::shared_ptr<Representation> representation)
+{
+  // check costume creators
+  auto custom = this->customGContainer.find(representation->name);
+  if (custom != this->customGContainer.end())
+  {
+    auto instance = (custom->second)(this->shared_from_this());
+    return std::dynamic_pointer_cast<T>(instance);
+  }
+
+  return nullptr;
+}
+
 
 }  // namespace ice
 

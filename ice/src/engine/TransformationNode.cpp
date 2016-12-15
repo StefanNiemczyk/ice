@@ -108,7 +108,7 @@ int TransformationNode::performNode()
 
     if (element == nullptr)
     {
-      _log->warn("Performing auto iro node aborted, no input element for '%v' of node '%v'",
+      _log->warn("Performing auto transformation node aborted, no input element for '%v' of node '%v'",
                  this->inputStreams.at(i)->toString(),this->toString());
       return 1;
     }
@@ -118,6 +118,16 @@ int TransformationNode::performNode()
 
   auto input = const_cast<std::shared_ptr<GContainer>*>(this->inputElements.data());
   auto output = this->transformation->transform(input);
+
+  if (output == nullptr)
+  {
+    _log->warn("Performing auto transformation node aborted, no output element for node '%v'",
+               this->toString());
+    return 1;
+  }
+
+  _log->debug("Performed auto transformation '%v'", this->transformation->getName());
+
   this->outputStream->add(output);
 
   return 0;

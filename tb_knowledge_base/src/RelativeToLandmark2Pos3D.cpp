@@ -12,6 +12,7 @@
 
 #include "TBKnowledgeBase.h"
 
+#include "container/Pos3D.h"
 #include "container/PositionOrientation3D.h"
 #include "container/RTLandmark.h"
 
@@ -53,10 +54,12 @@ int RelativeToLandmark2Pos3D::init()
 
   this->isSet = iter->second == "true";
 
-  if (this->inSet)
+  if (this->isSet)
   {
     if (this->inputSets.size() != 1 || this->outputSets.size() != 1)
     {
+      _log->error("RelativeToLandmark2Pos3D could not be initialized, '%v' inputSets, '%v' outputSets, '%v'",
+                  this->inputSets.size(), this->outputSets.size(), this->nodeDescription->toString());
       return 1;
     }
 
@@ -67,6 +70,8 @@ int RelativeToLandmark2Pos3D::init()
   {
     if (this->inputs.size() != 1 || this->outputs.size() != 1)
     {
+      _log->error("RelativeToLandmark2Pos3D could not be initialized, '%v' inputs, '%v' outputs, '%v'",
+                  this->inputs.size(), this->outputs.size(), this->nodeDescription->toString());
       return 1;
     }
 
@@ -76,7 +81,11 @@ int RelativeToLandmark2Pos3D::init()
 
   // get landmark map
   if (this->engine.expired())
+  {
+    _log->error("RelativeToLandmark2Pos3D could not be initialized, engine expired, '%v'",
+                this->nodeDescription->toString());
     return 1;
+  }
 
   auto e = this->engine.lock();
   auto tbkb = std::dynamic_pointer_cast<TBKnowledgeBase>(e);
@@ -104,15 +113,15 @@ const int RelativeToLandmark2Pos3D::newEvent(std::shared_ptr<InformationElement<
   }
 
   auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(list->at(0));
-  auto instance = std::dynamic_pointer_cast<RTLandmark>(this->gcontainerFactory->makeInstance(REP_OUT));
+  auto instance = std::dynamic_pointer_cast<Pos3D>(this->gcontainerFactory->makeInstance(REP_OUT));
 
   // rotate
   instance->x = cos(-landmark->alpha) * info->x - sin(-landmark->alpha) * info->y;
   instance->x = sin(-landmark->alpha) * info->x + cos(-landmark->alpha) * info->y;
 
   // translate
-  instance->x = info->x + landmark->x;
-  instance->y = info->y + landmark->y;
+  instance->x += landmark->x;
+  instance->y += landmark->y;
   instance->z = info->z + landmark->z;
 
 

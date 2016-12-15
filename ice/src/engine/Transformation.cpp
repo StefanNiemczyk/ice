@@ -54,7 +54,15 @@ std::shared_ptr<GContainer> Transformation::transform(std::shared_ptr<GContainer
       case (USE):
       {
         auto value = inputs[operation->sourceIndex]->get(operation->sourceDimension);
-        target->set(operation->targetDimension, value);
+
+        if (value == nullptr)
+        {
+          return nullptr;
+        }
+        else
+        {
+          target->set(operation->targetDimension, value);
+        }
         break;
       }
       case (FORMULA):

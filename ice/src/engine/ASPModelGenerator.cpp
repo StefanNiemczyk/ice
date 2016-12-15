@@ -500,6 +500,9 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
       input.nodeEntity = this->ontology->toLongIri(*node.args()[3].name());
       input.nodeEntityRelated = *node.args()[4].name() == "none" ? "" : this->ontology->toLongIri(*node.args()[4].name());
 
+      if (input.nodeName == "")
+        input.nodeName = *node.args()[2].name();
+
       input.entity = this->ontology->toLongIri(*info.args()[0].name());
       input.scope = this->ontology->toLongIri(*info.args()[1].name());
       input.representation = this->ontology->toLongIri(*info.args()[2].name());
@@ -637,6 +640,9 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
       input.nodeEntity = this->ontology->toLongIri(*node.args()[3].name());
       input.nodeEntityRelated = *node.args()[4].name() == "none" ? "" : this->ontology->toLongIri(*node.args()[4].name());
 
+      if (input.nodeName == "")
+        input.nodeName = *node.args()[2].name();
+
       input.entity = this->ontology->toLongIri(*info.args()[0].name());
       input.scope = this->ontology->toLongIri(*info.args()[1].name());
       input.representation = this->ontology->toLongIri(*info.args()[2].name());
@@ -714,6 +720,9 @@ bool ASPModelGenerator::extractNodes(vector<NodeDesc> &nodes, std::shared_ptr<En
       input.nodeName = this->ontology->toLongIri(*node.args()[2].name());
       input.nodeEntity = this->ontology->toLongIri(*node.args()[3].name());
       input.nodeEntityRelated = *node.args()[4].name() == "none" ? "" : this->ontology->toLongIri(*node.args()[4].name());
+
+      if (input.nodeName == "")
+        input.nodeName = *node.args()[2].name();
 
       input.entityType = this->ontology->toLongIri(*info.args()[0].name());
       input.scope = this->ontology->toLongIri(*info.args()[1].name());
@@ -1037,7 +1046,6 @@ void ASPModelGenerator::toASP(std::unique_ptr<std::vector<std::vector<std::strin
 
         element->className = cppStr.substr(0, index);
         element->configAsString = cppStr.substr(index + 1);
-        element->config = this->readConfiguration(element->configAsString);
       }
 
       std::string shortIris = this->ontology->toShortIriAll(elementStr);
@@ -1148,38 +1156,12 @@ std::shared_ptr<supplementary::ClingWrapper> ASPModelGenerator::getClingWrapper(
   return this->asp;
 }
 
-std::map<std::string, std::string> ASPModelGenerator::readConfiguration(std::string const &config)
-{
-  std::map<std::string, std::string> configuration;
-  std::string cleared = config;
-
-  if (cleared[cleared.length()] == '\n')
-    cleared.pop_back();
-
-  std::stringstream ss(config);
-  std::string item;
-
-  while (std::getline(ss, item, ';'))
-  {
-    int index = item.find("=");
-
-    if (index == std::string::npos)
-    {
-      _log->warn("Broken configuration '%v', skipped", item);
-      continue;
-    }
-
-    configuration[item.substr(0, index)] = item.substr(index + 1);
-  }
-
-  return configuration;
-}
-
 void ASPModelGenerator::readMetadata(std::map<std::string, int>  &metadata, const Gringo::Value &element, bool isStream)
 {
   // TODO read metadata from ontology
   this->readMetadata("delay", metadata, element, isStream);
   this->readMetadata("accuracy", metadata, element, isStream);
+  this->readMetadata("density", metadata, element, isStream);
 }
 
 void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int> &metadata,
@@ -1222,12 +1204,6 @@ void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int
   _log->debug("Metadata '%v' of stream '%v' has value '%v'", name, o.str(), value.num());
 
   metadata.insert(std::make_pair(this->ontology->toLongIri(name), value.num()));
-}
-
-std::string ASPModelGenerator::dataTypeForRepresentation(std::string &representation)
-{
-  // TODO
-  return this->ontology->toLongIri(representation);
 }
 
 } /* namespace ice */

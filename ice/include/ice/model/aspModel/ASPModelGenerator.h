@@ -69,7 +69,6 @@ protected:
 
 private:
   void readOntology();
-  std::string dataTypeForRepresentation(std::string &representation);
   void toASP(std::unique_ptr<std::vector<std::vector<std::string>>> &nodes,
              std::shared_ptr<Entity> &entity, std::string entityIriShort);
   void readTransformations();
@@ -78,7 +77,6 @@ private:
   bool extractSelected(std::shared_ptr<Entity> &entity, vector<SelectedSetDesc> &sets, vector<SelectedStreamDesc> &streams);
   bool extractStreamTransfers(std::shared_ptr<Entity> &from, std::shared_ptr<Entity> &to, std::vector<TransferStreamDesc> &transfers);
   bool extractSetTransfers(std::shared_ptr<Entity> &from, std::shared_ptr<Entity> &to, std::vector<TransferSetDesc> &transfers);
-  std::map<std::string, std::string> readConfiguration(std::string const &config);
   void readMetadata(std::map<std::string, int> &metadata, const Gringo::Value &element, bool isStream);
   void readMetadata(std::string name, std::map<std::string, int> &metadata, const Gringo::Value &element, bool isStream);
 

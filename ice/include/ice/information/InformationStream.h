@@ -179,6 +179,11 @@ template<typename T>
       return this->ringBuffer->getBufferSize();
     }
 
+    int getSize() const
+    {
+      return this->ringBuffer->getSize();
+    }
+
     /*!
      * \brief Clears the stream.
      *

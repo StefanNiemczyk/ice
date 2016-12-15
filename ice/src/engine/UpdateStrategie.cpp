@@ -22,6 +22,25 @@
 namespace ice
 {
 
+// trim from start
+static inline std::string &ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+            std::not1(std::ptr_fun<int, int>(std::isspace))));
+    return s;
+}
+
+// trim from end
+static inline std::string &rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+            std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    return s;
+}
+
+// trim from both ends
+static inline std::string &trim(std::string &s) {
+    return ltrim(rtrim(s));
+}
+
 UpdateStrategie::UpdateStrategie(std::weak_ptr<ICEngine> engine)
 {
   this->_log = el::Loggers::getLogger("UpdateStrategie");
@@ -642,7 +661,9 @@ std::map<std::string, std::string> UpdateStrategie::readConfiguration(std::strin
       continue;
     }
 
-    configuration[item.substr(0, index)] = item.substr(index + 1, item.size());
+    auto value = item.substr(index + 1);
+    configuration[item.substr(0, index)] = trim(value);
+//    configuration[item.substr(0, index)] = item.substr(index + 1, item.size());
   }
 
   return configuration;
