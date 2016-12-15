@@ -163,7 +163,6 @@ public:
     std::cout << "------------------------------------------------------------" << std::endl;
   }
 
-
   int registerSelected(std::shared_ptr<T> collection)
   {
     std::lock_guard<std::mutex> guard(this->_mtx);
@@ -187,7 +186,7 @@ public:
 
     std::map<std::string, int> metadatas;
     auto desc = std::make_shared<CollectionDescription>(collection->getSpecification(),
-                                                        "selecte_set", "selected", "selected", metadatas);
+                                                        "selecte_collection", "selected", "selected", metadatas);
 
     SelectedCollection<T> selected;
     auto dataType = this->knowledgeBase->dataTypeForRepresentation(collection->getSpecification()->getRepresentation());
@@ -205,6 +204,41 @@ public:
     this->selected.push_back(selected);
 
     return 1;
+  }
+
+
+  template<typename G>
+  std::shared_ptr<G> generateSelected(std::shared_ptr<InformationSpecification> infoSpec, CollectionType type)
+  {
+    std::lock_guard<std::mutex> guard(this->_mtx);
+    _log->info("Generate selected collection for '%v'", infoSpec->toString());
+
+    for (auto &selected : this->selected)
+    {
+      if (*selected.selected->getDescription()->getInformationSpecification()  == *infoSpec)
+      {
+        return std::dynamic_pointer_cast<G>(selected.selected);
+      }
+    }
+
+    std::map<std::string, int> metadatas;
+    auto desc = std::make_shared<CollectionDescription>(infoSpec,
+                                                        "selecte_collection", "selected", "selected", metadatas);
+
+    SelectedCollection<T> selected;
+    auto dataType = this->knowledgeBase->dataTypeForRepresentation(infoSpec->getRepresentation());
+    std::shared_ptr<InformationCollection> ic;
+
+    if (type == CollectionType::CT_SET)
+      ic = this->factory->createSet(dataType, desc, this->eventHandler);
+    else
+      ic = this->factory->createStream(dataType, desc, this->eventHandler, 100);
+
+    selected.selected = std::static_pointer_cast<T>(ic);
+
+    this->selected.push_back(selected);
+
+    return std::dynamic_pointer_cast<G>(selected.selected);
   }
 
 protected:

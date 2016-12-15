@@ -23,6 +23,9 @@ TEST(TBKnowledgeBase, oneBot)
   auto tbKnowledgeBase = std::make_shared<ice::TBKnowledgeBase>("Leonardo");
 
   tbKnowledgeBase->init();
+
+  ASSERT_TRUE((tbKnowledgeBase->positionLandmarks ? true : false));
+
   tbKnowledgeBase->start();
 
   auto streamStore = tbKnowledgeBase->getKnowlegeBase()->streamStore;
