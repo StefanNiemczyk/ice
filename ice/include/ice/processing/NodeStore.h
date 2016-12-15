@@ -77,6 +77,8 @@ public:
   void cleanUpNodes(std::shared_ptr<Entity> &entity);
   void cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp);
 
+  void print();
+
 private:
   std::weak_ptr<ICEngine>               engine;                 /**< Weak ptr to the engine */
   std::shared_ptr<GContainerFactory>    gcontainerFactory;      /**< The factory to create GContainer instances */

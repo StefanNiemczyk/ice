@@ -9,6 +9,7 @@
 #define CONFIGURATION_H_
 
 #include <string>
+#include <vector>
 
 namespace ice
 {
@@ -59,6 +60,13 @@ public:
 
   bool synthesizeTransformations;
   bool generateInformationProcessing;
+
+  bool  asp_globalOptimization;         /**< True if QoS metadata should be optimized global, false for local */
+  int   asp_maxHopCount;            /**< Max count of hops */
+  int   asp_maxChainLength;           /**< Maximal length of a node chain */
+  bool  asp_useXMLTransformation;
+  bool  asp_useAutoTransformation;
+  std::vector<std::string> asp_additionalFiles;
 
   //Static values
 public:

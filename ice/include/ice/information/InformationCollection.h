@@ -172,6 +172,8 @@ public:
   bool isGContainer();
   void setGContainer(bool value);
 
+  virtual int getSize() const = 0;
+
 protected:
   /*!
    * \brief Registers this stream in the communication class as sending stream.
@@ -209,7 +211,7 @@ protected:
   std::vector<std::shared_ptr<AsynchronousTask>>        taskSynchronous;        /**< List of events which are executed synchronous if a new element is addes */
   std::vector<std::shared_ptr<Entity>>                  remoteListeners;        /**< List of engine states of remote engines registered */
   std::shared_ptr<Entity>                               remoteSource;           /**< Remote source of this stream */
-  const std::shared_ptr<CollectionDescription>          streamDescription;      /**< Description of this stream used for information coordination */
+  const std::shared_ptr<CollectionDescription>          description;            /**< Description of this collection */
   bool                                                  gcontainer;             /**< True if stream is stream of gcontainers, else false */
   el::Logger*                                           _log;                   /**< Logger */
   std::mutex                                            _mtx;                   /**< Mutex */

@@ -195,7 +195,7 @@ int GContainerFactory::fromCSVStrings(std::unique_ptr<std::vector<std::string>> 
 
     if (false == r)
     {
-      _log->error("No representation extracted from CSV line '%s'", line);
+      _log->error("No representation extracted from CSV line '%v'", line);
       continue;
     }
 

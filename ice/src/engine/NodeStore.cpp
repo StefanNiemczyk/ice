@@ -214,11 +214,12 @@ void NodeStore::unregisterAndCleanUp(std::shared_ptr<Entity> &entity,
 
 void NodeStore::cleanUpNodes()
 {
-  _log->verbose(1, "Start removing unused nodes");
+  _log->debug("Start removing unused nodes");
   int counter = 0;
 
-  for (auto node : this->nodes)
+  for (int i=0; i < this->nodes.size(); ++i)
   {
+    auto node = this->nodes[i];
     if (node->getRegisteredEngineCount() > 0)
       continue;
 
@@ -227,18 +228,21 @@ void NodeStore::cleanUpNodes()
 
     node->deactivate();
     node->destroy();
+    this->nodes.erase(this->nodes.begin() + i);
+    --i;
   }
 
-  _log->info("Clean up node store: '%v' nodes are removed", counter);
+  _log->info("Clean up node store: '%v' nodes from '%v' are removed", counter, (counter + this->nodes.size()));
 }
 
 void NodeStore::cleanUpNodes(std::shared_ptr<Entity> &entity)
 {
-  _log->verbose(1, "Start removing nodes for entity '%v'", entity->toString());
+  _log->debug("Start removing nodes for entity '%v'", entity->toString());
   int counter = 0;
 
-  for (auto node : this->nodes)
-  {
+  for (int i=0; i < this->nodes.size(); ++i)
+   {
+    auto node = this->nodes[i];
     node->unregisterEntity(entity);
 
     if (node->getRegisteredEngineCount() > 0)
@@ -249,9 +253,11 @@ void NodeStore::cleanUpNodes(std::shared_ptr<Entity> &entity)
 
     node->deactivate();
     node->destroy();
+    this->nodes.erase(this->nodes.begin() + i);
+    --i;
   }
 
-  _log->info("Clean up node store: '%v' nodes are removed", counter);
+  _log->info("Clean up node store: '%v' nodes from '%v' are removed", counter, (counter + this->nodes.size()));
 }
 
 void NodeStore::cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp)
@@ -269,6 +275,22 @@ void NodeStore::cleanUpNodes(std::vector<std::shared_ptr<Node>> &nodesToCleanUp)
   }
 
   _log->info("Clean up node store: '%v' nodes are removed", counter);
+}
+
+void NodeStore::print()
+{
+//  std::lock_guard<std::mutex> guard(this->_mtx);
+
+  std::cout << "------------------------------------------------------------" << std::endl;
+  std::cout << "Nodes " << this->nodes.size() << std::endl;
+
+  for (auto node : this->nodes)
+  {
+    std::cout << "------------------------------------------------------------" << std::endl;
+    node->print();
+  }
+
+  std::cout << "------------------------------------------------------------" << std::endl;
 }
 
 } /* namespace ice */

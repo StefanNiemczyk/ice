@@ -12,6 +12,7 @@
 #include <ice/information/InformationStream.h>
 #include <ice/information/SetStore.h>
 #include <ice/information/StreamStore.h>
+#include <ice/model/aspModel/ASPModelGenerator.h>
 #include <ice/representation/GContainer.h>
 
 #include "TBCollectionFactory.h"
@@ -55,6 +56,7 @@ void TBKnowledgeBase::init()
   this->config->ontologyIri = "http://vs.uni-kassel.de/TurtleBot";
   this->config->ontologyIriOwnEntity = "http://vs.uni-kassel.de/TurtleBot#" + this->robotName;
   this->config->ontologyIriMapper = path + "/ontology/";
+  this->config->asp_additionalFiles.push_back(path + "/asp/tb_stuff.lp");
 
   // Set time factory
   auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();

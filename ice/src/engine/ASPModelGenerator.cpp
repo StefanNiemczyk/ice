@@ -9,6 +9,7 @@
 
 #include <sstream>
 
+#include "ice/Configuration.h"
 #include "ice/ICEngine.h"
 #include "ice/Entity.h"
 #include "ice/EntityDirectory.h"
@@ -48,16 +49,22 @@ void ASPModelGenerator::initInternal()
   std::lock_guard<std::mutex> guard(mtxModelGen_);
   auto en = this->engine.lock();
   this->gcontainerFactory = en->getGContainerFactory();
+  this->config = en->getConfig();
 
   // Initializing ASP
   this->asp = std::make_shared<supplementary::ClingWrapper>();
   this->asp->addKnowledgeFile(path + "processing.lp");
   this->asp->addKnowledgeFile(path + "searchBottomUp.lp");
 
-  if (this->config.globalOptimization)
+  if (this->config->asp_globalOptimization)
     this->asp->addKnowledgeFile(path + "globalOptimization.lp");
   else
     this->asp->addKnowledgeFile(path + "localOptimization.lp");
+
+  for (auto file : this->config->asp_additionalFiles)
+  {
+    this->asp->addKnowledgeFile(file);
+  }
 
   this->asp->setNoWarnings(true);
   this->asp->init();
@@ -120,8 +127,8 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
     }
 
     this->lastQuery = this->asp->getExternal("query", {this->queryIndex}, "query",
-                                             {this->queryIndex, this->config.maxHopCount,
-                                              this->config.maxChainLength}, true);
+                                             {this->queryIndex, this->config->asp_maxHopCount,
+                                              this->config->asp_maxChainLength}, true);
   }
 
   // Transformations
@@ -129,11 +136,11 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
 
   for (auto &trans : this->transformations)
   {
-    if (trans.node->autoTransformation && this->config.useAutoTransformation)
+    if (trans.node->autoTransformation && this->config->asp_useAutoTransformation)
     {
       trans.asp->external->assign(true);
     }
-    else if (false == trans.node->autoTransformation && this->config.useXMLTransformation)
+    else if (false == trans.node->autoTransformation && this->config->asp_useXMLTransformation)
     {
       trans.asp->external->assign(true);
     }
@@ -157,12 +164,12 @@ std::shared_ptr<ProcessingModel> ASPModelGenerator::createProcessingModel()
       entity->setNodesExtracted(true);
     }
 
-    if (this->self != entity && entity->updateExternals(false))
+    if (this->self != entity && entity->updateExternals(false, false))
     {
       used.push_back(entity);
     }
   }
-  this->self->updateExternals(true);
+  this->self->updateExternals(true, true);
 
   // Solving
   _log->debug("Start solving");

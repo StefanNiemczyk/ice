@@ -19,33 +19,36 @@
 
 
 % flagging nodes during search, identifies that a node will be before another node in the resulting processing graph
-MIN { before(TNODE_BEFORE,TNODE,INFO,S) : 
+%% stream concatination
+MIN { before(TNODE_BEFORE,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,S) : 
 		tstream(k,SYSTEM,TNODE_BEFORE,INFO), 
 		nnode(TNODE_BEFORE)
 		} MAX :- 
-	flagged(k,TNODE,S), 
-	snode(TNODE), 
+	flagged(k,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),S), 
+	snode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)), 
 	S < maxStepCount, 
-	tinput(TNODE,INFO,MIN,MAX), 
+	tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,MIN,MAX), 
 	query(k).
 
-MIN { before(TNODE_BEFORE,TNODE,INFO,S) : 
+MIN { before(TNODE_BEFORE,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,S) : 
 		tstream(k,SYSTEM,TNODE_BEFORE,INFO)
 		} MAX :-  
-	flagged(k,TNODE,S), 
+	flagged(k,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),S), 
 	S < maxStepCount, 
-	nnode(TNODE),
-	tinput(TNODE,INFO,MIN,MAX), 
+	nnode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)),
+	tinput(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,MIN,MAX), 
 	query(k).
 
-MIN { before(TNODE_BEFORE,TNODE,information(ENTITY,SCOPE,REP,ENTITY2),S) : 
+
+%% set concatination
+MIN { before(TNODE_BEFORE,tsetNode(k,SYSTEM,NODE,ENTITY3,ENTITY4),information(ENTITY,SCOPE,REP,ENTITY2),S) : 
 		tstream(k,SYSTEM,TNODE_BEFORE,information(ENTITY,SCOPE,REP,ENTITY2)),
 		entity(ENTITY,ENTITY_TYPE)
 		} MAX :- 
-	flagged(k,TNODE,S), 
+	flagged(k,tsetNode(k,SYSTEM,NODE,ENTITY3,ENTITY4),S), 
 	S < maxStepCount, 
-	nnode(TNODE),
-	tsetInput(TNODE,informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),MIN,MAX),
+	nnode(tsetNode(k,SYSTEM,NODE,ENTITY3,ENTITY4)),
+	tsetInput(tsetNode(k,SYSTEM,NODE,ENTITY3,ENTITY4),informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2),MIN,MAX),
 	query(k).
 
 MIN { before(TNODE,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,S) : 

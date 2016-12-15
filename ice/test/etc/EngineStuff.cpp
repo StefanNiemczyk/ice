@@ -98,15 +98,18 @@ public:
 
     if ("Position" == className)
     {
-      stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize);
+      stream = std::make_shared<ice::InformationStream<ice::Pos3D>>(streamDescription, eventHandler, streamSize);
+      stream->setGContainer(true);
     }
     else if ("http://vs.uni-kassel.de/IceTest#TestRepresentation1" == className)
     {
-      stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize);
+      stream = std::make_shared<ice::InformationStream<ice::Pos3D>>(streamDescription, eventHandler, streamSize);
+      stream->setGContainer(true);
     }
     else if ("http://vs.uni-kassel.de/IceTest#TestRepresentation2" == className)
     {
-      stream = std::make_shared<ice::InformationStream<ice::Position>>(streamDescription, eventHandler, streamSize);
+      stream = std::make_shared<ice::InformationStream<ice::Pos3D>>(streamDescription, eventHandler, streamSize);
+      stream->setGContainer(true);
     }
 
     if (stream == nullptr)
@@ -129,15 +132,18 @@ public:
 
       if ("Position" == className)
       {
-        set = std::make_shared<ice::InformationSet<ice::Position>>(streamDescription, eventHandler);
+        set = std::make_shared<ice::InformationSet<ice::Pos3D>>(streamDescription, eventHandler);
+        set->setGContainer(true);
       }
       else if ("http://vs.uni-kassel.de/IceTest#TestRepresentation1" == className)
       {
-        set = std::make_shared<ice::InformationSet<ice::Position>>(streamDescription, eventHandler);
+        set = std::make_shared<ice::InformationSet<ice::Pos3D>>(streamDescription, eventHandler);
+        set->setGContainer(true);
       }
       else if ("http://vs.uni-kassel.de/IceTest#TestRepresentation2" == className)
       {
-        set = std::make_shared<ice::InformationSet<ice::Position>>(streamDescription, eventHandler);
+        set = std::make_shared<ice::InformationSet<ice::Pos3D>>(streamDescription, eventHandler);
+        set->setGContainer(true);
       }
 
       if (set == nullptr)
@@ -228,6 +234,7 @@ public:
   virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
                              std::shared_ptr<ice::InformationCollection> collection)
   {
+    this->performNode();
     return 0;
   }
 
@@ -241,8 +248,8 @@ class SmothingNode : public ice::Node
 {
 public:
 
-  std::shared_ptr<ice::InformationStream<ice::Position>> inputStream;
-  std::shared_ptr<ice::InformationStream<ice::Position>> outputStream;
+  std::shared_ptr<ice::InformationStream<ice::Pos3D>> inputStream;
+  std::shared_ptr<ice::InformationStream<ice::Pos3D>> outputStream;
 
   static std::shared_ptr<ice::Node> createNode()
   {
@@ -266,8 +273,8 @@ public:
       return 1;
     }
 
-    this->inputStream = std::static_pointer_cast<ice::InformationStream<ice::Position>>(this->inputs[0]);
-    this->outputStream = std::static_pointer_cast<ice::InformationStream<ice::Position>>(this->outputs[0]);
+    this->inputStream = std::static_pointer_cast<ice::InformationStream<ice::Pos3D>>(this->inputs[0]);
+    this->outputStream = std::static_pointer_cast<ice::InformationStream<ice::Pos3D>>(this->outputs[0]);
 
     return 0;
   }
@@ -275,13 +282,15 @@ public:
   virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
                              std::shared_ptr<ice::InformationCollection> collection)
   {
+    this->performNode();
     return 0;
   }
 
   virtual int performNode()
   {
     auto infoEle = this->inputStream->getLast();
-    std::unique_ptr<ice::Position> posNew(new ice::Position());
+    auto rep = this->gcontainerFactory->getRepresentation("http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
+    std::unique_ptr<ice::Pos3D> posNew(new ice::Pos3D(rep));
     auto pos = infoEle->getInformation();
 
     posNew->x = pos->x - 1;
@@ -298,8 +307,8 @@ class SetTestNode : public ice::Node
 {
 public:
 
-  std::shared_ptr<ice::InformationSet<ice::Position>> inputSet;
-  std::shared_ptr<ice::InformationSet<ice::Position>> outputSet;
+  std::shared_ptr<ice::InformationSet<ice::Pos3D>> inputSet;
+  std::shared_ptr<ice::InformationSet<ice::Pos3D>> outputSet;
 
   static std::shared_ptr<ice::Node> createNode()
   {
@@ -326,8 +335,8 @@ public:
       return 1;
     }
 
-    this->inputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->inputSets[0]);
-    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->outputSets[0]);
+    this->inputSet = std::static_pointer_cast<ice::InformationSet<ice::Pos3D>>(this->inputSets[0]);
+    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Pos3D>>(this->outputSets[0]);
 
     return 0;
   }
@@ -335,13 +344,14 @@ public:
   virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
                              std::shared_ptr<ice::InformationCollection> collection)
   {
+    this->performNode();
     return 0;
   }
 
   virtual int performNode()
   {
     auto infoEle = this->inputSet->get("muh");
-    std::unique_ptr<ice::Position> posNew(new ice::Position());
+    std::unique_ptr<ice::Pos3D> posNew(new ice::Pos3D(nullptr));
     auto pos = infoEle->getInformation();
 
     posNew->x = pos->x - 1;
@@ -357,7 +367,7 @@ public:
 class SetSourceNode : public ice::Node
 {
 public:
-  std::shared_ptr<ice::InformationSet<ice::Position>> outputSet;
+  std::shared_ptr<ice::InformationSet<ice::Pos3D>> outputSet;
 
   static std::shared_ptr<ice::Node> createNode()
   {
@@ -382,7 +392,7 @@ public:
       return 1;
     }
 
-    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->outputSets[0]);
+    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Pos3D>>(this->outputSets[0]);
 
     return 0;
   }
@@ -390,12 +400,14 @@ public:
   virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
                              std::shared_ptr<ice::InformationCollection> collection)
   {
+    this->performNode();
     return 0;
   }
 
   virtual int performNode()
   {
-    std::unique_ptr<ice::Position> posNew(new ice::Position());
+    auto rep = this->gcontainerFactory->getRepresentation("http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
+    std::unique_ptr<ice::Pos3D> posNew(new ice::Pos3D(rep));
 
     posNew->x = 1;
     posNew->y = 21;
@@ -410,7 +422,7 @@ public:
 class TestSetNode : public ice::Node
 {
 public:
-  std::shared_ptr<ice::InformationSet<ice::Position>> outputSet;
+  std::shared_ptr<ice::InformationSet<ice::Pos3D>> outputSet;
 
   static std::shared_ptr<ice::Node> createNode()
   {
@@ -435,7 +447,7 @@ public:
       return 1;
     }
 
-    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->outputSets[0]);
+    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Pos3D>>(this->outputSets[0]);
 
     return 0;
   }
@@ -443,6 +455,7 @@ public:
   virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
                              std::shared_ptr<ice::InformationCollection> collection)
   {
+    this->performNode();
     return 0;
   }
 
@@ -450,7 +463,7 @@ public:
   {
     for (auto &in : this->inputs)
     {
-      auto stream = std::static_pointer_cast<ice::InformationStream<ice::Position>>(in);
+      auto stream = std::static_pointer_cast<ice::InformationStream<ice::Pos3D>>(in);
       auto info = stream->getLast();
       if (info != nullptr)
       {
@@ -465,8 +478,8 @@ public:
 class TestSetTransformNode : public ice::Node
 {
 public:
-  std::shared_ptr<ice::InformationSet<ice::Position>> inputSet;
-  std::shared_ptr<ice::InformationSet<ice::Position>> outputSet;
+  std::shared_ptr<ice::InformationSet<ice::Pos3D>> inputSet;
+  std::shared_ptr<ice::InformationSet<ice::Pos3D>> outputSet;
 
   static std::shared_ptr<ice::Node> createNode()
   {
@@ -494,8 +507,8 @@ public:
       return 1;
     }
 
-    this->inputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->inputSets[0]);
-    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Position>>(this->outputSets[0]);
+    this->inputSet = std::static_pointer_cast<ice::InformationSet<ice::Pos3D>>(this->inputSets[0]);
+    this->outputSet = std::static_pointer_cast<ice::InformationSet<ice::Pos3D>>(this->outputSets[0]);
 
     return 0;
   }
@@ -503,6 +516,7 @@ public:
   virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
                              std::shared_ptr<ice::InformationCollection> collection)
   {
+    this->performNode();
     return 0;
   }
 
@@ -510,11 +524,12 @@ public:
   {
     auto info = this->inputSet->get("muh");
     auto pos = info->getInformation();
-    auto newPos = std::make_shared<ice::Position>();
-    newPos->x = 100 + pos->x;
-    newPos->y = 100 + pos->y;
-    newPos->z = 100 + pos->z;
-    this->outputSet->add(info->getSpecification()->getEntity(), newPos);
+    auto rep = this->gcontainerFactory->getRepresentation("http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
+    auto posNew = std::make_shared<ice::Pos3D>(rep);
+    posNew->x = 100 + pos->x;
+    posNew->y = 100 + pos->y;
+    posNew->z = 100 + pos->z;
+    this->outputSet->add(info->getSpecification()->getEntity(), posNew);
 
     return 0;
   }
@@ -572,6 +587,7 @@ public:
   virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
                              std::shared_ptr<ice::InformationCollection> collection)
   {
+    this->performNode();
     return 0;
   }
 

@@ -81,8 +81,8 @@ TEST(TestNode, set_node)
   auto spec = std::make_shared<ice::InformationSpecification>("", "type", "scope", "rep");
   std::map<std::string, int> metadatas;
   auto description = std::make_shared<ice::CollectionDescription>(spec, "name,", "provider", "source", metadatas);
-  auto input = std::make_shared<ice::InformationSet<ice::Position>>(description, handler);
-  auto output = std::make_shared<ice::InformationSet<ice::Position>>(description, handler);
+  auto input = std::make_shared<ice::InformationSet<ice::Pos3D>>(description, handler);
+  auto output = std::make_shared<ice::InformationSet<ice::Pos3D>>(description, handler);
 
   node->setEventHandler(handler);
   node->addInputSet(input, true);
@@ -92,7 +92,7 @@ TEST(TestNode, set_node)
   node->activate();
   EXPECT_EQ(0, resultValue);
 
-  auto pos = std::make_shared<ice::Position>();
+  auto pos = std::make_shared<ice::Pos3D>(nullptr);
   pos->x = 1;
   pos->y = 2;
   pos->z = 3;

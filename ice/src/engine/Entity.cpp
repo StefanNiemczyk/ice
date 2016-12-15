@@ -875,7 +875,7 @@ std::shared_ptr<supplementary::External>& Entity::getExternal()
   return this->external;
 }
 
-bool Entity::updateExternals(bool activateRequired)
+bool Entity::updateExternals(bool activateRequired, bool activateRequirements)
 {
   bool active = activateRequired || this->isCooperationPossible();
 
@@ -906,12 +906,12 @@ bool Entity::updateExternals(bool activateRequired)
 
   for (auto element : this->aspRequiredStreams)
   {
-    element->external->assign((element->defect == false && active && activateRequired));
+    element->external->assign(activateRequired && (element->defect == false && active && activateRequired));
   }
 
   for (auto element : this->aspRequiredSets)
   {
-    element->external->assign((element->defect == false && active));
+    element->external->assign(activateRequired && (element->defect == false && active));
   }
 
   return active;

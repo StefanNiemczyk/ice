@@ -14,6 +14,9 @@ metadata(information,delay,minimize).
 metadata(set,density,maximize).
 metadata(processing,cost,minimize).
 
+%-isTransferable(o0_PositionOrientation3D).
+%-isTransferable(o0_PositionOrientation2D).
+%-isTransferable(o2_CoordinatePositionRep).
 
 %--------------------------------------------------------------------------------------
 #program query(k,maxHopCount,maxStepCount).
@@ -415,11 +418,12 @@ requiredInformationType(k,SYSTEM,INFO_TYPE) :-
 
 
 % transfer a stream between systems
-tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM_SOURCE,TNODE,INFO)) :-
-	requiredInformation(k,SYSTEM_TARGET,INFO),
+tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM_SOURCE,TNODE,information(ENTITY,SCOPE,REP,ENTITY2))) :-
+	requiredInformation(k,SYSTEM_TARGET,information(ENTITY,SCOPE,REP,ENTITY2)),
 	transfer(SYSTEM_SOURCE,SYSTEM_TARGET),
-	tstream(k,SYSTEM_SOURCE,TNODE,INFO),
-	SYSTEM_TARGET != SYSTEM_SOURCE.
+	tstream(k,SYSTEM_SOURCE,TNODE,information(ENTITY,SCOPE,REP,ENTITY2)),
+	SYSTEM_TARGET != SYSTEM_SOURCE,
+	not -isTransferable(REP).
 
 tstream(k,SYSTEM_TARGET,TNODE,INFO) :- 
 	tstreamTransfer(SYSTEM_TARGET,tstream(k,SYSTEM,TNODE,INFO)).
@@ -433,11 +437,12 @@ stream(k,SYSTEM_TARGET,PROVIDER,INFO,STEP+1) :-
 
 
 % transfer a set between systems
-tsetTransfer(SYSTEM_TARGET,tset(k,SYSTEM_SOURCE,TNODE,INFO_TYPE)) :-
-	requiredInformationType(k,SYSTEM_TARGET,INFO_TYPE),
+tsetTransfer(SYSTEM_TARGET,tset(k,SYSTEM_SOURCE,TNODE,informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2))) :-
+	requiredInformationType(k,SYSTEM_TARGET,informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2)),
 	transfer(SYSTEM_SOURCE,SYSTEM_TARGET),
-	tset(k,SYSTEM_SOURCE,TNODE,INFO_TYPE),
-	SYSTEM_TARGET != SYSTEM_SOURCE.
+	tset(k,SYSTEM_SOURCE,TNODE,informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2)),
+	SYSTEM_TARGET != SYSTEM_SOURCE,
+	not -isTransferable(REP).
 
 tset(k,SYSTEM_TARGET,TNODE,INFO_TYPE) :- 
 	tsetTransfer(SYSTEM_TARGET,tset(k,SYSTEM,TNODE,INFO_TYPE)).

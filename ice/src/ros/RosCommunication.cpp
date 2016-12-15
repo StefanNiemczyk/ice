@@ -113,8 +113,8 @@ void RosCommunication::sendMessage(std::shared_ptr<Message> msg)
 
     if (size > 1024)
     {
-      this->_log->error("Message could not be send to instance '%v', to large '%v' byte", msg->getEntity()->toString(), size);
-      return;
+//      this->_log->error("Message could not be send to instance '%v', to large '%v' byte", msg->getEntity()->toString(), size);
+//      return;
     }
     coordinationMsg.bytes.resize(size);
     std::copy(json.begin(), json.end(), coordinationMsg.bytes.begin());
@@ -164,13 +164,13 @@ std::shared_ptr<InformationReceiver> RosCommunication::createReceiver(std::share
 
   auto type = collection->getTypeInfo();
 
-  if (typeid(Position) == *type)
-  { // ice_msgs::Position -> ice::Position
-    _log->debug("Creating receiver for stream %v with mapping ice_msgs::Position -> ice::Position",
-                collection->getName());
-    transformM2C<Position, ice_msgs::Position> method = &RosMessageTransform::transformM2CPosition;
-    return this->_createReceiver<Position, ice_msgs::Position>(collection, method);
-  }
+//  if (typeid(Position) == *type)
+//  { // ice_msgs::Position -> ice::Position
+//    _log->debug("Creating receiver for stream %v with mapping ice_msgs::Position -> ice::Position",
+//                collection->getName());
+//    transformM2C<Position, ice_msgs::Position> method = &RosMessageTransform::transformM2CPosition;
+//    return this->_createReceiver<Position, ice_msgs::Position>(collection, method);
+//  }
 
   return nullptr;
 }

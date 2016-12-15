@@ -140,7 +140,7 @@ std::shared_ptr<BaseInformationSender> CommunicationInterface::registerCollectio
 
   if (ptr == nullptr)
   {
-    _log->error("Sender could not be created for stream %v with type string %v",
+    _log->error("Sender could not be created for stream %v with type %v",
                 collection->getName(), collection->getSpecification()->getTypeString());
   }
 

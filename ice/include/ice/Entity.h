@@ -206,7 +206,7 @@ public:
   void addASPElement(std::shared_ptr<ASPElement> node);
   void setExternal(std::shared_ptr<supplementary::External> &external);
   std::shared_ptr<supplementary::External>& getExternal();
-  bool updateExternals(bool activateRequired);
+  bool updateExternals(bool activateRequired, bool activateRequirements);
   int getNodeForClass(std::string className, std::vector<std::shared_ptr<ASPElement>> &result);
 
 private:

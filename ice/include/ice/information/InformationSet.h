@@ -53,7 +53,7 @@ template<typename T>
      *
      * The constructor initialize the set.
      *
-     * \param description The description of this stream.
+     * \param description The description of this set.
      * \param eventHandler Handler to execute events asynchronously.
      */
     InformationSet(std::shared_ptr<CollectionDescription> description, std::shared_ptr<EventHandler> eventHandler) :
@@ -98,7 +98,7 @@ template<typename T>
             time timeProcessed = NO_TIME)
     {
       std::lock_guard<std::mutex> guard(_mtx);
-      auto tempSpec = this->streamDescription->getInformationSpecification();
+      auto tempSpec = this->description->getInformationSpecification();
       auto spec = std::make_shared<InformationSpecification>(entity, tempSpec->getEntityType(),
                                                              tempSpec->getScope(), tempSpec->getRepresentation(),
                                                              tempSpec->getRelatedEntity());
@@ -138,9 +138,16 @@ template<typename T>
         {
           this->sender->sendInformationElement(this->remoteListeners, informationElement);
         }
+        else if (this->genericSender)
+        {
+          auto informationElement = std::make_shared<InformationElement<GContainer>>(
+              spec, information, timeValidity, timeObservation, timeProcessed);
+
+            this->genericSender->sendInformationElement(this->remoteListeners, informationElement);
+        }
         else
         {
-          _log->error("No sender for stream %v", this->streamDescription->getName());
+          _log->error("No sender for set %v", this->description->getName());
         }
       }
 
@@ -148,7 +155,7 @@ template<typename T>
     }
 
     virtual const int newEvent(std::shared_ptr<InformationElement<T>> element,
-                               std::shared_ptr<InformationCollection> stream)
+                               std::shared_ptr<InformationCollection> set)
     {
       this->add(element->getSpecification()->getEntity(), element->getInformation(), element->getTimeValidity(),
                      element->getTimeObservation(), element->getTimeProcessed());
@@ -268,9 +275,9 @@ template<typename T>
     }
 
     /*!
-     * \brief Filters the existing elements within the stream and add these to filteredList.
+     * \brief Filters the existing elements within the set and add these to filteredList.
      *
-     * Filters the existing elements within the stream and add these to filteredList. The function
+     * Filters the existing elements within the set and add these to filteredList. The function
      * func is used to decide if an element is filtered out (return false) or added to the list
      * (return true).
      *
@@ -318,9 +325,9 @@ template<typename T>
 
   protected:
     /*!
-     * \brief Registers this stream in the communication class as sending stream.
+     * \brief Registers this set in the communication class as sending set.
      *
-     * Registers this stream in the communication class as sending stream.
+     * Registers this set in the communication class as sending set.
      */
     virtual std::shared_ptr<BaseInformationSender> registerSender(
         std::shared_ptr<CommunicationInterface> &communication)
@@ -329,35 +336,45 @@ template<typename T>
       {
         return this->sender;
       }
+      if (this->genericSender)
+      {
+        return this->genericSender;
+      }
 
       auto comResult = communication->registerCollectionAsSender(this->shared_from_this());
 
       if (false == comResult)
       {
-        _log->error("No sender returned for stream %v", this->streamDescription->getName());
+        _log->error("No sender returned for set %v", this->description->getName());
         std::shared_ptr<ice::BaseInformationSender> ptr;
         return ptr;
       }
 
-      if (typeid(T) == *comResult->getTypeInfo())
+      if (typeid(T).hash_code() == comResult->getTypeInfo()->hash_code())
       {
         this->sender = std::static_pointer_cast<InformationSender<T>>(comResult);
         this->sender->init();
         return comResult;
       }
+      else if(typeid(GContainer).hash_code() == comResult->getTypeInfo()->hash_code())
+      {
+        this->genericSender = std::static_pointer_cast<InformationSender<GContainer>>(comResult);
+        this->genericSender->init();
+        return comResult;
+      }
       else
       {
-        _log->error("Incorrect type of sender %s for stream %s", comResult->getTypeInfo(),
-                    this->streamDescription->getName());
+        _log->error("Incorrect type of sender '%v' for set '%v'", comResult->getTypeInfo()->name(),
+                    this->description->getName());
         comResult->cleanUp();
         return nullptr;
       }
     }
 
     /*!
-     * \brief Registers this stream in the communication class as receiving stream.
+     * \brief Registers this set in the communication class as receiving set.
      *
-     * Registers this stream in the communication class as receiving stream.
+     * Registers this set in the communication class as receiving set.
      */
     virtual std::shared_ptr<InformationReceiver> registerReceiver(
         std::shared_ptr<CommunicationInterface> &communication)
@@ -366,7 +383,7 @@ template<typename T>
 
       if (false == comResult)
       {
-        _log->error("No receiver returned for stream %s", this->streamDescription->getName());
+        _log->error("No receiver returned for set %v", this->description->getName());
         return nullptr;
       }
 
@@ -377,9 +394,9 @@ template<typename T>
     }
 
     /*!
-     * \brief Removes the receiver of this stream.
+     * \brief Removes the receiver of this set.
      *
-     * Removes the receiver of this stream.
+     * Removes the receiver of this set.
      */
     virtual void dropReceiver()
     {
@@ -398,8 +415,11 @@ template<typename T>
     {
       if (this->sender)
         this->sender->cleanUp();
+      if (this->genericSender)
+        this->genericSender->cleanUp();
 
       this->sender.reset();
+      this->genericSender.reset();
     }
 
   private:
@@ -407,6 +427,7 @@ template<typename T>
     std::vector<std::shared_ptr<AbstractInformationListener<T>>>listenersAsynchronous; /**< List of asynchronous triggered listeners */
     std::vector<std::shared_ptr<AbstractInformationListener<T>>> listenersSynchronous; /**< List of synchronous triggered listeners */
     std::shared_ptr<InformationSender<T>> sender; /**< Sender to send information elements */
+    std::shared_ptr<InformationSender<GContainer>> genericSender; /**< Sender to send information elements */
     std::shared_ptr<InformationReceiver> receiver; /**< Receiver to receive information elements */
   };
 

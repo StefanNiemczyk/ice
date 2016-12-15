@@ -359,6 +359,11 @@ int Node::destroy()
   for (auto stream : this->triggeredByInputs)
   {
     stream->unregisterTaskAsync(this->shared_from_this());
+    if (stream->isGContainer())
+    {
+      auto gs = std::static_pointer_cast<InformationStream<GContainer>>(stream);
+      gs->unregisterListenerAsync(this->shared_from_this());
+    }
   }
 
   this->triggeredByInputs.clear();
@@ -366,6 +371,11 @@ int Node::destroy()
   for (auto set : this->triggeredByInputSets)
   {
     set->unregisterTaskAsync(this->shared_from_this());
+    if (set->isGContainer())
+    {
+      auto gs = std::static_pointer_cast<InformationSet<GContainer>>(set);
+      gs->unregisterListenerAsync(this->shared_from_this());
+    }
   }
 
   this->triggeredByInputSets.clear();
@@ -495,6 +505,31 @@ std::string Node::toString()
   ss << "node(" << this->nodeDescription->toString() << "," << this->active << ")";
 
   return ss.str();
+}
+
+void Node::print()
+{
+  std::cout << "node(" << this->nodeDescription->toString() << "," << this->active << ")" << std::endl;
+  std::cout << "Inputs : " << this->inputs.size() << std::endl;
+  for (auto input : this->inputs)
+  {
+    std::cout << "\t" << input->toString() << std::endl;
+  }
+  std::cout << "Outputs : " << this->outputs.size() << std::endl;
+  for (auto output : this->outputs)
+  {
+    std::cout << "\t" << output->toString() << std::endl;
+  }
+  std::cout << "Input Sets : " << this->inputSets.size() << std::endl;
+  for (auto input : this->inputSets)
+  {
+    std::cout << "\t" << input->toString() << std::endl;
+  }
+  std::cout << "Output Sets : " << this->outputSets.size() << std::endl;
+  for (auto output : this->outputSets)
+  {
+    std::cout << "\t" << output->toString() << std::endl;
+  }
 }
 
 void Node::registerEntity(std::shared_ptr<Entity> &entity)

@@ -104,7 +104,7 @@ bool WGS84::set(std::vector<int> *indices, int index, const void* value)
 std::string WGS84::toJSON()
 {
   std::stringstream ss;
-  ss << std::setprecision (std::numeric_limits<double>::digits10 + 1);
+  ss << std::setprecision (std::numeric_limits<double>::digits10 + 1) << std::showpoint;
   ss << "{\"http://vs.uni-kassel.de/Ice#WGS84Rep\":{\"http://vs.uni-kassel.de/Ice#Altitude\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
      << this->altitude
      << "},\"http://vs.uni-kassel.de/Ice#Latitude\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"

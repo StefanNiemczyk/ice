@@ -23,6 +23,7 @@ namespace ice
 {
 struct ASPElement;
 class BaseInformationStream;
+class Configuration;
 class GContainerFactory;
 class ICEngine;
 class Entity;
@@ -35,15 +36,6 @@ class TransNode;
 
 namespace ice
 {
-
-struct ASPModelGeneratorConf
-{
-  bool  globalOptimization      = true;         /**< True if QoS metadata should be optimized global, false for local */
-  int   maxHopCount             = 3;            /**< Max count of hops */
-  int   maxChainLength          = 10;           /**< Maximal length of a node chain */
-  bool  useXMLTransformation    = true;
-  bool  useAutoTransformation   = true;
-};
 
 struct ASPTransformation
 {
@@ -59,7 +51,6 @@ public:
 
   std::shared_ptr<ProcessingModel> createProcessingModel();
   std::shared_ptr<supplementary::ClingWrapper> getClingWrapper();
-  ASPModelGeneratorConf& getConfiguration();
 
 protected:
   void initInternal();
@@ -85,13 +76,13 @@ private:
   std::shared_ptr<GContainerFactory>            gcontainerFactory;      /**< Factory for representations and transformations */
   std::shared_ptr<EntityDirectory>              directory;              /**< Directory of entities */
   std::shared_ptr<Entity>                       self;                   /**< Pointer to the own asp description */
+  std::shared_ptr<Configuration>                config;                 /**< configuration of ASP solver */
   std::vector<std::string>                      entities;               /**< The entities as strings */
   std::vector<ASPTransformation>                transformations;        /**< List of transformations */
   bool                                          groundingDirty;         /**< Flag to check if the grounding is dirty */
   int                                           queryIndex;             /**< Index of the query */
   int                                           subModelIndex;          /**< Index of the current sub models */
   std::shared_ptr<supplementary::External>      lastQuery;              /**< The last query */
-  ASPModelGeneratorConf                         config;                 /**< configuration of ASP solver */
   el::Logger*                                   _log;                   /**< Logger */
 
   static std::mutex mtxModelGen_;

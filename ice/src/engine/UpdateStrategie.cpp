@@ -176,10 +176,7 @@ void UpdateStrategie::deactivateModel(bool notifyOtherEngines)
   if (this->lastModel == nullptr)
     return;
 
-  for (auto &node : this->lastModel->getNodes())
-  {
-    this->nodeStore->cleanUpNodes(this->self);
-  }
+  this->nodeStore->cleanUpNodes(this->self);
 
   if (notifyOtherEngines)
   {

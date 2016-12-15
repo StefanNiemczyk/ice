@@ -208,13 +208,14 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/test_Buffer.cpp
   test/test_EventHandler.cpp
   test/test_Time.cpp
-  test/test_StreamStore.cpp
   test/test_Node.cpp
   test/test_NodeStore.cpp
   test/test_CallbackList.cpp
   test/test_InformationStore.cpp
   test/test_TransformationNode.cpp
-  test/test_InformationSet.cpp
+  
+ # test/test_StreamStore.cpp
+ # test/test_InformationSet.cpp
 
   test/test_main.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test

@@ -32,6 +32,12 @@ Configuration::Configuration()
 
   // processing
   this->generateInformationProcessing = true;
+
+  this->asp_globalOptimization      = true;
+  this->asp_maxHopCount             = 3;
+  this->asp_maxChainLength          = 10;
+  this->asp_useXMLTransformation    = true;
+  this->asp_useAutoTransformation   = true;
 }
 
 Configuration::~Configuration()

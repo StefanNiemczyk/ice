@@ -47,6 +47,7 @@ public:
 
   virtual int registerBaseListenerSync(std::shared_ptr<BaseInformationStream> listener) = 0;
   virtual int unregisterBaseListenerSync(std::shared_ptr<BaseInformationStream> listener) = 0;
+  virtual int getSize() const = 0;
 };
 
 } /* namespace ice */

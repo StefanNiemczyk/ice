@@ -143,7 +143,7 @@ std::string RTLandmark::toJSON()
   replaceAll(landmark, "\\", "\\");
 
   std::stringstream ss;
-  ss << std::setprecision (std::numeric_limits<double>::digits10 + 1);
+  ss << std::setprecision (std::numeric_limits<double>::digits10 + 1) << std::showpoint;
   ss << "{\"http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark\":{\"http://vs.uni-kassel.de/Ice#Position\":{\"http://vs.uni-kassel.de/Ice#XCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
       << this->x
       << "},\"http://vs.uni-kassel.de/Ice#YCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"

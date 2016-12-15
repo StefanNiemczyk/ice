@@ -46,6 +46,7 @@ public:
 
   virtual int registerBaseListenerSync(std::shared_ptr<BaseInformationSet> listener) = 0;
   virtual int unregisterBaseListenerSync(std::shared_ptr<BaseInformationSet> listener) = 0;
+  virtual int getSize() const = 0;
 
 protected:
   std::set<ont::entity> entities;

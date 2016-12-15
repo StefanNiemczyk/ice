@@ -118,7 +118,7 @@ bool PositionOrientation3D::set(std::vector<int> *indices, int index, const void
 std::string PositionOrientation3D::toJSON()
 {
   std::stringstream ss;
-  ss << std::setprecision (std::numeric_limits<double>::digits10 + 1);
+  ss << std::setprecision (std::numeric_limits<double>::digits10 + 1) << std::showpoint;
   ss << "{\"http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D\":{\"http://vs.uni-kassel.de/Ice#Alpha\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
      << this->alpha
      << "},\"http://vs.uni-kassel.de/Ice#XCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
@@ -148,7 +148,7 @@ bool PositionOrientation3D::readFromJSON(Value& value)
   {
     if (false == it->name.IsString() || false == it->value.IsObject())
     {
-      _log->error("Payload could not be parsed: Id is not a string");
+      _log->error("PositionOrientation3D could not be parsed: Id is not a string");
       return false;
     }
 
@@ -160,7 +160,7 @@ bool PositionOrientation3D::readFromJSON(Value& value)
       auto &num = value.MemberBegin()->value;
       if (false == num.IsDouble())
       {
-        _log->error("Payload could not be parsed: Alpha is not a double value");
+        _log->error("PositionOrientation3D could not be parsed: Alpha is not a double value");
         return false;
       }
       this->alpha = num.GetDouble();
@@ -170,7 +170,7 @@ bool PositionOrientation3D::readFromJSON(Value& value)
       auto &num = value.MemberBegin()->value;
       if (false == num.IsDouble())
       {
-        _log->error("Payload could not be parsed: XCoordinate is not a double value");
+        _log->error("PositionOrientation3D could not be parsed: XCoordinate is not a double value");
         return false;
       }
       this->x = num.GetDouble();
@@ -180,7 +180,7 @@ bool PositionOrientation3D::readFromJSON(Value& value)
       auto &num = value.MemberBegin()->value;
       if (false == num.IsDouble())
       {
-        _log->error("Payload could not be parsed: YCoordinate is not a double value");
+        _log->error("PositionOrientation3D could not be parsed: YCoordinate is not a double value");
         return false;
       }
       this->y = num.GetDouble();
@@ -190,14 +190,14 @@ bool PositionOrientation3D::readFromJSON(Value& value)
       auto &num = value.MemberBegin()->value;
       if (false == num.IsDouble())
       {
-        _log->error("Payload could not be parsed: ZCoordinate is not a double value");
+        _log->error("PositionOrientation3D could not be parsed: ZCoordinate is not a double value");
         return false;
       }
       this->z = num.GetDouble();
     }
     else
     {
-      _log->error("Payload could not be parsed: '%v' is unknown", name);
+      _log->error("PositionOrientation3D could not be parsed: '%v' is unknown", name);
       return false;
     }
   }

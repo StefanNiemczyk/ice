@@ -115,7 +115,7 @@ template<typename T>
     {
       std::lock_guard<std::mutex> guard(_mtx);
       auto informationElement = std::make_shared<InformationElement<T>>(
-          this->streamDescription->getInformationSpecification(), information, timeValidity, timeObservation,
+          this->description->getInformationSpecification(), information, timeValidity, timeObservation,
           timeProcessed);
 
       int returnValue = this->ringBuffer->add(informationElement);
@@ -151,9 +151,17 @@ template<typename T>
         {
           this->sender->sendInformationElement(this->remoteListeners, informationElement);
         }
+        else if (this->genericSender)
+        {
+          auto informationElement = std::make_shared<InformationElement<GContainer>>(
+              this->description->getInformationSpecification(), information, timeValidity, timeObservation,
+              timeProcessed);
+
+            this->genericSender->sendInformationElement(this->remoteListeners, informationElement);
+        }
         else
         {
-          _log->error("No sender for stream %v", this->streamDescription->getName());
+          _log->error("No sender for stream %v", this->description->getName());
         }
       }
 
@@ -330,25 +338,35 @@ template<typename T>
       {
         return this->sender;
       }
+      if (this->genericSender)
+      {
+        return this->genericSender;
+      }
 
       auto comResult = communication->registerCollectionAsSender(this->shared_from_this());
 
       if (comResult == nullptr)
       {
-        _log->error("No sender returned for stream %v", this->streamDescription->getName());
+        _log->error("No sender returned for stream %v", this->description->getName());
         return nullptr;
       }
 
-      if (typeid(T) == *comResult->getTypeInfo())
+      if (typeid(T).hash_code() == comResult->getTypeInfo()->hash_code())
       {
         this->sender = std::static_pointer_cast<InformationSender<T>>(comResult);
         this->sender->init();
         return comResult;
       }
+      else if(typeid(GContainer).hash_code() == comResult->getTypeInfo()->hash_code())
+      {
+        this->genericSender = std::static_pointer_cast<InformationSender<GContainer>>(comResult);
+        this->genericSender->init();
+        return comResult;
+      }
       else
       {
-        _log->error("Incorrect type of sender %s for stream %s", comResult->getTypeInfo(),
-                    this->streamDescription->getName());
+        _log->error("Incorrect type of sender '%v' for stream '%v'", comResult->getTypeInfo()->name(),
+                    this->description->getName());
         comResult->cleanUp();
         return nullptr;
       }
@@ -365,7 +383,7 @@ template<typename T>
 
       if (comResult == nullptr)
       {
-        _log->error("No receiver returned for stream %v", this->streamDescription->getName());
+        _log->error("No receiver returned for stream %v", this->description->getName());
         return nullptr;
       }
 
@@ -397,8 +415,11 @@ template<typename T>
     {
       if (this->sender)
         this->sender->cleanUp();
+      if (this->genericSender)
+        this->genericSender->cleanUp();
 
       this->sender.reset();
+      this->genericSender.reset();
     }
 
   private:
@@ -408,6 +429,7 @@ template<typename T>
     std::vector<std::shared_ptr<
             AbstractInformationListener<T>>>            listenersSynchronous;   /**< List of synchronous triggered listeners */
     std::shared_ptr<InformationSender<T>>               sender;                 /**< Sender to send information elements */
+    std::shared_ptr<InformationSender<GContainer>>      genericSender;          /**< Sender to send information elements */
     std::shared_ptr<InformationReceiver>                receiver;               /**< Receiver to receive information elements */
   };
 

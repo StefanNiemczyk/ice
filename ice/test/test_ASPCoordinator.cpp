@@ -37,18 +37,18 @@ TEST(ASPCoordinator, simpleTest)
                                              "http://vs.uni-kassel.de/IceTest#TestScope1",
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation2");
 
-  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1, "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
+  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec1, "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                          "http://vs.uni-kassel.de/IceTest#TestSystem");
-  auto stream2 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec2, "http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd",
+  auto stream2 = engine->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec2, "http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd",
                                                                          "http://vs.uni-kassel.de/IceTest#TestSystem");
 
-  auto selected = engine->getKnowlegeBase()->streamStore->getSelectedStream<ice::Position>(&spec2);
+  auto selected = engine->getKnowlegeBase()->streamStore->getSelectedStream<ice::Pos3D>(&spec2);
 
   ASSERT_TRUE((stream1 ? true : false));
   ASSERT_TRUE((stream2 ? true : false));
   ASSERT_TRUE((selected ? true : false));
 
-  auto position1 = std::make_shared<ice::Position>();
+  auto position1 = std::make_shared<ice::Pos3D>(nullptr);
   position1->x = 3;
   position1->y = 2;
   position1->z = 1;
@@ -180,6 +180,14 @@ TEST(ASPCoordinator, twoSystemsSimple)
   engine2->setCollectionFactory(streamFactory2);
 
   engine2->init();
+
+  // adding custom creator for Pos3D
+  auto creator = [](std::shared_ptr<ice::GContainerFactory> factory){
+      auto rep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#TestRepresentation1");
+      return std::make_shared<ice::Pos3D>(rep);
+    };
+  engine2->getGContainerFactory()->registerCustomCreator("http://vs.uni-kassel.de/Ice#CoordinatePositionRep", creator);
+
   engine2->start();
 
   // wait some time to enable the engines to find each other
@@ -190,7 +198,7 @@ TEST(ASPCoordinator, twoSystemsSimple)
                                              "http://vs.uni-kassel.de/IceTest#TestEntity",
                                              "http://vs.uni-kassel.de/IceTest#TestScope1",
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation1");
-  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1,
+  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec1,
                                                                     "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                     "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd1");
   ASSERT_TRUE((stream1 ? true : false));
@@ -200,7 +208,7 @@ TEST(ASPCoordinator, twoSystemsSimple)
                                              "http://vs.uni-kassel.de/IceTest#TestEntity",
                                              "http://vs.uni-kassel.de/IceTest#TestScope1",
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation1");
-  auto stream2 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec2,
+  auto stream2 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec2,
                                                                      "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                      "http://vs.uni-kassel.de/IceTest#TestCoordination1_SystemInd1");
   ASSERT_TRUE((stream2 ? true : false));
@@ -210,7 +218,7 @@ TEST(ASPCoordinator, twoSystemsSimple)
   int y = rand();
   int z = rand();
 
-  auto position1 = std::make_shared<ice::Position>();
+  auto position1 = std::make_shared<ice::Pos3D>(nullptr);
   position1->x = x;
   position1->y = y;
   position1->z = z;
@@ -266,6 +274,14 @@ TEST(ASPCoordinator, twoSystemsComplex)
   engine2->setCollectionFactory(streamFactory2);
 
   engine2->init();
+
+  // adding custom creator for Pos3D
+  auto creator = [](std::shared_ptr<ice::GContainerFactory> factory){
+      auto rep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#TestRepresentation1");
+      return std::make_shared<ice::Pos3D>(rep);
+    };
+  engine2->getGContainerFactory()->registerCustomCreator("http://vs.uni-kassel.de/Ice#CoordinatePositionRep", creator);
+
   engine2->start();
 
   // wait some time to enable the engines to find each other
@@ -281,23 +297,23 @@ TEST(ASPCoordinator, twoSystemsComplex)
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation2");
 
   // test processing system 1
-  auto stream11 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1,
+  auto stream11 = engine->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec1,
                                                                      "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                      "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd1");
   ASSERT_TRUE((stream11 ? true : false));
 
-  auto stream12 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec2,
+  auto stream12 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec2,
                                                                       "http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd",
                                                                       "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd2");
   ASSERT_TRUE((stream12 ? true : false));
 
   // test processing system 2
-  auto stream21 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1,
+  auto stream21 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec1,
                                                                       "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                       "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd1");
   ASSERT_TRUE((stream21 ? true : false));
 
-  auto stream22 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec2,
+  auto stream22 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec2,
                                                                       "http://vs.uni-kassel.de/IceTest#TestComputationalNodeInd",
                                                                       "http://vs.uni-kassel.de/IceTest#TestCoordination2_SystemInd2");
   ASSERT_TRUE((stream22 ? true : false));
@@ -307,7 +323,7 @@ TEST(ASPCoordinator, twoSystemsComplex)
   int y = rand();
   int z = rand();
 
-  auto position1 = std::make_shared<ice::Position>();
+  auto position1 = std::make_shared<ice::Pos3D>(nullptr);
   position1->x = x;
   position1->y = y;
   position1->z = z;
@@ -356,7 +372,7 @@ TEST(ASPCoordinator, simpleSetTest)
                                              "http://vs.uni-kassel.de/IceTest#TestScope1",
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation1");
 
-  auto set = engine->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec1);
+  auto set = engine->getKnowlegeBase()->setStore->getSet<ice::Pos3D>(&spec1);
 
   ASSERT_TRUE((set ? true : false));
 
@@ -399,6 +415,14 @@ TEST(ASPCoordinator, streamsToSetTest)
 
   engine->getConfig()->synthesizeTransformations = false;
   engine->init();
+
+  // adding custom creator for Pos3D
+  auto creator = [](std::shared_ptr<ice::GContainerFactory> factory){
+      auto rep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#TestRepresentation1");
+      return std::make_shared<ice::Pos3D>(rep);
+    };
+  engine->getGContainerFactory()->registerCustomCreator("http://vs.uni-kassel.de/Ice#CoordinatePositionRep", creator);
+
   engine->start();
 
   // create engine 2
@@ -412,6 +436,14 @@ TEST(ASPCoordinator, streamsToSetTest)
 
   engine2->getConfig()->synthesizeTransformations = false;
   engine2->init();
+
+  // adding custom creator for Pos3D
+  auto creator2 = [](std::shared_ptr<ice::GContainerFactory> factory){
+      auto rep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#TestRepresentation1");
+      return std::make_shared<ice::Pos3D>(rep);
+    };
+  engine2->getGContainerFactory()->registerCustomCreator("http://vs.uni-kassel.de/Ice#CoordinatePositionRep", creator2);
+
   engine2->start();
 
   // wait some time to enable the engines to find each other
@@ -431,19 +463,19 @@ TEST(ASPCoordinator, streamsToSetTest)
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation2");
 
   // test processing system 1
-  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec11,
+  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec11,
                                                                      "http://vs.uni-kassel.de/IceTest#TestSourceNode2Ind",
                                                                      "http://vs.uni-kassel.de/IceTest#TestSet1_SystemInd1");
   ASSERT_TRUE((stream1 ? true : false));
 
-  auto set = engine->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec2,
+  auto set = engine->getKnowlegeBase()->setStore->getSet<ice::Pos3D>(&spec2,
                                                                       "http://vs.uni-kassel.de/IceTest#TestSetNodeInd",
                                                                       "http://vs.uni-kassel.de/IceTest#TestSet1_SystemInd1");
-  auto selected = engine->getKnowlegeBase()->setStore->getSelectedSet<ice::Position>(&spec2);
+  auto selected = engine->getKnowlegeBase()->setStore->getSelectedSet<ice::Pos3D>(&spec2);
   ASSERT_TRUE((selected ? true : false));
 
   // test processing system 2
-  auto stream2 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec12,
+  auto stream2 = engine2->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec12,
                                                                       "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                       "http://vs.uni-kassel.de/IceTest#TestSet1_SystemInd2");
   ASSERT_TRUE((stream2 ? true : false));
@@ -454,7 +486,7 @@ TEST(ASPCoordinator, streamsToSetTest)
   int y = rand();
   int z = rand();
 
-  auto position1 = std::make_shared<ice::Position>();
+  auto position1 = std::make_shared<ice::Pos3D>(nullptr);
   position1->x = x;
   position1->y = y;
   position1->z = z;
@@ -462,7 +494,7 @@ TEST(ASPCoordinator, streamsToSetTest)
   x = rand();
   y = rand();
   z = rand();
-  auto position2 = std::make_shared<ice::Position>();
+  auto position2 = std::make_shared<ice::Pos3D>(nullptr);
   position2->x = x;
   position2->y = y;
   position2->z = z;
@@ -531,9 +563,9 @@ TEST(ASPCoordinator, setTransformTest)
                                              "http://vs.uni-kassel.de/IceTest#TestScope1",
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation2");
 
-  auto set1 = engine->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec1);
+  auto set1 = engine->getKnowlegeBase()->setStore->getSet<ice::Pos3D>(&spec1);
   ASSERT_TRUE((set1 ? true : false));
-  auto set2 = engine->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec2);
+  auto set2 = engine->getKnowlegeBase()->setStore->getSet<ice::Pos3D>(&spec2);
   ASSERT_TRUE((set2 ? true : false));
 
   auto nodeSource = engine->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSetSourceInd", "http://vs.uni-kassel.de/IceTest#TestEntity");
@@ -592,6 +624,14 @@ TEST(ASPCoordinator, setTransferTest)
 
   engine2->getConfig()->synthesizeTransformations = false;
   engine2->init();
+
+  // adding custom creator for Pos3D
+  auto creator = [](std::shared_ptr<ice::GContainerFactory> factory){
+      auto rep = factory->getRepresentation("http://vs.uni-kassel.de/IceTest#TestRepresentation1");
+      return std::make_shared<ice::Pos3D>(rep);
+    };
+  engine2->getGContainerFactory()->registerCustomCreator("http://vs.uni-kassel.de/Ice#CoordinatePositionRep", creator);
+
   engine2->start();
 
   // wait some time to enable the engines to find each other
@@ -606,11 +646,11 @@ TEST(ASPCoordinator, setTransferTest)
                                              "http://vs.uni-kassel.de/IceTest#TestScope1",
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation2");
 
-  auto set1 = engine->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec1);
+  auto set1 = engine->getKnowlegeBase()->setStore->getSet<ice::Pos3D>(&spec1);
   ASSERT_TRUE((set1 ? true : false));
-  auto set11 = engine2->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec1);
+  auto set11 = engine2->getKnowlegeBase()->setStore->getSet<ice::Pos3D>(&spec1);
   ASSERT_TRUE((set1 ? true : false));
-  auto set2 = engine2->getKnowlegeBase()->setStore->getSet<ice::Position>(&spec2);
+  auto set2 = engine2->getKnowlegeBase()->setStore->getSet<ice::Pos3D>(&spec2);
   ASSERT_TRUE((set2 ? true : false));
 
   auto nodeSource = engine->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSetSourceInd", "http://vs.uni-kassel.de/IceTest#TestEntity");
@@ -663,13 +703,13 @@ TEST(ASPCoordinator, nodeFailureTest)
                                              "http://vs.uni-kassel.de/IceTest#TestScope1",
                                              "http://vs.uni-kassel.de/IceTest#TestRepresentation1");
 
-  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1, "http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeInd",
+  auto stream1 = engine->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec1, "http://vs.uni-kassel.de/IceTest#TestSourceNodeAlternativeInd",
                                                                          "http://vs.uni-kassel.de/IceTest#TestNodeFailureInd");
-  auto selected = engine->getKnowlegeBase()->streamStore->getSelectedStream<ice::Position>(&spec1);
+  auto selected = engine->getKnowlegeBase()->streamStore->getSelectedStream<ice::Pos3D>(&spec1);
   ASSERT_TRUE((stream1 ? true : false));
   ASSERT_TRUE((selected ? true : false));
 
-  auto pos = std::make_shared<ice::Position>();
+  auto pos = std::make_shared<ice::Pos3D>(nullptr);
   pos->x = 1;
   pos->y = 2;
   pos->z = 3;
@@ -692,14 +732,14 @@ TEST(ASPCoordinator, nodeFailureTest)
 
   EXPECT_FALSE(nodeSource->isActive());
 
-  auto stream2 = engine->getKnowlegeBase()->streamStore->getStream<ice::Position>(&spec1, "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
+  auto stream2 = engine->getKnowlegeBase()->streamStore->getStream<ice::Pos3D>(&spec1, "http://vs.uni-kassel.de/IceTest#TestSourceNodeInd",
                                                                          "http://vs.uni-kassel.de/IceTest#TestNodeFailureInd");
   EXPECT_TRUE((stream2 ? true : false));
 
   auto nodeSource2 = engine->getNodeStore()->getNode("http://vs.uni-kassel.de/IceTest#TestSourceNodeInd", "http://vs.uni-kassel.de/IceTest#TestEntity1");
   EXPECT_TRUE((nodeSource2 ? true : false));
 
-  auto pos2 = std::make_shared<ice::Position>();
+  auto pos2 = std::make_shared<ice::Pos3D>(nullptr);
   pos2->x = 4;
   pos2->y = 5;
   pos2->z = 6;

@@ -20,7 +20,7 @@ int InformationCollection::IDENTIFIER_COUNTER = 0;
 
 InformationCollection::InformationCollection(std::shared_ptr<CollectionDescription> streamDescription,
                                              std::shared_ptr<EventHandler> eventHandler) :
-    streamDescription(streamDescription), iid(IDENTIFIER_COUNTER++), eventHandler(eventHandler),
+    description(streamDescription), iid(IDENTIFIER_COUNTER++), eventHandler(eventHandler),
     hash(0), gcontainer(false)
 {
   _log = nullptr;
@@ -33,7 +33,7 @@ InformationCollection::~InformationCollection()
 
 std::shared_ptr<InformationSpecification> InformationCollection::getSpecification() const
 {
-  return this->streamDescription->getInformationSpecification();
+  return this->description->getInformationSpecification();
 }
 
 const int InformationCollection::getIID() const
@@ -43,14 +43,14 @@ const int InformationCollection::getIID() const
 
 const std::string InformationCollection::getName() const
 {
-  return this->streamDescription->getName();
+  return this->description->getName();
 }
 
 const uint32_t InformationCollection::getHash()
 {
   if (this->hash == 0)
   {
-    this->hash = FNV::fnv1a(this->streamDescription->getName());
+    this->hash = FNV::fnv1a(this->description->getName());
   }
 
   return this->hash;
@@ -58,13 +58,13 @@ const uint32_t InformationCollection::getHash()
 
 const std::string InformationCollection::getProvider() const
 {
-  return this->streamDescription->getProvider();
+  return this->description->getProvider();
 }
 
 
 std::shared_ptr<CollectionDescription> InformationCollection::getDescription()
 {
-  return this->streamDescription;
+  return this->description;
 }
 
 int ice::InformationCollection::registerTaskAsync(std::shared_ptr<AsynchronousTask> task)
@@ -207,13 +207,13 @@ std::string InformationCollection::toString()
   switch (this->getCollectionType())
   {
     case CT_SET:
-      ss << "set(" << this->streamDescription->toString() << "," << this->iid << ")";
+      ss << "set(" << this->description->toString() << "," << this->iid << "," << this->getSize() << ")";
       break;
     case CT_STREAM:
-      ss << "stream(" << this->streamDescription->toString() << "," << this->iid << ")";
+      ss << "stream(" << this->description->toString() << "," << this->iid << "," << this->getSize() << ")";
       break;
     default:
-      ss << "unknown(" << this->streamDescription->toString() << "," << this->iid << ")";
+      ss << "unknown(" << this->description->toString() << "," << this->iid << "," << this->getSize() << ")";
       break;
   }
 

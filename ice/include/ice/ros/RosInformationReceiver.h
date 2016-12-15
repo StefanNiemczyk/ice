@@ -61,18 +61,18 @@ public:
       return;
 
     std::string json(msg->bytes.begin(), msg->bytes.end());
-    auto contrainer = this->factory->fromJSON(json);
+    auto container = this->factory->fromJSON(json);
 
-    if (contrainer == nullptr)
+    if (container == nullptr)
     {
       // TODO
       return;
     }
 
     if (stream)
-      stream->add(contrainer, msg->info.validityTime, msg->info.timestamp, this->timeFactory->createTime());
+      stream->add(container, msg->info.validityTime, msg->info.timestamp, this->timeFactory->createTime());
     else
-      set->add(msg->info.entity, contrainer, msg->info.validityTime, msg->info.timestamp, this->timeFactory->createTime());
+      set->add(msg->info.entity, container, msg->info.validityTime, msg->info.timestamp, this->timeFactory->createTime());
   }
 
   bool checkReceiverIds(ice_msgs::ICEHeader header)

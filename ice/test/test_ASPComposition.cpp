@@ -1177,7 +1177,7 @@ TEST(ASPComposition, setFusionIslandTest)
   auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
 
   cw->solve();
-  cw->printLastModel();
+//  cw->printLastModel();
 //  std::cout << cw->getSolvingTime() << " ms" << std::endl;
 
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system1,in1,entity1,none),information(entity1,scope1,rep1,none),1)"));

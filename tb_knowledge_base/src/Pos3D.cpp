@@ -104,7 +104,7 @@ bool Pos3D::set(std::vector<int> *indices, int index, const void* value)
 std::string Pos3D::toJSON()
 {
   std::stringstream ss;
-  ss << std::setprecision (std::numeric_limits<double>::digits10 + 1);
+  ss << std::setprecision (std::numeric_limits<double>::digits10 + 1) << std::showpoint;
   ss << "{\"http://vs.uni-kassel.de/Ice#CoordinatePositionRep\":{\"http://vs.uni-kassel.de/Ice#XCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"
      << this->x
      << "},\"http://vs.uni-kassel.de/Ice#YCoordinate\":{\"http://vs.uni-kassel.de/Ice#DoubleRep\":"

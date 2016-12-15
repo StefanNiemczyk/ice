@@ -119,6 +119,7 @@ public:
   int getRegisteredEngineCount();
 
   std::string toString();
+  void print();
 
 protected:
   std::weak_ptr<ICEngine>                               engine;                 /**< THe ice engine */
