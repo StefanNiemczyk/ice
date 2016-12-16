@@ -16,6 +16,7 @@ TEST(ASPComposition, simpleTest)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // ontology
@@ -88,7 +89,6 @@ TEST(ASPComposition, simpleTest)
   EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
   EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,node(1,system1,in2,entity1,none),information(entity1,scope2,rep1,none),1))"));
-//  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,12)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2),6)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2),90)"));
 
@@ -103,7 +103,6 @@ TEST(ASPComposition, simpleTest)
   EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),3),6)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),3),2)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),3),99)"));
-//  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,12)"));
 
   node1->assign(false);
   cw->solve();
@@ -117,7 +116,6 @@ TEST(ASPComposition, simpleTest)
   EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node2,entity1,none),information(entity1,scope3,rep1,none),3),6)"));
   EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node2,entity1,none),information(entity1,scope3,rep1,none),3),2)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node2,entity1,none),information(entity1,scope3,rep1,none),3),96)"));
-//  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,8)"));
 }
 
 TEST(ASPComposition, simpleTestQuery)
@@ -126,6 +124,7 @@ TEST(ASPComposition, simpleTestQuery)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // ontology
@@ -198,7 +197,6 @@ TEST(ASPComposition, simpleTestQuery)
   EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
   EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,node(1,system1,in2,entity1,none),information(entity1,scope2,rep1,none),1))"));
-//  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,12)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2),6)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2),90)"));
 
@@ -217,7 +215,6 @@ TEST(ASPComposition, simpleTestQuery)
   EXPECT_EQ(false, cw->query("metadataStream(2,delay,stream(2,system1,node(2,system1,node1,entity1,none),information(entity1,scope3,rep1,none),3),6)"));
   EXPECT_EQ(true, cw->query("metadataStream(2,delay,stream(2,system1,node(2,system1,node1,entity1,none),information(entity1,scope3,rep1,none),3),2)"));
   EXPECT_EQ(true, cw->query("metadataStream(2,accuracy,stream(2,system1,node(2,system1,node1,entity1,none),information(entity1,scope3,rep1,none),3),99)"));
-//  EXPECT_EQ(true, cw->query("sumMetadata(2,cost,12)"));
 
   node1->assign(false);
   query2->assign(false);
@@ -235,7 +232,6 @@ TEST(ASPComposition, simpleTestQuery)
   EXPECT_EQ(true, cw->query("metadataStream(3,delay,stream(3,system1,node(3,system1,node2,entity1,none),information(entity1,scope3,rep1,none),3),6)"));
   EXPECT_EQ(false, cw->query("metadataStream(3,delay,stream(3,system1,node(3,system1,node2,entity1,none),information(entity1,scope3,rep1,none),3),2)"));
   EXPECT_EQ(true, cw->query("metadataStream(3,accuracy,stream(3,system1,node(3,system1,node2,entity1,none),information(entity1,scope3,rep1,none),3),96)"));
-//  EXPECT_EQ(true, cw->query("sumMetadata(3,cost,8)"));
 }
 
 TEST(ASPComposition, informationTranslation)
@@ -245,6 +241,7 @@ TEST(ASPComposition, informationTranslation)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // entities
@@ -297,6 +294,7 @@ TEST(ASPComposition, ego2allo)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // entities
@@ -354,6 +352,7 @@ TEST(ASPComposition, requiredStreamsByEntityType)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // entities
@@ -414,7 +413,6 @@ TEST(ASPComposition, requiredStreamsByEntityType)
 
   cw->solve();
 //  cw->printLastModel();
-//  std::cout << cw->getSolvingTime() << " ms" << std::endl;
 
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system1,in1,entity1,none),information(entity1,scope1,rep1,none),1)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system2,in2,entity2,none),information(entity2,scope1,rep1,none),2)"));
@@ -431,34 +429,16 @@ TEST(ASPComposition, setFusion)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // entities
-//  cw->ground("entity", {"entity1", "type"});
-//  cw->ground("entity", {"entity2", "type"});
-//  cw->ground("entity", {"entity3", "type"});
-//  cw->ground("entity", {"entity4", "type"});
-//  cw->ground("entity", {"entity5", "type"});
   cw->add("base", {}, "hasScope(type,scope1).");
 
   // systems
   auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
   auto system2 = cw->getExternal("system", {"system2"}, "system", {"system1", 10}, true);
   auto system3 = cw->getExternal("system", {"system3"}, "system", {"system1", 10}, true);
-//  auto system4 = cw->getExternal("system", {"system4", 10}, true);
-//  auto system5 = cw->getExternal("system", {"system5", 10}, true);
-
-  // inputs
-//  cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
-//  auto input1 = cw->getExternal("sourceNode", {"system1", "in1", "entity1"}, true);
-//  cw->ground("sourceNode", {"in2", "system2", "system1", "entity2", "scope1", "rep1", "none", 0, 90, 1});
-//  auto input2 = cw->getExternal("sourceNode", {"system2", "in2", "entity2"}, true);
-//  cw->ground("sourceNode", {"in3", "system3", "system1", "entity3", "scope1", "rep1", "none", 0, 90, 1});
-//  auto input3 = cw->getExternal("sourceNode", {"system3", "in3", "entity3"}, true);
-//  cw->ground("sourceNode", {"in4", "system4", "system1", "entity4", "scope1", "rep1", "none", 0, 90, 1});
-//  auto input4 = cw->getExternal("sourceNode", {"system4", "in4", "entity4"}, true);
-//  cw->ground("sourceNode", {"in5", "system5", "system1", "entity5", "scope1", "rep1", "none", 0, 90, 1});
-//  auto input5 = cw->getExternal("sourceNode", {"system5", "in5", "entity5"}, true);
 
   // input sets
   cw->add("setInput1", {}, "#external setNodeTemplate(system2,setInput1,type).");
@@ -503,7 +483,6 @@ TEST(ASPComposition, setFusion)
 
   cw->solve();
 //  cw->printLastModel();
-//  std::cout << cw->getSolvingTime() << " ms" << std::endl;
 
   EXPECT_EQ(true, cw->query("set(1,system2,setNode(1,system2,setInput1,type,none),informationType(type,scope1,rep1,none),1)"));
   EXPECT_EQ(true, cw->query("set(1,system3,setNode(1,system3,setInput2,type,none),informationType(type,scope1,rep1,none),1)"));
@@ -521,6 +500,7 @@ TEST(ASPComposition, fusion)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // entities
@@ -581,8 +561,6 @@ TEST(ASPComposition, fusion)
   EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
   EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,node(1,system1,in1,entity1,none),information(entity1,scope1,rep1,none),1))"));
-  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,none,none,none),stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2))"));
-  //  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,12)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2),90)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2),1)"));
 
@@ -594,6 +572,7 @@ TEST(ASPComposition, noInputTest)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // ontology
@@ -659,21 +638,11 @@ TEST(ASPComposition, noInputTest)
   cw->solve();
 //  cw->printLastModel();
 
-//  ofstream file;
-//  file.open("/tmp/tut.txt");
-//  file << cw->toStringLastModel(true);
-//  file.close();
-
   EXPECT_EQ(true, cw->query("node(1,system1,in1,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node1,entity1,none)"));
   EXPECT_EQ(true, cw->query("node(1,system1,node2,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node3,entity1,none)"));
-  // metadataStream(1,accuracy,system1,node2,system1,information(entity1,scope1,rep1,none),2,94
-//  bool result = cw->query("metadataStream(1,accuracy,stream(1,system1,node2,system1,information(entity1,scope1,rep1,none),3),98)");
-//  result |= cw->query("metadataStream(1,accuracy,stream(1,system1,node3,system1,information(entity1,scope1,rep1,none),3),98)");
-//
-//  EXPECT_EQ(true, result);
-//  EXPECT_EQ(true, cw->query("sumCost(1,11)"));
+
 }
 
 TEST(ASPComposition, simpleChainTest)
@@ -682,6 +651,7 @@ TEST(ASPComposition, simpleChainTest)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // ontology
@@ -751,12 +721,6 @@ TEST(ASPComposition, simpleChainTest)
   EXPECT_EQ(true, cw->query("node(1,system1,node2,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node3,entity1,none)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node2,entity1,none),information(entity1,scope1,rep1,none),2),95)"));
-  // metadataStream(1,accuracy,system1,node2,system1,information(entity1,scope1,rep1,none),2,94
-//  bool result = cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node2,entity1,none),system1,information(entity1,scope1,rep1,none),3),98)");
-//  result |= cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node3,entity1,none),system1,information(entity1,scope1,rep1,none),3),98)");
-
-//  EXPECT_EQ(true, result);
-//  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,11)"));
 }
 
 TEST(ASPComposition, nodeUsedTwice)
@@ -765,6 +729,7 @@ TEST(ASPComposition, nodeUsedTwice)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // ontology
@@ -824,7 +789,6 @@ TEST(ASPComposition, nodeUsedTwice)
   EXPECT_EQ(true, cw->query("node(1,system1,node1,entity2,none)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope1,rep1,none),2),95)"));
   EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node1,entity2,none),information(entity2,scope1,rep1,none),2),95)"));
-//  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,18)"));
 }
 
 TEST(ASPComposition, localSimpleTest)
@@ -833,6 +797,7 @@ TEST(ASPComposition, localSimpleTest)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/localOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // ontology
@@ -905,9 +870,6 @@ TEST(ASPComposition, localSimpleTest)
   EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
   EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,node(1,system1,in2,entity1,none),information(entity1,scope2,rep1,none),1))"));
-//  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,12)"));
-//  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),6)"));
-//  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),2),90)"));
 
   input3->assign(true);
   cw->solve();
@@ -917,10 +879,6 @@ TEST(ASPComposition, localSimpleTest)
   EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
   EXPECT_EQ(false, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,node(1,system1,in2,entity1,none),information(entity1,scope2,rep1,none),1))"));
   EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,node(1,system2,in3,entity1,none),information(entity1,scope2,rep1,none),2))"));
-//  EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),6)"));
-//  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),2)"));
-//  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node1,system1,information(entity1,scope3,rep1,none),3),99)"));
-//  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,12)"));
 
   node1->assign(false);
   cw->solve();
@@ -931,10 +889,6 @@ TEST(ASPComposition, localSimpleTest)
   EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node2,entity1,none),stream(1,system1,node(1,system1,in1,entity1,none),information(entity1,scope1,rep1,none),1))"));
   EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node2,entity1,none),stream(1,system1,node(1,system1,in2,entity1,none),information(entity1,scope2,rep1,none),1))"));
   EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node2,entity1,none),stream(1,system1,node(1,system2,in3,entity1,none),information(entity1,scope2,rep1,none),2))"));
-//  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),6)"));
-//  EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),2)"));
-//  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node2,system1,information(entity1,scope3,rep1,none),3),96)"));
-//  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,8)"));
 }
 
 TEST(ASPComposition, localChainTest)
@@ -943,6 +897,7 @@ TEST(ASPComposition, localChainTest)
   cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/localOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // ontology
@@ -951,15 +906,6 @@ TEST(ASPComposition, localChainTest)
   cw->add("base", {}, "representation(rep1).");
   cw->add("base", {}, "hasScope(robot,scope1).");
   cw->add("base", {}, "hasRepresentation(scope1,rep1).");
-
-//  for (int i=0; i < 100; ++i)
-//  {
-//    std::stringstream ss;
-//
-//    ss << "value(" << i << ").";
-//    cw->add("base", {}, ss.str());
-//  }
-
 
   cw->ground("base", {});
 
@@ -1020,12 +966,6 @@ TEST(ASPComposition, localChainTest)
   EXPECT_EQ(false, cw->query("node(1,system1,node1,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
   EXPECT_EQ(false, cw->query("node(1,system1,node3,entity1,none)"));
-  // metadataStream(1,accuracy,system1,node2,system1,information(entity1,scope1,rep1,none),2,94
-//  bool result = cw->query("metadataStream(1,accuracy,stream(1,system1,node2,system1,information(entity1,scope1,rep1,none),3),98)");
-//  result |= cw->query("metadataStream(1,accuracy,stream(1,system1,node3,system1,information(entity1,scope1,rep1,none),3),98)");
-
-//  EXPECT_EQ(true, result);
-//  EXPECT_EQ(true, cw->query("sumMetadata(1,cost,1)"));
 }
 
 TEST(ASPComposition, simpleIslandTest)
@@ -1035,6 +975,7 @@ TEST(ASPComposition, simpleIslandTest)
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/nicer.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // ontology
@@ -1078,9 +1019,6 @@ TEST(ASPComposition, simpleIslandTest)
                                                      10000, -100},
                                   true);
 
-  // add transfer
- // auto transfer = cw->getExternal("transfer", {"system2", "system1"}, "transfer", {"system2", "system1", 1, 2}, true);
-
   // add node1
   cw->add("node1", {}, "#external nodeTemplate(system1,node1,any).");
   auto node1 = cw->getExternal("nodeTemplate", {"system1", "node1", "any"}, "node1", {}, true);
@@ -1115,6 +1053,7 @@ TEST(ASPComposition, setFusionIslandTest)
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/nicer.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // entities
@@ -1178,13 +1117,10 @@ TEST(ASPComposition, setFusionIslandTest)
 
   cw->solve();
 //  cw->printLastModel();
-//  std::cout << cw->getSolvingTime() << " ms" << std::endl;
 
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system1,in1,entity1,none),information(entity1,scope1,rep1,none),1)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system2,in2,entity2,none),information(entity2,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system3,in3,entity3,none),information(entity3,scope1,rep1,none),2)"));
-//  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system4,in4,entity4,none),information(entity4,scope1,rep1,none),2)"));
-//  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system5,in5,entity5,none),information(entity5,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,accuracy,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),102)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,density,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),3)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,delay,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),105)"));
@@ -1197,6 +1133,7 @@ TEST(ASPComposition, islandCoverageTest)
   cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
   cw->addKnowledgeFile("../asp/informationProcessing/nicer.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
   cw->init();
 
   // entities
@@ -1266,14 +1203,135 @@ TEST(ASPComposition, islandCoverageTest)
 
   cw->solve();
 //  cw->printLastModel();
-//  std::cout << cw->getSolvingTime() << " ms" << std::endl;
 
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system1,in1,entity1,none),information(entity1,scope1,rep1,none),1)"));
-//  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system2,in2,entity2,none),information(entity2,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system3,in3,entity3,none),information(entity3,scope1,rep1,none),2)"));
-//  EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system4,in4,entity4,none),information(entity4,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("stream(1,system1,node(1,system5,in5,entity5,none),information(entity5,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,accuracy,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),105)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,delay,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),405)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,islandCoverage,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),3)"));
+}
+
+TEST(ASPComposition, localProcessingOnly)
+{
+  std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
+  cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
+  cw->init();
+
+  // ontology
+  cw->add("base", {}, "entityType(robot).");
+  cw->add("base", {}, "scope(scope1).");
+  cw->add("base", {}, "scope(scope2).");
+  cw->add("base", {}, "scope(scope3).");
+  cw->add("base", {}, "representation(rep1).");
+  cw->add("base", {}, "hasScope(robot,scope1).");
+  cw->add("base", {}, "hasScope(robot,scope2).");
+  cw->add("base", {}, "hasScope(robot,scope3).");
+  cw->add("base", {}, "hasRepresentation(scope1,rep1).");
+  cw->add("base", {}, "hasRepresentation(scope2,rep1).");
+  cw->add("base", {}, "hasRepresentation(scope3,rep1).");
+  cw->ground("base", {});
+
+  // entities
+  cw->ground("entity", {"entity1", "robot"});
+
+  // systems
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2"}, "system", {"system1", 100}, true);
+
+  // inputs
+  cw->ground("sourceNode", {"in1", "system1", "system1", "entity1", "scope1", "rep1", "none", 0, 90, 1});
+  auto input1 = cw->getExternal("sourceNode", {"system1", "in1", "entity1"}, true);
+  cw->ground("sourceNode", {"in2", "system1", "system1", "entity1", "scope2", "rep1", "none", 5, 90, 1});
+  auto input2 = cw->getExternal("sourceNode", {"system1", "in2", "entity1"}, true);
+  cw->ground("sourceNode", {"in3", "system2", "system2", "entity1", "scope2", "rep1", "none", 0, 99, 1});
+  auto input3 = cw->getExternal("sourceNode", {"system2", "in3", "entity1"}, false);
+
+  // requireds
+  auto required = cw->getExternal("requiredStream", {"system1", Gringo::Value("information", {"entity1", "scope3",
+                                                                                              "rep1", "none"})},
+                                  "requiredStream", {"system1", Gringo::Value("information", {"entity1", "scope3",
+                                                                                              "rep1", "none"}),
+                                                     10000, -100},
+                                  true);
+
+  // add transfer
+  auto transfer = cw->getExternal("transfer", {"system2", "system1"}, "transfer", {"system2", "system1", 1, 2}, true);
+
+  // add node1
+  cw->add("node1", {}, "#external nodeTemplate(system1,node1,any).");
+  auto node1 = cw->getExternal("nodeTemplate", {"system1", "node1", "any"}, "node1", {}, true);
+  cw->add("node1", {}, "input(system1,node1,scope1,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
+  cw->add("node1", {}, "input(system1,node1,scope2,rep1,none,1,1) :- nodeTemplate(system1,node1,any).");
+  cw->add("node1", {}, "output(system1,node1,scope3,rep1,none).");
+  cw->add("node1", {}, "metadataOutput(delay,system1,node1,max,1,0).");
+  cw->add("node1", {}, "metadataProcessing(cost,system1,node1,10).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node1,max,0,0).");
+  cw->ground("node1", {});
+
+  // add node2
+  cw->add("node2", {}, "#external nodeTemplate(system1,node2,any).");
+  auto node2 = cw->getExternal("nodeTemplate", {"system1", "node2", "any"}, "node2", {}, true);
+  cw->add("node2", {}, "input(system1,node2,scope1,rep1,none,1,1) :- nodeTemplate(system1,node2,any).");
+  cw->add("node2", {}, "input(system1,node2,scope2,rep1,none,2,2) :- nodeTemplate(system1,node2,any).");
+  cw->add("node2", {}, "output(system1,node2,scope3,rep1,none).");
+  cw->add("node2", {}, "metadataOutput(delay,system1,node2,max,1,0).");
+  cw->add("node2", {}, "metadataProcessing(cost,system1,node2,5).");
+  cw->add("node1", {}, "metadataOutput(accuracy,system1,node2,avg,0,1).");
+  cw->ground("node2", {});
+
+  auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
+
+  cw->solve();
+//  cw->printLastModel();
+
+  EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
+  EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,node(1,system1,in2,entity1,none),information(entity1,scope2,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2),6)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2),90)"));
+
+  input3->assign(true);
+  cw->solve();
+//  cw->printLastModel();
+
+  EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
+  EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
+  EXPECT_EQ(false, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,node(1,system1,in2,entity1,none),information(entity1,scope2,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,node(1,system2,in3,entity1,none),information(entity1,scope2,rep1,none),2))"));
+  EXPECT_EQ(false, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),3),6)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),3),2)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),3),99)"));
+
+  // change optimization
+  cw->add("updatedOptimization", {}, "self(system1).");
+  cw->add("updatedOptimization", {}, "#minimize { 1@9,NODE,ENTITY,ENTITY2 : node(1,SYSTEM,NODE,ENTITY,ENTITY2), self(SELF), SYSTEM != SELF }.");
+  cw->ground("updatedOptimization", {});
+
+  cw->solve();
+//  cw->printLastModel();
+
+  EXPECT_EQ(true, cw->query("node(1,system1,node1,entity1,none)"));
+  EXPECT_EQ(false, cw->query("node(1,system1,node2,entity1,none)"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,node(1,system1,in2,entity1,none),information(entity1,scope2,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2),6)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node1,entity1,none),information(entity1,scope3,rep1,none),2),90)"));
+
+  // disable node 1 -> nodes from other systems are required
+  node1->assign(false);
+
+  cw->solve();
+//  cw->printLastModel();
+
+  EXPECT_EQ(false, cw->query("node(1,system1,node1,entity1,none)"));
+  EXPECT_EQ(true, cw->query("node(1,system1,node2,entity1,none)"));
+  EXPECT_EQ(false, cw->query("connectToNode(node(1,system1,node1,entity1,none),stream(1,system1,node(1,system1,in2,entity1,none),information(entity1,scope2,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node2,entity1,none),stream(1,system1,node(1,system1,in1,entity1,none),information(entity1,scope1,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node2,entity1,none),stream(1,system1,node(1,system1,in2,entity1,none),information(entity1,scope2,rep1,none),1))"));
+  EXPECT_EQ(true, cw->query("connectToNode(node(1,system1,node2,entity1,none),stream(1,system1,node(1,system2,in3,entity1,none),information(entity1,scope2,rep1,none),2))"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,delay,stream(1,system1,node(1,system1,node2,entity1,none),information(entity1,scope3,rep1,none),3),6)"));
+  EXPECT_EQ(true, cw->query("metadataStream(1,accuracy,stream(1,system1,node(1,system1,node2,entity1,none),information(entity1,scope3,rep1,none),3),96)"));
 }

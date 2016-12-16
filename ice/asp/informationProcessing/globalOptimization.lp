@@ -8,19 +8,6 @@
 #program query(k,maxHopCount,maxStepCount).
 
 %% computing stream QoS metadata 
-%inputMetaNode(NODE,METADATA,VALUE) :-
-%	connectToNode(NODE,stream(k,SYSTEM,PROVIDER,INFO,STEP)),
-%	metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO,STEP),VALUE),
-%	VALUE < 1000, VALUE > -1.
-%inputMetaNode(NODE,METADATA,1000) :-
-%	connectToNode(NODE,stream(k,SYSTEM,PROVIDER,INFO,STEP)),
-%	metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO,STEP),VALUE),
-%	VALUE > 1000.
-%inputMetaNode(NODE,METADATA,0) :-
-%	connectToNode(NODE,stream(k,SYSTEM,PROVIDER,INFO,STEP)),
-%	metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO,STEP),VALUE),
-%	VALUE < 0.
-
 inputMetaNode(NODE,METADATA,stream(k,SYSTEM,STREAM_NODE,INFO2,STEP2),STEP,VALUE) :-
 	stream(k,SYSTEM,NODE,INFO,STEP),
 	connectToNode(NODE,stream(k,SYSTEM,STREAM_NODE,INFO2,STEP2)),
@@ -36,7 +23,6 @@ metadataStream(k,METADATA,stream(k,SYSTEM,node(k,SYSTEM,NODE,ENTITY,ENTITY2),INF
 metadataStream(k,METADATA,stream(k,SYSTEM,node(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,STEP),VALUE+FIX_VALUE+MOD_VALUE*COUNT) :- 
 	stream(k,SYSTEM,node(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,STEP), 
 	metadataOutput(METADATA,SYSTEM,NODE,min,FIX_VALUE,MOD_VALUE),
-	%VALUE = #min{D : inputMetaNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2),METADATA,D)}, 
 	VALUE = #min{D : inputMetaNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2),METADATA,_,STEP,D)}, 
 	nodeMeta(node(k,SYSTEM,NODE,ENTITY,ENTITY2), STEP-1, COUNT),
 	COUNT > 0.
@@ -45,11 +31,6 @@ metadataStream(k,METADATA,stream(k,SYSTEM,node(k,SYSTEM,NODE,ENTITY,ENTITY2),INF
 metadataStream(k,METADATA,stream(k,SYSTEM,node(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,STEP),VALUE/COUNT+FIX_VALUE+MOD_VALUE*COUNT) :- 
 	stream(k,SYSTEM,node(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,STEP), 
 	metadataOutput(METADATA,SYSTEM,NODE,avg,FIX_VALUE,MOD_VALUE),
-%	VALUE = #sum{D,STEP2,PROVIDER,INFO2 : 
-%		connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,PROVIDER,INFO2,STEP2)),
-%		metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO2,STEP2),D), 
-%		node(k,SYSTEM,NODE,ENTITY,ENTITY2) != PROVIDER, 
-%		STEP2 < STEP}, 
 	VALUE = #sum{D,CONNECTED : inputMetaNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2),METADATA,CONNECTED,STEP,D)}, 
 	nodeMeta(node(k,SYSTEM,NODE,ENTITY,ENTITY2), STEP-1, COUNT),
 	COUNT > 0.
@@ -58,7 +39,6 @@ metadataStream(k,METADATA,stream(k,SYSTEM,node(k,SYSTEM,NODE,ENTITY,ENTITY2),INF
 metadataStream(k,METADATA,stream(k,SYSTEM,node(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,STEP),VALUE+FIX_VALUE+MOD_VALUE*COUNT) :- 
 	stream(k,SYSTEM,node(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,STEP), 
 	metadataOutput(METADATA,SYSTEM,NODE,max,FIX_VALUE,MOD_VALUE),
-	%VALUE = #max{D : inputMetaNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2),METADATA,D)}, 
 	VALUE = #max{D : inputMetaNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2),METADATA,_,STEP,D)}, 
 	nodeMeta(node(k,SYSTEM,NODE,ENTITY,ENTITY2), STEP-1, COUNT),
 	COUNT > 0.
@@ -145,8 +125,6 @@ metadataSet(k,density,set(k,SYSTEM,setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),in
 	VALUE_SUM = #sum{D,CONNECTED : inputMetaSetNode(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),density,CONNECTED,STEP,D)}, 
 	query(k).
 
-
-
 %% Speed up
 :- metadataSet(k,METADATA,SET,VALUE), 
    metadataSet(k,METADATA,SET,VALUE2),
@@ -173,14 +151,14 @@ metadataSet(k,METADATA,set(k,SYSTEM_TARGET,PROVIDER,INFO_TYPE,STEP+1),VALUE+VALU
    metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO,STEP),VALUE), 
    metadata(information,METADATA,maximize),
    TRESHOLD > VALUE,
-   query(k). [1@4,requiredStream]
+   query(k). [1@priorityQualityConstraint,requiredStream]
 :~ requiredStream(SYSTEM,INFO), 
    selectedStream(k,SYSTEM,PROVIDER,INFO,STEP),
    requiredMetadata(METADATA,SYSTEM,INFO,TRESHOLD), 
    metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO,STEP),VALUE),
    metadata(information,METADATA,minimize), 
    TRESHOLD < VALUE,
-   query(k). [1@4,requiredStream]
+   query(k). [1@priorityQualityConstraint,requiredStream]
 
 :~ requiredStream(SYSTEM,INFO), 
    selectedStream(k,SYSTEM,PROVIDER,INFO,STEP),
@@ -188,14 +166,14 @@ metadataSet(k,METADATA,set(k,SYSTEM_TARGET,PROVIDER,INFO_TYPE,STEP+1),VALUE+VALU
    metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO,STEP),VALUE), 
    metadata(stream,METADATA,maximize),
    TRESHOLD > VALUE,
-   query(k). [1@4,requiredStream]
+   query(k). [1@priorityQualityConstraint,requiredStream]
 :~ requiredStream(SYSTEM,INFO), 
    selectedStream(k,SYSTEM,PROVIDER,INFO,STEP),
    requiredMetadata(METADATA,SYSTEM,INFO,TRESHOLD), 
    metadataStream(k,METADATA,stream(k,SYSTEM,PROVIDER,INFO,STEP),VALUE),
    metadata(stream,METADATA,minimize), 
    TRESHOLD < VALUE,
-   query(k). [1@4,requiredStream]
+   query(k). [1@priorityQualityConstraint,requiredStream]
 
 
 % checking set QoS parameters
@@ -204,26 +182,26 @@ metadataSet(k,METADATA,set(k,SYSTEM_TARGET,PROVIDER,INFO_TYPE,STEP+1),VALUE+VALU
    metadataSet(k,METADATA,set(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
    metadata(information,METADATA,maximize),
    TRESHOLD > VALUE,
-   query(k). [1@4,requiredStream]
+   query(k). [1@priorityQualityConstraint,requiredStream]
 :~ selectedSet(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),
    requiredMetadata(METADATA,SYSTEM,INFO_TYPE,TRESHOLD), 
    metadataSet(k,METADATA,set(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
    metadata(information,METADATA,minimize),
    TRESHOLD < VALUE,
-   query(k). [1@4,requiredStream]
+   query(k). [1@priorityQualityConstraint,requiredStream]
 
 :~ selectedSet(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),
    requiredMetadata(METADATA,SYSTEM,INFO_TYPE,TRESHOLD), 
    metadataSet(k,METADATA,set(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
    metadata(set,METADATA,maximize),
    TRESHOLD > VALUE,
-   query(k). [1@4,requiredStream]
+   query(k). [1@priorityQualityConstraint,requiredStream]
 :~ selectedSet(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),
    requiredMetadata(METADATA,SYSTEM,INFO_TYPE,TRESHOLD), 
    metadataSet(k,METADATA,set(k,SYSTEM,PROVIDER,INFO_TYPE,STEP),VALUE),
    metadata(set,METADATA,minimize),
    TRESHOLD < VALUE,
-   query(k). [1@4,requiredStream]
+   query(k). [1@priorityQualityConstraint,requiredStream]
 
 
 
@@ -238,10 +216,19 @@ metadataSelected(METADATA,set(k,SYSTEM,NODE,INFO_TYPE,STEP),VALUE) :-
 
 #minimize { VALUE@priorityDelay,SELECTED : metadataSelected(delay,SELECTED,VALUE) }.
 #maximize { VALUE@priorityAccuracy,SELECTED : metadataSelected(accuracy,SELECTED,VALUE) }.
+#maximize { VALUE@priorityDensity,SELECTED : metadataSelected(density,SELECTED,VALUE) }.
 
-#maximize { VALUE@4,SELECTED : metadataSelected(density,SELECTED,VALUE) }.
 
+% further optimization
 
+% transfer cost
+%#minimize { COST@priorityTransferCost,SYSTEM,SYSTEM_TARGET,PROVIDER,INFO : 
+%		streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,INFO,_),_), 
+%		metadataProcessing(cost,SYSTEM,SYSTEM_TARGET,COST), 
+%		query(k) }.
+
+% cost
+#minimize { COST@priorityCost,SYSTEM : reqPoints(k,SYSTEM,COST) }.
 
 
 

@@ -75,7 +75,6 @@ MIN { before(TNODE,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,S) :
 	query(k).
 
 % flag node as to used
-%:- flagged(k,TNODE,S1), flagged(k,TNODE,S2), S1 != S2, query(k).
 flagged(k,TNODE,S+1) :- before(TNODE,_,_,S), query(k).
 
 
@@ -86,13 +85,6 @@ node(k,SYSTEM,NODE,ENTITY,ENTITY2) :-
 setNode(k,SYSTEM,NODE,ENTITY_TYPE,none) :-
 	flagged(k,tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,none),S),
 	query(k).
-
-% detect loops
-%cycle(k,TNODE,TNODE2) :- before(TNODE,TNODE2,_,_).
-%cycle(k,TNODE,TNODE2) :- 
-%	cycle(k,TNODE,TNODE_BEFORE),
-% 	cycle(k,TNODE_BEFORE,TNODE2).
-%:- cycle(k,TNODE,TNODE).
 
 % transfer streams if nodes are from different systems
 streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM_SOURCE,node(k,SYSTEM_SOURCE,NODE2,ENTITY3,ENTITY4),INFO,STEP),0) :-

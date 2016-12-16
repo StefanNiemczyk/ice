@@ -6,6 +6,7 @@
 %%%%
 %%%%--------------------------------------------------------------------------------------
 #program query(k,maxHopCount,maxStepCount).
+
 % heuristic of node output QoS
 heuristic(k,tstream(k,SYSTEM,tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO),METADATA,1000-SUM) :-
 	metadata(information,METADATA,minimize),
@@ -60,5 +61,22 @@ penalty(k,SYSTEM,METADATA,INFO,C2,C2-C1) :-
 	order(k,SYSTEM,METADATA,INFO,C1,C2), 
 	penalty(k,SYSTEM,METADATA,INFO,C1,_).
 
-% TODO add configurable settings for different metadata
-#minimize { 1@3,SYSTEM,METADATA,INFO,C : penalty(k,SYSTEM,METADATA,INFO,C,D) }.
+% Optimization rules
+#minimize { 1@priorityAccuracy,SYSTEM,INFO,C : penalty(k,SYSTEM,accuracy,INFO,C,D) }.
+#minimize { 1@priorityDelay,SYSTEM,INFO,C : penalty(k,SYSTEM,delay,INFO,C,D) }.
+#minimize { 1@priorityDensity,SYSTEM,INFO,C : penalty(k,SYSTEM,density,INFO,C,D) }.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

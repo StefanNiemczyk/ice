@@ -1,5 +1,9 @@
 %--------------------------------------------------------------------------------------
 % paramters
+#const priorityReqStream=10.
+#const priorityReqSet=10.
+#const priorityQualityConstraint=7.
+#const priorityDensity=4.
 #const priorityDelay=3.
 #const priorityAccuracy=3.
 #const priorityTransferCost=2.
@@ -13,10 +17,6 @@ metadata(information,accuracy,maximize).
 metadata(information,delay,minimize).
 metadata(set,density,maximize).
 metadata(processing,cost,minimize).
-
-%-isTransferable(o0_PositionOrientation3D).
-%-isTransferable(o0_PositionOrientation2D).
-%-isTransferable(o2_CoordinatePositionRep).
 
 %--------------------------------------------------------------------------------------
 #program query(k,maxHopCount,maxStepCount).
@@ -79,20 +79,6 @@ tnode(k,SYSTEM,NODE,ENTITY,none) :-
 	query(k).
 
 % identify special nodes
-%snode(TNODE) :-
-%	tstream(k,SYSTEM,TNODE,INFO),
-%	tinput(TNODE,INFO,_,_).
-%snode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
-%	tnode(k,SYSTEM,IRO,ENTITY,ENTITY2),
-%	transformation(SYSTEM,NODE,_,_).
-%nnode(TNODE) :-
-%	tstream(k,SYSTEM,TNODE,INFO),
-%	tinput(TNODE,INFO2,_,_),
-%	INFO != INFO2.
-%nnode(tnode(k,SYSTEM,NODE,ENTITY,ENTITY2)) :-
-%	sourceNode(SYSTEM,NODE,_),
-%	tnode(k,SYSTEM,NODE,ENTITY,ENTITY2).
-
 snode(tnode(k, SYSTEM, NODE, ENTITY, ENTITY2)) :-
 	tstream(k, SYSTEM,tnode(k, SYSTEM, NODE, ENTITY, ENTITY2), INFO),
 	tinput(tnode(k, SYSTEM, NODE, ENTITY, ENTITY2), INFO, _, _).
@@ -191,6 +177,7 @@ nodeCount(node(k,SYSTEM,NODE,ENTITY,ENTITY2),MIN,MAX) :-
 connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(k,SYSTEM,node(k,SOURCE,PROVIDER,ENTITY3,ENTITY4),INFO,STEP)) :-
 	STEP < maxStepCount,
 	PROVIDER != NODE,
+	NODE != none,
 	before(tnode(k,SOURCE,PROVIDER,ENTITY3,ENTITY4),tnode(k,SYSTEM,NODE,ENTITY,ENTITY2),INFO,S), 
 	stream(k,SYSTEM,node(k,SOURCE,PROVIDER,ENTITY3,ENTITY4),INFO,STEP). 
 
@@ -215,7 +202,6 @@ nodeMeta(node(k,SYSTEM,NODE,ENTITY,ENTITY2),STEP_MAX,COUNT) :-
 
 nodeMeta(node(k,SYSTEM,NODE,ENTITY,ENTITY2), STEP_MAX, COUNT) :- 
 	maxStepNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2),STEP_MAX),
-	%STEP_MAX = #max{STEP : connectToNode(node(k,SYSTEM,NODE,ENTITY,ENTITY2), stream(_,_,_,_,STEP))},
 	nodeCount(node(k,SYSTEM,NODE,ENTITY,ENTITY2),COUNT,COUNT),
 	STEP_MAX < maxStepCount,
 	STEP_MAX != #inf.
@@ -342,12 +328,14 @@ connectToSet(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),stream(k,SYSTEM,node(k,S
 	before(tnode(k,SOURCE,PROVIDER,ENTITY3,ENTITY4),tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO,_), 
 	STEP < maxStepCount,
 	PROVIDER != NODE,
+	NODE != none,
 	stream(k,SYSTEM,node(k,SOURCE,PROVIDER,ENTITY3,ENTITY4),INFO,STEP). 
 
 connectToSet(setNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),set(k,SYSTEM,setNode(k,SOURCE,PROVIDER,ENTITY_TYPE2,ENTITY4),INFO_TYPE,STEP)) :-
 	before(tsetNode(k,SOURCE,PROVIDER,ENTITY_TYPE2,ENTITY4),tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2),INFO_TYPE,_), 
 	STEP < maxStepCount,
 	PROVIDER != NODE,
+	NODE != none,
 	set(k,SYSTEM,setNode(k,SOURCE,PROVIDER,ENTITY_TYPE2,ENTITY4),INFO_TYPE,STEP).
 
 -maxStep(NODE,STEP) :-
@@ -465,13 +453,13 @@ set(k,SYSTEM_TARGET,PROVIDER,INFO_TYPE,STEP+1) :-
 selectedStream(k,SYSTEM,node(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO,STEP) :-
 	before(tnode(k,SYSTEM2,NODE,ENTITY,ENTITY2),tnode(k,SYSTEM,none,none,none),INFO,0),
 	stream(k,SYSTEM,node(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO,STEP).
-:~ requiredStream(SYSTEM,INFO), not selectedStream(k,SYSTEM,_,INFO,_), query(k). [1@5,requiredStream]
+:~ requiredStream(SYSTEM,INFO), not selectedStream(k,SYSTEM,_,INFO,_), query(k). [1@priorityReqStream,requiredStream]
 
 % sets
 selectedSet(k,SYSTEM,setNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO_TYPE,STEP) :-
 	before(tsetNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),tnode(k,SYSTEM,none,none,none),INFO,0),
 	set(k,SYSTEM,setNode(k,SYSTEM2,NODE,ENTITY,ENTITY2),INFO_TYPE,STEP).
-:~ requiredSet(SYSTEM,INFO_TYPE), not selectedSet(k,SYSTEM,_,INFO_TYPE,_), query(k). [1@5,requiredSet]
+:~ requiredSet(SYSTEM,INFO_TYPE), not selectedSet(k,SYSTEM,_,INFO_TYPE,_), query(k). [1@priorityReqSet,requiredSet]
 
 % checking point budget of systems
 reqPoints(k,SYSTEM,(SUM_NODES + SUM_STREAMS + SUM_SET_NODES)) :- 
@@ -489,72 +477,6 @@ reqPoints(k,SYSTEM,(SUM_NODES + SUM_STREAMS + SUM_SET_NODES)) :-
 
 :- reqPoints(k,SYSTEM,REQ_POINTS), systemPoints(SYSTEM,POINTS), REQ_POINTS > POINTS.
 
-% transfer cost
-%#minimize { COST@priorityTransferCost,SYSTEM,SYSTEM_TARGET,PROVIDER,INFO : 
-%		streamTransfer(k,SYSTEM_TARGET,stream(k,SYSTEM,PROVIDER,INFO,_),_), 
-%		metadataProcessing(cost,SYSTEM,SYSTEM_TARGET,COST), 
-%		query(k) }.
-
-% cost
-#minimize { COST@priorityCost,SYSTEM : reqPoints(k,SYSTEM,COST) }.
-
-
-
-%--------------------------------------------------------------------------------------
-#program entity(entity,entityType).
-
-entity(entity,entityType).
-
-
-%--------------------------------------------------------------------------------------
-#program sourceNode(node,system,source,entity,scope,rep,entity2,delayFix,accuracyFix,costValue).
-
-#external sourceNode(system,node,entity).
-
-output(system,node,scope,rep,none).
-
-metadataOutput(accuracy,system,node,fix,accuracyFix,0).
-metadataOutput(delay,system,node,fix,delayFix,0).
-metadataProcessing(cost,system,node,costValue).
-
-
-%--------------------------------------------------------------------------------------
-#program requiredStream(system,information,delayValue,accuracyValue).
-
-#external requiredStream(system,information).
-requiredMetadata(accuracy,system,information,accuracyValue).
-requiredMetadata(delay,system,information,delayValue).
-
-
-%--------------------------------------------------------------------------------------
-#program requiredSet(system,informationType).
-
-#external requiredSet(system,informationType).
-
-
-%--------------------------------------------------------------------------------------
-#program transfer(system1,system2,delayValue,costValue).
-
-#external transfer(system1,system2).
-transfer(system2,system1) :- transfer(system1,system2).
-
-metadataProcessing(cost,system1,system2,costValue).
-metadataOutput(delay,system1,system2,delayValue).
-
-metadataProcessing(cost,system2,system1,costValue).
-metadataOutput(delay,system2,system1,delayValue).
-
-
-%--------------------------------------------------------------------------------------
-#program system(name).
-
-#external system(name).
-
-%--------------------------------------------------------------------------------------
-#program system(name,points).
-
-#external system(name).
-systemPoints(name,points) :- system(name).
 
 
 

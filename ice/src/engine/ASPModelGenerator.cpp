@@ -961,10 +961,11 @@ void ASPModelGenerator::readSystemsFromOntology()
 
     if (entity->getExternal() == nullptr)
     {
-      auto ext = this->asp->getExternal("system", {Gringo::Value(iri)}, "system", {Gringo::Value(iri)}, true);
+      this->asp->add(iri, {}, "#external system(" + iri + ").");
+      auto ext = this->asp->getExternal("system", {Gringo::Value(iri)}, iri, {}, true);
       entity->setExternal(ext);
 
-      this->asp->add("base", {}, "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ").");
+      this->asp->add(iri, {}, "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ").");
     }
 
     if (entity == this->self || entity->isCooperationPossible())
