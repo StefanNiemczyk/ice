@@ -46,41 +46,4 @@ std::shared_ptr<Position> RosMessageTransform::transformM2CPosition(
   return pos;
 }
 
-std::shared_ptr<ice_msgs::Positions> RosMessageTransform::transformC2MPositions(std::shared_ptr<InformationElement<std::vector<Position>>> informationElement)
-{
-  auto infoList = informationElement->getInformation();
-  auto positions = std::make_shared<ice_msgs::Positions>();
-
-  for (auto infoPos : *infoList)
-  {
-    ice_msgs::Position pos;
-
-    pos.x = infoPos.x;
-    pos.y = infoPos.y;
-    pos.z = infoPos.z;
-
-    positions->positions.push_back(pos);
-  }
-
-  return positions;
-}
-
-std::shared_ptr<std::vector<Position>> RosMessageTransform::transformM2CPositions(const boost::shared_ptr<ice_msgs::Positions const> msg)
-{
-  auto positions = std::make_shared<std::vector<Position>>();
-
-  for (auto msgPos : msg->positions)
-  {
-    Position pos;
-
-    pos.x = msgPos.x;
-    pos.y = msgPos.y;
-    pos.z = msgPos.z;
-
-    positions->push_back(pos);
-  }
-
-  return positions;
-}
-
 } /* namespace ice */

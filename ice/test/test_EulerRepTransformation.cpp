@@ -73,14 +73,14 @@ TEST(EulerRepTransformation, rollPitchYawToEulerAngles)
       rollPitchYaw->set(pitch, &valPitch);
       rollPitchYaw->set(yaw, &valYaw);
 
-      std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+//      std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
       auto euler = trans->transform(&rollPitchYaw);
 
-      std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-      std::cout << "Transformation took "
-                << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
-                << "ns.\n";
+//      std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+//      std::cout << "Transformation took "
+//                << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
+//                << "ns.\n";
 
 
       ASSERT_NE(euler->getValue<double>(yaw), valYaw);

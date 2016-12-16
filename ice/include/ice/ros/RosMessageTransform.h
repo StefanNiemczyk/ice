@@ -18,7 +18,6 @@
 #include "ice/information/InformationElement.h"
 
 #include "ice_msgs/Position.h"
-#include "ice_msgs/Positions.h"
 
 namespace ice
 {
@@ -30,13 +29,6 @@ public:
   static std::shared_ptr<ice_msgs::Position> transformC2MPosition(
       std::shared_ptr<InformationElement<Position>> informationElement);
   static std::shared_ptr<Position> transformM2CPosition(const boost::shared_ptr<ice_msgs::Position const> msg);
-
-
-  // ice::Position[] <-> ice_msgs::Positions
-  static std::shared_ptr<ice_msgs::Positions> transformC2MPositions(
-      std::shared_ptr<InformationElement<std::vector<Position>>> informationElement);
-  static std::shared_ptr<std::vector<Position>> transformM2CPositions(const boost::shared_ptr<ice_msgs::Positions const> msg);
-
 };
 
 } /* namespace ice */
