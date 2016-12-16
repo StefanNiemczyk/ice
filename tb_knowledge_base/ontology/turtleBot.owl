@@ -137,6 +137,46 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectLandmarks -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectLandmarks">
+        <rdfs:subClassOf rdf:resource="&Ice;SetNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;aboutEntity"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#Landmark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutputSet"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3DSet"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectVictims -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectVictims">
+        <rdfs:subClassOf rdf:resource="&Ice;SetNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutputSet"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CoordinatePositionSet"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;aboutEntity"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#Victim"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
     <!-- http://vs.uni-kassel.de/TurtleBot#FuseTBPositions -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseTBPositions">
@@ -245,26 +285,6 @@
     
 
 
-    <!-- http://vs.uni-kassel.de/TurtleBot#LandmarkDetection -->
-
-    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#LandmarkDetection">
-        <rdfs:subClassOf rdf:resource="&Ice;SetNode"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasOutputSet"/>
-                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3DSet"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;aboutEntity"/>
-                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#Landmark"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-    </owl:Class>
-    
-
-
     <!-- http://vs.uni-kassel.de/TurtleBot#LandmarkId -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#LandmarkId">
@@ -294,6 +314,20 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&Ice;aboutEntity"/>
                 <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#Landmark"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBot -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBot">
+        <rdfs:subClassOf rdf:resource="&Ice;SourceNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3DStream"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -594,20 +628,6 @@
     
 
 
-    <!-- http://vs.uni-kassel.de/TurtleBot#TBLocalization -->
-
-    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#TBLocalization">
-        <rdfs:subClassOf rdf:resource="&Ice;SourceNode"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasOutput"/>
-                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3DStream"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-    </owl:Class>
-    
-
-
     <!-- http://vs.uni-kassel.de/TurtleBot#TurtleBot -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#TurtleBot">
@@ -683,26 +703,6 @@
     
 
 
-    <!-- http://vs.uni-kassel.de/TurtleBot#VictimDetection -->
-
-    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#VictimDetection">
-        <rdfs:subClassOf rdf:resource="&Ice;SetNode"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;aboutEntity"/>
-                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#Victim"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&Ice;hasOutputSet"/>
-                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CoordinatePositionSet"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-    </owl:Class>
-    
-
-
     <!-- http://vs.uni-kassel.de/TurtleBot#VictimPositionReqSet -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#VictimPositionReqSet">
@@ -728,15 +728,132 @@
     
 
 
-    <!-- http://vs.uni-kassel.de/TurtleBot#DefaultVictimDetection -->
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectLandmarks -->
 
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DefaultVictimDetection">
-        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#VictimDetection"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#VictimDetectionAccuracyGrounding"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#VictimDetectionCostGrounding"/>
-        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#VictimDetectionCppGrounding"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#VictimDetectionDelayGrounding"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#VictimDetectionDensityGrounding"/>
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectLandmarks">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectLandmarks"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectLandmarksAccuracyGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectLandmarksCostGrounding"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectLandmarksCppGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectLandmarksDelayGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectLandmarksDensityGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectLandmarksAccuracyGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectLandmarksAccuracyGrounding">
+        <rdf:type rdf:resource="&Ice;Accuracy"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">90</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyFixASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectLandmarksCostGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectLandmarksCostGrounding">
+        <rdf:type rdf:resource="&Ice;Cost"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">5</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeCostASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectLandmarksCppGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectLandmarksCppGrounding">
+        <rdf:type rdf:resource="&Ice;CppGrounding"/>
+        <Ice:hasGroundingValue rdf:datatype="&xsd;string">DetectLandmarks</Ice:hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectLandmarksDelayGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectLandmarksDelayGrounding">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">10</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeDelayFixASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectLandmarksDensityGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectLandmarksDensityGrounding">
+        <rdf:type rdf:resource="&Ice;Density"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">10</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;SetDensityFixASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectVictimsAccuracyGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectVictimsAccuracyGrounding">
+        <rdf:type rdf:resource="&Ice;Accuracy"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">80</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyFixASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectVictimsCostGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectVictimsCostGrounding">
+        <rdf:type rdf:resource="&Ice;Cost"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">40</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeCostASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectVictimsCppGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectVictimsCppGrounding">
+        <rdf:type rdf:resource="&Ice;CppGrounding"/>
+        <Ice:hasGroundingValue rdf:datatype="&xsd;string">DetectVictims</Ice:hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectVictimsDefault -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectVictimsDefault">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectVictims"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectVictimsAccuracyGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectVictimsCostGrounding"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectVictimsCppGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectVictimsDelayGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectVictimsDensityGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectVictimsDelayGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectVictimsDelayGrounding">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">80</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeDelayFixASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectVictimsDensityGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectVictimsDensityGrounding">
+        <rdf:type rdf:resource="&Ice;Density"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">5</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;SetDensityFixASPGrounding"/>
     </owl:NamedIndividual>
     
 
@@ -880,71 +997,6 @@
     
 
 
-    <!-- http://vs.uni-kassel.de/TurtleBot#LandmarkDetection -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LandmarkDetection">
-        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkDetection"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionAccuracyGrounding"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionCostGrounding"/>
-        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionCppGrounding"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionDelayGrounding"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionDensityGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionAccuracyGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionAccuracyGrounding">
-        <rdf:type rdf:resource="&Ice;Accuracy"/>
-        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;int">90</Ice:hasMetadataValue>
-        <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyFixASPGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionCostGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionCostGrounding">
-        <rdf:type rdf:resource="&Ice;Cost"/>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;int">5</Ice:hasMetadataValue>
-        <Ice:hasGrounding rdf:resource="&Ice;NodeCostASPGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionCppGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionCppGrounding">
-        <rdf:type rdf:resource="&Ice;CppGrounding"/>
-        <Ice:hasGroundingValue rdf:datatype="&xsd;string">DetectLandmarks</Ice:hasGroundingValue>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionDelayGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionDelayGrounding">
-        <rdf:type rdf:resource="&Ice;Delay"/>
-        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;int">10</Ice:hasMetadataValue>
-        <Ice:hasGrounding rdf:resource="&Ice;NodeDelayFixASPGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionDensityGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LandmarkDetectionDensityGrounding">
-        <rdf:type rdf:resource="&Ice;Density"/>
-        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;int">10</Ice:hasMetadataValue>
-        <Ice:hasGrounding rdf:resource="&Ice;SetDensityFixASPGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
     <!-- http://vs.uni-kassel.de/TurtleBot#LandmarkReqSet -->
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LandmarkReqSet">
@@ -959,13 +1011,13 @@
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#Leonardo">
         <rdf:type rdf:resource="&Ice;System"/>
         <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBot"/>
-        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DefaultVictimDetection"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectLandmarks"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectVictimsDefault"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseTBPositions"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseVictims"/>
-        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkDetection"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkReqSet"/>
-        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LeonardoLocalization"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LeonardoPositionReqStream"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeLeonardo"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#Pos3D2RelativeToLandmark"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#Pos3D2RelativeToLandmarkSet"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark2Pos3D"/>
@@ -994,25 +1046,79 @@
     
 
 
-    <!-- http://vs.uni-kassel.de/TurtleBot#LeonardoLocalization -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LeonardoLocalization">
-        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#TBLocalization"/>
-        <Ice:aboutEntity rdf:resource="http://vs.uni-kassel.de/TurtleBot#Leonardo"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#TBLocalizationAccuracyGrounding"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#TBLocalizationCostGrounding"/>
-        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#TBLocalizationCppGrounding"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#TBLocalizationDelayGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
     <!-- http://vs.uni-kassel.de/TurtleBot#LeonardoPositionReqStream -->
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LeonardoPositionReqStream">
         <rdf:type rdf:resource="&Ice;RequiredStream"/>
         <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3DStream"/>
         <Ice:aboutEntity rdf:resource="http://vs.uni-kassel.de/TurtleBot#Leonardo"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#LocalizeLeonardo -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LocalizeLeonardo">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBot"/>
+        <Ice:aboutEntity rdf:resource="http://vs.uni-kassel.de/TurtleBot#Leonardo"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotAccuracyGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotCostGrounding"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotCppGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotDelayGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#LocalizeRaphael -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LocalizeRaphael">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBot"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotAccuracyGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotCostGrounding"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotCppGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotDelayGrounding"/>
+        <Ice:aboutEntity rdf:resource="http://vs.uni-kassel.de/TurtleBot#Raphael"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotAccuracyGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotAccuracyGrounding">
+        <rdf:type rdf:resource="&Ice;Accuracy"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">80</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyFixASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotCostGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotCostGrounding">
+        <rdf:type rdf:resource="&Ice;Cost"/>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">10</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeCostASPGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotCppGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotCppGrounding">
+        <rdf:type rdf:resource="&Ice;CppGrounding"/>
+        <Ice:hasGroundingValue rdf:datatype="&xsd;string">LocalizeTurtleBot</Ice:hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotDelayGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#LocalizeTurtleBotDelayGrounding">
+        <rdf:type rdf:resource="&Ice;Delay"/>
+        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
+        <Ice:hasMetadataValue rdf:datatype="&xsd;int">50</Ice:hasMetadataValue>
+        <Ice:hasGrounding rdf:resource="&Ice;NodeDelayFixASPGrounding"/>
     </owl:NamedIndividual>
     
 
@@ -1110,32 +1216,19 @@
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#Raphael">
         <rdf:type rdf:resource="&Ice;System"/>
         <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBot"/>
-        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DefaultVictimDetection"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectLandmarks"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectVictimsDefault"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseTBPositions"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseVictims"/>
-        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkDetection"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkReqSet"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeRaphael"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#Pos3D2RelativeToLandmark"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#Pos3D2RelativeToLandmarkSet"/>
-        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RaphaelLocalization"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RaphaelPositionReqStream"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark2Pos3D"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark2Pos3DSet"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBotReqSet"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#VictimPositionReqSet"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#RaphaelLocalization -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#RaphaelLocalization">
-        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#TBLocalization"/>
-        <Ice:aboutEntity rdf:resource="http://vs.uni-kassel.de/TurtleBot#Raphael"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#TBLocalizationAccuracyGrounding"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#TBLocalizationCostGrounding"/>
-        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#TBLocalizationCppGrounding"/>
-        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#TBLocalizationDelayGrounding"/>
     </owl:NamedIndividual>
     
 
@@ -1238,104 +1331,11 @@
     
 
 
-    <!-- http://vs.uni-kassel.de/TurtleBot#TBLocalizationAccuracyGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#TBLocalizationAccuracyGrounding">
-        <rdf:type rdf:resource="&Ice;Accuracy"/>
-        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;int">80</Ice:hasMetadataValue>
-        <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyFixASPGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#TBLocalizationCostGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#TBLocalizationCostGrounding">
-        <rdf:type rdf:resource="&Ice;Cost"/>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;int">10</Ice:hasMetadataValue>
-        <Ice:hasGrounding rdf:resource="&Ice;NodeCostASPGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#TBLocalizationCppGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#TBLocalizationCppGrounding">
-        <rdf:type rdf:resource="&Ice;CppGrounding"/>
-        <Ice:hasGroundingValue rdf:datatype="&xsd;string">TBLocalization</Ice:hasGroundingValue>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#TBLocalizationDelayGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#TBLocalizationDelayGrounding">
-        <rdf:type rdf:resource="&Ice;Delay"/>
-        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;int">50</Ice:hasMetadataValue>
-        <Ice:hasGrounding rdf:resource="&Ice;NodeDelayFixASPGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
     <!-- http://vs.uni-kassel.de/TurtleBot#TurtleBotReqSet -->
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#TurtleBotReqSet">
         <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmarkSet"/>
         <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBotReqSet"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#VictimDetectionAccuracyGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#VictimDetectionAccuracyGrounding">
-        <rdf:type rdf:resource="&Ice;Accuracy"/>
-        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;int">80</Ice:hasMetadataValue>
-        <Ice:hasGrounding rdf:resource="&Ice;NodeAccuracyFixASPGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#VictimDetectionCostGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#VictimDetectionCostGrounding">
-        <rdf:type rdf:resource="&Ice;Cost"/>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;int">40</Ice:hasMetadataValue>
-        <Ice:hasGrounding rdf:resource="&Ice;NodeCostASPGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#VictimDetectionCppGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#VictimDetectionCppGrounding">
-        <rdf:type rdf:resource="&Ice;CppGrounding"/>
-        <Ice:hasGroundingValue rdf:datatype="&xsd;string">DetectVictims</Ice:hasGroundingValue>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#VictimDetectionDelayGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#VictimDetectionDelayGrounding">
-        <rdf:type rdf:resource="&Ice;Delay"/>
-        <Ice:hasMetadataValue2 rdf:datatype="&xsd;int">0</Ice:hasMetadataValue2>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;int">80</Ice:hasMetadataValue>
-        <Ice:hasGrounding rdf:resource="&Ice;NodeDelayFixASPGrounding"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#VictimDetectionDensityGrounding -->
-
-    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#VictimDetectionDensityGrounding">
-        <rdf:type rdf:resource="&Ice;Density"/>
-        <Ice:hasMetadataValue2 rdf:datatype="&xsd;integer">0</Ice:hasMetadataValue2>
-        <Ice:hasMetadataValue rdf:datatype="&xsd;int">5</Ice:hasMetadataValue>
-        <Ice:hasGrounding rdf:resource="&Ice;SetDensityFixASPGrounding"/>
     </owl:NamedIndividual>
     
 

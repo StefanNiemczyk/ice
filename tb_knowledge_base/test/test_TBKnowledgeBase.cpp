@@ -55,7 +55,7 @@ TEST(TBKnowledgeBase, leonardo)
                                                "http://vs.uni-kassel.de/Ice#Position",
                                                "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
   auto posLeornardo = streamStore->getStream<ice::PositionOrientation3D>(&specPosLeonardo,
-                                                                         "http://vs.uni-kassel.de/TurtleBot#LeonardoLocalization",
+                                                                         "http://vs.uni-kassel.de/TurtleBot#LocalizeLeonardo",
                                                                          "http://vs.uni-kassel.de/TurtleBot#Leonardo");
   ASSERT_TRUE((posLeornardo ? true : false));
 
@@ -79,7 +79,7 @@ TEST(TBKnowledgeBase, leonardo)
                                                "http://vs.uni-kassel.de/Ice#Position",
                                                "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
   auto landmarks = setStore->getSet<ice::PositionOrientation3D>(&landmarksSpec,
-                                                                         "http://vs.uni-kassel.de/TurtleBot#LandmarkDetection",
+                                                                         "http://vs.uni-kassel.de/TurtleBot#DetectLandmarks",
                                                                          "http://vs.uni-kassel.de/TurtleBot#Leonardo");
   ASSERT_TRUE((landmarks ? true : false));
 
@@ -225,7 +225,7 @@ TEST(TBKnowledgeBase, raphael)
                                                "http://vs.uni-kassel.de/Ice#Position",
                                                "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
   auto landmarks = setStore->getSet<ice::PositionOrientation3D>(&landmarksSpec,
-                                                                         "http://vs.uni-kassel.de/TurtleBot#LandmarkDetection",
+                                                                         "http://vs.uni-kassel.de/TurtleBot#DetectLandmarks",
                                                                          "http://vs.uni-kassel.de/TurtleBot#Raphael");
   ASSERT_TRUE((landmarks ? true : false));
 
@@ -357,7 +357,7 @@ TEST(TBKnowledgeBase, twoBots)
                                                "http://vs.uni-kassel.de/Ice#Position",
                                                "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
   auto posLeornardo = streamStore->getStream<ice::PositionOrientation3D>(&specPosLeonardo,
-                                                                         "http://vs.uni-kassel.de/TurtleBot#LeonardoLocalization",
+                                                                         "http://vs.uni-kassel.de/TurtleBot#LocalizeLeonardo",
                                                                          "http://vs.uni-kassel.de/TurtleBot#Leonardo");
   ASSERT_TRUE((posLeornardo ? true : false));
 
@@ -381,7 +381,7 @@ TEST(TBKnowledgeBase, twoBots)
                                                "http://vs.uni-kassel.de/Ice#Position",
                                                "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
   auto landmarks = setStore->getSet<ice::PositionOrientation3D>(&landmarksSpec,
-                                                                         "http://vs.uni-kassel.de/TurtleBot#LandmarkDetection",
+                                                                         "http://vs.uni-kassel.de/TurtleBot#DetectLandmarks",
                                                                          "http://vs.uni-kassel.de/TurtleBot#Leonardo");
   ASSERT_TRUE((landmarks ? true : false));
 

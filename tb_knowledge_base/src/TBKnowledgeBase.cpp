@@ -35,7 +35,7 @@ TBKnowledgeBase::TBKnowledgeBase(std::string robotName) : robotName(robotName)
   _log = el::Loggers::getLogger("TBKnowledgeBase");
 
   // register nodes
-  ice::Node::registerNodeCreator("TBLocalization", &TBLocalization::createNode);
+  ice::Node::registerNodeCreator("LocalizeTurtleBot", &TBLocalization::createNode);
   ice::Node::registerNodeCreator("DetectVictims", &DetectVictims::createNode);
   ice::Node::registerNodeCreator("DetectLandmarks", &DetectLandmarks::createNode);
   ice::Node::registerNodeCreator("Pos3D2RelativeToLandmark", &Pos3D2RelativeToLandmark::createNode);
