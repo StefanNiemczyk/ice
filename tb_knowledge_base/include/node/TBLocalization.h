@@ -10,6 +10,9 @@
 
 #include <memory>
 
+#include <ros/ros.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+
 #include <ice/processing/Node.h>
 
 namespace ice
@@ -28,16 +31,19 @@ public:
   virtual ~TBLocalization();
 
   int init();
+  int cleanUp();
 
   virtual std::string getClassName();
   virtual const int newEvent(std::shared_ptr<InformationElement<GContainer>> element,
                              std::shared_ptr<InformationCollection> collection);
   virtual int performNode();
+  void onPosition(const geometry_msgs::PoseWithCovarianceStamped& msg);
 
 private:
   static std::string POS_REP;
 
 private:
+  ros::Subscriber                       				      subscriber;
   std::shared_ptr<InformationStream<PositionOrientation3D>>   out;
 };
 

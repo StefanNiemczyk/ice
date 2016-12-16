@@ -7,8 +7,10 @@
 
 #include "node/TBLocalization.h"
 
+#include <ice/Time.h>
 #include <ice/information/InformationStream.h>
 
+#include "TBKnowledgeBase.h"
 #include "container/PositionOrientation3D.h"
 
 namespace ice
@@ -45,9 +47,37 @@ int TBLocalization::init()
     return 1;
   }
 
+  if (this->engine.expired())
+  {
+	  return -1;
+  }
+
+  auto e = std::dynamic_pointer_cast<TBKnowledgeBase>(this->engine.lock());
+
+  this->subscriber = e->nodeHandel.subscribe("amcl_pose", 10, &TBLocalization::onPosition, this);
   this->out = std::static_pointer_cast<ice::InformationStream<PositionOrientation3D>>(this->outputs[0]);
 
   return 0;
+}
+
+int TBLocalization::cleanUp()
+{
+  this->subscriber.shutdown();
+
+  return 0;
+}
+
+void TBLocalization::onPosition(const geometry_msgs::PoseWithCovarianceStamped& msg)
+{
+	auto pos = std::make_shared<PositionOrientation3D>(this->gcontainerFactory->getRepresentation(POS_REP));
+
+	pos->alpha = msg.pose.pose.orientation.z;
+	pos->x = msg.pose.pose.position.x;
+	pos->y = msg.pose.pose.position.y;
+	pos->z = msg.pose.pose.position.z;
+
+	time t = msg.header.stamp.sec * 1000000000 + msg.header.stamp.nsec;
+	this->out->add(pos, NO_TIME, t, t);
 }
 
 const int TBLocalization::newEvent(std::shared_ptr<InformationElement<GContainer>> element,
@@ -59,15 +89,7 @@ const int TBLocalization::newEvent(std::shared_ptr<InformationElement<GContainer
 
 int TBLocalization::performNode()
 {
-  //auto instance = this->gcontainerFactory->makeInstance(POS_REP);
-  auto instance = std::make_shared<PositionOrientation3D>(this->gcontainerFactory->getRepresentation(POS_REP));
-
-//  posNew->x = 1;
-//  posNew->y = 21;
-//  posNew->z = 31;
-
-  this->out->add(instance);
-
+  // source node, not necessary
   return 0;
 }
 

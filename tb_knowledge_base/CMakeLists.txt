@@ -7,6 +7,7 @@ find_package(catkin REQUIRED
   ice
   serval_wrapper
   cmake_modules
+  geometry_msgs
   )
 
 ## Use c++ 11x std
@@ -65,6 +66,11 @@ target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${TinyXML_LIBRARIES}
 )
+
+add_executable(ice_tb_node
+  src/ice_tb_node.cpp
+)
+target_link_libraries(ice_tb_node ${PROJECT_NAME})
 
 #############
 ## Testing ##

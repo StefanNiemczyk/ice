@@ -14,6 +14,7 @@
 #include <ice/information/StreamStore.h>
 #include <ice/model/aspModel/ASPModelGenerator.h>
 #include <ice/representation/GContainer.h>
+#include <ice/ros/RosTimeFactory.h>
 
 #include "TBCollectionFactory.h"
 #include "TBKnowledgeBase.h"
@@ -30,9 +31,15 @@
 namespace ice
 {
 
+
 TBKnowledgeBase::TBKnowledgeBase(std::string robotName) : robotName(robotName)
 {
   _log = el::Loggers::getLogger("TBKnowledgeBase");
+
+  auto lower = robotName;
+  std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+  this->nodeHandel = ros::NodeHandle(lower);
+  this->parentNodeHandel = ros::NodeHandle("~");
 
   // register nodes
   ice::Node::registerNodeCreator("LocalizeTurtleBot", &TBLocalization::createNode);
@@ -41,6 +48,12 @@ TBKnowledgeBase::TBKnowledgeBase(std::string robotName) : robotName(robotName)
   ice::Node::registerNodeCreator("Pos3D2RelativeToLandmark", &Pos3D2RelativeToLandmark::createNode);
   ice::Node::registerNodeCreator("RelativeToLandmark2Pos3D", &RelativeToLandmark2Pos3D::createNode);
   ice::Node::registerNodeCreator("FusePositions", &FusePositions::createNode);
+}
+
+TBKnowledgeBase::TBKnowledgeBase(std::string robotName, ros::NodeHandle nh_, ros::NodeHandle pnh_) : TBKnowledgeBase(robotName)
+{
+	this->nodeHandel = nh_;
+	this->parentNodeHandel = pnh_;
 }
 
 TBKnowledgeBase::~TBKnowledgeBase()
@@ -59,7 +72,7 @@ void TBKnowledgeBase::init()
   this->config->asp_additionalFiles.push_back(path + "/asp/tb_stuff.lp");
 
   // Set time factory
-  auto timeFactory = std::make_shared<ice::SimpleTimeFactory>();
+  auto timeFactory = std::make_shared<ice::RosTimeFactory>();
   this->setTimeFactory(timeFactory);
 
   // Set collection factory

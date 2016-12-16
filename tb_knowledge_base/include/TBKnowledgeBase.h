@@ -10,6 +10,8 @@
 
 #include <memory>
 
+#include <ros/ros.h>
+
 #include <ice/ICEngine.h>
 #include <easylogging++.h>
 
@@ -27,6 +29,7 @@ class TBKnowledgeBase : public ICEngine
 {
 public:
   TBKnowledgeBase(std::string robotName);
+  TBKnowledgeBase(std::string robotName, ros::NodeHandle nh_, ros::NodeHandle pnh_);
   virtual ~TBKnowledgeBase();
 
   virtual void init();
@@ -37,6 +40,8 @@ public:
   std::shared_ptr<InformationSet<RTLandmark>>                   positionRobots;
   std::shared_ptr<InformationSet<RTLandmark>>                   positionVictims;
   std::shared_ptr<InformationSet<PositionOrientation3D>>        positionLandmarks;
+  ros::NodeHandle                       						nodeHandel;
+  ros::NodeHandle                       						parentNodeHandel;
 
 private:
   std::string const                                     robotName;
