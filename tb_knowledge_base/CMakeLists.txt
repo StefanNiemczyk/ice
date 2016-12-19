@@ -80,8 +80,8 @@ target_link_libraries(ice_tb_node ${PROJECT_NAME})
 
 ## Add gtest based cpp test target and link libraries
  catkin_add_gtest(${PROJECT_NAME}-test 
- #  test/test_Containers.cpp
- #  test/test_GPSTransformation.cpp
+   test/test_Containers.cpp
+   test/test_GPSTransformation.cpp
    test/test_TBKnowledgeBase.cpp
    
    test/test_main.cpp

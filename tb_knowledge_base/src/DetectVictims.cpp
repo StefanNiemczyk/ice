@@ -92,11 +92,15 @@ void DetectVictims::onVictim(const ttb_msgs::LogicalCamera& msg)
     double dist = (old->getInformation()->x - pos->x) * (old->getInformation()->x - pos->x)
         + (old->getInformation()->y - pos->y) * (old->getInformation()->y - pos->y);
 
-    if (dist < 0, 25 * 0, 25)
-      return;
+//    if (dist < 0.25 * 0.25)
+//      return;
+//
+//    _log->info("Victim '%v' position updated to '%v/%v'", msg.modelName, pos->x, pos->y);
   }
-
-  _log->info("Victim '%v' added at position '%v/%v'", msg.modelName, pos->x, pos->y);
+  else
+  {
+    _log->info("Victim '%v' added at position '%v/%v'", msg.modelName, pos->x, pos->y);
+  }
 
   time t = msg.timeStamp.sec * 1000000000 + msg.timeStamp.nsec;
   this->out->add(msg.modelName, pos, NO_TIME, t, t);

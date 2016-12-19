@@ -106,13 +106,13 @@ const int RelativeToLandmark2Pos3D::newEvent(std::shared_ptr<InformationElement<
   auto list = std::make_shared<std::vector<std::shared_ptr<InformationElement<PositionOrientation3D>>>>();
   auto result = this->positionLandmarks->getFilteredList(list, eval);
 
-  if (list->size() != 0)
+  if (list->size() != 1)
   {
     _log->error("Position could not be transformation, landmark '%v' is unknown", info->landmark);
     return 1;
   }
 
-  auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(list->at(0));
+  auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(list->at(0)->getInformation());
   auto instance = std::dynamic_pointer_cast<Pos3D>(this->gcontainerFactory->makeInstance(REP_OUT));
 
   // rotate

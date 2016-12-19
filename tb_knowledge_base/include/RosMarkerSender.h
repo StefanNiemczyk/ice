@@ -65,6 +65,20 @@ public:
     return 0;
   }
 
+  void setSize(double x, double y, double z)
+  {
+    this->scaleX = x;
+    this->scaleY = y;
+    this->scaleZ = z;
+  }
+
+  void setColor(double r, double g, double b)
+  {
+    this->red = r;
+    this->green = g;
+    this->blue = b;
+  }
+
   virtual const int newEvent(std::shared_ptr<InformationElement<T>> element,
                              std::shared_ptr<InformationCollection> collection) = 0;
 
@@ -109,20 +123,6 @@ protected:
     marker.lifetime = ros::Duration();
 
     this->publisher.publish(marker);
-  }
-
-  void setSize(double x, double y, double z)
-  {
-    this->scaleX = x;
-    this->scaleY = y;
-    this->scaleZ = z;
-  }
-
-  void setColor(double r, double g, double b)
-  {
-    this->red = r;
-    this->green = g;
-    this->blude = b;
   }
 
 protected:
@@ -183,13 +183,13 @@ public:
     auto list = std::make_shared<std::vector<std::shared_ptr<InformationElement<PositionOrientation3D>>>>();
     auto result = this->positionLandmarks->getFilteredList(list, eval);
 
-    if (list->size() != 0)
+    if (list->size() != 1)
     {
       _log->error("Position could not be transformation, landmark '%v' is unknown", info->landmark);
       return 1;
     }
 
-    auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(list->at(0));
+    auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(list->at(0)->getInformation());
 
     // rotate
     double x = cos(-landmark->alpha) * info->x - sin(-landmark->alpha) * info->y;

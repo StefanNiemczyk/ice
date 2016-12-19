@@ -150,10 +150,27 @@ void TBKnowledgeBase::init()
   this->positionLandmarks = this->knowledgeBase->setStore->generateSelected<InformationSet<PositionOrientation3D>>(landmarkPos, CollectionType::CT_SET);
 
 
+  auto landmark1 = this->getGContainerFactory()->makeInstance<ice::PositionOrientation3D>("http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
+
+  landmark1->alpha = M_PI;
+  landmark1->x = 7.8;
+  landmark1->y = 1.5;
+  landmark1->z = 0.5;
+
+  this->positionLandmarks->add("landmark_door_floor", landmark1);
+
   // register marker sender
   auto positionMarkerSender = std::make_shared<RosMarkerSenderPosOri>(this->shared_from_this(), visualization_msgs::Marker::CUBE);
+  positionMarkerSender->setColor(0, 1, 0);
+  positionMarkerSender->setSize(0.25, 0.25, 0.25);
   positionMarkerSender->init();
   this->positionLandmarks->registerListenerSync(positionMarkerSender);
+
+  auto victimMarkerSender = std::make_shared<RosMarkerSenderRTL>(this->shared_from_this(), visualization_msgs::Marker::CUBE);
+  victimMarkerSender->setColor(0, 0, 1);
+  victimMarkerSender->setSize(0.5, 0.5, 1.0);
+  victimMarkerSender->init();
+  this->positionVictims->registerListenerSync(victimMarkerSender);
 
 }
 
