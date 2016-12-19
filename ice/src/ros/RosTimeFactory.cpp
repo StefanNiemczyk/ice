@@ -30,15 +30,15 @@ time RosTimeFactory::createTime()
 
 time RosTimeFactory::createTime(ros::Time rosTime)
 {
-  time iceTime = rosTime.sec * 1000000000 + rosTime.nsec;
-    return iceTime;
+  time iceTime = (rosTime.sec * 1000000000 + rosTime.nsec);
+  return iceTime;
 }
 
 bool RosTimeFactory::checkTimeout(time timestamp, long milliseconds)
 {
   time t = this->createTime();
 
-  return (timestamp + milliseconds * 1000) < t;
+  return (timestamp + milliseconds * 1000000) < t;
 }
 
 } /* namespace ice */

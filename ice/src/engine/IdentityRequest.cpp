@@ -105,12 +105,12 @@ void IdentityRequest::handleMessage(std::shared_ptr<Message> const &message)
 void IdentityRequest::sendRequestIds()
 {
   _log->info("Requesting Ids from '%v'", entity->toString());
+  this->updateActiveTime();
   this->stateIR = IdentityRequestState::IRS_REQUEST_IDS;
 
   auto m = std::make_shared<CommandMessage>(IceMessageIds::IMI_IDS_REQUEST);
   this->send(m);
   this->state = CJState::CJ_WAITING;
-  this->updateActiveTime();
 }
 
 void IdentityRequest::onRequestIds(std::shared_ptr<Message> const &message)

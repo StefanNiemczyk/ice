@@ -199,9 +199,8 @@ void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
     entity = this->directory->create(EntityDirectory::ID_ICE, sid);
     // At the beginning each discovered node is expected to be an ice node
     entity->setAvailable(true);
-    this->discoveredEntity(entity);
-
     _log->info("New ID discovered: %v", entity->toString());
+    this->discoveredEntity(entity);
   }
 
   entity->setActiveTimestamp();

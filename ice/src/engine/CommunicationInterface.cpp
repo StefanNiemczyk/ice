@@ -101,7 +101,7 @@ void CommunicationInterface::removeComJob(std::shared_ptr<ComJobBase> const &job
 
 void CommunicationInterface::discoveredEntity(std::shared_ptr<Entity> const &entity)
 {
-  _log->info("Requesting information from discovered entity '%v'", entity->toString());
+  _log->info("Create request job for discovered entity '%v'", entity->toString());
 
   auto request = std::make_shared<IdentityRequest>(this->engine, entity);
   this->addComJob(request);

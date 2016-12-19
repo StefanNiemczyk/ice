@@ -10,6 +10,9 @@
 
 #include <memory>
 
+#include <ros/ros.h>
+#include <ttb_msgs/LogicalCamera.h>
+
 #include <ice/processing/Node.h>
 
 namespace ice
@@ -17,6 +20,7 @@ namespace ice
 template <typename T>
 class InformationSet;
 class Pos3D;
+class PositionOrientation3D;
 
 class DetectVictims : public Node
 {
@@ -28,17 +32,21 @@ public:
   virtual ~DetectVictims();
 
   int init();
+  int cleanUp();
 
   virtual std::string getClassName();
   virtual const int newEvent(std::shared_ptr<InformationElement<GContainer>> element,
                              std::shared_ptr<InformationCollection> collection);
   virtual int performNode();
+  void onVictim(const ttb_msgs::LogicalCamera& msg);
 
 private:
   static std::string POS_REP;
 
 private:
-  std::shared_ptr<InformationSet<Pos3D>>   out;
+  ros::Subscriber                                               subscriber;
+  std::shared_ptr<InformationSet<Pos3D>>                        out;
+  std::shared_ptr<InformationStream<PositionOrientation3D>>     pos;
 };
 } /* namespace ice */
 

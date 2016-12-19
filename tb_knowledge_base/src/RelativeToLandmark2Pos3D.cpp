@@ -117,7 +117,7 @@ const int RelativeToLandmark2Pos3D::newEvent(std::shared_ptr<InformationElement<
 
   // rotate
   instance->x = cos(-landmark->alpha) * info->x - sin(-landmark->alpha) * info->y;
-  instance->x = sin(-landmark->alpha) * info->x + cos(-landmark->alpha) * info->y;
+  instance->y = sin(-landmark->alpha) * info->x + cos(-landmark->alpha) * info->y;
 
   // translate
   instance->x += landmark->x;

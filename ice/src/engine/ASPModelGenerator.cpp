@@ -78,7 +78,10 @@ void ASPModelGenerator::initInternal()
     std::string iri;
     this->self->getId(EntityDirectory::ID_ONTOLOGY, iri);
     iri = this->ontology->toShortIri(iri);
-    auto ext = this->asp->getExternal("system", {Gringo::Value(iri)}, "system", {Gringo::Value(iri)}, true);
+
+    this->asp->add(iri, {}, "#external system(" + iri + ").");
+    auto ext = this->asp->getExternal("system", {Gringo::Value(iri)}, true);
+    this->asp->ground(iri, {});
     this->self->setExternal(ext);
   }
 }
@@ -962,10 +965,11 @@ void ASPModelGenerator::readSystemsFromOntology()
     if (entity->getExternal() == nullptr)
     {
       this->asp->add(iri, {}, "#external system(" + iri + ").");
-      auto ext = this->asp->getExternal("system", {Gringo::Value(iri)}, iri, {}, true);
+      auto ext = this->asp->getExternal("system", {Gringo::Value(iri)}, true);
       entity->setExternal(ext);
 
       this->asp->add(iri, {}, "transfer(" + iri + "," + iriSelf + ") :- system(" + iri + ").");
+      this->asp->ground(iri, {});
     }
 
     if (entity == this->self || entity->isCooperationPossible())

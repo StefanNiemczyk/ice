@@ -7,6 +7,8 @@
 
 #include "node/TBLocalization.h"
 
+#include <tf/transform_datatypes.h>
+
 #include <ice/Time.h>
 #include <ice/information/InformationStream.h>
 
@@ -69,15 +71,20 @@ int TBLocalization::cleanUp()
 
 void TBLocalization::onPosition(const geometry_msgs::PoseWithCovarianceStamped& msg)
 {
-	auto pos = std::make_shared<PositionOrientation3D>(this->gcontainerFactory->getRepresentation(POS_REP));
+  auto pos = std::make_shared<PositionOrientation3D>(this->gcontainerFactory->getRepresentation(POS_REP));
 
-	pos->alpha = msg.pose.pose.orientation.z;
-	pos->x = msg.pose.pose.position.x;
-	pos->y = msg.pose.pose.position.y;
-	pos->z = msg.pose.pose.position.z;
+  tf::Quaternion q(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
+  tf::Matrix3x3 m(q);
+  double rx, ry, rz;
+  m.getEulerZYX(rz, ry, rx);
 
-	time t = msg.header.stamp.sec * 1000000000 + msg.header.stamp.nsec;
-	this->out->add(pos, NO_TIME, t, t);
+  pos->alpha = rz;
+  pos->x = msg.pose.pose.position.x;
+  pos->y = msg.pose.pose.position.y;
+  pos->z = msg.pose.pose.position.z;
+
+  time t = msg.header.stamp.sec * 1000000000 + msg.header.stamp.nsec;
+  this->out->add(pos, NO_TIME, t, t);
 }
 
 const int TBLocalization::newEvent(std::shared_ptr<InformationElement<GContainer>> element,

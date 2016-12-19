@@ -20,8 +20,8 @@ namespace ice
 
 //* InformationListener
 /**
- * Abstract listener which can be registered at a information stream and is triggered if
- * a new information element is added to the stream.
+ * Abstract listener which can be registered at a information collection and is triggered if
+ * a new information element is added to the collection.
  *
  */
 template<typename T>
@@ -36,15 +36,15 @@ template<typename T>
     virtual ~AbstractInformationListener() {};
 
     /*!
-     * \brief This method will be triggered if a new element is added to the information stream.
+     * \brief This method will be triggered if a new element is added to the information collection.
      *
-     * This method will be triggered if a new element is added to the information stream.
+     * This method will be triggered if a new element is added to the information collection.
      *
      * \param element The new information element.
-     * \param stream The stream which received the new information element.
+     * \param collection The collection which received the new information element.
      */
     virtual const int newEvent(std::shared_ptr<InformationElement<T>> element,
-                               std::shared_ptr<InformationCollection> stream) = 0;
+                               std::shared_ptr<InformationCollection> collection) = 0;
   };
 
 } /* namespace ice */

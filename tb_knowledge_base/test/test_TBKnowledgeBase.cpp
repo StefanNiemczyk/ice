@@ -434,8 +434,8 @@ TEST(TBKnowledgeBase, twoBots)
   // wait for processing
   std::this_thread::sleep_for(std::chrono::milliseconds {100});
 
-  leonardo->getKnowlegeBase()->streamStore->print();
-  raphael->getKnowlegeBase()->streamStore->print();
+//  leonardo->getKnowlegeBase()->streamStore->print();
+//  raphael->getKnowlegeBase()->streamStore->print();
 //  leonardo->getNodeStore()->print();
 
   // check

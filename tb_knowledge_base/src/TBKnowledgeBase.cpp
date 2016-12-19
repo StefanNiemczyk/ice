@@ -8,6 +8,8 @@
 #include "node/FusePositions.h"
 
 #include <ros/package.h>
+#include <visualization_msgs/Marker.h>
+
 #include <ice/information/InformationSet.h>
 #include <ice/information/InformationStream.h>
 #include <ice/information/SetStore.h>
@@ -27,6 +29,7 @@
 #include "node/RelativeToLandmark2Pos3D.h"
 #include "node/DetectLandmarks.h"
 #include "node/DetectVictims.h"
+#include "RosMarkerSender.h"
 
 namespace ice
 {
@@ -115,40 +118,55 @@ void TBKnowledgeBase::init()
   result = this->gcontainerFactory->registerCustomCreator("http://vs.uni-kassel.de/Ice#WGS84Rep",
                                                           wgs84Creator);
 
+
+  // get selected sets and streams
+  // position of own robot
+  auto ownPos = std::make_shared<ice::InformationSpecification>("http://vs.uni-kassel.de/TurtleBot#" + this->robotName,
+                                              "http://vs.uni-kassel.de/TurtleBot#TurtleBot",
+                                              "http://vs.uni-kassel.de/Ice#Position",
+                                              "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
+  this->positionOwn = this->knowledgeBase->streamStore->generateSelected<InformationStream<PositionOrientation3D>>(ownPos, CollectionType::CT_STREAM);
+
+
+  // position set of all robots
+  auto allPos = std::make_shared<ice::InformationSpecification>("",
+                                              "http://vs.uni-kassel.de/TurtleBot#TurtleBot",
+                                              "http://vs.uni-kassel.de/Ice#Position",
+                                              "http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
+  this->positionRobots = this->knowledgeBase->setStore->generateSelected<InformationSet<RTLandmark>>(allPos, CollectionType::CT_SET);
+
+  // position set of victims
+  auto victimPos = std::make_shared<ice::InformationSpecification>("",
+                                                 "http://vs.uni-kassel.de/TurtleBot#Victim",
+                                                 "http://vs.uni-kassel.de/Ice#Position",
+                                                 "http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
+  this->positionVictims = this->knowledgeBase->setStore->generateSelected<InformationSet<RTLandmark>>(victimPos, CollectionType::CT_SET);
+
   // initialize landmarks
   auto landmarkPos = std::make_shared<ice::InformationSpecification>("",
                                                    "http://vs.uni-kassel.de/TurtleBot#Landmark",
                                                    "http://vs.uni-kassel.de/Ice#Position",
                                                    "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
   this->positionLandmarks = this->knowledgeBase->setStore->generateSelected<InformationSet<PositionOrientation3D>>(landmarkPos, CollectionType::CT_SET);
+
+
+  // register marker sender
+  auto positionMarkerSender = std::make_shared<RosMarkerSenderPosOri>(this->shared_from_this(), visualization_msgs::Marker::CUBE);
+  positionMarkerSender->init();
+  this->positionLandmarks->registerListenerSync(positionMarkerSender);
+
 }
 
 void TBKnowledgeBase::start()
 {
   ICEngine::start();
-
-  // get selected sets and streams
-  // position of own robot
-  auto ownPos = ice::InformationSpecification("http://vs.uni-kassel.de/TurtleBot#" + this->robotName,
-                                              "http://vs.uni-kassel.de/TurtleBot#TurtleBot",
-                                              "http://vs.uni-kassel.de/Ice#Position",
-                                              "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
-  this->positionOwn = this->knowledgeBase->streamStore->getSelectedStream<PositionOrientation3D>(&ownPos);
-
-
-  // position set of all robots
-  auto allPos = ice::InformationSpecification("",
-                                              "http://vs.uni-kassel.de/TurtleBot#TurtleBot",
-                                              "http://vs.uni-kassel.de/Ice#Position",
-                                              "http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
-  this->positionRobots = this->knowledgeBase->setStore->getSelectedSet<RTLandmark>(&allPos);
-
-  // position set of victims
-  auto victimPos = ice::InformationSpecification("",
-                                                 "http://vs.uni-kassel.de/TurtleBot#Victim",
-                                                 "http://vs.uni-kassel.de/Ice#Position",
-                                                 "http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark");
-  this->positionVictims = this->knowledgeBase->setStore->getSelectedSet<RTLandmark>(&victimPos);
 }
 
+
+std::string TBKnowledgeBase::getRobotName()
+{
+  auto lower = this->robotName;
+  std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+  return lower;
+}
 } /* namespace ice */
