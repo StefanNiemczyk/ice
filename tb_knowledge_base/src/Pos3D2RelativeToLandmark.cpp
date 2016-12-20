@@ -87,8 +87,7 @@ int Pos3D2RelativeToLandmark::init()
   }
 
   auto e = this->engine.lock();
-  auto tbkb = std::dynamic_pointer_cast<TBKnowledgeBase>(e);
-  this->positionLandmarks = tbkb->positionLandmarks;
+  tbKnowledgeBase = std::dynamic_pointer_cast<TBKnowledgeBase>(e);
 
   return 0;
 }
@@ -98,47 +97,20 @@ const int Pos3D2RelativeToLandmark::newEvent(std::shared_ptr<InformationElement<
 {
   auto info = std::dynamic_pointer_cast<Pos3D>(element->getInformation());
 
-  auto eval = [info](std::shared_ptr<InformationElement<PositionOrientation3D>>& pos1,
-                     std::shared_ptr<InformationElement<PositionOrientation3D>>& pos2) {
-    double dist1 = sqrt((info->x - pos1->getInformation()->x)*(info->x - pos1->getInformation()->x) +
-                        (info->y - pos1->getInformation()->y)*(info->y - pos1->getInformation()->y) +
-                        (info->z - pos1->getInformation()->z)*(info->z - pos1->getInformation()->z));
-    double dist2 = sqrt((info->x - pos2->getInformation()->x)*(info->x - pos2->getInformation()->x) +
-                        (info->y - pos2->getInformation()->y)*(info->y - pos2->getInformation()->y) +
-                        (info->z - pos2->getInformation()->z)*(info->z - pos2->getInformation()->z));
+  double x = info->x;
+  double y = info->y;
+  double z = info->z;
+  std::string landmark = this->tbKnowledgeBase->makeRelativeToLandmark(x, y, z);
 
-    return (dist2 < dist1);
-  };
-
-  auto result = this->positionLandmarks->getOptimal(eval);
-
-  if (result == nullptr)
-  {
-    _log->error("Position could not be transformation, no landmark found");
+  if (landmark == "")
     return 1;
-  }
-
-  auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(result->getInformation());
-
-  if (landmark == nullptr)
-  {
-    _log->error("Position could not be transformation, landmark is not a PositionOrientation3D, '%v' generic",
-                result->getInformation()->isGeneric());
-    return 1;
-  }
 
   auto instance = std::dynamic_pointer_cast<RTLandmark>(this->gcontainerFactory->makeInstance(REP_OUT));
 
-  instance->landmark = result->getSpecification()->getEntity();
-
-  // translate
-  auto x = info->x - landmark->x;
-  auto y = info->y - landmark->y;
-  instance->z = info->z - landmark->z;
-
-  // rotate
-  instance->x = cos(landmark->alpha) * x - sin(landmark->alpha) * y;
-  instance->y = sin(landmark->alpha) * x + cos(landmark->alpha) * y;
+  instance->x = x;
+  instance->y = y;
+  instance->z = z;
+  instance->landmark = landmark;
 
   if (this->isSet)
     this->outSet->add(element->getSpecification()->getEntity(), instance);

@@ -36,12 +36,14 @@ public:
   virtual void start();
 
   std::string getRobotName();
+  std::string makeRelativeToLandmark(double &x, double &y, double &z);
 
 public:
   std::shared_ptr<InformationStream<PositionOrientation3D>>     positionOwn;
   std::shared_ptr<InformationSet<RTLandmark>>                   positionRobots;
   std::shared_ptr<InformationSet<RTLandmark>>                   positionVictims;
   std::shared_ptr<InformationSet<PositionOrientation3D>>        positionLandmarks;
+  std::shared_ptr<InformationSet<GContainer>>                   dangerZones;
   ros::NodeHandle                                               nodeHandel;
   ros::NodeHandle                                               parentNodeHandel;
 

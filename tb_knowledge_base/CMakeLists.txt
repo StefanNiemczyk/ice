@@ -49,6 +49,8 @@ add_library(${PROJECT_NAME}
   src/RTLandmark.cpp
   src/WGS84.cpp
   
+  src/DetectContaminatedAreas.cpp
+  src/DetectDangerZonesRemote.cpp
   src/DetectLandmarks.cpp
   src/DetectVictims.cpp
   src/FusePositions.cpp

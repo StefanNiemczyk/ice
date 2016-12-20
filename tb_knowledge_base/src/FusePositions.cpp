@@ -11,8 +11,6 @@
 namespace ice
 {
 
-std::string FusePositions::POS_REP = "http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark";
-
 std::shared_ptr<ice::Node> FusePositions::createNode()
 {
   auto node = std::make_shared<FusePositions>();

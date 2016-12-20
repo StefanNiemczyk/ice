@@ -91,38 +91,60 @@
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#CircleArea">
         <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#AreaRepresentation"/>
         <rdfs:subClassOf>
-            <owl:Class>
-                <owl:intersectionOf rdf:parseType="Collection">
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
-                        <owl:someValuesFrom>
-                            <owl:Class>
-                                <owl:intersectionOf rdf:parseType="Collection">
-                                    <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaCenter"/>
-                                    <owl:Restriction>
-                                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
-                                        <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#CoordinatePositionRep"/>
-                                    </owl:Restriction>
-                                </owl:intersectionOf>
-                            </owl:Class>
-                        </owl:someValuesFrom>
-                    </owl:Restriction>
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
-                        <owl:someValuesFrom>
-                            <owl:Class>
-                                <owl:intersectionOf rdf:parseType="Collection">
-                                    <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaSurface"/>
-                                    <owl:Restriction>
-                                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
-                                        <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CircleSurface"/>
-                                    </owl:Restriction>
-                                </owl:intersectionOf>
-                            </owl:Class>
-                        </owl:someValuesFrom>
-                    </owl:Restriction>
-                </owl:intersectionOf>
-            </owl:Class>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaCenter"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaSurface"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CircleSurface"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#CircleAreaSet -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#CircleAreaSet">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#NamedSet"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#isSetOf"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#Area"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CircleArea"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     
@@ -221,7 +243,7 @@
                             <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaCenter"/>
                             <owl:Restriction>
                                 <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
-                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#CoordinatePositionRep"/>
+                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark"/>
                             </owl:Restriction>
                         </owl:intersectionOf>
                     </owl:Class>
@@ -237,7 +259,37 @@
                             <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaSurface"/>
                             <owl:Restriction>
                                 <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
-                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#SquareSurface"/>
+                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CircleSurface"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#ContaminatedAreaSet -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#ContaminatedAreaSet">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#NamedSet"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#aboutEntity"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#RadioactiveArea"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#isSetOf"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#Area"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#ContaminatedArea"/>
                             </owl:Restriction>
                         </owl:intersectionOf>
                     </owl:Class>
@@ -348,6 +400,60 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/TurtleBot#DangerZoneReqSet -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#DangerZoneReqSet">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#RequiredSet"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#aboutEntity"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#DangerZone"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreas -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreas">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#SetNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#aboutEntity"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#RadioactiveArea"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasOutputSet"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#ContaminatedAreaSet"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemote -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemote">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#SetNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#aboutEntity"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#DangerZone"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasOutputSet"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CircleAreaSet"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
     <!-- http://vs.uni-kassel.de/TurtleBot#DetectLandmarks -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectLandmarks">
@@ -400,6 +506,42 @@
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#FloodedArea">
         <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DangerZone"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseDangerZones -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseDangerZones">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#SetNode"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasInputSet"/>
+                        <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">2</owl:minQualifiedCardinality>
+                        <owl:onClass rdf:resource="http://vs.uni-kassel.de/TurtleBot#CircleAreaSet"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasInputSet"/>
+                        <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">10</owl:maxQualifiedCardinality>
+                        <owl:onClass rdf:resource="http://vs.uni-kassel.de/TurtleBot#CircleAreaSet"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#aboutEntity"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#DangerZone"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasOutputSet"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CircleAreaSet"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -1072,6 +1214,145 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/TurtleBot#DangerZoneReqSet -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DangerZoneReqSet">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#CircleAreaSet"/>
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#DangerZoneReqSet"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreas -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreas">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreas"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasCppGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasAccuracyGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasCostGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasDelayGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasDensityGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasAccuracyGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasAccuracyGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Accuracy"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeAccuracyFixASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">80</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue2>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasCostGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasCostGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Cost"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeCostASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">25</Ice:hasMetadataValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasCppGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasCppGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#CppGrounding"/>
+        <Ice:hasGroundingValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">DetectContaminatedAreas</Ice:hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasDelayGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasDelayGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Delay"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeDelayFixASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">40</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue2>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasDensityGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreasDensityGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Density"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#SetDensityFixASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue2>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesDensityGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesDensityGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Density"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#SetDensityFixASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue2>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemote -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemote">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemote"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteCppGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesDensityGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteAccuracyGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteCostGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteDelayGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteAccuracyGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteAccuracyGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Accuracy"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeAccuracyFixASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">50</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue2>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteCostGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteCostGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Cost"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeCostASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">35</Ice:hasMetadataValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteCppGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteCppGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#CppGrounding"/>
+        <Ice:hasGroundingValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">DetectDangerZonesRemote</Ice:hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteDelayGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemoteDelayGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Delay"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeDelayFixASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">100</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue2>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://vs.uni-kassel.de/TurtleBot#DetectLandmarks -->
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectLandmarks">
@@ -1221,6 +1502,71 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseDangerZones -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseDangerZones">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseDangerZones"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesCppGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesAccuracyGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesCostGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesDelayGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesDensityGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesAccuracyGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesAccuracyGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Accuracy"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeAccuracyMaxASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="http://www.w3.org/2001/XMLSchema#int">3</Ice:hasMetadataValue2>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesCostGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesCostGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Cost"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeCostASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">15</Ice:hasMetadataValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesCppGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesCppGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#CppGrounding"/>
+        <Ice:hasGroundingValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">FusePositions</Ice:hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesDelayGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesDelayGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Delay"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeDelayASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue2>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesDensityGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FuseDangerZonesDensityGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Density"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#SetDensitySumASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue2>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://vs.uni-kassel.de/TurtleBot#FusePositionsCppGrounding -->
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#FusePositionsCppGrounding">
@@ -1355,8 +1701,11 @@
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#Leonardo">
         <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#System"/>
         <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBot"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DangerZoneReqSet"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectDangerZonesRemote"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectLandmarks"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectVictimsDefault"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseDangerZones"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseTBPositions"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseVictims"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LandmarkReqSet"/>
@@ -1542,6 +1891,7 @@
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#Raphael">
         <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#System"/>
         <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBot"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectContaminatedAreas"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectLandmarks"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DetectVictimsDefault"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#FuseTBPositions"/>

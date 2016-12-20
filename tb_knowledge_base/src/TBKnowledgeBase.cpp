@@ -25,10 +25,12 @@
 #include "container/RTLandmark.h"
 #include "container/WGS84.h"
 #include "node/TBLocalization.h"
-#include "node/Pos3D2RelativeToLandmark.h"
-#include "node/RelativeToLandmark2Pos3D.h"
+#include "node/DetectContaminatedAreas.h"
+#include "node/DetectDangerZonesRemote.h"
 #include "node/DetectLandmarks.h"
 #include "node/DetectVictims.h"
+#include "node/Pos3D2RelativeToLandmark.h"
+#include "node/RelativeToLandmark2Pos3D.h"
 #include "RosMarkerSender.h"
 
 namespace ice
@@ -51,6 +53,9 @@ TBKnowledgeBase::TBKnowledgeBase(std::string robotName) : robotName(robotName)
   ice::Node::registerNodeCreator("Pos3D2RelativeToLandmark", &Pos3D2RelativeToLandmark::createNode);
   ice::Node::registerNodeCreator("RelativeToLandmark2Pos3D", &RelativeToLandmark2Pos3D::createNode);
   ice::Node::registerNodeCreator("FusePositions", &FusePositions::createNode);
+
+  ice::Node::registerNodeCreator("DetectDangerZonesRemote", &DetectDangerZonesRemote::createNode);
+  ice::Node::registerNodeCreator("DetectContaminatedAreas", &DetectContaminatedAreas::createNode);
 }
 
 TBKnowledgeBase::TBKnowledgeBase(std::string robotName, ros::NodeHandle nh_, ros::NodeHandle pnh_) : TBKnowledgeBase(robotName)
@@ -159,6 +164,14 @@ void TBKnowledgeBase::init()
 
   this->positionLandmarks->add("landmark_door_floor", landmark1);
 
+  // initialize danger zones
+  auto dangerZone = std::make_shared<ice::InformationSpecification>("",
+                                                   "http://vs.uni-kassel.de/TurtleBot#DangerZone",
+                                                   "http://vs.uni-kassel.de/TurtleBot#Area",
+                                                   "http://vs.uni-kassel.de/TurtleBot#CircleArea");
+  this->dangerZones = this->knowledgeBase->setStore->generateSelected<InformationSet<GContainer>>(dangerZone, CollectionType::CT_SET);
+
+
   // register marker sender
   auto positionMarkerSender = std::make_shared<RosMarkerSenderPosOri>(this->shared_from_this(), visualization_msgs::Marker::CUBE);
   positionMarkerSender->setColor(0, 1, 0);
@@ -185,5 +198,49 @@ std::string TBKnowledgeBase::getRobotName()
   auto lower = this->robotName;
   std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
   return lower;
+}
+
+
+std::string TBKnowledgeBase::makeRelativeToLandmark(double &x, double &y, double &z)
+{
+    auto eval = [x,y,z](std::shared_ptr<InformationElement<PositionOrientation3D>>& pos1,
+                       std::shared_ptr<InformationElement<PositionOrientation3D>>& pos2) {
+      double dist1 = sqrt((x - pos1->getInformation()->x)*(x - pos1->getInformation()->x) +
+                          (y - pos1->getInformation()->y)*(y - pos1->getInformation()->y) +
+                          (z - pos1->getInformation()->z)*(z - pos1->getInformation()->z));
+      double dist2 = sqrt((x - pos2->getInformation()->x)*(x - pos2->getInformation()->x) +
+                          (y - pos2->getInformation()->y)*(y - pos2->getInformation()->y) +
+                          (z - pos2->getInformation()->z)*(z - pos2->getInformation()->z));
+
+      return (dist2 < dist1);
+    };
+
+    auto result = this->positionLandmarks->getOptimal(eval);
+
+    if (result == nullptr)
+    {
+      _log->error("Position could not be transformation, no landmark found");
+      return "";
+    }
+
+    auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(result->getInformation());
+
+    if (landmark == nullptr)
+    {
+      _log->error("Position could not be transformation, landmark is not a PositionOrientation3D, '%v' generic",
+                  result->getInformation()->isGeneric());
+      return "";
+    }
+
+    // translate
+    auto x1 = x - landmark->x;
+    auto y1 = y - landmark->y;
+    z = z - landmark->z;
+
+    // rotate
+    x = cos(landmark->alpha) * x1 - sin(landmark->alpha) * y1;
+    y = sin(landmark->alpha) * x1 + cos(landmark->alpha) * y1;
+
+    return result->getSpecification()->getEntity();
 }
 } /* namespace ice */

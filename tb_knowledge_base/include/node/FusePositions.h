@@ -37,9 +37,6 @@ public:
   virtual int performNode();
 
 private:
-  static std::string POS_REP;
-
-private:
   std::vector<std::shared_ptr<InformationSet<GContainer>>>      inSets;
   std::vector<std::shared_ptr<InformationStream<GContainer>>>   ins;
   std::shared_ptr<InformationSet<GContainer>>                   out;

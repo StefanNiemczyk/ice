@@ -20,6 +20,7 @@ class InformationSet;
 template <typename T>
 class InformationStream;
 class PositionOrientation3D;
+class TBKnowledgeBase;
 
 class Pos3D2RelativeToLandmark : public Node
 {
@@ -42,6 +43,7 @@ private:
   static std::string REP_OUT;
 
 private:
+  std::shared_ptr<TBKnowledgeBase>                              tbKnowledgeBase;
   bool                                                          isSet;
   std::shared_ptr<InformationStream<GContainer>>                inStream;
   std::shared_ptr<InformationStream<GContainer>>                outStream;
