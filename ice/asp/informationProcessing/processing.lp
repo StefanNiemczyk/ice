@@ -257,12 +257,18 @@ tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2) :-
 	inputSet(SYSTEM,NODE,any,SCOPE,_,ENTITY2,_,_),
 	query(k).
 
-
 tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2) :- 
 	setNodeTemplate(SYSTEM,NODE,any),
 	ENTITY_TYPE != any,
 	inputSet(SYSTEM,NODE,ENTITY_TYPE,_,_,ENTITY2,_,_),
 	query(k).
+
+tsetNode(k,SYSTEM,NODE,ENTITY_TYPE,ENTITY2) :- 
+	setAutoTrans(SYSTEM,NODE,any),
+	hasScope(ENTITY_TYPE,SCOPE), 
+	inputSet(SYSTEM,NODE,Sany,SCOPE,_,ENTITY2,_,_),
+	query(k).
+
 
 % identify special nodes
 snode(TNODE) :-
@@ -425,10 +431,11 @@ stream(k,SYSTEM_TARGET,PROVIDER,INFO,STEP+1) :-
 
 
 % transfer a set between systems
-tsetTransfer(SYSTEM_TARGET,tset(k,SYSTEM_SOURCE,TNODE,informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2))) :-
+tsetTransfer(SYSTEM_TARGET,tset(k,SYSTEM_SOURCE,TNODE,informationType(ENTITY_TYPE2,SCOPE,REP,ENTITY2))) :-
 	requiredInformationType(k,SYSTEM_TARGET,informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2)),
 	transfer(SYSTEM_SOURCE,SYSTEM_TARGET),
-	tset(k,SYSTEM_SOURCE,TNODE,informationType(ENTITY_TYPE,SCOPE,REP,ENTITY2)),
+	tset(k,SYSTEM_SOURCE,TNODE,informationType(ENTITY_TYPE2,SCOPE,REP,ENTITY2)),
+	entityType(ENTITY_TYPE2,ENTITY_TYPE),
 	SYSTEM_TARGET != SYSTEM_SOURCE,
 	not -isTransferable(REP).
 

@@ -1151,9 +1151,13 @@ std::string OntologyInterface::toLongIri(std::string p_shortIri)
   if (index == std::string::npos)
     return "";
 
-  std::string idStr = p_shortIri.substr(1, index);
-  int id = std::stoi(idStr);
-
+  std::string idStr = p_shortIri.substr(1, index - 1);
+  int id;
+  try {
+    id = std::stoi(idStr);
+  } catch (...) {
+    return "";
+  }
   if (this->ontologyIriMapping.size() <= id)
     return "";
 

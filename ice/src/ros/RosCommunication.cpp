@@ -40,7 +40,7 @@ void RosCommunication::initInternal()
 {
   std::string sid;
   this->self->getId(EntityDirectory::ID_ICE, sid);
-  this->iceId = std::stoi(sid);
+  this->iceId = std::stoul(sid);
 
   // init ros channels
   this->heartbeatPublisher = this->nodeHandel.advertise<ice_msgs::Heartbeat>("ice/heartbeat", 100);
@@ -99,7 +99,7 @@ void RosCommunication::sendMessage(std::shared_ptr<Message> msg)
   coordinationMsg.header.senderId.value = this->iceId;
 
   ice_msgs::Identifier receiver;
-  receiver.value = std::stoi(sid);
+  receiver.value = std::stoul(sid);
   coordinationMsg.header.receiverIds.push_back(receiver);
 
   coordinationMsg.id = msg->getId();

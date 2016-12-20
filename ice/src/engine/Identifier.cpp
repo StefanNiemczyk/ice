@@ -57,7 +57,7 @@ identifier IDGenerator::getIdentifier()
 
 identifier IDGenerator::getIdentifier(std::string value)
 {
-  return std::stoi(value);
+  return std::stoul(value);
 //  return boost::lexical_cast<boost::uuids::uuid>(value);
 }
 

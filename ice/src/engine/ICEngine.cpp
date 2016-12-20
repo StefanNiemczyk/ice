@@ -59,7 +59,9 @@ void ICEngine::init()
   this->entityDirectory->init();
   this->self = this->entityDirectory->self;
   this->self->addId(EntityDirectory::ID_ONTOLOGY, this->config->ontologyIriOwnEntity);
-  this->self->addId(EntityDirectory::ID_ICE, std::to_string(FNV::fnv1a(this->config->ontologyIriOwnEntity)));//Generator::toString(IDGenerator::getInstance()->getIdentifier()));
+  unsigned long sid = FNV::fnv1a(this->config->ontologyIriOwnEntity);
+  this->self->addId(EntityDirectory::ID_ICE, std::to_string(sid));
+//  this->self->addId(EntityDirectory::ID_ICE, IDGenerator::toString(IDGenerator::getInstance()->getIdentifier()));
 
   // Initialize ontology
   this->ontologyInterface = std::make_shared<OntologyInterface>(path + "/java/lib/");

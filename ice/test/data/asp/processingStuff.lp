@@ -1,3 +1,5 @@
+entityType(TYPE,TYPE) :- entityType(TYPE).
+
 %--------------------------------------------------------------------------------------
 #program entity(entity,entityType).
 

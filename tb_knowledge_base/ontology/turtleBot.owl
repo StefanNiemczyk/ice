@@ -26,6 +26,52 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/TurtleBot#Area -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#Area">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#EntityScope"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#AreaRepresentation"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#AreaCenter -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaCenter">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#AreaValueScope"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#AreaRepresentation -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaRepresentation">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#CompositeRepresentation"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#AreaSurface -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaSurface">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#AreaValueScope"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#AreaValueScope -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaValueScope">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#ValueScope"/>
+    </owl:Class>
+    
+
+
     <!-- http://vs.uni-kassel.de/TurtleBot#ChargeStation -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#ChargeStation">
@@ -34,6 +80,168 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasScope"/>
                 <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#Position"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#CircleArea -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#CircleArea">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#AreaRepresentation"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
+                        <owl:someValuesFrom>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaCenter"/>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                        <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#CoordinatePositionRep"/>
+                                    </owl:Restriction>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                        </owl:someValuesFrom>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
+                        <owl:someValuesFrom>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaSurface"/>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                        <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CircleSurface"/>
+                                    </owl:Restriction>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                        </owl:someValuesFrom>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#CircleSurface -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#CircleSurface">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#SurfaceRepresentation"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#CircleToSquare -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#CircleToSquare">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#TransformationNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasInput"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://vs.uni-kassel.de/Ice#Stream"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#isStreamOf"/>
+                                <owl:someValuesFrom>
+                                    <owl:Class>
+                                        <owl:intersectionOf rdf:parseType="Collection">
+                                            <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#Area"/>
+                                            <owl:Restriction>
+                                                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CircleArea"/>
+                                            </owl:Restriction>
+                                        </owl:intersectionOf>
+                                    </owl:Class>
+                                </owl:someValuesFrom>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasOutput"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://vs.uni-kassel.de/Ice#Stream"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#isStreamOf"/>
+                                <owl:someValuesFrom>
+                                    <owl:Class>
+                                        <owl:intersectionOf rdf:parseType="Collection">
+                                            <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#Area"/>
+                                            <owl:Restriction>
+                                                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#SquareArea"/>
+                                            </owl:Restriction>
+                                        </owl:intersectionOf>
+                                    </owl:Class>
+                                </owl:someValuesFrom>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#ContaminatedArea -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#ContaminatedArea">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#AreaRepresentation"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#RadioactivityMax"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#RadioactivityMin"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaCenter"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#CoordinatePositionRep"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaSurface"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#SquareSurface"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -126,6 +334,20 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/TurtleBot#DangerZone -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#DangerZone">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#EntityType"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasScope"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#Area"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
     <!-- http://vs.uni-kassel.de/TurtleBot#DetectLandmarks -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#DetectLandmarks">
@@ -162,6 +384,22 @@
                 <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CoordinatePositionSet"/>
             </owl:Restriction>
         </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FireArea -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#FireArea">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DangerZone"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#FloodedArea -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#FloodedArea">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DangerZone"/>
     </owl:Class>
     
 
@@ -498,6 +736,56 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/TurtleBot#RadioactiveArea -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#RadioactiveArea">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#DangerZone"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasScope"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#Area"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#Radioactivity -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#Radioactivity">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#ValueScope"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#RadioactivityMax -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#RadioactivityMax">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#Radioactivity"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#DoubleRep"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#RadioactivityMin -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#RadioactivityMin">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#Radioactivity"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#DoubleRep"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
     <!-- http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark">
@@ -617,6 +905,100 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/TurtleBot#SquareArea -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#SquareArea">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#AreaRepresentation"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
+                        <owl:someValuesFrom>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaCenter"/>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                        <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#CoordinatePositionRep"/>
+                                    </owl:Restriction>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                        </owl:someValuesFrom>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
+                        <owl:someValuesFrom>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="http://vs.uni-kassel.de/TurtleBot#AreaSurface"/>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                                        <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#SquareSurface"/>
+                                    </owl:Restriction>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                        </owl:someValuesFrom>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#SquareSurface -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#SquareSurface">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#SurfaceRepresentation"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#SurfaceRadius -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#SurfaceRadius">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#SurfaceValueScope"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#DoubleRep"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#SurfaceRepresentation -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#SurfaceRepresentation">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#CompositeRepresentation"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#SurfaceSideLength -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#SurfaceSideLength">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#SurfaceValueScope"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#DoubleRep"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#SurfaceValueScope -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#SurfaceValueScope">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#ValueScope"/>
+    </owl:Class>
+    
+
+
     <!-- http://vs.uni-kassel.de/TurtleBot#TurtleBot -->
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#TurtleBot">
@@ -631,33 +1013,6 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasScope"/>
                 <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#Position"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasScope"/>
-                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#Identifier"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-    </owl:Class>
-    
-
-
-    <!-- http://vs.uni-kassel.de/TurtleBot#TurtleBotId -->
-
-    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#TurtleBotId">
-        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#IdentifierValueScope"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
-                <owl:allValuesFrom rdf:resource="http://vs.uni-kassel.de/Ice#LongRep"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasRepresentation"/>
-                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onClass rdf:resource="http://vs.uni-kassel.de/Ice#LongRep"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>

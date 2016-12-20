@@ -566,6 +566,37 @@ public:
   }
 };
 
+class SimpleSetSourceNode : public ice::Node
+{
+public:
+  static std::shared_ptr<ice::Node> createNode()
+  {
+    return std::make_shared<SimpleSetSourceNode>();
+  }
+
+  SimpleSetSourceNode() :
+      Node()
+  {
+
+  }
+
+  virtual std::string getClassName()
+  {
+    return "SimpleSetSourceNode";
+  }
+
+  virtual const int newEvent(std::shared_ptr<ice::InformationElement<ice::GContainer>> element,
+                             std::shared_ptr<ice::InformationCollection> collection)
+  {
+    return 0;
+  }
+
+  virtual int performNode()
+  {
+    return 0;
+  }
+};
+
 class SimpleSourceNodeAlternative : public ice::Node
 {
 public:

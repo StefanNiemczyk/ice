@@ -110,6 +110,29 @@ public class InfoStructureVisitor extends IceVisitor {
 		this.anonymiousThings = new HashSet<String>();
 	}
 
+	private void printSubclass(final OWLClass p_start, final OWLClass p_stop, final String print) {
+		if (p_start == null)
+			return;
+
+		// owlapi 4.0 remove this
+		if (p_start.isAnonymous()) {
+			return;
+		}
+
+		if (p_start.equals(p_stop))
+			return;
+
+		Set<OWLClass> superClasses = this.reasoner.getSuperClasses(p_start, true).getFlattened();
+
+		for (OWLClass c : superClasses) {
+			if (c.equals(p_stop))
+				return;
+
+			sb.append(String.format(print, this.iRIShortName(p_start.getIRI()), this.iRIShortName(c.getIRI())));
+			this.printSubclass(c, p_stop, print);
+		}
+	}
+
 	@Override
 	public void visit(OWLClass ce) {
 		if (foundClasses.contains(ce))
@@ -134,6 +157,10 @@ public class InfoStructureVisitor extends IceVisitor {
 					sb.append(").\n");
 
 					Set<OWLNamedIndividual> entities = this.reasoner.getInstances(ce, true).getFlattened();
+					
+					this.printSubclass(ce, this.ii.entityType, "entityType(%s,%s).\n");
+					sb.append(String.format("entityType(%s,%s).\n", this.iRIShortName(ce.getIRI()), 
+							this.iRIShortName(ce.getIRI())));
 
 					for (OWLNamedIndividual ind : entities) {
 						ind.accept(this);

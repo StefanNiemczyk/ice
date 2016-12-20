@@ -1116,8 +1116,10 @@ void ASPModelGenerator::readTransformations()
       continue;
 
     std::stringstream ss;
-    auto &trans = transNode.second->transformation;
-    auto &name = transNode.second->shortName;
+
+    // stream
+    auto trans = transNode.second->transformation;
+    auto name = transNode.second->shortName;
     auto scope = this->ontology->toShortIri(trans->getScope());
     std::string autoTrans = "autoTrans(" + system + "," + name + ",any,none).";
     ss << autoTrans << std::endl;
@@ -1160,6 +1162,58 @@ void ASPModelGenerator::readTransformations()
     node.asp = element;
     node.node = transNode.second;
     this->transformations.push_back(node);
+
+    // set transform
+    if (trans->getInputs().size() != 1)
+      continue;
+
+    ss.str("");
+    trans = transNode.second->transformation;
+    name = transNode.second->shortName + "Set";
+    scope = this->ontology->toShortIri(trans->getScope());
+    autoTrans = "setAutoTrans(" + system + "," + name + ",any).";
+    ss << autoTrans << std::endl;
+
+    // outputSet(SYSTEM,NODE,_,SCOPE,REP,ENTITY2)
+    ss << "outputSet(" << system << "," << name << ",any," << scope << ","
+        << this->ontology->toShortIri(trans->getTargetRepresentation()->name) + ",none)." << std::endl;
+
+    // inputSet(SYSTEM,NODE,_,SCOPE,REP,ENTITY2,MIN,MAX)
+    for (auto &input : trans->getInputs())
+    {
+      ss << "inputSet(" << system << "," << name << ",any," << scope << ","
+          << this->ontology->toShortIri(input->name) << ",none,1,1) :- " << autoTrans << std::endl;
+    }
+
+    ss << "metadataProcessing(cost," << system << "," << name << ",10)." << std::endl;
+    ss << "metadataOutput(delay," << system << "," << name << ",max,25,0)." << std::endl;
+    ss << "metadataOutput(accuracy," << system << "," << name << ",max,-5,0)." << std::endl;
+
+    element = std::make_shared<ASPElement>();
+    element->aspString = this->ontology->toShortIriAll(ss.str());
+    element->name = name;
+    element->className = transNode.second->name;
+    element->state = ASPElementState::ADDED_TO_ASP;
+    element->type = ASPElementType::ASP_SET_NODE;
+
+    value = supplementary::ClingWrapper::stringToValue(autoTrans.c_str());
+
+    element->external = this->asp->getExternal(*value.name(), value.args());
+    element->external->assign(false);
+
+    this->asp->add(element->name, {}, element->aspString);
+    this->asp->ground(element->name, {});
+
+    this->groundingDirty = true;
+
+    _log->info("Created external for set transformation node %v: %v -> %v", element->name,
+               transNode.second->transformation->getInputs().at(0)->name,
+               transNode.second->transformation->getTargetRepresentation()->name);
+
+    ASPTransformation nodeSet;
+    nodeSet.asp = element;
+    nodeSet.node = transNode.second;
+    this->transformations.push_back(nodeSet);
   }
 }
 
@@ -1173,7 +1227,9 @@ void ASPModelGenerator::readMetadata(std::map<std::string, int>  &metadata, cons
   // TODO read metadata from ontology
   this->readMetadata("delay", metadata, element, isStream);
   this->readMetadata("accuracy", metadata, element, isStream);
-  this->readMetadata("density", metadata, element, isStream);
+
+  if (false == isStream)
+    this->readMetadata("density", metadata, element, isStream);
 }
 
 void ASPModelGenerator::readMetadata(std::string name, std::map<std::string, int> &metadata,

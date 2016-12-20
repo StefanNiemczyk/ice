@@ -63,7 +63,7 @@ class RosGContainerSender : public InformationSender<GContainer>
         ice_msgs::Identifier receiver;
         std::string id;
         entity->getId(EntityDirectory::ID_ICE, id);
-        receiver.value = std::stoi(id);
+        receiver.value = std::stoul(id);
         msg->info.header.receiverIds.push_back(receiver);
       }
 
@@ -127,7 +127,7 @@ template<typename ICEType, typename ROSType>
         ice_msgs::Identifier receiver;
         std::string id;
         entity->getId(EntityDirectory::ID_ICE, id);
-        receiver.value = std::stoi(id);
+        receiver.value = std::stol(id);
         msg->info.header.receiverIds.push_back(receiver);
       }
 

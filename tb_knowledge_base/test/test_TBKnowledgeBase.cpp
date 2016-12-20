@@ -135,7 +135,7 @@ TEST(TBKnowledgeBase, leonardo)
   ASSERT_EQ(1, posLeornardo2->getSize());
   ASSERT_EQ(1, posLeornardo3->getSize());
   ASSERT_EQ(1, leonardo->positionOwn->getSize());
-  ASSERT_EQ(2, leonardo->positionLandmarks->getSize());
+  ASSERT_EQ(3, leonardo->positionLandmarks->getSize());
   ASSERT_EQ(1, leonardo->positionRobots->getSize());
 
   // check own pos
@@ -281,7 +281,7 @@ TEST(TBKnowledgeBase, raphael)
   ASSERT_EQ(1, posLeornardo2->getSize());
   ASSERT_EQ(1, posLeornardo3->getSize());
   ASSERT_EQ(1, raphael->positionOwn->getSize());
-  ASSERT_EQ(2, raphael->positionLandmarks->getSize());
+  ASSERT_EQ(3, raphael->positionLandmarks->getSize());
   ASSERT_EQ(1, raphael->positionRobots->getSize());
 
   // check own pos
@@ -334,7 +334,7 @@ TEST(TBKnowledgeBase, twoBots)
   auto factory = leonardo->getGContainerFactory();
 
   // wait some time to enable the engines to find each other
-  std::this_thread::sleep_for(std::chrono::milliseconds {10000});
+  std::this_thread::sleep_for(std::chrono::milliseconds {6000});
 
   // test processing
   ASSERT_TRUE((leonardo->positionOwn ? true : false));
@@ -443,10 +443,10 @@ TEST(TBKnowledgeBase, twoBots)
   ASSERT_EQ(1, posLeornardo2->getSize());
   ASSERT_EQ(1, posLeornardo3->getSize());
   ASSERT_EQ(1, leonardo->positionOwn->getSize());
-  ASSERT_EQ(2, leonardo->positionLandmarks->getSize());
+  ASSERT_EQ(3, leonardo->positionLandmarks->getSize());
   ASSERT_EQ(1, leonardo->positionRobots->getSize());
   ASSERT_EQ(1, leonardo->positionVictims->getSize());
-  ASSERT_EQ(2, raphael->positionLandmarks->getSize());
+  ASSERT_EQ(3, raphael->positionLandmarks->getSize());
 //  ASSERT_EQ(1, raphael->positionRobots->getSize());
   ASSERT_EQ(1, raphael->positionVictims->getSize());
 

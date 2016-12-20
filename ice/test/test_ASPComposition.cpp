@@ -434,6 +434,7 @@ TEST(ASPComposition, setFusion)
 
   // entities
   cw->add("base", {}, "hasScope(type,scope1).");
+  cw->add("base", {}, "entityType(type).");
 
   // systems
   auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
@@ -488,6 +489,80 @@ TEST(ASPComposition, setFusion)
   EXPECT_EQ(true, cw->query("set(1,system3,setNode(1,system3,setInput2,type,none),informationType(type,scope1,rep1,none),1)"));
   EXPECT_EQ(true, cw->query("set(1,system1,setNode(1,system2,setInput1,type,none),informationType(type,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("set(1,system1,setNode(1,system3,setInput2,type,none),informationType(type,scope1,rep1,none),2)"));
+  EXPECT_EQ(true, cw->query("set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3)"));
+  EXPECT_EQ(true, cw->query("metadataSet(1,accuracy,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),98)"));
+  EXPECT_EQ(true, cw->query("metadataSet(1,delay,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),21)"));
+  EXPECT_EQ(true, cw->query("metadataSet(1,density,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),7)"));
+}
+
+
+TEST(ASPComposition, setFusionSubType)
+{
+  std::shared_ptr<supplementary::ClingWrapper> cw = std::make_shared<supplementary::ClingWrapper>();
+  cw->addKnowledgeFile("../asp/informationProcessing/processing.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/searchBottomUp.lp");
+  cw->addKnowledgeFile("../asp/informationProcessing/globalOptimization.lp");
+  cw->addKnowledgeFile("../test/data/asp/processingStuff.lp");
+  cw->init();
+
+  // entities
+  cw->add("base", {}, "hasScope(type,scope1).");
+  cw->add("base", {}, "entityType(type).");
+  cw->add("base", {}, "entityType(type2,type).");
+
+  // systems
+  auto system1 = cw->getExternal("system", {"system1"}, "system", {"system1", 100}, true);
+  auto system2 = cw->getExternal("system", {"system2"}, "system", {"system1", 10}, true);
+  auto system3 = cw->getExternal("system", {"system3"}, "system", {"system1", 10}, true);
+
+  // input sets
+  cw->add("setInput1", {}, "#external setNodeTemplate(system2,setInput1,type).");
+  auto setInput1 = cw->getExternal("setNodeTemplate", {"system2", "setInput1", "type"}, "nodeTemplate", {}, true);
+  cw->add("setInput1", {}, "outputSet(system2,setInput1,type,scope1,rep1,none).");
+  cw->add("setInput1", {}, "metadataProcessing(cost,system2,setInput1,1).");
+  cw->add("setInput1", {}, "metadataOutput(delay,system2,setInput1,fix,10,0).");
+  cw->add("setInput1", {}, "metadataOutput(accuracy,system2,setInput1,fix,90,0).");
+  cw->add("setInput1", {}, "metadataOutput(density,system2,setInput1,fix,3,0).");
+  cw->ground("setInput1", {});
+
+  cw->add("setInput2", {}, "#external setNodeTemplate(system3,setInput2,type2).");
+  auto setInput2 = cw->getExternal("setNodeTemplate", {"system3", "setInput2", "type2"}, "nodeTemplate", {}, true);
+  cw->add("setInput2", {}, "outputSet(system3,setInput2,type2,scope1,rep1,none).");
+  cw->add("setInput2", {}, "metadataProcessing(cost,system3,setInput2,1).");
+  cw->add("setInput2", {}, "metadataOutput(delay,system3,setInput2,fix,10,0).");
+  cw->add("setInput2", {}, "metadataOutput(accuracy,system3,setInput2,fix,90,0).");
+  cw->add("setInput2", {}, "metadataOutput(density,system3,setInput2,fix,4,0).");
+  cw->ground("setInput2", {});
+
+  // set fusion
+  cw->add("setFusionNode", {}, "#external setNodeTemplate(system1,setFusionNode,type).");
+  auto nodeFusion = cw->getExternal("setNodeTemplate", {"system1", "setFusionNode", "type"}, "nodeTemplate", {}, true);
+  cw->add("setFusionNode", {}, "inputSet(system1,setFusionNode,type,scope1,rep1,none,1,3).");
+  cw->add("setFusionNode", {}, "outputSet(system1,setFusionNode,type,scope1,rep1,none).");
+  cw->add("setFusionNode", {}, "metadataProcessing(cost,system1,setFusionNode,1).");
+  cw->add("setFusionNode", {}, "metadataOutput(delay,system1,setFusionNode,max,1,0).");
+  cw->add("setFusionNode", {}, "metadataOutput(accuracy,system1,setFusionNode,avg,0,4).");
+  cw->add("setFusionNode", {}, "metadataOutput(density,system1,setFusionNode,sum,0,0).");
+  cw->ground("setFusionNode", {});
+
+  // requires
+  // requiredSet(system,entity_type,scope,representation,entity2).
+  auto required = cw->getExternal("requiredSet", {"system1", Gringo::Value("informationType", {"type", "scope1", "rep1", "none"})}, true);
+
+  // add transfer
+  auto transfer1_2 = cw->getExternal("transfer", {"system1", "system2"}, "transfer", {"system1", "system2", 10, 1}, true);
+  auto transfer1_3 = cw->getExternal("transfer", {"system1", "system3"}, "transfer", {"system1", "system3", 10, 1}, true);
+  auto transfer2_3 = cw->getExternal("transfer", {"system2", "system3"}, "transfer", {"system2", "system3", 10, 1}, true);
+
+  auto query1 = cw->getExternal("query", {1}, "query", {1,3,10}, true);
+
+  cw->solve();
+//  cw->printLastModel();
+
+  EXPECT_EQ(true, cw->query("set(1,system2,setNode(1,system2,setInput1,type,none),informationType(type,scope1,rep1,none),1)"));
+  EXPECT_EQ(true, cw->query("set(1,system3,setNode(1,system3,setInput2,type2,none),informationType(type2,scope1,rep1,none),1)"));
+  EXPECT_EQ(true, cw->query("set(1,system1,setNode(1,system2,setInput1,type,none),informationType(type,scope1,rep1,none),2)"));
+  EXPECT_EQ(true, cw->query("set(1,system1,setNode(1,system3,setInput2,type2,none),informationType(type2,scope1,rep1,none),2)"));
   EXPECT_EQ(true, cw->query("set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,accuracy,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),98)"));
   EXPECT_EQ(true, cw->query("metadataSet(1,delay,set(1,system1,setNode(1,system1,setFusionNode,type,none),informationType(type,scope1,rep1,none),3),21)"));

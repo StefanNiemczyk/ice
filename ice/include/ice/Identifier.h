@@ -19,7 +19,7 @@
 namespace ice
 {
 /** Type definition of the time data type */
-typedef int identifier;
+typedef unsigned long identifier;
 
 //* IDGenerator
 /**
