@@ -163,6 +163,9 @@ std::shared_ptr<InformationReceiver> CommunicationInterface::registerCollectionA
 
 void CommunicationInterface::handleMessage(std::shared_ptr<Message> message)
 {
+  if (this->running == false)
+    return;
+
   auto entity = message->getEntity();
   entity->setActiveTimestamp();
   _log->info("Received Message '%v', job id '%v' and index '%v' from %v",

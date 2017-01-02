@@ -190,6 +190,9 @@ void RosCommunication::spin()
 
 void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
 {
+  if (false == this->running)
+    return;
+
   std::string sid = std::to_string(msg->header.senderId.value);
   auto entity = this->directory->lookup(EntityDirectory::ID_ICE, sid);
 
@@ -215,6 +218,9 @@ void RosCommunication::onHeartbeat(const ice_msgs::Heartbeat::ConstPtr& msg)
 
 void RosCommunication::onCoordination(const ice_msgs::ICECoordination::ConstPtr& msg)
 {
+  if (false == this->running)
+    return;
+
   identifier senderId = msg->header.senderId.value;
 
   if (false == this->checkReceiverIds(msg->header) || senderId == this->iceId)

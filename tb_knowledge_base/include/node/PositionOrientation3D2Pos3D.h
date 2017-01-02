@@ -5,8 +5,8 @@
  *      Author: sni
  */
 
-#ifndef INCLUDE_NODE_POS3D2RELATIVETOLANDMARK_H_
-#define INCLUDE_NODE_POS3D2RELATIVETOLANDMARK_H_
+#ifndef INCLUDE_NODE_POSITIONORIENTATION3D2POS3D_H_
+#define INCLUDE_NODE_POSITIONORIENTATION3D2POS3D_H_
 
 #include <memory>
 
@@ -22,14 +22,14 @@ class InformationStream;
 class PositionOrientation3D;
 class TBKnowledgeBase;
 
-class Pos3D2RelativeToLandmark : public Node
+class PositionOrientation3D2Pos3D : public Node
 {
 public:
   static std::shared_ptr<Node> createNode();
 
 public:
-  Pos3D2RelativeToLandmark();
-  virtual ~Pos3D2RelativeToLandmark();
+  PositionOrientation3D2Pos3D();
+  virtual ~PositionOrientation3D2Pos3D();
 
   int init();
   int cleanUp();
@@ -40,11 +40,6 @@ public:
   virtual int performNode();
 
 private:
-  static std::string REP_IN;
-  static std::string REP_OUT;
-
-private:
-  std::shared_ptr<TBKnowledgeBase>                              tbKnowledgeBase;
   bool                                                          isSet;
   std::shared_ptr<InformationStream<GContainer>>                inStream;
   std::shared_ptr<InformationStream<GContainer>>                outStream;

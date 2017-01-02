@@ -50,6 +50,7 @@ private:
   static std::string POS_Y;
   static std::string POS_Z;
   static std::string POS_LANDMARK;
+  static std::string SUR_RADIUS;
 
 private:
   std::shared_ptr<TBKnowledgeBase>                              tbKnowledgeBase;
@@ -61,6 +62,7 @@ private:
   std::vector<int>*                                             pathY;
   std::vector<int>*                                             pathZ;
   std::vector<int>*                                             pathLandmark;
+  std::vector<int>*                                             pathRadius;
 };
 } /* namespace ice */
 

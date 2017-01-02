@@ -30,6 +30,7 @@
 #include "node/DetectLandmarks.h"
 #include "node/DetectVictims.h"
 #include "node/Pos3D2RelativeToLandmark.h"
+#include "node/PositionOrientation3D2Pos3D.h"
 #include "node/RelativeToLandmark2Pos3D.h"
 #include "RosMarkerSender.h"
 
@@ -52,6 +53,7 @@ TBKnowledgeBase::TBKnowledgeBase(std::string robotName) : robotName(robotName)
   ice::Node::registerNodeCreator("DetectLandmarks", &DetectLandmarks::createNode);
   ice::Node::registerNodeCreator("Pos3D2RelativeToLandmark", &Pos3D2RelativeToLandmark::createNode);
   ice::Node::registerNodeCreator("RelativeToLandmark2Pos3D", &RelativeToLandmark2Pos3D::createNode);
+  ice::Node::registerNodeCreator("PositionOrientation3D2Pos3D", &PositionOrientation3D2Pos3D::createNode);
   ice::Node::registerNodeCreator("FusePositions", &FusePositions::createNode);
 
   ice::Node::registerNodeCreator("DetectDangerZonesRemote", &DetectDangerZonesRemote::createNode);
@@ -173,6 +175,12 @@ void TBKnowledgeBase::init()
 
 
   // register marker sender
+  auto agentsMarkerSender = std::make_shared<RosMarkerSenderRTL>(this->shared_from_this(), visualization_msgs::Marker::CUBE);
+  agentsMarkerSender->setColor(0, 0, 0);
+  agentsMarkerSender->setSize(0.5, 0.5, 1.0);
+  agentsMarkerSender->init();
+  this->positionRobots->registerListenerSync(agentsMarkerSender);
+
   auto positionMarkerSender = std::make_shared<RosMarkerSenderPosOri>(this->shared_from_this(), visualization_msgs::Marker::CUBE);
   positionMarkerSender->setColor(0, 1, 0);
   positionMarkerSender->setSize(0.25, 0.25, 0.25);
@@ -185,6 +193,11 @@ void TBKnowledgeBase::init()
   victimMarkerSender->init();
   this->positionVictims->registerListenerSync(victimMarkerSender);
 
+  auto dangerMarkerSender = std::make_shared<RosMarkerSenderDangerZones>(this->shared_from_this(), visualization_msgs::Marker::SPHERE);
+  dangerMarkerSender->setColor(1, 0, 0);
+  dangerMarkerSender->setSize(1.0, 1.0, 1.0);
+  dangerMarkerSender->init();
+  this->dangerZones->registerListenerSync(dangerMarkerSender);
 }
 
 void TBKnowledgeBase::start()
@@ -203,44 +216,75 @@ std::string TBKnowledgeBase::getRobotName()
 
 std::string TBKnowledgeBase::makeRelativeToLandmark(double &x, double &y, double &z)
 {
-    auto eval = [x,y,z](std::shared_ptr<InformationElement<PositionOrientation3D>>& pos1,
-                       std::shared_ptr<InformationElement<PositionOrientation3D>>& pos2) {
-      double dist1 = sqrt((x - pos1->getInformation()->x)*(x - pos1->getInformation()->x) +
-                          (y - pos1->getInformation()->y)*(y - pos1->getInformation()->y) +
-                          (z - pos1->getInformation()->z)*(z - pos1->getInformation()->z));
-      double dist2 = sqrt((x - pos2->getInformation()->x)*(x - pos2->getInformation()->x) +
-                          (y - pos2->getInformation()->y)*(y - pos2->getInformation()->y) +
-                          (z - pos2->getInformation()->z)*(z - pos2->getInformation()->z));
+  auto eval = [x,y,z](std::shared_ptr<InformationElement<PositionOrientation3D>>& pos1,
+                     std::shared_ptr<InformationElement<PositionOrientation3D>>& pos2) {
+    double dist1 = sqrt((x - pos1->getInformation()->x)*(x - pos1->getInformation()->x) +
+                        (y - pos1->getInformation()->y)*(y - pos1->getInformation()->y) +
+                        (z - pos1->getInformation()->z)*(z - pos1->getInformation()->z));
+    double dist2 = sqrt((x - pos2->getInformation()->x)*(x - pos2->getInformation()->x) +
+                        (y - pos2->getInformation()->y)*(y - pos2->getInformation()->y) +
+                        (z - pos2->getInformation()->z)*(z - pos2->getInformation()->z));
 
-      return (dist2 < dist1);
-    };
+    return (dist2 < dist1);
+  };
 
-    auto result = this->positionLandmarks->getOptimal(eval);
+  auto result = this->positionLandmarks->getOptimal(eval);
 
-    if (result == nullptr)
-    {
-      _log->error("Position could not be transformation, no landmark found");
-      return "";
-    }
+  if (result == nullptr)
+  {
+    _log->error("Position could not be transformation, no landmark found");
+    return "";
+  }
 
-    auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(result->getInformation());
+  auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(result->getInformation());
 
-    if (landmark == nullptr)
-    {
-      _log->error("Position could not be transformation, landmark is not a PositionOrientation3D, '%v' generic",
-                  result->getInformation()->isGeneric());
-      return "";
-    }
+  if (landmark == nullptr)
+  {
+    _log->error("Position could not be transformation, landmark is not a PositionOrientation3D, '%v' generic",
+                result->getInformation()->isGeneric());
+    return "";
+  }
 
-    // translate
-    auto x1 = x - landmark->x;
-    auto y1 = y - landmark->y;
-    z = z - landmark->z;
+  // translate
+  auto x1 = x - landmark->x;
+  auto y1 = y - landmark->y;
+  z = z - landmark->z;
 
-    // rotate
-    x = cos(landmark->alpha) * x1 - sin(landmark->alpha) * y1;
-    y = sin(landmark->alpha) * x1 + cos(landmark->alpha) * y1;
+  // rotate
+  x = cos(landmark->alpha) * x1 - sin(landmark->alpha) * y1;
+  y = sin(landmark->alpha) * x1 + cos(landmark->alpha) * y1;
 
-    return result->getSpecification()->getEntity();
+  return result->getSpecification()->getEntity();
 }
+
+bool TBKnowledgeBase::makeGlobal(double &x, double &y, double &z, std::string &landmark)
+{
+  auto eval = [landmark](std::shared_ptr<InformationElement<PositionOrientation3D>>& element)
+  {
+    return landmark == element->getSpecification()->getEntity();
+  };
+
+  auto list = std::make_shared<std::vector<std::shared_ptr<InformationElement<PositionOrientation3D>>> >();
+  auto result = this->positionLandmarks->getFilteredList(list, eval);
+
+  if (list->size() != 1)
+  {
+    _log->error("Position could not be transformation, landmark '%v' is unknown", landmark);
+    return false;
+  }
+
+  auto landmarkPos = std::dynamic_pointer_cast<PositionOrientation3D>(list->at(0)->getInformation());
+
+  // rotate
+  double x1 = cos(-landmarkPos->alpha) * x - sin(-landmarkPos->alpha) * y;
+  double y1 = sin(-landmarkPos->alpha) * x + cos(-landmarkPos->alpha) * y;
+
+  // translate
+  x = x1 + landmarkPos->x;
+  y = y1 + landmarkPos->y;
+  z = z + landmarkPos->z;
+
+  return true;
+}
+
 } /* namespace ice */

@@ -37,6 +37,7 @@ public:
 
   std::string getRobotName();
   std::string makeRelativeToLandmark(double &x, double &y, double &z);
+  bool makeGlobal(double &x, double &y, double &z, std::string &landmark);
 
 public:
   std::shared_ptr<InformationStream<PositionOrientation3D>>     positionOwn;

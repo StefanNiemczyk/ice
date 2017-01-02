@@ -154,6 +154,12 @@
 
     <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#CircleSurface">
         <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#SurfaceRepresentation"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasDimension"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#SurfaceRadius"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -825,6 +831,26 @@
                     </owl:Restriction>
                 </owl:intersectionOf>
             </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3D -->
+
+    <owl:Class rdf:about="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3D">
+        <rdfs:subClassOf rdf:resource="http://vs.uni-kassel.de/Ice#TransformationNode"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasInput"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3DStream"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vs.uni-kassel.de/Ice#hasOutput"/>
+                <owl:someValuesFrom rdf:resource="http://vs.uni-kassel.de/TurtleBot#CoordinatePositionStream"/>
+            </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     
@@ -1713,6 +1739,7 @@
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeLeonardo"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#Pos3D2RelativeToLandmark"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#Pos3D2RelativeToLandmarkSet"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3D"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark2Pos3D"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark2Pos3DSet"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#TurtleBotReqSet"/>
@@ -1886,6 +1913,60 @@
     
 
 
+    <!-- http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3D -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3D">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3D"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DCppGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DAccuracyGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DCostGrounding"/>
+        <Ice:hasMetadata rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DDelayGrounding"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DAccuracyGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DAccuracyGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Accuracy"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeAccuracyMaxASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-5</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue2>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DCostGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DCostGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Cost"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeCostASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</Ice:hasMetadataValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DCppGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DCppGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#CppGrounding"/>
+        <Ice:hasConfiguration rdf:datatype="http://www.w3.org/2001/XMLSchema#string">isSet=false</Ice:hasConfiguration>
+        <Ice:hasGroundingValue rdf:datatype="http://www.w3.org/2001/XMLSchema#string">PositionOrientation3D2Pos3D</Ice:hasGroundingValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DDelayGrounding -->
+
+    <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3DDelayGrounding">
+        <rdf:type rdf:resource="http://vs.uni-kassel.de/Ice#Delay"/>
+        <Ice:hasGrounding rdf:resource="http://vs.uni-kassel.de/Ice#NodeDelayASPGrounding"/>
+        <Ice:hasMetadataValue rdf:datatype="http://www.w3.org/2001/XMLSchema#int">1</Ice:hasMetadataValue>
+        <Ice:hasMetadataValue2 rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</Ice:hasMetadataValue2>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://vs.uni-kassel.de/TurtleBot#Raphael -->
 
     <owl:NamedIndividual rdf:about="http://vs.uni-kassel.de/TurtleBot#Raphael">
@@ -1900,6 +1981,7 @@
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#LocalizeRaphael"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#Pos3D2RelativeToLandmark"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#Pos3D2RelativeToLandmarkSet"/>
+        <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D2Pos3D"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RaphaelPositionReqStream"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark2Pos3D"/>
         <Ice:isSystemOf rdf:resource="http://vs.uni-kassel.de/TurtleBot#RelativeToLandmark2Pos3DSet"/>

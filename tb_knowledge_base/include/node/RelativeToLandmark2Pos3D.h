@@ -20,6 +20,7 @@ class InformationSet;
 template <typename T>
 class InformationStream;
 class PositionOrientation3D;
+class TBKnowledgeBase;
 
 class RelativeToLandmark2Pos3D : public Node
 {
@@ -31,6 +32,7 @@ public:
   virtual ~RelativeToLandmark2Pos3D();
 
   int init();
+  int cleanUp();
 
   virtual std::string getClassName();
   virtual const int newEvent(std::shared_ptr<InformationElement<GContainer>> element,
@@ -42,12 +44,12 @@ private:
   static std::string REP_OUT;
 
 private:
+  std::shared_ptr<TBKnowledgeBase>                              tbKnowledgeBase;
   bool                                                          isSet;
   std::shared_ptr<InformationStream<GContainer>>                inStream;
   std::shared_ptr<InformationStream<GContainer>>                outStream;
   std::shared_ptr<InformationSet<GContainer>>                   inSet;
   std::shared_ptr<InformationSet<GContainer>>                   outSet;
-  std::shared_ptr<InformationSet<PositionOrientation3D>>        positionLandmarks;
 };
 
 } /* namespace ice */

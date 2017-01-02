@@ -21,9 +21,10 @@ namespace ice
 
 std::string DetectContaminatedAreas::POS_REP = "http://vs.uni-kassel.de/TurtleBot#ContaminatedArea";
 std::string DetectContaminatedAreas::POS_X = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#XCoordinate";
-std::string DetectContaminatedAreas::POS_Y = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#XCoordinate";
-std::string DetectContaminatedAreas::POS_Z = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#XCoordinate";
+std::string DetectContaminatedAreas::POS_Y = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#YCoordinate";
+std::string DetectContaminatedAreas::POS_Z = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#ZCoordinate";
 std::string DetectContaminatedAreas::POS_LANDMARK = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/TurtleBot#LandmarkId";
+std::string DetectContaminatedAreas::SUR_RADIUS = "http://vs.uni-kassel.de/TurtleBot#AreaSurface;http://vs.uni-kassel.de/TurtleBot#SurfaceRadius";
 
 std::shared_ptr<ice::Node> DetectContaminatedAreas::createNode()
 {
@@ -66,6 +67,7 @@ int DetectContaminatedAreas::init()
   this->pathY = this->representation->accessPath(POS_Y);
   this->pathZ = this->representation->accessPath(POS_Z);
   this->pathLandmark = this->representation->accessPath(POS_LANDMARK);
+  this->pathRadius = this->representation->accessPath(SUR_RADIUS);
 
   return 0;
 }
@@ -105,10 +107,13 @@ void DetectContaminatedAreas::onArea(const ttb_msgs::LogicalCamera& msg)
   if (landmark == "")
     return;
 
+  double radius = 3.5;//TODO(msg.size.xlength + msg.size.ylength) / 2.0;
+
   pos->set(this->pathX, &x);
   pos->set(this->pathY, &y);
   pos->set(this->pathZ, &z);
   pos->set(this->pathLandmark, &landmark);
+  pos->set(this->pathRadius, &radius);
 
   auto old = this->out->get(msg.modelName);
 
@@ -118,14 +123,14 @@ void DetectContaminatedAreas::onArea(const ttb_msgs::LogicalCamera& msg)
     double oldY = old->getInformation()->getValue<double>(this->pathY);
     double dist = (oldX - x) * (oldX - x) + (oldY - y) * (oldY - y);
 
-    if (dist < 0.25 * 0.25)
-      return;
+//    if (dist < 0.25 * 0.25)
+//      return;
 
-    _log->info("Landmark '%v' position updated to '%v/%v'", msg.modelName, x, y);
+    _log->info("Contaminated area '%v' position updated to '%v/%v'", msg.modelName, x, y);
   }
   else
   {
-    _log->info("Landmark '%v' added at position '%v/%v'", msg.modelName, x, y);
+    _log->info("Contaminated area '%v' added at position '%v/%v'", msg.modelName, x, y);
   }
 
 

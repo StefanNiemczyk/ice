@@ -55,6 +55,7 @@ add_library(${PROJECT_NAME}
   src/DetectVictims.cpp
   src/FusePositions.cpp
   src/Pos3D2RelativeToLandmark.cpp
+  src/PositionOrientation3D2Pos3D.cpp
   src/RelativeToLandmark2Pos3D.cpp
   src/TBLocalization.cpp
   

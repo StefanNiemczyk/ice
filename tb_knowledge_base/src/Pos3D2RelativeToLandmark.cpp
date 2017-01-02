@@ -87,7 +87,14 @@ int Pos3D2RelativeToLandmark::init()
   }
 
   auto e = this->engine.lock();
-  tbKnowledgeBase = std::dynamic_pointer_cast<TBKnowledgeBase>(e);
+  this->tbKnowledgeBase = std::dynamic_pointer_cast<TBKnowledgeBase>(e);
+
+  return 0;
+}
+
+int Pos3D2RelativeToLandmark::cleanUp()
+{
+  this->tbKnowledgeBase.reset();
 
   return 0;
 }

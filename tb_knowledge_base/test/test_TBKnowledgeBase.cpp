@@ -22,9 +22,10 @@
 #include "container/RTLandmark.h"
 
 std::string POS_X = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#XCoordinate";
-std::string POS_Y = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#XCoordinate";
-std::string POS_Z = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#XCoordinate";
+std::string POS_Y = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#YCoordinate";
+std::string POS_Z = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#ZCoordinate";
 std::string POS_LANDMARK = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/TurtleBot#LandmarkId";
+std::string SUR_RADIUS = "http://vs.uni-kassel.de/TurtleBot#AreaSurface;http://vs.uni-kassel.de/TurtleBot#SurfaceRadius";
 
 
 TEST(TBKnowledgeBase, leonardo)
@@ -340,17 +341,19 @@ TEST(TBKnowledgeBase, twoBots)
   auto factory = leonardo->getGContainerFactory();
 
   // wait some time to enable the engines to find each other
-  std::this_thread::sleep_for(std::chrono::milliseconds {6000});
+  std::this_thread::sleep_for(std::chrono::milliseconds {8000});
 
   // test processing
   ASSERT_TRUE((leonardo->positionOwn ? true : false));
   ASSERT_TRUE((leonardo->positionRobots ? true : false));
   ASSERT_TRUE((leonardo->positionVictims ? true : false));
   ASSERT_TRUE((leonardo->positionLandmarks ? true : false));
+  ASSERT_TRUE((leonardo->dangerZones ? true : false));
   ASSERT_TRUE((raphael->positionOwn ? true : false));
   ASSERT_TRUE((raphael->positionRobots ? true : false));
   ASSERT_TRUE((raphael->positionVictims ? true : false));
   ASSERT_TRUE((raphael->positionLandmarks ? true : false));
+  ASSERT_TRUE((raphael->dangerZones ? true : false));
 
 
   std::cout << std::endl << "---------------------------------------------------------------" << std::endl;
@@ -381,6 +384,13 @@ TEST(TBKnowledgeBase, twoBots)
   auto posLeornardo3 = streamStore->getStream<ice::RTLandmark>(&specPosLeonardo3);
   ASSERT_TRUE((posLeornardo3 ? true : false));
 
+  auto specPosRaphael = ice::InformationSpecification("http://vs.uni-kassel.de/TurtleBot#Raphael",
+                                                      "http://vs.uni-kassel.de/TurtleBot#TurtleBot",
+                                                      "http://vs.uni-kassel.de/Ice#Position",
+                                                      "http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
+  auto posRaphael = raphael->getKnowlegeBase()->streamStore->getStream<ice::PositionOrientation3D>(&specPosRaphael);
+  ASSERT_TRUE((posRaphael ? true : false));
+
   // landmarks
   auto landmarksSpec = ice::InformationSpecification("",
                                                "http://vs.uni-kassel.de/TurtleBot#Landmark",
@@ -404,8 +414,8 @@ TEST(TBKnowledgeBase, twoBots)
                                                "http://vs.uni-kassel.de/TurtleBot#RadioactiveArea",
                                                "http://vs.uni-kassel.de/TurtleBot#Area",
                                                "http://vs.uni-kassel.de/TurtleBot#ContaminatedArea");
-  auto radioactiveAreas = setStore->getSet<ice::GContainer>(&radioactiveAreasSpec);
-  ASSERT_TRUE((victims ? true : false));
+  auto radioactiveAreas = raphael->getKnowlegeBase()->setStore->getSet<ice::GContainer>(&radioactiveAreasSpec);
+  ASSERT_TRUE((radioactiveAreas ? true : false));
 
   // create landmarks
   auto landmark1 = factory->makeInstance<ice::PositionOrientation3D>("http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
@@ -436,6 +446,15 @@ TEST(TBKnowledgeBase, twoBots)
 
   posLeornardo->add(element);
 
+  auto element2 = factory->makeInstance<ice::PositionOrientation3D>("http://vs.uni-kassel.de/TurtleBot#PositionOrientation3D");
+
+  element2->alpha = 0;
+  element2->x = 200;
+  element2->y = 300;
+  element2->z = 0;
+
+  posRaphael->add(element2);
+
   // generate victim
   auto victim = factory->makeInstance<ice::Pos3D>("http://vs.uni-kassel.de/Ice#CoordinatePositionRep");
 
@@ -454,32 +473,32 @@ TEST(TBKnowledgeBase, twoBots)
   auto pathY = representation->accessPath(POS_Y);
   auto pathZ = representation->accessPath(POS_Z);
   auto pathLandmark = representation->accessPath(POS_LANDMARK);
+  auto pathRadius = representation->accessPath(SUR_RADIUS);
 
   ASSERT_TRUE((pathX ? true : false));
   ASSERT_TRUE((pathY ? true : false));
   ASSERT_TRUE((pathZ ? true : false));
   ASSERT_TRUE((pathLandmark ? true : false));
+  ASSERT_TRUE((pathRadius ? true : false));
 
   auto area = raphael->getGContainerFactory()->makeInstance(representation);
 
   double x = 10;
-  double y = 10;
-  double z = 10;
+  double y = 15;
+  double z = 20;
+  double r = 25;
   std::string landmark = "Landmark1";
 
   area->set(pathX, &x);
   area->set(pathY, &y);
   area->set(pathZ, &z);
   area->set(pathLandmark, &landmark);
+  area->set(pathRadius, &r);
 
   radioactiveAreas->add("area", area);
 
   // wait for processing
   std::this_thread::sleep_for(std::chrono::milliseconds {100});
-
-//  leonardo->getKnowlegeBase()->streamStore->print();
-//  raphael->getKnowlegeBase()->streamStore->print();
-//  leonardo->getNodeStore()->print();
 
   // check
   ASSERT_EQ(1, posLeornardo->getSize());
@@ -487,11 +506,10 @@ TEST(TBKnowledgeBase, twoBots)
   ASSERT_EQ(1, posLeornardo3->getSize());
   ASSERT_EQ(1, leonardo->positionOwn->getSize());
   ASSERT_EQ(3, leonardo->positionLandmarks->getSize());
-  ASSERT_EQ(1, leonardo->positionRobots->getSize());
+  ASSERT_EQ(2, leonardo->positionRobots->getSize());
   ASSERT_EQ(1, leonardo->positionVictims->getSize());
   ASSERT_EQ(1, leonardo->dangerZones->getSize());
   ASSERT_EQ(3, raphael->positionLandmarks->getSize());
-//  ASSERT_EQ(1, raphael->positionRobots->getSize());
   ASSERT_EQ(1, raphael->positionVictims->getSize());
 
   // check own pos
@@ -502,6 +520,11 @@ TEST(TBKnowledgeBase, twoBots)
   EXPECT_EQ(element->x, pos->getInformation()->x);
   EXPECT_EQ(element->y, pos->getInformation()->y);
   EXPECT_EQ(element->z, pos->getInformation()->z);
+
+  // check pos raphael
+  auto pos2 = leonardo->positionRobots->get("http://vs.uni-kassel.de/TurtleBot#Raphael");
+
+  ASSERT_TRUE((pos2 ? true : false));
 
   // check pos in set
   auto posSet = leonardo->positionRobots->get("http://vs.uni-kassel.de/TurtleBot#Leonardo");
@@ -541,9 +564,10 @@ TEST(TBKnowledgeBase, twoBots)
 
   ASSERT_TRUE((dangerZone ? true : false));
   EXPECT_EQ("Landmark1", dangerZone->getInformation()->getValue<std::string>(pathLandmark));
-  EXPECT_EQ(10.0, dangerZone->getInformation()->getValue<double>(pathX));
-  EXPECT_EQ(10.0, dangerZone->getInformation()->getValue<double>(pathY));
-  EXPECT_EQ(10.0, dangerZone->getInformation()->getValue<double>(pathZ));
+  EXPECT_EQ(x, dangerZone->getInformation()->getValue<double>(pathX));
+  EXPECT_EQ(y, dangerZone->getInformation()->getValue<double>(pathY));
+  EXPECT_EQ(z, dangerZone->getInformation()->getValue<double>(pathZ));
+  EXPECT_EQ(r, dangerZone->getInformation()->getValue<double>(pathRadius));
 
   leonardo->cleanUp();
   leonardo.reset();

@@ -88,8 +88,14 @@ int RelativeToLandmark2Pos3D::init()
   }
 
   auto e = this->engine.lock();
-  auto tbkb = std::dynamic_pointer_cast<TBKnowledgeBase>(e);
-  this->positionLandmarks = tbkb->positionLandmarks;
+  tbKnowledgeBase = std::dynamic_pointer_cast<TBKnowledgeBase>(e);
+
+  return 0;
+}
+
+int RelativeToLandmark2Pos3D::cleanUp()
+{
+  this->tbKnowledgeBase.reset();
 
   return 0;
 }
@@ -97,33 +103,22 @@ int RelativeToLandmark2Pos3D::init()
 const int RelativeToLandmark2Pos3D::newEvent(std::shared_ptr<InformationElement<GContainer>> element,
                            std::shared_ptr<InformationCollection> collection)
 {
-  auto info = std::dynamic_pointer_cast<RTLandmark>(element->getInformation());
+  auto input = std::dynamic_pointer_cast<RTLandmark>(element->getInformation());
 
-  auto eval = [info](std::shared_ptr<InformationElement<PositionOrientation3D>>& element) {
-    return info->landmark == element->getSpecification()->getEntity();
-  };
+  double x = input->x;
+  double y = input->y;
+  double z = input->z;
 
-  auto list = std::make_shared<std::vector<std::shared_ptr<InformationElement<PositionOrientation3D>>>>();
-  auto result = this->positionLandmarks->getFilteredList(list, eval);
-
-  if (list->size() != 1)
+  if (false == this->tbKnowledgeBase->makeGlobal(x, y, z, input->landmark))
   {
-    _log->error("Position could not be transformation, landmark '%v' is unknown", info->landmark);
     return 1;
   }
 
-  auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(list->at(0)->getInformation());
   auto instance = std::dynamic_pointer_cast<Pos3D>(this->gcontainerFactory->makeInstance(REP_OUT));
 
-  // rotate
-  instance->x = cos(-landmark->alpha) * info->x - sin(-landmark->alpha) * info->y;
-  instance->y = sin(-landmark->alpha) * info->x + cos(-landmark->alpha) * info->y;
-
-  // translate
-  instance->x += landmark->x;
-  instance->y += landmark->y;
-  instance->z = info->z + landmark->z;
-
+  instance->x = x;
+  instance->z = x;
+  instance->y = x;
 
   if (this->isSet)
     this->outSet->add(element->getSpecification()->getEntity(), instance);

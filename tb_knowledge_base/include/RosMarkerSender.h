@@ -84,6 +84,10 @@ public:
 
 protected:
   void publish(std::string name, double x, double y, double z, double rotation){
+    this->publish(name, x, y, z, this->scaleX, this->scaleY, this->scaleZ, rotation);
+  }
+
+  void publish(std::string name, double x, double y, double z, double scaleX, double scaleY, double scaleZ, double rotation){
     visualization_msgs::Marker marker;
     // Set the frame ID and timestamp.  See the TF tutorials for information on these.
     marker.header.frame_id = "/map";
@@ -110,9 +114,9 @@ protected:
     marker.pose.orientation.w = 1.0;
 
     // Set the scale of the marker -- 1x1x1 here means 1m on a side
-    marker.scale.x = this->scaleX;
-    marker.scale.y = this->scaleY;
-    marker.scale.z = this->scaleZ;
+    marker.scale.x = scaleX;
+    marker.scale.y = scaleY;
+    marker.scale.z = scaleZ;
 
     // Set the color -- be sure to set alpha to something non-zero!
     marker.color.r = this->red;
@@ -165,48 +169,95 @@ public:
   {
     RosMarkerSender<RTLandmark>::init();
 
-    std::shared_ptr<TBKnowledgeBase> e = std::dynamic_pointer_cast<TBKnowledgeBase>(this->engine.lock());
-    this->positionLandmarks = e->positionLandmarks;
-
     return 0;
   }
 
   const int newEvent(std::shared_ptr<InformationElement<RTLandmark>> element,
                                std::shared_ptr<InformationCollection> collection)
   {
+    if (this->engine.expired())
+      return 1;
+
+    std::shared_ptr<TBKnowledgeBase> e = std::dynamic_pointer_cast<TBKnowledgeBase>(this->engine.lock());
+    auto tbKnowledgeBase = std::dynamic_pointer_cast<TBKnowledgeBase>(e);
+
     auto info = std::dynamic_pointer_cast<RTLandmark>(element->getInformation());
 
-    auto eval = [info](std::shared_ptr<InformationElement<PositionOrientation3D>>& element) {
-      return info->landmark == element->getSpecification()->getEntity();
-    };
+    double x = info->x;
+    double y = info->y;
+    double z = info->z;
 
-    auto list = std::make_shared<std::vector<std::shared_ptr<InformationElement<PositionOrientation3D>>>>();
-    auto result = this->positionLandmarks->getFilteredList(list, eval);
-
-    if (list->size() != 1)
+    if (false == tbKnowledgeBase->makeGlobal(x, y, z, info->landmark))
     {
-      _log->error("Position could not be transformation, landmark '%v' is unknown", info->landmark);
       return 1;
     }
-
-    auto landmark = std::dynamic_pointer_cast<PositionOrientation3D>(list->at(0)->getInformation());
-
-    // rotate
-    double x = cos(-landmark->alpha) * info->x - sin(-landmark->alpha) * info->y;
-    double y = sin(-landmark->alpha) * info->x + cos(-landmark->alpha) * info->y;
-
-    // translate
-    x += landmark->x;
-    y += landmark->y;
-    double z = info->z + landmark->z;
 
     this->publish(element->getSpecification()->getEntity(), x, y, z, 0);
 
     return 0;
   }
+};
+
+class RosMarkerSenderDangerZones : public RosMarkerSender<GContainer>
+{
+public:
+  RosMarkerSenderDangerZones(std::weak_ptr<ICEngine> engine, uint32_t markerType) : RosMarkerSender(engine, markerType) {}
+
+
+  virtual int init()
+  {
+    RosMarkerSender<GContainer>::init();
+
+    auto tbKnowledgeBase = std::dynamic_pointer_cast<TBKnowledgeBase>(this->engine.lock());
+
+    auto representation = tbKnowledgeBase->getGContainerFactory()->getRepresentation("http://vs.uni-kassel.de/TurtleBot#CircleArea");
+
+    std::string px = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#XCoordinate";
+    std::string py = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#YCoordinate";
+    std::string pz = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/Ice#Position;http://vs.uni-kassel.de/Ice#ZCoordinate";
+    std::string pl = "http://vs.uni-kassel.de/TurtleBot#AreaCenter;http://vs.uni-kassel.de/TurtleBot#LandmarkId";
+    std::string sr = "http://vs.uni-kassel.de/TurtleBot#AreaSurface;http://vs.uni-kassel.de/TurtleBot#SurfaceRadius";
+    this->pathX = representation->accessPath(px);
+    this->pathY = representation->accessPath(py);
+    this->pathZ = representation->accessPath(pz);
+    this->pathLandmark = representation->accessPath(pl);
+    this->pathRadius = representation->accessPath(sr);
+
+    return 0;
+  }
+
+  const int newEvent(std::shared_ptr<InformationElement<GContainer>> element,
+                               std::shared_ptr<InformationCollection> collection)
+  {
+    if (this->engine.expired())
+      return 1;
+
+    std::shared_ptr<TBKnowledgeBase> e = std::dynamic_pointer_cast<TBKnowledgeBase>(this->engine.lock());
+    auto tbKnowledgeBase = std::dynamic_pointer_cast<TBKnowledgeBase>(e);
+
+    double x = element->getInformation()->getValue<double>(this->pathX);
+    double y = element->getInformation()->getValue<double>(this->pathY);
+    double z = element->getInformation()->getValue<double>(this->pathZ);
+    std::string landmark = element->getInformation()->getValue<std::string>(this->pathLandmark);
+    double radius = element->getInformation()->getValue<double>(this->pathRadius);
+
+    if (false == tbKnowledgeBase->makeGlobal(x, y, z, landmark))
+    {
+      return 1;
+    }
+
+    this->publish(element->getSpecification()->getEntity(), x, y, z, 2*radius, 2*radius, 0.5, 0);
+
+    return 0;
+  }
 
 private:
-  std::shared_ptr<InformationSet<PositionOrientation3D>>        positionLandmarks;
+  std::shared_ptr<Representation>       representation;
+  std::vector<int>*                     pathX;
+  std::vector<int>*                     pathY;
+  std::vector<int>*                     pathZ;
+  std::vector<int>*                     pathLandmark;
+  std::vector<int>*                     pathRadius;
 };
 } /* namespace ice */
 
