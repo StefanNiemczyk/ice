@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <name>ice_expressions</name>
+  <version>0.0.0</version>
+  <description>The tb_expressions package</description>
+
+  <maintainer email="phileas@fogglabs.de">Phileas Vöcking</maintainer>
+
+  <license>MIT</license>
+
+  <author email="phileas@fogglabs.de">Phileas Vöcking</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>alica_engine</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>message_generation</build_depend>
+
+  <run_depend>alica_engine</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>message_generation</run_depend>
+
+  <export>
+  </export>
+</package>

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package>
+  <name>ice_base</name>
+  <version>0.0.0</version>
+  <description>The ice_base package</description>
+
+  <maintainer email="phileas@fogglabs.de">Phileas Vöcking</maintainer>
+
+  <license>MIT</license>
+
+  <author email="phileas@fogglabs.de">Phileas Vöcking</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>alica_engine</build_depend>
+  <build_depend>ice_expressions</build_depend>
+  <build_depend>roscpp</build_depend>
+
+  <run_depend>alica_engine</run_depend>
+  <run_depend>ice_expressions</run_depend>
+  <run_depend>roscpp</run_depend>
+
+  <export>
+  </export>
+  
+</package>
