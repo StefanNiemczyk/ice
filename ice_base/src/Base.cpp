@@ -15,8 +15,6 @@
 #include "clock/AlicaROSClock.h"
 #include "communication/AlicaRosCommunication.h"
 #include "SigFault.h"
-#include "SolverType.h"
-#include <alica_asp_solver/ASPSolver.h>
 
 using namespace std;
 
@@ -33,8 +31,6 @@ namespace ice
 		ae->setIAlicaClock(new alicaRosProxy::AlicaROSClock());
 		ae->setCommunicator(new alicaRosProxy::AlicaRosCommunication(ae));
 
-		auto solver = new alica::reasoner::ASPSolver(ae, args);
-		ae->addSolver(SolverType::ASPSOLVER, solver);
 		ae->init(bc, cc, uc, crc, roleSetName, masterPlanName, roleSetDir, false);
 	}
 
@@ -55,7 +51,7 @@ namespace ice
 		delete crc;
 	}
 
-} /* namespace ttb */
+} /* namespace ice */
 
 void printUsage(const char *str)
 {
@@ -102,7 +98,7 @@ int main(int argc, char** argv)
 	}
 	if (masterplan.size() == 0 || rolesetdir.size() == 0)
 	{
-		printUsage();
+		printUsage(argv[0]);
 		return 0;
 	}
 	cout << "\tMasterplan is:       \"" << masterplan << "\"" << endl;
@@ -110,7 +106,7 @@ int main(int argc, char** argv)
 	cout << "\tRolset is:           \"" << (roleset.empty() ? "Default" : roleset) << "\"" << endl;
 
 	cout << "\nConstructing Base ..." << endl;
-	ice::Base* base = new ttb::Base(roleset, masterplan, rolesetdir);
+	ice::Base* base = new ice::Base(roleset, masterplan, rolesetdir);
 
 	cout << "\nStarting Base ..." << endl;
 	base->start();

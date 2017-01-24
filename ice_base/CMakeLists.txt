@@ -14,6 +14,7 @@ set(CMAKE_CXX_FLAGS "-rdynamic -g -fnon-call-exceptions -ggdb ${CMAKE_CXX_FLAGS}
 find_package(catkin REQUIRED COMPONENTS 
   roscpp 
   alica_engine 
+  alica_ros_proxy
   ice_expressions 
 )
 
