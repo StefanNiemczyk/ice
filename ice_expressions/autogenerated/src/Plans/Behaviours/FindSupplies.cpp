@@ -2,6 +2,7 @@ using namespace std;
 #include "Plans/Behaviours/FindSupplies.h"
 
 /*PROTECTED REGION ID(inccpp1484927578806) ENABLED START*/ //Add additional includes here
+#include <iostream>
 /*PROTECTED REGION END*/
 namespace alica
 {
@@ -21,6 +22,13 @@ namespace alica
     void FindSupplies::run(void* msg)
     {
         /*PROTECTED REGION ID(run1484927578806) ENABLED START*/ //Add additional options here
+		static int i = 0;
+		std::cout << "Finding Supplies i = " << i << std::endl;
+		if (i > 100) {
+			this->setSuccess(true);
+		} else {
+			i++;
+		}
         /*PROTECTED REGION END*/
     }
     void FindSupplies::initialiseParameters()

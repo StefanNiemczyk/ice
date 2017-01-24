@@ -2,10 +2,12 @@ using namespace std;
 #include "Plans/Behaviours/DoStuff.h"
 
 /*PROTECTED REGION ID(inccpp1484927143799) ENABLED START*/ //Add additional includes here
+#include <iostream>
 /*PROTECTED REGION END*/
 namespace alica
 {
     /*PROTECTED REGION ID(staticVars1484927143799) ENABLED START*/ //initialise static variables here
+
     /*PROTECTED REGION END*/
     DoStuff::DoStuff() :
             DomainBehaviour("DoStuff")
@@ -21,6 +23,12 @@ namespace alica
     void DoStuff::run(void* msg)
     {
         /*PROTECTED REGION ID(run1484927143799) ENABLED START*/ //Add additional options here
+		static int i = 0;
+		std::cout << "Doing Stuff on i = " << i << std::endl;
+		i++;
+		if (i > 20) {
+
+		}
         /*PROTECTED REGION END*/
     }
     void DoStuff::initialiseParameters()
