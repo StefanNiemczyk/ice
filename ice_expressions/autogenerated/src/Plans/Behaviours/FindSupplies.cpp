@@ -1,5 +1,5 @@
-using namespace std;
 #include "Plans/Behaviours/FindSupplies.h"
+#include <container/PositionOrientation3D.h>
 
 /*PROTECTED REGION ID(inccpp1484927578806) ENABLED START*/ //Add additional includes here
 #include <iostream>
@@ -22,18 +22,13 @@ namespace alica
     void FindSupplies::run(void* msg)
     {
         /*PROTECTED REGION ID(run1484927578806) ENABLED START*/ //Add additional options here
-        static int i = 0;
-		printf("FindSupplies!!!\n");
-        std::cout << "Finding Supplies i = " << i << std::endl;
-        if (i > 100)
-        {
-            this->setSuccess(true);
-        }
-        else
-        {
-            i++;
-        }
-        /*PROTECTED REGION END*/
+ 		auto pos = this->kb->positionOwn->getLast()->getInformation();
+		printf("My position is: \n");
+		pos->print(1);
+
+		// TODO: Check if at landmark
+
+       /*PROTECTED REGION END*/
     }
     void FindSupplies::initialiseParameters()
     {

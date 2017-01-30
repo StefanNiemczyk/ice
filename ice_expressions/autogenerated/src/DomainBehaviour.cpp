@@ -5,6 +5,7 @@ namespace alica
     DomainBehaviour::DomainBehaviour(string name) :
             BasicBehaviour(name)
     {
+			this->kb = ice::getTBKB("leonardo");
     }
 
     DomainBehaviour::~DomainBehaviour()
