@@ -1,0 +1,9 @@
+START:	1485346750558
+AVG-RT:	1.037000
+CUR-RT:	1.037962
+REASON:	Init	PAlloc(ProvideSupplies in State FindSupplies)
+TeamSize:	1 TeamMember:	2
+LocalTree:	DefaultTask	FindSupplies	-1	BasicBehaviour	FindSupplies	-2
+ASS 1484927081537 ProvideSupplies:	DefaultTask 2 
+OtherTrees:
+END

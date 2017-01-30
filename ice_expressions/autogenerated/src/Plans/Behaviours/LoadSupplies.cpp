@@ -21,6 +21,7 @@ namespace alica
     void LoadSupplies::run(void* msg)
     {
         /*PROTECTED REGION ID(run1484927595866) ENABLED START*/ //Add additional options here
+		printf("Test");
         /*PROTECTED REGION END*/
     }
     void LoadSupplies::initialiseParameters()

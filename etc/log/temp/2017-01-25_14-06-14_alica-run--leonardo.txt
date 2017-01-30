@@ -1,0 +1,9 @@
+START:	1485349574444
+AVG-RT:	0.983000
+CUR-RT:	0.983863
+REASON:	Init	Transition(ProvideSupplies to State LoadSupplies)	PAlloc(ProvideSupplies in State LoadSupplies)
+TeamSize:	1 TeamMember:	2
+LocalTree:	DefaultTask	LoadSupplies	-1	BasicBehaviour	LoadSupplies	-2
+ASS 1484927081537 ProvideSupplies:	DefaultTask 2 
+OtherTrees:
+END

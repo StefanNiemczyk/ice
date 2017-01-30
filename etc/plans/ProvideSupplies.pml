@@ -34,7 +34,7 @@
     <inState>#1484927371709</inState>
     <outState>#1484927333656</outState>
   </transitions>
-  <transitions id="1484927398698" name="MISSING_NAME" comment="" msg="">
+  <transitions id="1484927398698" name="toLoadSupplies" comment="toLoadSupplies" msg="toLoadSupplies">
     <preCondition id="1484927401848" name="MISSING_NAME" comment="" conditionString="" pluginName="DefaultPlugin" enabled="true"/>
     <inState>#1484927333656</inState>
     <outState>#1484927341401</outState>

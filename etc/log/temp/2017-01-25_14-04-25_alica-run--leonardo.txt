@@ -1,0 +1,9 @@
+START:	1485349465568
+AVG-RT:	0.999000
+CUR-RT:	0.999736
+REASON:	Init	Transition(ProvideSupplies to State LoadSupplies)	Transition(ProvideSupplies to State FindVictim)	PAlloc(ProvideSupplies in State FindVictim)
+TeamSize:	1 TeamMember:	2
+LocalTree:	DefaultTask	FindVictim	-1	BasicBehaviour	FindVictim	-2
+ASS 1484927081537 ProvideSupplies:	DefaultTask 2 
+OtherTrees:
+END

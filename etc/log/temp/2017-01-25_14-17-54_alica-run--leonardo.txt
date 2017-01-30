@@ -1,0 +1,18 @@
+START:	1485350274463
+AVG-RT:	1.052000
+CUR-RT:	1.052343
+REASON:	Init	PAlloc(ProvideSupplies in State FindSupplies)
+TeamSize:	1 TeamMember:	2
+LocalTree:	DefaultTask	FindSupplies	-1	BasicBehaviour	FindSupplies	-2
+ASS 1484927081537 ProvideSupplies:	DefaultTask 2 
+OtherTrees:
+END
+START:	1485350277836
+AVG-RT:	0.187554
+CUR-RT:	0.314924
+REASON:	Transition(ProvideSupplies to State LoadSupplies)	PAlloc(ProvideSupplies in State LoadSupplies)
+TeamSize:	1 TeamMember:	2
+LocalTree:	DefaultTask	LoadSupplies	-1	BasicBehaviour	LoadSupplies	-2
+ASS 1484927081537 ProvideSupplies:	DefaultTask 2 
+OtherTrees:
+END
