@@ -5,7 +5,9 @@
 #include <TBKnowledgeBase.h>
 
 namespace ice {
-	TBKnowledgeBase *getTBKB(std::string robotName);
+
+std::shared_ptr<TBKnowledgeBase> getTBKB(std::string robotName);
+
 }
 
 #endif // GETTBKB_H_   
