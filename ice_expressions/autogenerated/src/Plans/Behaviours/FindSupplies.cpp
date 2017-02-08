@@ -22,10 +22,9 @@ namespace alica
     void FindSupplies::run(void* msg)
     {
         /*PROTECTED REGION ID(run1484927578806) ENABLED START*/ //Add additional options here
- 		auto pos = this->kb->positionOwn->getLast()->getInformation();
-		printf("My position is: \n");
-		pos->print(1);
-
+		auto pos = this->kb->positionOwn;
+		auto sz = pos->getSize();
+		printf("sz: %d\n", sz);
 		// TODO: Check if at landmark
 
        /*PROTECTED REGION END*/

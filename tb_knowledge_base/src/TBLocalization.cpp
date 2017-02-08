@@ -30,6 +30,7 @@ std::shared_ptr<ice::Node> TBLocalization::createNode()
 TBLocalization::TBLocalization()
 {
   //
+  puts("TBLocalization CREATED!");
 }
 
 TBLocalization::~TBLocalization()
@@ -55,8 +56,11 @@ int TBLocalization::init()
   }
 
   auto e = std::dynamic_pointer_cast<TBKnowledgeBase>(this->engine.lock());
+  std::string topic = e->getRobotName() + "/amcl_pose";
 
-  this->subscriber = e->nodeHandel.subscribe("amcl_pose", 10, &TBLocalization::onPosition, this);
+  printf("listening on topic %s\n", topic.c_str());
+
+  this->subscriber = e->nodeHandel.subscribe(topic, 10, &TBLocalization::onPosition, this);
   this->out = std::static_pointer_cast<ice::InformationStream<PositionOrientation3D>>(this->outputs[0]);
 
   return 0;
